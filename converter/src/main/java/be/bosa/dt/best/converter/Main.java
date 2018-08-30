@@ -23,17 +23,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.unzip;
+package be.bosa.dt.best.converter;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
+import be.bosa.dt.best.converter.reader.BestReader;
 import java.nio.file.Paths;
-
-import java.util.zip.ZipFile;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -41,7 +34,6 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.IOUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,17 +46,20 @@ import org.slf4j.LoggerFactory;
  */
 public class Main {
 	private final static Logger LOG = LoggerFactory.getLogger(Main.class);
-		
+	
 	private final static Options OPTS = new Options()
-		.addRequiredOption("i", "infile", true, "zipped file")
-		.addRequiredOption("o", "outdir", true, "output directory");
-
+		.addRequiredOption("i", "indir", true, "input directory")
+		.addOption("o", "outdir", true, "output directory")
+		.addOption("B", "Brussels", false, "process files for Brussels")
+		.addOption("F", "Flanders", false, "process files for Flanders")
+		.addOption("W", "Wallonia", false, "process files for Wallonia");
+	
 	/**
 	 * Print help info
 	 */
 	private static void printHelp() {
 		HelpFormatter fmt = new HelpFormatter();
-		fmt.printHelp("unzip BeST zip files", OPTS);
+		fmt.printHelp("BeST converters", OPTS);
 	}
 	
 	/**
@@ -84,60 +79,6 @@ public class Main {
 	}
 	
 	/**
-	 * Unzip a zip file into a directory
-	 * 
-	 * @param pin input file
-	 * @param pout output directory
-	 */
-	private static void unzip(Path pin, Path pout) {
-		try (ZipFile zip = new ZipFile(pin.toFile())) {
-			zip.stream().forEach(f -> {
-				String name = f.getName();
-				Path p = Paths.get(pout.toString(), name);
-				LOG.info("Unzipping {}", p);
-				
-				try (InputStream is = zip.getInputStream(f);
-					OutputStream os = Files.newOutputStream(p)) {
-					IOUtils.copyLarge(is, os);
-					if (name.endsWith("zip")) { // zip within zip
-						unzip(p, pout);
-						Files.delete(p);
-					}
-				} catch (IOException e) {
-					LOG.error("Error extracting {}", p);
-				}
-			});
-		} catch (IOException ioe) {
-			LOG.error("Error extracting {}", pin.toFile());
-		}
-	}
-	
-	/**
-	 * Perform some quick checks and unzip, exit on error
-	 * 
-	 * @param infile zip input file
-	 * @param outdir output directory
-	 */
-	private static void checkUnzip(String infile, String outdir) {
-		if (! infile.toLowerCase().endsWith("zip")) {
-			LOG.error("Not a zip file");
-			System.exit(-2);
-		}
-		Path pin = Paths.get(infile);
-		if (! (Files.exists(pin) && Files.isRegularFile(pin))) {
-			LOG.error("Could not find input file");
-			System.exit(-3);
-		}
-		
-		Path pout = Paths.get(outdir);
-		if (! (Files.exists(pout) && Files.isDirectory(pout))) {
-			LOG.error("Could not find output directory");
-			System.exit(-4);
-		}
-		unzip(pin, pout);
-	}
-	
-	/**
 	 * Main
 	 * 
 	 * @param args 
@@ -147,10 +88,14 @@ public class Main {
 		if (cli == null) {
 			System.exit(-1);
 		}
-
-		String infile = cli.getOptionValue("i");
-		String outdir = cli.getOptionValue("o");
-
-		checkUnzip(infile, outdir);	
+		
+		String indir = cli.getOptionValue("i");
+		String outdir = cli.getOptionValue(indir, indir);
+		
+		for (BestReader.Region r: BestReader.Region.values()) {
+			if (cli.hasOption(r.getCode())) {
+				process(r, Paths.get(indir), Paths.get(outdir));
+			}
+		}
 	}
 }
