@@ -62,4 +62,6 @@ public interface BestReader<T> {
 	 * @return a stream of BeSt objects
 	 */
 	public Stream<T> read(Region region, Path indir);
+	
+	public String getSuffix();
 }

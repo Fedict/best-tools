@@ -69,4 +69,7 @@ public class Streetname {
 	public void setName(String name, String lang) {
 		this.names.put(lang, name);
 	}
+	
+	public Streetname() {
+	}
 }

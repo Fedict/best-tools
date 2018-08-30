@@ -25,18 +25,50 @@
  */
 package be.bosa.dt.best.converter.reader;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.Spliterators;
+import java.util.logging.Level;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * BeST XML file processor interface
  * 
  * @author Bart Hanssens
- * 
  * @param <T>
  */
 public abstract class AbstractReader<T> implements BestReader {
+	public final String TNS = "http://fsb.belgium.be/mappingservices/FullDownload/v1_00";
+	public final String ADD = "http://vocab.belgif.be/ns/inspire/";
+	
+	private final XMLInputFactory FAC = XMLInputFactory.newInstance();
+	
+	private final Logger LOG = LoggerFactory.getLogger(AbstractReader.class);
+	
+	/**
+	 * Check if there is a file for a region.
+	 * File names should follow the pattern "Region""Suffix""...""ext"
+	 * 
+	 * @param indir input directory
+	 * @param region region
+	 * @param suffix 
+	 * @param ext file extension
+	 * @return path to file
+	 * @throws IOException when no matching file was found 
+	 */
 	protected Path checkFile(Path indir, Region region, String suffix, String ext) throws IOException {
 		String start = (region.getName() + suffix).toLowerCase();
 		
@@ -49,5 +81,43 @@ public abstract class AbstractReader<T> implements BestReader {
 			return xml;
 		}
 		throw new IOException("File not readable");
+	}
+	
+	protected abstract Iterator<T> getIterator(XMLStreamReader reader);
+	
+	protected void closeReader(XMLStreamReader reader) {
+		if (reader != null) {
+			try {
+				reader.close();
+			} catch (XMLStreamException xse) {
+				LOG.warn("Failed to close XML reader", xse);
+			}
+		}
+	}
+	
+	@Override
+	public Stream<T> read(Region region, Path indir) {
+		Path file;
+		
+		try {
+			file = checkFile(indir, region, getSuffix(), "xml");
+		} catch (IOException ex) {
+			LOG.error("Error, no XML file found for {} in {}", region.getName(), indir);
+			return Stream.empty();
+		}	
+		LOG.info("Reading {}", file);
+		
+		XMLStreamReader reader = null;
+		
+		try (	InputStream is = Files.newInputStream(file);
+				BufferedInputStream bis = new BufferedInputStream(is)) {
+			reader = FAC.createXMLStreamReader(bis);
+			Iterator<T> iter = getIterator(reader);
+			return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, 0), true);
+		} catch (IOException|XMLStreamException ex) {
+			LOG.error("Error parsing XML", ex);
+			closeReader(reader);
+			return Stream.empty();
+		}
 	}
 }

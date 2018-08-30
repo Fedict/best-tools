@@ -26,6 +26,7 @@
 package be.bosa.dt.best.converter;
 
 import be.bosa.dt.best.converter.reader.BestReader;
+import be.bosa.dt.best.converter.reader.StreetnameReader;
 import java.nio.file.Paths;
 
 import org.apache.commons.cli.CommandLine;
@@ -94,7 +95,8 @@ public class Main {
 		
 		for (BestReader.Region r: BestReader.Region.values()) {
 			if (cli.hasOption(r.getCode())) {
-				process(r, Paths.get(indir), Paths.get(outdir));
+				LOG.info("Region {}", r.getName());
+				new StreetnameReader().read(r, Paths.get(indir));
 			}
 		}
 	}

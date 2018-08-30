@@ -25,27 +25,50 @@
  */
 package be.bosa.dt.best.converter.reader;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.stream.Stream;
+import be.bosa.dt.best.converter.dao.Streetname;
+import java.util.Iterator;
+import java.util.function.Consumer;
+import javax.xml.stream.XMLStreamReader;
+	
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * BeST XML file processor interface
  * 
  * @author Bart Hanssens
- * @param <Streetname> streetname objects
  */
-public class StreetnameReader<Streetname> extends AbstractReader {
-	private final static Logger LOG = LoggerFactory.getLogger(StreetnameReader.class);
+public class StreetnameReader extends AbstractReader<Streetname> {
+	public final static String POSTAL_INFO = "PostalInfo";
+	
+	private Streetname obj;
+	
+	private final Logger LOG = LoggerFactory.getLogger(StreetnameReader.class);
 	
 	@Override
-	public Stream<Streetname> read(Region region, Path indir) {
-		try {
-			checkFile(indir, region, "Streetname", "xml");
-		} catch (IOException ex) {
-			return Stream.empty();
-		}
+	public String getSuffix() {
+		return "Streetname";
+	}
+	
+	@Override
+	protected Iterator<Streetname> getIterator(XMLStreamReader reader) {
+		return new Iterator<Streetname>() {			
+			@Override
+			public boolean hasNext() {
+				throw new UnsupportedOperationException("Not supported yet.");
+			}
+
+			@Override
+			public void forEachRemaining(Consumer<? super Streetname> cnsmr) {
+				Iterator.super.forEachRemaining(cnsmr); 
+			}
+
+			@Override
+			public Streetname next() {
+				throw new UnsupportedOperationException("Not supported yet."); 
+			}
+		};
 	}
 }
