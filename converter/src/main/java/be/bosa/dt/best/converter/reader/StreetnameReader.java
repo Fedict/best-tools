@@ -53,22 +53,49 @@ public class StreetnameReader extends AbstractXMLReader<Streetname> {
 	private final static QName STATUS = new QName(AbstractXMLReader.ADD, "status");
 	private final static QName STREETNAME = new QName(AbstractXMLReader.TNS, "Streetname");
 	
-	private final Logger LOG = LoggerFactory.getLogger(StreetnameReader.class);
-
+	private final static Logger LOG = LoggerFactory.getLogger(StreetnameReader.class);
+	
+	@Override
+	protected void start(XMLEventReader reader) throws XMLStreamException {
+		while(reader.hasNext()) {
+			XMLEvent peek = reader.peek();
+			if (peek.isStartElement()) {
+				QName el = peek.asStartElement().getName();
+				if (el.equals(STREETNAME)) {
+					return;
+				}
+			}
+			reader.nextEvent();
+		}
+	}
 	
 	@Override
 	protected Streetname getNextObj(XMLEventReader reader) throws XMLStreamException {
 		Streetname obj = null;
+		String lang = "";
 		
 		while(reader.hasNext()) {
-			XMLEvent event = reader.nextTag();
+			XMLEvent event = reader.nextEvent();
 			if (event.isStartElement()) {
 				QName el = event.asStartElement().getName();
 				if (el.equals(STREETNAME)) {
 					obj = new Streetname();
-				}
-				if (el.equals(NAMESPACE)) {
-					
+				} else if (obj != null) {
+					if (el.equals(NAMESPACE)) {
+						String txt = reader.getElementText();
+						obj.setNamespace(txt);
+					}
+					if (el.equals(OBJECTID)) {
+						String txt = reader.getElementText();
+						obj.setId(txt);
+					}
+					if (el.equals(LANGUAGE)) {
+						lang = reader.getElementText();
+					}
+					if (el.equals(SPELLING)) {
+						String txt = reader.getElementText();
+						obj.setName(txt, lang);
+					}
 				}
 			}
 			if (event.isEndElement() && event.asEndElement().getName().equals(STREETNAME)) {

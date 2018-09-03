@@ -38,7 +38,6 @@ import java.util.stream.Stream;
  * @author Bart Hanssens
  */
 public interface BestWriter {
-	
 	/**
 	 * Process the input file and return a stream of BeSt objects
 	 * 
@@ -46,9 +45,17 @@ public interface BestWriter {
 	 * @param outdir
 	 * @param streetnames
 	 */
-	public void writeStreetNames(BestRegion region, Path outdir, Stream<Streetname> streetnames);
+	public void writeStreets(BestRegion region, Path outdir, Stream<Streetname> streetnames);
 	//public void writeAddresses(Region region, Path outdir, Stream<Address> addresses);
 	
+	/**
+	 * 
+	 * @param outdir
+	 * @param region
+	 * @param suffix
+	 * @param ext
+	 * @return 
+	 */
 	public static Path getPath(Path outdir, BestRegion region, String suffix, String ext) {
 		return Paths.get(outdir.toString(), region.getName() + suffix + "." + ext);
 	}

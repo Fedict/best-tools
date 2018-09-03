@@ -35,28 +35,34 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * BeST result file writer interface
  * 
  * @author Bart Hanssens
  */
 public class BestWriterCSV implements BestWriter {
+	private final static Logger LOG = LoggerFactory.getLogger(BestWriterCSV.class);
 	
 	/**
 	 * Process the input file and return a stream of BeSt objects
 	 * 
 	 * @param region
 	 * @param outdir
-	 * @param streetnames
+	 * @param streets
 	 */
 	@Override
-	public void writeStreetNames(BestRegion region, Path outdir, Stream<Streetname> streetnames) {
+	public void writeStreets(BestRegion region, Path outdir, Stream<Streetname> streets) {
 		Path p = BestWriter.getPath(outdir, region, "Street", "csv");
+		LOG.info("Writing {}", p);
+			
 		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(p))) {
 			String[] header = { "namespace", "id", "name_nl", "name_fr" };
 			w.writeNext(header);
 			
-			streetnames.forEach(s -> {
+			streets.forEach(s -> {
 				String[] line = { s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr") };
 				w.writeNext(line);
 			});
