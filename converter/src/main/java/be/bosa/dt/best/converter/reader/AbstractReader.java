@@ -25,20 +25,23 @@
  */
 package be.bosa.dt.best.converter.reader;
 
+import be.bosa.dt.best.converter.dao.BestRegion;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.logging.Level;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+
+import org.codehaus.stax2.XMLInputFactory2;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,12 +54,12 @@ import org.slf4j.LoggerFactory;
  * @param <T>
  */
 public abstract class AbstractReader<T> implements BestReader {
-	public final String TNS = "http://fsb.belgium.be/mappingservices/FullDownload/v1_00";
-	public final String ADD = "http://vocab.belgif.be/ns/inspire/";
+	public final static String TNS = "http://fsb.belgium.be/mappingservices/FullDownload/v1_00";
+	public final static String ADD = "http://vocab.belgif.be/ns/inspire/";
 	
-	private final XMLInputFactory FAC = XMLInputFactory.newInstance();
+	private final static XMLInputFactory2 FAC = (XMLInputFactory2) XMLInputFactory.newInstance();  
 	
-	private final Logger LOG = LoggerFactory.getLogger(AbstractReader.class);
+	private final static Logger LOG = LoggerFactory.getLogger(AbstractReader.class);
 	
 	/**
 	 * Check if there is a file for a region.
@@ -69,7 +72,7 @@ public abstract class AbstractReader<T> implements BestReader {
 	 * @return path to file
 	 * @throws IOException when no matching file was found 
 	 */
-	protected Path checkFile(Path indir, Region region, String suffix, String ext) throws IOException {
+	protected Path checkFile(Path indir, BestRegion region, String suffix, String ext) throws IOException {
 		String start = (region.getName() + suffix).toLowerCase();
 		
 		Path xml = Files.list(indir).filter(p -> {
@@ -83,20 +86,55 @@ public abstract class AbstractReader<T> implements BestReader {
 		throw new IOException("File not readable");
 	}
 	
-	protected abstract Iterator<T> getIterator(XMLStreamReader reader);
-	
-	protected void closeReader(XMLStreamReader reader) {
+	/**
+	 * Gracefully close the XML reader
+	 * 
+	 * @param reader 
+	 */
+	public static void closeReader(XMLEventReader reader) {
 		if (reader != null) {
 			try {
 				reader.close();
 			} catch (XMLStreamException xse) {
-				LOG.warn("Failed to close XML reader", xse);
+				LOG.warn("Error closing reader", xse);
+				// do nothing
 			}
 		}
 	}
 	
+	protected abstract boolean hasNext(XMLEventReader reader) throws XMLStreamException;
+	
+	protected abstract T getNext(XMLEventReader reader) throws XMLStreamException;
+
+	
+	protected Iterator<T> getIterator(XMLEventReader reader) {
+		return new Iterator<T>() {	
+			@Override
+			public boolean hasNext() {
+				try {
+					return hasNext(reader);
+				} catch (XMLStreamException ex) {
+					LOG.error("Error peeking");
+					closeReader(reader);
+				}
+				return false;
+			}
+
+			@Override
+			public T next() {
+				try {
+					return getNext(reader);
+				} catch (XMLStreamException ex) {
+					LOG.error("Error parsing");
+					closeReader(reader);
+				}
+				return null;
+			}
+		};
+	}
+	
 	@Override
-	public Stream<T> read(Region region, Path indir) {
+	public Stream<T> read(BestRegion region, Path indir) {
 		Path file;
 		
 		try {
@@ -107,16 +145,19 @@ public abstract class AbstractReader<T> implements BestReader {
 		}	
 		LOG.info("Reading {}", file);
 		
-		XMLStreamReader reader = null;
+		FAC.configureForSpeed();
+		XMLEventReader reader = null;
 		
 		try (	InputStream is = Files.newInputStream(file);
 				BufferedInputStream bis = new BufferedInputStream(is)) {
-			reader = FAC.createXMLStreamReader(bis);
+			reader = FAC.createXMLEventReader(bis);
+  
 			Iterator<T> iter = getIterator(reader);
-			return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, 0), true);
+			Spliterator<T> split = Spliterators.spliteratorUnknownSize(iter, Spliterator.IMMUTABLE);
+			return StreamSupport.stream(split, true);
 		} catch (IOException|XMLStreamException ex) {
-			LOG.error("Error parsing XML", ex);
 			closeReader(reader);
+			LOG.error("Error parsing XML", ex);
 			return Stream.empty();
 		}
 	}

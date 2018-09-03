@@ -23,28 +23,32 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.converter.reader;
+package be.bosa.dt.best.converter.writer;
 
-import be.bosa.dt.best.converter.dao.BestRegion;
+import be.bosa.dt.best.converter.dao.Streetname;
+import be.bosa.dt.best.converter.reader.BestReader.Region;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 /**
- * BeST XML file processor interface
+ * BeST result file writer interface
  * 
  * @author Bart Hanssens
- * 
- * @param <T>
  */
-public interface BestReader<T> {
+public interface BestWriter {
+	
 	/**
 	 * Process the input file and return a stream of BeSt objects
 	 * 
 	 * @param region
-	 * @param indir
-	 * @return a stream of BeSt objects
+	 * @param outdir
+	 * @param streetnames
 	 */
-	public Stream<T> read(BestRegion region, Path indir);
+	public void writeStreetNames(Region region, Path outdir, Stream<Streetname> streetnames);
+	//public void writeAddresses(Region region, Path outdir, Stream<Address> addresses);
 	
-	public String getSuffix();
+	public static Path getPath(Path outdir, Region region, String suffix, String ext) {
+		return Paths.get(outdir.toString(), region.getName() + suffix + "." + ext);
+	}
 }

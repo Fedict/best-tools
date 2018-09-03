@@ -23,28 +23,51 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.converter.reader;
+package be.bosa.dt.best.converter.writer;
 
-import be.bosa.dt.best.converter.dao.BestRegion;
+import be.bosa.dt.best.converter.dao.Streetname;
+import be.bosa.dt.best.converter.reader.BestReader.Region;
+import com.opencsv.CSVWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Files;
+
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
 /**
- * BeST XML file processor interface
+ * BeST result file writer interface
  * 
  * @author Bart Hanssens
- * 
- * @param <T>
  */
-public interface BestReader<T> {
+public class BestWriterCSV implements BestWriter {
+	
 	/**
 	 * Process the input file and return a stream of BeSt objects
 	 * 
 	 * @param region
-	 * @param indir
-	 * @return a stream of BeSt objects
+	 * @param outdir
+	 * @param streetnames
 	 */
-	public Stream<T> read(BestRegion region, Path indir);
+	@Override
+	public void writeStreetNames(Region region, Path outdir, Stream<Streetname> streetnames) {
+		Path p = BestWriter.getPath(outdir, region, "Street", "csv");
+		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(p))) {
+			String[] header = { "namespace", "id", "name_nl", "name_fr" };
+			w.writeNext(header);
+			
+			streetnames.forEach(s -> {
+				String[] line = { s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr") };
+				w.writeNext(line);
+			});
+		} catch(IOException ioe) {
+		}
+	}
 	
-	public String getSuffix();
+	
+	public void writeAddresses(Region region, Path outdir, Stream<Address> addresses) {
+
+	}
+
 }

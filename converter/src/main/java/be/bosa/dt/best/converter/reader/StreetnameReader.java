@@ -26,11 +26,11 @@
 package be.bosa.dt.best.converter.reader;
 
 import be.bosa.dt.best.converter.dao.Streetname;
-import java.util.Iterator;
-import java.util.function.Consumer;
-import javax.xml.stream.XMLStreamReader;
-	
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
+	
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,10 +41,8 @@ import org.slf4j.LoggerFactory;
  * @author Bart Hanssens
  */
 public class StreetnameReader extends AbstractReader<Streetname> {
-	public final static String POSTAL_INFO = "PostalInfo";
-	
-	private Streetname obj;
-	
+	public final static QName POSTAL_INFO = new QName(AbstractReader.TNS, "PostalInfo");
+
 	private final Logger LOG = LoggerFactory.getLogger(StreetnameReader.class);
 	
 	@Override
@@ -53,22 +51,11 @@ public class StreetnameReader extends AbstractReader<Streetname> {
 	}
 	
 	@Override
-	protected Iterator<Streetname> getIterator(XMLStreamReader reader) {
-		return new Iterator<Streetname>() {			
-			@Override
-			public boolean hasNext() {
-				throw new UnsupportedOperationException("Not supported yet.");
-			}
-
-			@Override
-			public void forEachRemaining(Consumer<? super Streetname> cnsmr) {
-				Iterator.super.forEachRemaining(cnsmr); 
-			}
-
-			@Override
-			public Streetname next() {
-				throw new UnsupportedOperationException("Not supported yet."); 
-			}
-		};
+	protected Streetname getNext(XMLEventReader reader) throws XMLStreamException {
+		Streetname obj = new Streetname();
+		
+		moveTo(reader, POSTAL_INFO);
+		
+		return obj;
 	}
 }
