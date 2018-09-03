@@ -10,7 +10,7 @@ package be.bosa.dt.best.converter.dao;
  * 
  * @author Bart Hanssens
  */
-public enum BestTypes {
+public enum BestType {
 	ADDRESSES("Addresses"),
 	MUNICIPALITIES("Municipality"),
 	POSTALINFO("Postalinfo"),
@@ -18,7 +18,7 @@ public enum BestTypes {
 	
 	private final String name;
 		
-	BestTypes(String name) {
+	BestType(String name) {
 		this.name = name;
 	}
 

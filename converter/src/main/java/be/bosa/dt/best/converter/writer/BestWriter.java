@@ -25,8 +25,9 @@
  */
 package be.bosa.dt.best.converter.writer;
 
+import be.bosa.dt.best.converter.dao.BestRegion;
 import be.bosa.dt.best.converter.dao.Streetname;
-import be.bosa.dt.best.converter.reader.BestReader.Region;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
@@ -45,10 +46,10 @@ public interface BestWriter {
 	 * @param outdir
 	 * @param streetnames
 	 */
-	public void writeStreetNames(Region region, Path outdir, Stream<Streetname> streetnames);
+	public void writeStreetNames(BestRegion region, Path outdir, Stream<Streetname> streetnames);
 	//public void writeAddresses(Region region, Path outdir, Stream<Address> addresses);
 	
-	public static Path getPath(Path outdir, Region region, String suffix, String ext) {
+	public static Path getPath(Path outdir, BestRegion region, String suffix, String ext) {
 		return Paths.get(outdir.toString(), region.getName() + suffix + "." + ext);
 	}
 }

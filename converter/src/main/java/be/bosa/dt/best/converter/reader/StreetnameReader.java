@@ -25,11 +25,16 @@
  */
 package be.bosa.dt.best.converter.reader;
 
+import be.bosa.dt.best.converter.dao.BestRegion;
+import be.bosa.dt.best.converter.dao.BestType;
 import be.bosa.dt.best.converter.dao.Streetname;
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.XMLEvent;
 	
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,22 +45,47 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Bart Hanssens
  */
-public class StreetnameReader extends AbstractReader<Streetname> {
-	public final static QName POSTAL_INFO = new QName(AbstractReader.TNS, "PostalInfo");
-
+public class StreetnameReader extends AbstractXMLReader<Streetname> {
+	private final static QName LANGUAGE = new QName(AbstractXMLReader.ADD, "language");
+	private final static QName NAMESPACE = new QName(AbstractXMLReader.ADD, "namespace");
+	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");;
+	private final static QName SPELLING = new QName(AbstractXMLReader.ADD, "spelling");
+	private final static QName STATUS = new QName(AbstractXMLReader.ADD, "status");
+	private final static QName STREETNAME = new QName(AbstractXMLReader.TNS, "Streetname");
+	
 	private final Logger LOG = LoggerFactory.getLogger(StreetnameReader.class);
+
 	
 	@Override
-	public String getSuffix() {
-		return "Streetname";
+	protected Streetname getNextObj(XMLEventReader reader) throws XMLStreamException {
+		Streetname obj = null;
+		
+		while(reader.hasNext()) {
+			XMLEvent event = reader.nextTag();
+			if (event.isStartElement()) {
+				QName el = event.asStartElement().getName();
+				if (el.equals(STREETNAME)) {
+					obj = new Streetname();
+				}
+				if (el.equals(NAMESPACE)) {
+					
+				}
+			}
+			if (event.isEndElement() && event.asEndElement().getName().equals(STREETNAME)) {
+				return obj;
+			}
+		}
+		throw new XMLStreamException("Was expecting next object");
 	}
 	
-	@Override
-	protected Streetname getNext(XMLEventReader reader) throws XMLStreamException {
-		Streetname obj = new Streetname();
-		
-		moveTo(reader, POSTAL_INFO);
-		
-		return obj;
+	/**
+	 * Get a Java stream of streetnames
+	 * 
+	 * @param region region
+	 * @param indir input directory
+	 * @return 
+	 */
+	public Stream<Streetname> read(BestRegion region, Path indir) {
+		return read(region, BestType.STREETNAMES, indir);
 	}
 }

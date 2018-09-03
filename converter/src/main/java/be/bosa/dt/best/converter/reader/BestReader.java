@@ -26,6 +26,7 @@
 package be.bosa.dt.best.converter.reader;
 
 import be.bosa.dt.best.converter.dao.BestRegion;
+import be.bosa.dt.best.converter.dao.BestType;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
@@ -38,13 +39,13 @@ import java.util.stream.Stream;
  */
 public interface BestReader<T> {
 	/**
-	 * Process the input file and return a stream of BeSt objects
+	 * Process the input file and return a stream of BeSt objects.
+	 * Each of the three regions has several types of objects.
 	 * 
-	 * @param region
-	 * @param indir
+	 * @param region region
+	 * @param type type
+	 * @param indir input directory
 	 * @return a stream of BeSt objects
 	 */
-	public Stream<T> read(BestRegion region, Path indir);
-	
-	public String getSuffix();
+	public Stream<T> read(BestRegion region, BestType type, Path indir);
 }

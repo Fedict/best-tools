@@ -25,7 +25,7 @@
  */
 package be.bosa.dt.best.converter;
 
-import be.bosa.dt.best.converter.reader.BestReader;
+import be.bosa.dt.best.converter.dao.BestRegion;
 import be.bosa.dt.best.converter.reader.StreetnameReader;
 import java.nio.file.Paths;
 
@@ -93,7 +93,7 @@ public class Main {
 		String indir = cli.getOptionValue("i");
 		String outdir = cli.getOptionValue(indir, indir);
 		
-		for (BestReader.Region r: BestReader.Region.values()) {
+		for (BestRegion r: BestRegion.values()) {
 			if (cli.hasOption(r.getCode())) {
 				LOG.info("Region {}", r.getName());
 				new StreetnameReader().read(r, Paths.get(indir));

@@ -25,14 +25,13 @@
  */
 package be.bosa.dt.best.converter.writer;
 
+import be.bosa.dt.best.converter.dao.BestRegion;
 import be.bosa.dt.best.converter.dao.Streetname;
-import be.bosa.dt.best.converter.reader.BestReader.Region;
-import com.opencsv.CSVWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.Files;
 
+import com.opencsv.CSVWriter;
+
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
@@ -51,7 +50,7 @@ public class BestWriterCSV implements BestWriter {
 	 * @param streetnames
 	 */
 	@Override
-	public void writeStreetNames(Region region, Path outdir, Stream<Streetname> streetnames) {
+	public void writeStreetNames(BestRegion region, Path outdir, Stream<Streetname> streetnames) {
 		Path p = BestWriter.getPath(outdir, region, "Street", "csv");
 		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(p))) {
 			String[] header = { "namespace", "id", "name_nl", "name_fr" };
@@ -66,8 +65,8 @@ public class BestWriterCSV implements BestWriter {
 	}
 	
 	
-	public void writeAddresses(Region region, Path outdir, Stream<Address> addresses) {
+	//public void writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses) {
 
-	}
+	//}
 
 }
