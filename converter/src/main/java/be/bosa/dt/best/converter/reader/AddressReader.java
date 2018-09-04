@@ -25,9 +25,9 @@
  */
 package be.bosa.dt.best.converter.reader;
 
+import be.bosa.dt.best.converter.dao.Address;
 import be.bosa.dt.best.converter.dao.BestRegion;
 import be.bosa.dt.best.converter.dao.BestType;
-import be.bosa.dt.best.converter.dao.Streetname;
 
 import java.nio.file.Path;
 import java.util.stream.Stream;
@@ -42,32 +42,31 @@ import javax.xml.stream.events.XMLEvent;
  * 
  * @author Bart Hanssens
  */
-public class StreetnameReader extends AbstractXMLReader<Streetname> {
-	private final static QName LANGUAGE = new QName(AbstractXMLReader.ADD, "language");
+public class AddressReader extends AbstractXMLReader<Address> {
+	private final static QName ADDRESS = new QName(AbstractXMLReader.TNS, "Address");
 	private final static QName MUNICIPALITY = new QName(AbstractXMLReader.ADD, "Municipality");
 	private final static QName NAMESPACE = new QName(AbstractXMLReader.ADD, "namespace");
-	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");;
-	private final static QName SPELLING = new QName(AbstractXMLReader.ADD, "spelling");
+	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");
+	private final static QName POS = new QName(AbstractXMLReader.GML, "pos");
+	private final static QName SRSNAME = new QName(AbstractXMLReader.GML, "srsName");
 	private final static QName STATUS = new QName(AbstractXMLReader.ADD, "status");
-	private final static QName STREETNAME = new QName(AbstractXMLReader.TNS, "Streetname");
 
 	@Override
 	protected QName getRoot() {
-		return STREETNAME;
+		return ADDRESS;
 	}
 
 	@Override
-	protected Streetname getNextObj(XMLEventReader reader) throws XMLStreamException {
-		Streetname obj = null;
-		String lang = "";
+	protected Address getNextObj(XMLEventReader reader) throws XMLStreamException {
+		Address obj = null;
 		boolean inAssigned = false;
 			
 		while(reader.hasNext()) {
 			XMLEvent event = reader.nextEvent();
 			if (event.isStartElement()) {
 				QName el = event.asStartElement().getName();
-				if (el.equals(STREETNAME)) {
-					obj = new Streetname();
+				if (el.equals(ADDRESS)) {
+					obj = new Address();
 				} else if (obj != null) {
 					if (el.equals(MUNICIPALITY)) {
 						inAssigned = true;
@@ -80,16 +79,21 @@ public class StreetnameReader extends AbstractXMLReader<Streetname> {
 						}
 					} else if (el.equals(OBJECTID)) {
 						String txt = reader.getElementText();
+						System.err.println(txt);
 						if (inAssigned) {
 							obj.getCity().setId(txt);
 						} else {
 							obj.setId(txt);
 						}
-					} else if (el.equals(LANGUAGE)) {
-						lang = reader.getElementText();
-					} else if (el.equals(SPELLING)) {
+					} else if (el.equals(POS)) {
+						String srs = reader.getProperty(SRSNAME.getLocalPart()).toString();
 						String txt = reader.getElementText();
-						obj.setName(txt, lang);
+						if (txt.contains(" ")) {
+							String[] coords = txt.split(" ");
+							int x = Integer.valueOf(coords[0]);
+							int y = Integer.valueOf(coords[1]);
+							obj.getPoint().set(x, y, srs);
+						}
 					} else if (el.equals(STATUS)) {
 						String txt = reader.getElementText();
 						obj.setStatus(txt);
@@ -101,7 +105,7 @@ public class StreetnameReader extends AbstractXMLReader<Streetname> {
 				if (el.equals(MUNICIPALITY)) {
 					inAssigned = false;
 				}
-				if (el.equals(STREETNAME)) {
+				if (el.equals(ADDRESS)) {
 					return obj;
 				}
 			}
@@ -116,7 +120,7 @@ public class StreetnameReader extends AbstractXMLReader<Streetname> {
 	 * @param indir input directory
 	 * @return 
 	 */
-	public Stream<Streetname> read(BestRegion region, Path indir) {
-		return read(region, BestType.STREETNAMES, indir);
+	public Stream<Address> read(BestRegion region, Path indir) {
+		return read(region, BestType.ADDRESSES, indir);
 	}
 }

@@ -11,7 +11,7 @@ package be.bosa.dt.best.converter.dao;
  * @author Bart Hanssens
  */
 public enum BestType {
-	ADDRESSES("Addresses"),
+	ADDRESSES("Address"),
 	MUNICIPALITIES("Municipality"),
 	POSTALINFO("Postalinfo"),
 	STREETNAMES("Streetname");

@@ -33,53 +33,41 @@ import java.util.Map;
  * 
  * @author Bart Hanssens
  */
-public class Streetname {
-	private String namespace = "";
-	private String id = "";
-	private final Map<String,String> names = new HashMap<>();
-	private final Municipality city = new Municipality();
-	private String status = "";
+public class Geopoint {
+	private int x;
+	private int y;
+	private String srs;
 
-	public String getNamespace() {
-		return namespace;
+	public int getX() {
+		return x;
 	}
 
-	public void setNamespace(String namespace) {
-		this.namespace = namespace;
+	public void setX(int x) {
+		this.x = x;
 	}
 
-	public String getId() {
-		return id;
+	public int getY() {
+		return y;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setY(int y) {
+		this.y = y;
 	}
 
-	public Map<String,String> getNames() {
-		return names;
+	public String getSrs() {
+		return srs;
+	}
+
+	public void setSrs(String srs) {
+		this.srs = srs;
 	}
 	
-	public String getName(String lang) {
-		return names.getOrDefault(lang, "");
+	public void set (int x, int y, String srs) {
+		this.x = x;
+		this.y = y;
+		this.srs = srs;
 	}
 	
-	public void setName(String name, String lang) {
-		this.names.put(lang, name);
-	}
-	
-	public Municipality getCity() {
-		return city;
-	}
-	
-	public String getStatus() {
-		return status;
-	}
-	
-	public void setStatus(String status) {
-		this.status = status;
-	}
-	
-	public Streetname() {
+	public Geopoint() {
 	}
 }

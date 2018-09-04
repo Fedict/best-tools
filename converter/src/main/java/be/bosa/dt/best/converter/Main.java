@@ -25,13 +25,16 @@
  */
 package be.bosa.dt.best.converter;
 
+import be.bosa.dt.best.converter.dao.Address;
 import be.bosa.dt.best.converter.dao.BestRegion;
 import be.bosa.dt.best.converter.dao.Municipality;
 import be.bosa.dt.best.converter.dao.Streetname;
+import be.bosa.dt.best.converter.reader.AddressReader;
 import be.bosa.dt.best.converter.reader.MunicipalityReader;
 import be.bosa.dt.best.converter.reader.StreetnameReader;
 import be.bosa.dt.best.converter.writer.BestWriterCSV;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
@@ -99,15 +102,20 @@ public class Main {
 		String indir = cli.getOptionValue("i");
 		String outdir = cli.getOptionValue(indir, indir);
 		
+		Path inPath = Paths.get(indir);
+		Path outPath = Paths.get(outdir);
+		
 		for (BestRegion r: BestRegion.values()) {
 			if (cli.hasOption(r.getCode())) {
 				LOG.info("Region {}", r.getName());
-				Stream<Municipality> cities = new MunicipalityReader().read(r, Paths.get(indir));
-				Stream<Streetname> streets = new StreetnameReader().read(r, Paths.get(indir));
-				
+				Stream<Municipality> cities = new MunicipalityReader().read(r, inPath);
+				Stream<Streetname> streets = new StreetnameReader().read(r, inPath);
+				Stream<Address> addresses = new AddressReader().read(r, inPath);
+			
 				BestWriterCSV writer = new BestWriterCSV();
-				writer.writeMunicipalities(r, Paths.get(outdir), cities);
-				writer.writeStreets(r, Paths.get(outdir), streets);
+				writer.writeMunicipalities(r, outPath, cities);
+				writer.writeStreets(r, outPath, streets);
+				writer.writeAddresses(r, outPath, addresses);
 			}
 		}
 	}

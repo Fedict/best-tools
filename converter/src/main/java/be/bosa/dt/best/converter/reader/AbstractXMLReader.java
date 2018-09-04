@@ -59,6 +59,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractXMLReader<T> implements BestReader {
 	// XML namespaces
 	public final static String TNS = "http://fsb.belgium.be/mappingservices/FullDownload/v1_00";
+	public final static String GML = "http://www.opengis.net/gml/3.2";
 	public final static String ADD = "http://vocab.belgif.be/ns/inspire/";
 	
 	private final static XMLInputFactory2 FAC = (XMLInputFactory2) XMLInputFactory.newInstance();

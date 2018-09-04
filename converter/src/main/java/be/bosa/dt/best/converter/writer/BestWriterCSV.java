@@ -25,6 +25,7 @@
  */
 package be.bosa.dt.best.converter.writer;
 
+import be.bosa.dt.best.converter.dao.Address;
 import be.bosa.dt.best.converter.dao.BestRegion;
 import be.bosa.dt.best.converter.dao.BestType;
 import be.bosa.dt.best.converter.dao.Municipality;
@@ -67,7 +68,7 @@ public class BestWriterCSV implements BestWriter {
 		}
 	}
 
-/**
+	/**
 	 * Process the input file and return a stream of BeSt objects
 	 * 
 	 * @param region
@@ -107,11 +108,13 @@ public class BestWriterCSV implements BestWriter {
 		LOG.info("Writing {}", p);
 			
 		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(p))) {
-			String[] header = { "namespace", "id", "name_nl", "name_fr", "status" };
+			String[] header = { "namespace", "id", "assigned_ns", "assigned_id", 
+								"name_nl", "name_fr", "status" };
 			w.writeNext(header);
 			streets.forEach(s -> {
 				String[] line = { s.getNamespace(), s.getId(), 
-									s.getName("nl"), s.getName("fr"), s.getStatus() };
+								s.getCity().getNamespace(), s.getCity().getId(),
+								s.getName("nl"), s.getName("fr"), s.getStatus() };
 				w.writeNext(line);
 			});
 		} catch(IOException ioe) {
@@ -119,9 +122,34 @@ public class BestWriterCSV implements BestWriter {
 		}
 	}
 	
-	
-	//public void writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses) {
-
-	//}
+	/**
+	 * 
+	 * @param region
+	 * @param outdir
+	 * @param addresses 
+	 */
+	public void writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses) {
+		String name = BestType.ADDRESSES.toString().toLowerCase();
+		Path p = BestWriter.getPath(outdir, region, name, "csv");
+		LOG.info("Writing {}", p);
+		
+		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(p))) {
+			String[] header = { "namespace", "id", "x", "y", 
+//								"street_ns", "street_id", "city_ns", "city_id", "number",
+								"status" };
+			w.writeNext(header);
+			addresses.forEach(s -> {
+				String[] line = { s.getNamespace(), s.getId(),
+								String.valueOf(s.getPoint().getX()), 
+								String.valueOf(s.getPoint().getY()),
+//								s.getCity().getNamespace(), s.getCity().getId(),
+//								s.getName("nl"), s.getName("fr"), 
+								s.getStatus() };
+				w.writeNext(line);
+			});
+		} catch(IOException ioe) {
+			LOG.error("Error writing to file", ioe);
+		}
+	}
 
 }

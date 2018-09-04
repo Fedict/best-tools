@@ -25,18 +25,15 @@
  */
 package be.bosa.dt.best.converter.dao;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Helper class for street names
+ * Helper class for addresses
  * 
  * @author Bart Hanssens
  */
-public class Streetname {
+public class Address {
 	private String namespace = "";
 	private String id = "";
-	private final Map<String,String> names = new HashMap<>();
+	private final Geopoint point = new Geopoint();
 	private final Municipality city = new Municipality();
 	private String status = "";
 
@@ -56,16 +53,8 @@ public class Streetname {
 		this.id = id;
 	}
 
-	public Map<String,String> getNames() {
-		return names;
-	}
-	
-	public String getName(String lang) {
-		return names.getOrDefault(lang, "");
-	}
-	
-	public void setName(String name, String lang) {
-		this.names.put(lang, name);
+	public Geopoint getPoint() {
+		return point;
 	}
 	
 	public Municipality getCity() {
@@ -80,6 +69,6 @@ public class Streetname {
 		this.status = status;
 	}
 	
-	public Streetname() {
+	public Address() {
 	}
 }
