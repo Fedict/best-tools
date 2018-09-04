@@ -27,7 +27,7 @@ package be.bosa.dt.best.converter.reader;
 
 import be.bosa.dt.best.converter.dao.BestRegion;
 import be.bosa.dt.best.converter.dao.BestType;
-import be.bosa.dt.best.converter.dao.Streetname;
+import be.bosa.dt.best.converter.dao.Postal;
 
 import java.nio.file.Path;
 import java.util.stream.Stream;
@@ -37,35 +37,35 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
+
 /**
  * BeST XML file processor interface
  * 
  * @author Bart Hanssens
  */
-public class StreetnameReader extends AbstractXMLReader<Streetname> {
+public class PostalReader extends AbstractXMLReader<Postal> {
 	private final static QName LANGUAGE = new QName(AbstractXMLReader.ADD, "language");
+	private final static QName POSTAL = new QName(AbstractXMLReader.TNS, "¨PostalInfo");
 	private final static QName NAMESPACE = new QName(AbstractXMLReader.ADD, "namespace");
 	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");;
 	private final static QName SPELLING = new QName(AbstractXMLReader.ADD, "spelling");
-	private final static QName STATUS = new QName(AbstractXMLReader.ADD, "status");
-	private final static QName STREETNAME = new QName(AbstractXMLReader.TNS, "Streetname");
 
 	@Override
 	protected QName getRoot() {
-		return STREETNAME;
+		return POSTAL;
 	}
-
+	
 	@Override
-	protected Streetname getNextObj(XMLEventReader reader) throws XMLStreamException {
-		Streetname obj = null;
+	protected Postal getNextObj(XMLEventReader reader) throws XMLStreamException {
+		Postal obj = null;
 		String lang = "";
 		
 		while(reader.hasNext()) {
 			XMLEvent event = reader.nextEvent();
 			if (event.isStartElement()) {
 				QName el = event.asStartElement().getName();
-				if (el.equals(STREETNAME)) {
-					obj = new Streetname();
+				if (el.equals(POSTAL)) {
+					obj = new Postal();
 				} else if (obj != null) {
 					if (el.equals(NAMESPACE)) {
 						String txt = reader.getElementText();
@@ -78,13 +78,10 @@ public class StreetnameReader extends AbstractXMLReader<Streetname> {
 					} else if (el.equals(SPELLING)) {
 						String txt = reader.getElementText();
 						obj.setName(txt, lang);
-					} else if (el.equals(STATUS)) {
-						String txt = reader.getElementText();
-						obj.setStatus(txt);
 					}
 				}
 			}
-			if (event.isEndElement() && event.asEndElement().getName().equals(STREETNAME)) {
+			if (event.isEndElement() && event.asEndElement().getName().equals(POSTAL)) {
 				return obj;
 			}
 		}
@@ -98,7 +95,7 @@ public class StreetnameReader extends AbstractXMLReader<Streetname> {
 	 * @param indir input directory
 	 * @return 
 	 */
-	public Stream<Streetname> read(BestRegion region, Path indir) {
-		return read(region, BestType.STREETNAMES, indir);
+	public Stream<Postal> read(BestRegion region, Path indir) {
+		return read(region, BestType.POSTALINFO, indir);
 	}
 }

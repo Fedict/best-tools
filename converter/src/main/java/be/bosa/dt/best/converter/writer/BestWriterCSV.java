@@ -26,6 +26,9 @@
 package be.bosa.dt.best.converter.writer;
 
 import be.bosa.dt.best.converter.dao.BestRegion;
+import be.bosa.dt.best.converter.dao.BestType;
+import be.bosa.dt.best.converter.dao.Municipality;
+import be.bosa.dt.best.converter.dao.Postal;
 import be.bosa.dt.best.converter.dao.Streetname;
 
 import com.opencsv.CSVWriter;
@@ -46,6 +49,50 @@ import org.slf4j.LoggerFactory;
 public class BestWriterCSV implements BestWriter {
 	private final static Logger LOG = LoggerFactory.getLogger(BestWriterCSV.class);
 	
+	@Override
+	public void writeMunicipalities(BestRegion region, Path outdir, Stream<Municipality> cities) {
+		String name = BestType.MUNICIPALITIES.toString().toLowerCase();
+		Path p = BestWriter.getPath(outdir, region, name, "csv");
+		LOG.info("Writing {}", p);
+			
+		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(p))) {
+			String[] header = { "namespace", "id", "name_nl", "name_fr" };
+			w.writeNext(header);
+			cities.forEach(s -> {
+				String[] line = { s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr") };
+				w.writeNext(line);
+			});
+		} catch(IOException ioe) {
+			LOG.error("Error writing to file", ioe);
+		}
+	}
+
+/**
+	 * Process the input file and return a stream of BeSt objects
+	 * 
+	 * @param region
+	 * @param outdir
+	 * @param postals
+	 */
+	@Override
+	public void writePostals(BestRegion region, Path outdir, Stream<Postal> postals) {
+		String name = BestType.POSTALINFO.toString().toLowerCase();
+		Path p = BestWriter.getPath(outdir, region, name, "csv");
+		LOG.info("Writing {}", p);
+			
+		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(p))) {
+			String[] header = { "namespace", "id", "name_nl", "name_fr", "status" };
+			w.writeNext(header);
+			postals.forEach(s -> {
+				String[] line = { s.getNamespace(), s.getId(), 
+									s.getName("nl"), s.getName("fr") };
+				w.writeNext(line);
+			});
+		} catch(IOException ioe) {
+			LOG.error("Error writing to file", ioe);
+		}
+	}
+	
 	/**
 	 * Process the input file and return a stream of BeSt objects
 	 * 
@@ -55,18 +102,20 @@ public class BestWriterCSV implements BestWriter {
 	 */
 	@Override
 	public void writeStreets(BestRegion region, Path outdir, Stream<Streetname> streets) {
-		Path p = BestWriter.getPath(outdir, region, "Street", "csv");
+		String name = BestType.STREETNAMES.toString().toLowerCase();
+		Path p = BestWriter.getPath(outdir, region, name, "csv");
 		LOG.info("Writing {}", p);
 			
 		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(p))) {
-			String[] header = { "namespace", "id", "name_nl", "name_fr" };
+			String[] header = { "namespace", "id", "name_nl", "name_fr", "status" };
 			w.writeNext(header);
-			
 			streets.forEach(s -> {
-				String[] line = { s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr") };
+				String[] line = { s.getNamespace(), s.getId(), 
+									s.getName("nl"), s.getName("fr"), s.getStatus() };
 				w.writeNext(line);
 			});
 		} catch(IOException ioe) {
+			LOG.error("Error writing to file", ioe);
 		}
 	}
 	

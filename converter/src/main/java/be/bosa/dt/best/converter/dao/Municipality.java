@@ -29,15 +29,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Helper class for street names
+ * Helper class for municipalities
  * 
  * @author Bart Hanssens
  */
-public class Streetname {
+public class Municipality {
 	private String namespace = "";
 	private String id = "";
 	private Map<String,String> names = new HashMap<>();
-	private String status = "";
 
 	public String getNamespace() {
 		return namespace;
@@ -71,14 +70,6 @@ public class Streetname {
 		this.names.put(lang, name);
 	}
 	
-	public String getStatus() {
-		return status;
-	}
-	
-	public void setStatus(String status) {
-		this.status = status;
-	}
-	
-	public Streetname() {
+	public Municipality() {
 	}
 }

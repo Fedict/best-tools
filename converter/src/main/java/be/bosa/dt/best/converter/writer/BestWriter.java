@@ -26,6 +26,8 @@
 package be.bosa.dt.best.converter.writer;
 
 import be.bosa.dt.best.converter.dao.BestRegion;
+import be.bosa.dt.best.converter.dao.Municipality;
+import be.bosa.dt.best.converter.dao.Postal;
 import be.bosa.dt.best.converter.dao.Streetname;
 
 import java.nio.file.Path;
@@ -39,10 +41,28 @@ import java.util.stream.Stream;
  */
 public interface BestWriter {
 	/**
-	 * Process the input file and return a stream of BeSt objects
+	 * Process the input file and return a stream of BeSt municipalities objects
 	 * 
 	 * @param region
-	 * @param outdir
+	 * @param outdir output directory
+	 * @param cities 
+	 */
+	public void writeMunicipalities(BestRegion region, Path outdir, Stream<Municipality> cities);
+
+	/**
+	 * Process the input file and return a stream of BeSt postcode objects
+	 * 
+	 * @param region
+	 * @param outdir output directory
+	 * @param postals 
+	 */
+	public void writePostals(BestRegion region, Path outdir, Stream<Postal> postals);
+
+	/**
+	 * Process the input file and return a stream of BeSt streetname objects
+	 * 
+	 * @param region
+	 * @param outdir output directory
 	 * @param streetnames
 	 */
 	public void writeStreets(BestRegion region, Path outdir, Stream<Streetname> streetnames);

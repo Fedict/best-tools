@@ -26,9 +26,12 @@
 package be.bosa.dt.best.converter;
 
 import be.bosa.dt.best.converter.dao.BestRegion;
+import be.bosa.dt.best.converter.dao.Municipality;
 import be.bosa.dt.best.converter.dao.Streetname;
+import be.bosa.dt.best.converter.reader.MunicipalityReader;
 import be.bosa.dt.best.converter.reader.StreetnameReader;
 import be.bosa.dt.best.converter.writer.BestWriterCSV;
+
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
@@ -99,9 +102,11 @@ public class Main {
 		for (BestRegion r: BestRegion.values()) {
 			if (cli.hasOption(r.getCode())) {
 				LOG.info("Region {}", r.getName());
+				Stream<Municipality> cities = new MunicipalityReader().read(r, Paths.get(indir));
 				Stream<Streetname> streets = new StreetnameReader().read(r, Paths.get(indir));
 				
 				BestWriterCSV writer = new BestWriterCSV();
+				writer.writeMunicipalities(r, Paths.get(outdir), cities);
 				writer.writeStreets(r, Paths.get(outdir), streets);
 			}
 		}
