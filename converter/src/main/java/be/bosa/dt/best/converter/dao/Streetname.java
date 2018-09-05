@@ -37,7 +37,7 @@ public class Streetname extends BestObject {
 	private final Map<String,String> names = new HashMap<>();
 	private final Municipality city = new Municipality();
 	private String status = "";
-
+	private String date;
 
 	public Map<String,String> getNames() {
 		return names;
@@ -63,6 +63,13 @@ public class Streetname extends BestObject {
 		this.status = status;
 	}
 	
+	public void setDate(String date) {
+		this.date = date;
+	}
+	
+	public String getDate() {
+		return date;
+	}
 	public Streetname() {
 	}
 }

@@ -99,7 +99,7 @@ public class BestObject {
 	 * @return 
 	 */
 	public String getIDVersion() {
-		return this.id + "/" + this.version;
+		return this.version.isEmpty() ? this.id : this.id + "/" + this.version;
 	}
 	
 	/**

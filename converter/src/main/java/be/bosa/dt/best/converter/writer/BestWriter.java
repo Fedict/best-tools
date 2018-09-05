@@ -85,7 +85,8 @@ public interface BestWriter {
 	 * @param streetnames
 	 * @return 
 	 */
-	public Map<String,String[]> writeStreets(BestRegion region, Path outdir, Stream<Streetname> streetnames);
+	public Map<String,String[]> writeStreets(BestRegion region, Path outdir, Stream<Streetname> streetnames,
+											Map<String,String[]> cities);
 	
 	/**
 	 * Write a stream of BeSt addresses to a file

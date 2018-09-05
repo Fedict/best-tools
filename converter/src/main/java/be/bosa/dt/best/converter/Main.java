@@ -100,8 +100,8 @@ public class Main {
 			BestWriterCSV writer = new BestWriterCSV();
 				
 			Map<String, String[]> cacheCities = writer.writeMunicipalities(region, outPath, cities);
-			Map<String, String[]> cacheStreets = writer.writeStreets(region, outPath, streets);
 			Map<String, String[]> cachePostals = writer.writePostals(region, outPath, postals);
+			Map<String, String[]> cacheStreets = writer.writeStreets(region, outPath, streets, cacheCities);
 			
 			writer.writeAddresses(region, outPath, addresses, cacheCities, cacheStreets);
 		}
