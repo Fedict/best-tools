@@ -25,7 +25,9 @@
  */
 package be.bosa.dt.best.converter.writer;
 
+import be.bosa.dt.best.converter.dao.Address;
 import be.bosa.dt.best.converter.dao.BestRegion;
+import be.bosa.dt.best.converter.dao.BestType;
 import be.bosa.dt.best.converter.dao.Municipality;
 import be.bosa.dt.best.converter.dao.Postal;
 import be.bosa.dt.best.converter.dao.Streetname;
@@ -41,7 +43,7 @@ import java.util.stream.Stream;
  */
 public interface BestWriter {
 	/**
-	 * Process the input file and return a stream of BeSt municipalities objects
+	 * Write a stream of BeSt municipalities objects to a file
 	 * 
 	 * @param region
 	 * @param outdir output directory
@@ -50,7 +52,7 @@ public interface BestWriter {
 	public void writeMunicipalities(BestRegion region, Path outdir, Stream<Municipality> cities);
 
 	/**
-	 * Process the input file and return a stream of BeSt postcode objects
+	 * Write a stream of stream of BeSt postcode objects to a file
 	 * 
 	 * @param region
 	 * @param outdir output directory
@@ -59,24 +61,34 @@ public interface BestWriter {
 	public void writePostals(BestRegion region, Path outdir, Stream<Postal> postals);
 
 	/**
-	 * Process the input file and return a stream of BeSt streetname objects
+	 * Write a stream of BeSt streetname objects to a file
 	 * 
 	 * @param region
 	 * @param outdir output directory
 	 * @param streetnames
 	 */
 	public void writeStreets(BestRegion region, Path outdir, Stream<Streetname> streetnames);
-	//public void writeAddresses(Region region, Path outdir, Stream<Address> addresses);
 	
 	/**
+	 * Write a stream of BeSt addresses to a file
 	 * 
-	 * @param outdir
 	 * @param region
-	 * @param suffix
-	 * @param ext
-	 * @return 
+	 * @param outdir output directory
+	 * @param addresses
 	 */
-	public static Path getPath(Path outdir, BestRegion region, String suffix, String ext) {
+	public void writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses);
+	
+	/**
+	 * Construct the name for an output file
+	 * 
+	 * @param outdir output directory
+	 * @param region BeST region
+	 * @param type BeST type
+	 * @param ext file extension
+	 * @return full path to file
+	 */
+	public static Path getPath(Path outdir, BestRegion region, BestType type, String ext) {
+		String suffix = type.toString().toLowerCase();
 		return Paths.get(outdir.toString(), region.getName() + suffix + "." + ext);
 	}
 }

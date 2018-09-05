@@ -30,45 +30,50 @@ package be.bosa.dt.best.converter.dao;
  * 
  * @author Bart Hanssens
  */
-public class Address {
-	private String namespace = "";
-	private String id = "";
+public class Address extends BestObject {
 	private final Geopoint point = new Geopoint();
 	private final Municipality city = new Municipality();
 	private String status = "";
 
-	public String getNamespace() {
-		return namespace;
-	}
-
-	public void setNamespace(String namespace) {
-		this.namespace = namespace;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
+	/**
+	 * Get the geo-position
+	 * 
+	 * @return geopoint object
+	 */
 	public Geopoint getPoint() {
 		return point;
 	}
 	
+	/**
+	 * Get the municipality / city of the address
+	 * 
+	 * @return municipality object
+	 */
 	public Municipality getCity() {
 		return city;
 	}
 	
+	/**
+	 * Get the status of this address
+	 * 
+	 * @return string
+	 */
 	public String getStatus() {
 		return status;
 	}
 	
+	/**
+	 * Set the status of thie address
+	 * 
+	 * @param status 
+	 */
 	public void setStatus(String status) {
 		this.status = status;
 	}
 	
+	/**
+	 * Constructor
+	 */
 	public Address() {
 	}
 }

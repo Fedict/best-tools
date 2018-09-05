@@ -31,7 +31,7 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 /**
- * BeST XML file processor interface
+ * BeST XML file reader interface
  * 
  * @author Bart Hanssens
  * 

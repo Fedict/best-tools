@@ -25,49 +25,86 @@
  */
 package be.bosa.dt.best.converter.dao;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * Helper class for street names
+ * Helper class for geo point
  * 
  * @author Bart Hanssens
  */
 public class Geopoint {
-	private int x;
-	private int y;
+	private float x;
+	private float y;
 	private String srs;
 
-	public int getX() {
+	/**
+	 * Get X coordinate
+	 * 
+	 * @return float
+	 */
+	public float getX() {
 		return x;
 	}
 
-	public void setX(int x) {
+	/**
+	 * Set X coordinate
+	 * @param x 
+	 */
+	public void setX(float x) {
 		this.x = x;
 	}
 
-	public int getY() {
+	/**
+	 * Get Y coordinate
+	 * 
+	 * @return float
+	 */
+	public float getY() {
 		return y;
 	}
 
-	public void setY(int y) {
+	/**
+	 * Set Y coordinate
+	 * 
+	 * @param y 
+	 */
+	public void setY(float y) {
 		this.y = y;
 	}
 
+	/**
+	 * Get GML srsName (ID of coordinate system being used)
+	 * 
+	 * @return 
+	 */
 	public String getSrs() {
 		return srs;
 	}
 
+	/**
+	 * Set GML srsName (ID of coordinate system being used)
+	 * 
+	 * @param srs 
+	 */
 	public void setSrs(String srs) {
 		this.srs = srs;
 	}
 	
-	public void set (int x, int y, String srs) {
+	/**
+	 * Convenience method for setting X,Y and system at once
+	 * 
+	 * @param x
+	 * @param y
+	 * @param srs 
+	 */
+	public void set (float x, float y, String srs) {
 		this.x = x;
 		this.y = y;
 		this.srs = srs;
 	}
 	
+	/**
+	 * Constructor
+	 */
 	public Geopoint() {
 	}
 }

@@ -26,6 +26,7 @@
 package be.bosa.dt.best.converter.writer;
 
 import be.bosa.dt.best.converter.dao.Address;
+import be.bosa.dt.best.converter.dao.BestObject;
 import be.bosa.dt.best.converter.dao.BestRegion;
 import be.bosa.dt.best.converter.dao.BestType;
 import be.bosa.dt.best.converter.dao.Municipality;
@@ -37,35 +38,50 @@ import com.opencsv.CSVWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * BeST result file writer interface
+ * BeST result CSV file writer
  * 
  * @author Bart Hanssens
  */
 public class BestWriterCSV implements BestWriter {
 	private final static Logger LOG = LoggerFactory.getLogger(BestWriterCSV.class);
 	
-	@Override
-	public void writeMunicipalities(BestRegion region, Path outdir, Stream<Municipality> cities) {
-		String name = BestType.MUNICIPALITIES.toString().toLowerCase();
-		Path p = BestWriter.getPath(outdir, region, name, "csv");
-		LOG.info("Writing {}", p);
-			
-		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(p))) {
-			String[] header = { "namespace", "id", "name_nl", "name_fr" };
+	/**
+	 * Write a series of Best object to a file
+	 * 
+	 * @param <T>
+	 * @param file CSV file to write to
+	 * @param header header as array of strings
+	 * @param lines stream of lines
+	 * @param func function to create a row in the CSV
+	 */
+	private <T extends BestObject> void write(Path file, String[] header, Stream<T> lines, 
+													Function<T,String[]> func) {
+		LOG.info("Writing {}", file);
+		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(file))) {
 			w.writeNext(header);
-			cities.forEach(s -> {
-				String[] line = { s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr") };
-				w.writeNext(line);
-			});
+			lines.forEach(s -> w.writeNext(func.apply(s)));
 		} catch(IOException ioe) {
 			LOG.error("Error writing to file", ioe);
 		}
+	}
+	
+	@Override
+	public void writeMunicipalities(BestRegion region, Path outdir, Stream<Municipality> cities) {
+		Path file = BestWriter.getPath(outdir, region, BestType.MUNICIPALITIES, "csv");
+
+		String[] header = { "namespace", "id", "name_nl", "name_fr" };
+		Function<Municipality,String[]> func = (Municipality s) -> { return new String[]
+			{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr") };
+		};
+		
+		write(file, header, cities, func);
 	}
 
 	/**
@@ -77,79 +93,47 @@ public class BestWriterCSV implements BestWriter {
 	 */
 	@Override
 	public void writePostals(BestRegion region, Path outdir, Stream<Postal> postals) {
-		String name = BestType.POSTALINFO.toString().toLowerCase();
-		Path p = BestWriter.getPath(outdir, region, name, "csv");
-		LOG.info("Writing {}", p);
-			
-		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(p))) {
-			String[] header = { "namespace", "id", "name_nl", "name_fr", "status" };
-			w.writeNext(header);
-			postals.forEach(s -> {
-				String[] line = { s.getNamespace(), s.getId(), 
-									s.getName("nl"), s.getName("fr") };
-				w.writeNext(line);
-			});
-		} catch(IOException ioe) {
-			LOG.error("Error writing to file", ioe);
-		}
+		Path file = BestWriter.getPath(outdir, region, BestType.POSTALINFO, "csv");
+		
+		String[] header = { "namespace", "id", "name_nl", "name_fr", "status" };
+		Function<Postal,String[]> func = (Postal s) -> { return new String[] 
+			{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr") };
+		};
+				
+		write(file, header, postals, func);
 	}
 	
-	/**
-	 * Process the input file and return a stream of BeSt objects
-	 * 
-	 * @param region
-	 * @param outdir
-	 * @param streets
-	 */
+	
 	@Override
 	public void writeStreets(BestRegion region, Path outdir, Stream<Streetname> streets) {
-		String name = BestType.STREETNAMES.toString().toLowerCase();
-		Path p = BestWriter.getPath(outdir, region, name, "csv");
-		LOG.info("Writing {}", p);
-			
-		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(p))) {
-			String[] header = { "namespace", "id", "assigned_ns", "assigned_id", 
-								"name_nl", "name_fr", "status" };
-			w.writeNext(header);
-			streets.forEach(s -> {
-				String[] line = { s.getNamespace(), s.getId(), 
-								s.getCity().getNamespace(), s.getCity().getId(),
-								s.getName("nl"), s.getName("fr"), s.getStatus() };
-				w.writeNext(line);
-			});
-		} catch(IOException ioe) {
-			LOG.error("Error writing to file", ioe);
-		}
+		Path file = BestWriter.getPath(outdir, region, BestType.STREETNAMES, "csv");
+		
+		String[] header = { "namespace", "id", "assigned_ns", "assigned_id", 
+							"name_nl", "name_fr", "status" };
+		Function<Streetname,String[]> func = (Streetname s) -> { return new String[] 
+			{ s.getNamespace(), s.getId(), s.getCity().getNamespace(), s.getCity().getId(),
+				s.getName("nl"), s.getName("fr"), s.getStatus() };
+		};
+		
+		write(file, header, streets, func);
 	}
 	
-	/**
-	 * 
-	 * @param region
-	 * @param outdir
-	 * @param addresses 
-	 */
+	@Override
 	public void writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses) {
-		String name = BestType.ADDRESSES.toString().toLowerCase();
-		Path p = BestWriter.getPath(outdir, region, name, "csv");
-		LOG.info("Writing {}", p);
-		
-		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(p))) {
-			String[] header = { "namespace", "id", "x", "y", 
+		Path file = BestWriter.getPath(outdir, region, BestType.ADDRESSES, "csv");
+
+		String[] header = { "namespace", "id", "x", "y", 
 //								"street_ns", "street_id", "city_ns", "city_id", "number",
-								"status" };
-			w.writeNext(header);
-			addresses.forEach(s -> {
-				String[] line = { s.getNamespace(), s.getId(),
-								String.valueOf(s.getPoint().getX()), 
-								String.valueOf(s.getPoint().getY()),
+							"status" };
+		Function<Address,String[]> func = (Address s) -> { return new String[] 
+			{ s.getNamespace(), s.getId(),
+				String.valueOf(s.getPoint().getX()), String.valueOf(s.getPoint().getY()),
 //								s.getCity().getNamespace(), s.getCity().getId(),
 //								s.getName("nl"), s.getName("fr"), 
-								s.getStatus() };
-				w.writeNext(line);
-			});
-		} catch(IOException ioe) {
-			LOG.error("Error writing to file", ioe);
-		}
+				s.getStatus() };
+		};
+		
+		write(file, header, addresses, func);
 	}
 
 }

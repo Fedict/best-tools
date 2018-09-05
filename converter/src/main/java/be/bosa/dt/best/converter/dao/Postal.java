@@ -33,26 +33,9 @@ import java.util.Map;
  * 
  * @author Bart Hanssens
  */
-public class Postal {
-	private String namespace = "";
-	private String id = "";
+public class Postal extends BestObject {
 	private Map<String,String> names = new HashMap<>();
 
-	public String getNamespace() {
-		return namespace;
-	}
-
-	public void setNamespace(String namespace) {
-		this.namespace = namespace;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
 
 	public Map<String,String> getNames() {
 		return names;

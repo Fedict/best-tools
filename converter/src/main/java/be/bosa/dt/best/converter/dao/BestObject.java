@@ -25,33 +25,56 @@
  */
 package be.bosa.dt.best.converter.dao;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Helper class for municipalities
+ * Helper class for BeST objects with namespace and ID
  * 
  * @author Bart Hanssens
  */
-public class Municipality extends BestObject {
-	private Map<String,String> names = new HashMap<>();
+public class BestObject {
+	private String namespace = "";
+	private String id = "";
 
-	public Map<String,String> getNames() {
-		return names;
+	/**
+	 * Get namespace provided by the Region.
+	 * Combine the namespace with the ID to get a globally unique ID.
+	 * 
+	 * @return namespace as string
+	 */
+	public String getNamespace() {
+		return namespace;
 	}
 
-	public void setNames(Map<String,String> names) {
-		this.names = names;
+	/**
+	 * Set namespace provided by the Region
+	 * 
+	 * @param namespace 
+	 */
+	public void setNamespace(String namespace) {
+		this.namespace = namespace;
 	}
-	
-	public String getName(String lang) {
-		return names.getOrDefault(lang, "");
+
+	/**
+	 * Get ID provided by the region
+	 * Combine the namespace with the ID to get a globally unique ID.
+	 * 
+	 * @return ID as string
+	 */
+	public String getId() {
+		return id;
 	}
-	
-	public void setName(String name, String lang) {
-		this.names.put(lang, name);
+
+	/**
+	 * Set address ID provided by the region
+	 * 
+	 * @param id 
+	 */
+	public void setId(String id) {
+		this.id = id;
 	}
-	
-	public Municipality() {
+
+	/**
+	 * Constructor
+	 */
+	public BestObject() {
 	}
 }

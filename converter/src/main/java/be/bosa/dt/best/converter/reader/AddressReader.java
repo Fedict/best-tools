@@ -37,6 +37,9 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * BeST XML file processor interface
  * 
@@ -48,9 +51,14 @@ public class AddressReader extends AbstractXMLReader<Address> {
 	private final static QName NAMESPACE = new QName(AbstractXMLReader.ADD, "namespace");
 	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");
 	private final static QName POS = new QName(AbstractXMLReader.GML, "pos");
-	private final static QName SRSNAME = new QName(AbstractXMLReader.GML, "srsName");
 	private final static QName STATUS = new QName(AbstractXMLReader.ADD, "status");
+	private final static String SRSNAME = "srsName";
 
+	private final static Logger LOG = LoggerFactory.getLogger(AddressReader.class);
+	
+	private int nr = 0;
+		
+	
 	@Override
 	protected QName getRoot() {
 		return ADDRESS;
@@ -60,13 +68,16 @@ public class AddressReader extends AbstractXMLReader<Address> {
 	protected Address getNextObj(XMLEventReader reader) throws XMLStreamException {
 		Address obj = null;
 		boolean inAssigned = false;
-			
+		
 		while(reader.hasNext()) {
 			XMLEvent event = reader.nextEvent();
 			if (event.isStartElement()) {
 				QName el = event.asStartElement().getName();
 				if (el.equals(ADDRESS)) {
 					obj = new Address();
+					if ((++nr % 100_000L) == 0) {
+						LOG.info("Parsing address {}", nr);
+					}
 				} else if (obj != null) {
 					if (el.equals(MUNICIPALITY)) {
 						inAssigned = true;
@@ -79,20 +90,25 @@ public class AddressReader extends AbstractXMLReader<Address> {
 						}
 					} else if (el.equals(OBJECTID)) {
 						String txt = reader.getElementText();
-						System.err.println(txt);
 						if (inAssigned) {
 							obj.getCity().setId(txt);
 						} else {
 							obj.setId(txt);
 						}
 					} else if (el.equals(POS)) {
-						String srs = reader.getProperty(SRSNAME.getLocalPart()).toString();
+						Object attr = reader.getProperty(SRSNAME);
+						String srs = (attr == null) ? "" : attr.toString();
 						String txt = reader.getElementText();
-						if (txt.contains(" ")) {
+						
+						if (txt != null && txt.contains(" ")) {
 							String[] coords = txt.split(" ");
-							int x = Integer.valueOf(coords[0]);
-							int y = Integer.valueOf(coords[1]);
-							obj.getPoint().set(x, y, srs);
+							try {
+								float x = Float.valueOf(coords[0]);
+								float y = Float.valueOf(coords[1]);
+								obj.getPoint().set(x, y, srs);
+							} catch (NumberFormatException nfe) {
+								LOG.warn("Error geoposition {} for {} ", nfe, obj.getId());
+							}
 						}
 					} else if (el.equals(STATUS)) {
 						String txt = reader.getElementText();
