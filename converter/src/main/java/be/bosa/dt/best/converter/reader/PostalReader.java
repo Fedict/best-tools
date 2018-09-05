@@ -45,7 +45,7 @@ import javax.xml.stream.events.XMLEvent;
  */
 public class PostalReader extends AbstractXMLReader<Postal> {
 	private final static QName LANGUAGE = new QName(AbstractXMLReader.ADD, "language");
-	private final static QName POSTAL = new QName(AbstractXMLReader.TNS, "¨PostalInfo");
+	private final static QName POSTAL = new QName(AbstractXMLReader.TNS, "PostalInfo");
 	private final static QName NAMESPACE = new QName(AbstractXMLReader.ADD, "namespace");
 	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");;
 	private final static QName SPELLING = new QName(AbstractXMLReader.ADD, "spelling");

@@ -28,14 +28,17 @@ package be.bosa.dt.best.converter;
 import be.bosa.dt.best.converter.dao.Address;
 import be.bosa.dt.best.converter.dao.BestRegion;
 import be.bosa.dt.best.converter.dao.Municipality;
+import be.bosa.dt.best.converter.dao.Postal;
 import be.bosa.dt.best.converter.dao.Streetname;
 import be.bosa.dt.best.converter.reader.AddressReader;
 import be.bosa.dt.best.converter.reader.MunicipalityReader;
+import be.bosa.dt.best.converter.reader.PostalReader;
 import be.bosa.dt.best.converter.reader.StreetnameReader;
 import be.bosa.dt.best.converter.writer.BestWriterCSV;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
@@ -87,6 +90,22 @@ public class Main {
 		}
 		return null;
 	}
+
+	private static void writeRegion(BestRegion region, Path inPath, Path outPath) {	
+		try( Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
+			Stream<Postal> postals = new PostalReader().read(region, inPath);
+			Stream<Streetname> streets = new StreetnameReader().read(region, inPath);
+			Stream<Address> addresses = new AddressReader().read(region, inPath)) {
+
+			BestWriterCSV writer = new BestWriterCSV();
+				
+			Map<String, String[]> cacheCities = writer.writeMunicipalities(region, outPath, cities);
+			Map<String, String[]> cacheStreets = writer.writeStreets(region, outPath, streets);
+			Map<String, String[]> cachePostals = writer.writePostals(region, outPath, postals);
+			
+			writer.writeAddresses(region, outPath, addresses, cacheCities, cacheStreets);
+		}
+	}
 	
 	/**
 	 * Main
@@ -105,17 +124,10 @@ public class Main {
 		Path inPath = Paths.get(indir);
 		Path outPath = Paths.get(outdir);
 		
-		for (BestRegion r: BestRegion.values()) {
-			if (cli.hasOption(r.getCode())) {
-				LOG.info("Region {}", r.getName());
-				Stream<Municipality> cities = new MunicipalityReader().read(r, inPath);
-				Stream<Streetname> streets = new StreetnameReader().read(r, inPath);
-				Stream<Address> addresses = new AddressReader().read(r, inPath);
-			
-				BestWriterCSV writer = new BestWriterCSV();
-				writer.writeMunicipalities(r, outPath, cities);
-				writer.writeStreets(r, outPath, streets);
-				writer.writeAddresses(r, outPath, addresses);
+		for (BestRegion region: BestRegion.values()) {
+			if (cli.hasOption(region.getCode())) {
+				LOG.info("Region {}", region.getName());
+				writeRegion(region, inPath, outPath);
 			}
 		}
 	}

@@ -38,6 +38,8 @@ import com.opencsv.CSVWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -73,15 +75,21 @@ public class BestWriterCSV implements BestWriter {
 	}
 	
 	@Override
-	public void writeMunicipalities(BestRegion region, Path outdir, Stream<Municipality> cities) {
+	public Map<String,String[]> writeMunicipalities(BestRegion region, Path outdir, Stream<Municipality> cities) {
 		Path file = BestWriter.getPath(outdir, region, BestType.MUNICIPALITIES, "csv");
-
+		
+		Map<String,String[]> cache = new HashMap<>();
+		
 		String[] header = { "namespace", "id", "name_nl", "name_fr" };
-		Function<Municipality,String[]> func = (Municipality s) -> { return new String[]
-			{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr") };
+		Function<Municipality,String[]> func = (Municipality s) -> { 
+			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr")});
+			return new String[] 
+				{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr") };
 		};
 		
 		write(file, header, cities, func);
+		
+		return cache;
 	}
 
 	/**
@@ -92,41 +100,56 @@ public class BestWriterCSV implements BestWriter {
 	 * @param postals
 	 */
 	@Override
-	public void writePostals(BestRegion region, Path outdir, Stream<Postal> postals) {
+	public Map<String,String[]> writePostals(BestRegion region, Path outdir, Stream<Postal> postals) {
 		Path file = BestWriter.getPath(outdir, region, BestType.POSTALINFO, "csv");
 		
+		Map<String,String[]> cache = new HashMap<>();
+		
 		String[] header = { "namespace", "id", "name_nl", "name_fr", "status" };
-		Function<Postal,String[]> func = (Postal s) -> { return new String[] 
-			{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr") };
+		Function<Postal,String[]> func = (Postal s) -> { 
+			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr")});
+			return new String[] 
+				{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr") };
 		};
 				
 		write(file, header, postals, func);
+		
+		return cache;
 	}
 	
 	
 	@Override
-	public void writeStreets(BestRegion region, Path outdir, Stream<Streetname> streets) {
+	public Map<String,String[]> writeStreets(BestRegion region, Path outdir, Stream<Streetname> streets) {
 		Path file = BestWriter.getPath(outdir, region, BestType.STREETNAMES, "csv");
+	
+		Map<String,String[]> cache = new HashMap<>();
 		
 		String[] header = { "namespace", "id", "assigned_ns", "assigned_id", 
 							"name_nl", "name_fr", "status" };
-		Function<Streetname,String[]> func = (Streetname s) -> { return new String[] 
-			{ s.getNamespace(), s.getId(), s.getCity().getNamespace(), s.getCity().getId(),
+		Function<Streetname,String[]> func = (Streetname s) -> { 
+			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr")});
+			return new String[] 
+				{ s.getNamespace(), s.getId(), s.getCity().getNamespace(), s.getCity().getId(),
 				s.getName("nl"), s.getName("fr"), s.getStatus() };
 		};
 		
 		write(file, header, streets, func);
+		
+		return cache;
 	}
 	
 	@Override
-	public void writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses) {
+	public void writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses,
+			Map<String,String[]> streets, Map<String,String[]> postals) {
 		Path file = BestWriter.getPath(outdir, region, BestType.ADDRESSES, "csv");
 
 		String[] header = { "namespace", "id", "x", "y", 
 //								"street_ns", "street_id", "city_ns", "city_id", "number",
 							"status" };
-		Function<Address,String[]> func = (Address s) -> { return new String[] 
-			{ s.getNamespace(), s.getId(),
+		Function<Address,String[]> func = (Address s) -> {
+
+			return new String[] 
+				{ s.getNamespace(), s.getId(),
 				String.valueOf(s.getPoint().getX()), String.valueOf(s.getPoint().getY()),
 //								s.getCity().getNamespace(), s.getCity().getId(),
 //								s.getName("nl"), s.getName("fr"), 
