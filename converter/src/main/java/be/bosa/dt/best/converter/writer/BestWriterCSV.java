@@ -82,7 +82,7 @@ public class BestWriterCSV implements BestWriter {
 		
 		String[] header = { "namespace", "id", "name_nl", "name_fr" };
 		Function<Municipality,String[]> func = (Municipality s) -> { 
-			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr")});
+			cache.put(s.getIDVersion(), new String[] { s.getName("nl"), s.getName("fr")});
 			return new String[] 
 				{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr") };
 		};
@@ -107,7 +107,7 @@ public class BestWriterCSV implements BestWriter {
 		
 		String[] header = { "namespace", "id", "name_nl", "name_fr", "status" };
 		Function<Postal,String[]> func = (Postal s) -> { 
-			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr")});
+			cache.put(s.getIDVersion(), new String[] { s.getName("nl"), s.getName("fr")});
 			return new String[] 
 				{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr") };
 		};
@@ -127,7 +127,7 @@ public class BestWriterCSV implements BestWriter {
 		String[] header = { "namespace", "id", "assigned_ns", "assigned_id", 
 							"name_nl", "name_fr", "status" };
 		Function<Streetname,String[]> func = (Streetname s) -> { 
-			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr")});
+			cache.put(s.getIDVersion(), new String[] { s.getName("nl"), s.getName("fr")});
 			return new String[] 
 				{ s.getNamespace(), s.getId(), s.getCity().getNamespace(), s.getCity().getId(),
 				s.getName("nl"), s.getName("fr"), s.getStatus() };

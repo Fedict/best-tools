@@ -43,10 +43,12 @@ import javax.xml.stream.events.XMLEvent;
  * @author Bart Hanssens
  */
 public class MunicipalityReader extends AbstractXMLReader<Municipality> {
-	private final static QName LANGUAGE = new QName(AbstractXMLReader.ADD, "language");
 	private final static QName MUNICIPALITY = new QName(AbstractXMLReader.TNS, "Municipality");
+	private final static QName MUNICIPALITY_NAME = new QName(AbstractXMLReader.ADD, "municipalityName");
 	private final static QName NAMESPACE = new QName(AbstractXMLReader.ADD, "namespace");
-	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");;
+	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");
+	private final static QName VERSIONID = new QName(AbstractXMLReader.ADD, "versionIdentifier");
+	private final static QName LANGUAGE = new QName(AbstractXMLReader.ADD, "language");
 	private final static QName SPELLING = new QName(AbstractXMLReader.ADD, "spelling");
 
 	@Override
@@ -58,6 +60,7 @@ public class MunicipalityReader extends AbstractXMLReader<Municipality> {
 	protected Municipality getNextObj(XMLEventReader reader) throws XMLStreamException {
 		Municipality obj = null;
 		String lang = "";
+		String spelling = "";
 		
 		while(reader.hasNext()) {
 			XMLEvent event = reader.nextEvent();
@@ -72,16 +75,26 @@ public class MunicipalityReader extends AbstractXMLReader<Municipality> {
 					} else if (el.equals(OBJECTID)) {
 						String txt = reader.getElementText();
 						obj.setId(txt);
+					} else if (el.equals(VERSIONID)) {
+						String txt = reader.getElementText();
+						obj.setVersion(txt);
+					} else if (el.equals(MUNICIPALITY_NAME)) {
+						lang = "";
+						spelling = "";
 					} else if (el.equals(LANGUAGE)) {
 						lang = reader.getElementText();
 					} else if (el.equals(SPELLING)) {
-						String txt = reader.getElementText();
-						obj.setName(txt, lang);
+						spelling = reader.getElementText();
 					}
 				}
 			}
-			if (event.isEndElement() && event.asEndElement().getName().equals(MUNICIPALITY)) {
-				return obj;
+			if (event.isEndElement()) {
+				QName el = event.asEndElement().getName();
+				if (el.equals(MUNICIPALITY_NAME)) {
+					obj.setName(spelling, lang);
+				} else if (el.equals(MUNICIPALITY)) {
+					return obj;
+				}
 			}
 		}
 		throw new XMLStreamException("Was expecting next object");

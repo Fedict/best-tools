@@ -54,7 +54,7 @@ public interface BestWriter {
 	 */
 	public static Path getPath(Path outdir, BestRegion region, BestType type, String ext) {
 		String suffix = type.toString().toLowerCase();
-		return Paths.get(outdir.toString(), region.getName() + suffix + "." + ext);
+		return Paths.get(outdir.toString(), region.getName() + "_" + suffix + "." + ext);
 	}
 	
 	/**

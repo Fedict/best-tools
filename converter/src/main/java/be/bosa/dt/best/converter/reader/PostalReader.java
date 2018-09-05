@@ -44,10 +44,12 @@ import javax.xml.stream.events.XMLEvent;
  * @author Bart Hanssens
  */
 public class PostalReader extends AbstractXMLReader<Postal> {
-	private final static QName LANGUAGE = new QName(AbstractXMLReader.ADD, "language");
 	private final static QName POSTAL = new QName(AbstractXMLReader.TNS, "PostalInfo");
+	private final static QName POST_NAME = new QName(AbstractXMLReader.ADD, "postalname");
 	private final static QName NAMESPACE = new QName(AbstractXMLReader.ADD, "namespace");
-	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");;
+	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");
+	private final static QName VERSIONID = new QName(AbstractXMLReader.ADD, "versionIdentifier");
+	private final static QName LANGUAGE = new QName(AbstractXMLReader.ADD, "language");
 	private final static QName SPELLING = new QName(AbstractXMLReader.ADD, "spelling");
 
 	@Override
@@ -59,6 +61,7 @@ public class PostalReader extends AbstractXMLReader<Postal> {
 	protected Postal getNextObj(XMLEventReader reader) throws XMLStreamException {
 		Postal obj = null;
 		String lang = "";
+		String spelling = "";
 		
 		while(reader.hasNext()) {
 			XMLEvent event = reader.nextEvent();
@@ -73,16 +76,27 @@ public class PostalReader extends AbstractXMLReader<Postal> {
 					} else if (el.equals(OBJECTID)) {
 						String txt = reader.getElementText();
 						obj.setId(txt);
+					} else if (el.equals(VERSIONID)) {
+						String txt = reader.getElementText();
+						obj.setVersion(txt);
+					} else if (el.equals(POST_NAME)) {
+						lang = "";
+						spelling = "";
 					} else if (el.equals(LANGUAGE)) {
 						lang = reader.getElementText();
 					} else if (el.equals(SPELLING)) {
-						String txt = reader.getElementText();
-						obj.setName(txt, lang);
+						spelling = reader.getElementText();
 					}
 				}
 			}
-			if (event.isEndElement() && event.asEndElement().getName().equals(POSTAL)) {
-				return obj;
+			if (event.isEndElement()) {
+				QName el = event.asEndElement().getName();
+				if (el.equals(POST_NAME)) {
+					obj.setName(spelling, lang);
+				}
+				if (el.equals(POSTAL)) {
+					return obj;
+				}
 			}
 		}
 		throw new XMLStreamException("Was expecting next object");

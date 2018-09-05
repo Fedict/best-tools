@@ -33,10 +33,12 @@ package be.bosa.dt.best.converter.dao;
 public class BestObject {
 	private String namespace = "";
 	private String id = "";
+	private String version = "";
 
+	
 	/**
 	 * Get namespace provided by the Region.
-	 * Combine the namespace with the ID to get a globally unique ID.
+	 * Combine the namespace with the ID and version to get a globally unique ID.
 	 * 
 	 * @return namespace as string
 	 */
@@ -55,7 +57,7 @@ public class BestObject {
 
 	/**
 	 * Get ID provided by the region
-	 * Combine the namespace with the ID to get a globally unique ID.
+	 * Combine the namespace with the ID and version to get a globally unique ID.
 	 * 
 	 * @return ID as string
 	 */
@@ -64,14 +66,42 @@ public class BestObject {
 	}
 
 	/**
-	 * Set address ID provided by the region
+	 * Set ID provided by the region
 	 * 
 	 * @param id 
 	 */
 	public void setId(String id) {
 		this.id = id;
 	}
+	
+	/**
+	 * Get version ID provided by the region
+	 * Combine the namespace with the ID and version to get a globally unique ID.
+	 * 
+	 * @return ID as string
+	 */
+	public String getVersion() {
+		return version;
+	}
 
+	/**
+	 * Set version ID provided by the region
+	 * 
+	 * @param version 
+	 */
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	/**
+	 * Convenience method
+	 * 
+	 * @return 
+	 */
+	public String getIDVersion() {
+		return this.id + "/" + this.version;
+	}
+	
 	/**
 	 * Constructor
 	 */
