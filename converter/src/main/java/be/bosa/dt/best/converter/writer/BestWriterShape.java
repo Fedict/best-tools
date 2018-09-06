@@ -35,22 +35,25 @@ import be.bosa.dt.best.converter.dao.Streetname;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.geotools.data.collection.ListFeatureCollection;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
-import org.geotools.data.store.ContentFeatureSource;
+import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
+
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
@@ -139,44 +142,77 @@ public class BestWriterShape implements BestWriter {
 		
 		return cache;
 	}
+
+	/**
+	 * Build a shapefile feature from an address
+	 * 
+	 * @param builder
+	 * @param address
+	 * @param cCities citie name cache
+ 	 * @param cStreet street name cache
+	 * @param cPostal postal name cache
+	 * @return shapefile feature
+	 */
+	private SimpleFeature buildFeature(SimpleFeatureBuilder builder, Address address, 
+										String[] cCities, String[] cStreet, String[] cPostal) {
+		Coordinate xy = new Coordinate(address.getPoint().getX(), address.getPoint().getY());
+		Point point = FAC.createPoint(xy);
+		builder.add(point);
+		//		builder.add(s.getId());
+		builder.add(address.getNumber());
+		builder.add(address.getBox());
+		builder.add(address.getStreet().getId());
+		builder.add(cStreet[0]);
+		builder.add(cStreet[1]);
+		builder.add(address.getCity().getId());
+		builder.add(cCities[0]);
+		builder.add(cCities[1]);		
+		builder.add(address.getPostal().getId());
+		builder.add(cPostal[0]);
+		builder.add(cPostal[1]);
+		builder.add(address.getStatus());
+				
+		return builder.buildFeature(address.getId());
+	}
 	
 	@Override
 	public void writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses,
 			Map<String,String[]> streets, Map<String,String[]> cities, Map<String,String[]> postals) {
 		Path file = BestWriter.getPath(outdir, region, BestType.ADDRESSES, "shp");
-		
+		LOG.info("Writing {}", file);
+				
 		try {
+			SimpleFeatureType ftype = getFeatureType();
+			
 			ShapefileDataStore datastore = getDatastore(file);
-			SimpleFeatureBuilder builder = new SimpleFeatureBuilder(getFeatureType());
-			ContentFeatureSource featureSource = datastore.getFeatureSource();
+			datastore.createSchema(ftype);
+			
+			SimpleFeatureBuilder builder = new SimpleFeatureBuilder(ftype);
+			SimpleFeatureStore fstore = (SimpleFeatureStore) datastore.getFeatureSource("Addresses");
+			
+			List<SimpleFeature> features = new ArrayList<>(100_000);
 			
 			addresses.forEach(s -> {
+				int i = 0;
 				String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[2]);
 				String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[2]);
 				String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[2]);
-
-				Point point = FAC.createPoint(new Coordinate(s.getPoint().getX(), s.getPoint().getY()));
-				builder.add(point);
-		//		builder.add(s.getId());
-				builder.add(s.getNumber());
-				builder.add(s.getBox());
-				builder.add(s.getStreet().getId());
-				builder.add(cStreet[0]);
-				builder.add(cStreet[1]);
-				builder.add(s.getCity().getId());
-				builder.add(cCities[0]);
-				builder.add(cCities[1]);		
-				builder.add(s.getPostal().getId());
-				builder.add(cPostal[0]);
-				builder.add(cPostal[1]);
-				builder.add(s.getStatus());
+				features.add(buildFeature(builder, s, cCities, cStreet, cPostal));
 				
-				SimpleFeature buildFeature = builder.buildFeature(s.getId());
+				if (++i == 100_000) {
+					try {
+						fstore.addFeatures(new ListFeatureCollection(ftype, features));
+					} catch (IOException ioe) {
+						LOG.error("Error adding features", ioe);
+					}
+					features.clear();
+				}
 			});
-		} catch (IOException ioe) {
-			LOG.error("Can't write shapefile {}", ioe);
+			fstore.addFeatures(new ListFeatureCollection(ftype, features));			
+			} catch (IOException ioe) {
+			LOG.error("Can't write shapefile", ioe);
 		} catch (FactoryException fe) {
-			LOG.error("Coordinate system not supported {}", fe);
+			LOG.error("Coordinate system not supported", fe);
 		}
 	}
 

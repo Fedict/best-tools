@@ -145,7 +145,7 @@ public class Main {
 		for (BestRegion region: BestRegion.values()) {
 			if (cli.hasOption(region.getCode())) {
 				LOG.info("Region {}", region.getName());
-				writeRegionCSV(region, inPath, outPath);
+				//writeRegionCSV(region, inPath, outPath);
 				writeRegionShape(region, inPath, outPath);
 			}
 		}
