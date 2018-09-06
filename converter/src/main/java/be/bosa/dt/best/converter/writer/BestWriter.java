@@ -95,8 +95,9 @@ public interface BestWriter {
 	 * @param outdir output directory
 	 * @param addresses
 	 * @param streets
+	 * @param cities
 	 * @param postals
 	 */
 	public void writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses, 
-							Map<String,String[]> streets, Map<String,String[]> postals);
+			Map<String,String[]> streets, Map<String,String[]> cities, Map<String,String[]> postals);
 }

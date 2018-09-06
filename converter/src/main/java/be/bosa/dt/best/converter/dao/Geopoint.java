@@ -25,7 +25,6 @@
  */
 package be.bosa.dt.best.converter.dao;
 
-
 /**
  * Helper class for geo point
  * 
@@ -92,15 +91,22 @@ public class Geopoint {
 	/**
 	 * Convenience method for setting X,Y and system at once
 	 * 
-	 * @param x
-	 * @param y
-	 * @param srs 
+	 * @param xy
+	 * @param srs
+	 * @throws NumberFormatException
 	 */
-	public void set (float x, float y, String srs) {
-		this.x = x;
-		this.y = y;
-		this.srs = srs;
-	}
+	public void setXY(String xy, String srs) throws NumberFormatException {
+		if (xy == null || !xy.contains(" ")) {
+			throw new NumberFormatException("Not a valid X Y coordinate string");
+		}
+		if (!srs.endsWith("31370")) {
+			throw new NumberFormatException("Not Lambert 72 projection");
+		}
+		String[] coords = xy.split(" ");
+		this.x = Float.valueOf(coords[0]);
+		this.y = Float.valueOf(coords[1]);
+		this.srs = "31370";
+	}		
 	
 	/**
 	 * Constructor

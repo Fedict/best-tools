@@ -82,7 +82,7 @@ public class BestWriterCSV implements BestWriter {
 		
 		String[] header = { "namespace", "id", "version", "name_nl", "name_fr" };
 		Function<Municipality,String[]> func = (Municipality s) -> { 
-			cache.put(s.getIDVersion(), new String[] { s.getName("nl"), s.getName("fr")});
+			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr")});
 			return new String[] 
 				{ s.getNamespace(), s.getId(), s.getVersion(), s.getName("nl"), s.getName("fr") };
 		};
@@ -107,7 +107,7 @@ public class BestWriterCSV implements BestWriter {
 		
 		String[] header = { "namespace", "id", "name_nl", "name_fr", "status" };
 		Function<Postal,String[]> func = (Postal s) -> { 
-			cache.put(s.getIDVersion(), new String[] { s.getName("nl"), s.getName("fr")});
+			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr")});
 			return new String[] 
 				{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr") };
 		};
@@ -129,12 +129,12 @@ public class BestWriterCSV implements BestWriter {
 							"city_ns", "city_id", "city_nl", "city_fr",
 							"status", "from" };
 		Function<Streetname,String[]> func = (Streetname s) -> { 
-			cache.put(s.getIDVersion(), new String[] { s.getName("nl"), s.getName("fr")});
-			String[] found = cities.getOrDefault(s.getCity().getIDVersion(), new String[2]);
+			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr")});
+			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[2]);
 			
 			return new String[] 
 				{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr"),
-				s.getCity().getNamespace(), s.getCity().getId(), found[0], found[1],
+				s.getCity().getNamespace(), s.getCity().getId(), cCities[0], cCities[1],
 				s.getStatus(), s.getDate() };
 		};
 		
@@ -145,19 +145,27 @@ public class BestWriterCSV implements BestWriter {
 	
 	@Override
 	public void writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses,
-			Map<String,String[]> streets, Map<String,String[]> postals) {
+			Map<String,String[]> streets, Map<String,String[]> cities, Map<String,String[]> postals) {
 		Path file = BestWriter.getPath(outdir, region, BestType.ADDRESSES, "csv");
 
-		String[] header = { "namespace", "id", "x", "y", 
-//								"street_ns", "street_id", "city_ns", "city_id", "number",
+		String[] header = { "id", "x", "y",
+							"number", "box",
+							"street_id", "street_nl", "street_fr",
+							"city_id", "city_nl", "city_fr",
+							"postal_id", "postal_nl", "postal_fr",
 							"status" };
 		Function<Address,String[]> func = (Address s) -> {
-
+			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[2]);
+			String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[2]);
+			String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[2]);
+						
 			return new String[] 
-				{ s.getNamespace(), s.getId(),
+				{ s.getId(),
 				String.valueOf(s.getPoint().getX()), String.valueOf(s.getPoint().getY()),
-//								s.getCity().getNamespace(), s.getCity().getId(),
-//								s.getName("nl"), s.getName("fr"), 
+				s.getNumber(), s.getBox(),
+				s.getStreet().getId(), cStreet[0], cStreet[1],
+				s.getCity().getId(), cCities[0], cCities[1],
+				s.getPostal().getId(), cPostal[0], cPostal[1],
 				s.getStatus() };
 		};
 		

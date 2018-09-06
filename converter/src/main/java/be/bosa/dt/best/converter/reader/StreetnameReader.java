@@ -31,17 +31,12 @@ import be.bosa.dt.best.converter.dao.BestType;
 import be.bosa.dt.best.converter.dao.Streetname;
 
 import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.stream.Stream;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * BeST XML file processor interface
@@ -60,8 +55,6 @@ public class StreetnameReader extends AbstractXMLReader<Streetname> {
 	private final static QName SPELLING = new QName(AbstractXMLReader.ADD, "spelling");
 	private final static QName STATUS = new QName(AbstractXMLReader.ADD, "status");
 	private final static QName VALID = new QName(AbstractXMLReader.ADD, "validFrom");
-
-	private final static Logger LOG = LoggerFactory.getLogger(StreetnameReader.class);
 	
 	@Override
 	protected QName getRoot() {

@@ -33,6 +33,10 @@ package be.bosa.dt.best.converter.dao;
 public class Address extends BestObject {
 	private final Geopoint point = new Geopoint();
 	private final Municipality city = new Municipality();
+	private final Postal postal = new Postal();
+	private final Streetname street = new Streetname();
+	private String number = "";
+	private String box = "";
 	private String status = "";
 
 	/**
@@ -51,6 +55,60 @@ public class Address extends BestObject {
 	 */
 	public Municipality getCity() {
 		return city;
+	}
+	
+	/**
+	 * Get the postal info of the address
+	 * 
+	 * @return postal object
+	 */
+	public Postal getPostal() {
+		return postal;
+	}
+	
+	/**
+	 * Get the street of the address
+	 * 
+	 * @return street object
+	 */
+	public Streetname getStreet() {
+		return street;
+	}
+	
+	/**
+	 * Get the house number of the address as string
+	 * 
+	 * @return house number
+	 */
+	public String getNumber() {
+		return number;
+	}
+	
+	/**
+	 * Set the house number of the address
+	 * 
+	 * @param number house number
+	 */
+	public void setNumber(String number) {
+		this.number = number;
+	}
+
+	/**
+	 * Get the box number, if any
+	 * 
+	 * @return box number
+	 */
+	public String getBox() {
+		return box;
+	}
+	
+	/**
+	 * Set the box number, if any
+	 * 
+	 * @param box box number
+	 */
+	public void setBox(String box) {
+		this.box = box;
 	}
 	
 	/**

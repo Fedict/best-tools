@@ -26,6 +26,7 @@
 package be.bosa.dt.best.converter.reader;
 
 import be.bosa.dt.best.converter.dao.Address;
+import be.bosa.dt.best.converter.dao.BestObject;
 import be.bosa.dt.best.converter.dao.BestRegion;
 import be.bosa.dt.best.converter.dao.BestType;
 
@@ -48,11 +49,16 @@ import org.slf4j.LoggerFactory;
 public class AddressReader extends AbstractXMLReader<Address> {
 	private final static QName ADDRESS = new QName(AbstractXMLReader.TNS, "Address");
 	private final static QName MUNICIPALITY = new QName(AbstractXMLReader.ADD, "Municipality");
+	private final static QName POSTAL = new QName(AbstractXMLReader.ADD, "PostalInfo");
+	private final static QName STREETNAME = new QName(AbstractXMLReader.ADD, "Streetname");
+	private final static QName HOUSENUMBER = new QName(AbstractXMLReader.ADD, "houseNumber");
+	private final static QName BOXNUMBER = new QName(AbstractXMLReader.ADD, "boxNumber");
 	private final static QName NAMESPACE = new QName(AbstractXMLReader.ADD, "namespace");
 	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");
+	private final static QName VERSIONID = new QName(AbstractXMLReader.ADD, "versionIdentifier");
 	private final static QName POS = new QName(AbstractXMLReader.GML, "pos");
 	private final static QName STATUS = new QName(AbstractXMLReader.ADD, "status");
-	private final static String SRSNAME = "srsName";
+	private final static QName SRSNAME = new QName("", "srsName");
 
 	private final static Logger LOG = LoggerFactory.getLogger(AddressReader.class);
 	
@@ -67,7 +73,7 @@ public class AddressReader extends AbstractXMLReader<Address> {
 	@Override
 	protected Address getNextObj(XMLEventReader reader) throws XMLStreamException {
 		Address obj = null;
-		boolean inAssigned = false;
+		BestObject withinObj = null;
 		
 		while(reader.hasNext()) {
 			XMLEvent event = reader.nextEvent();
@@ -75,40 +81,40 @@ public class AddressReader extends AbstractXMLReader<Address> {
 				QName el = event.asStartElement().getName();
 				if (el.equals(ADDRESS)) {
 					obj = new Address();
+					withinObj = obj;
 					if ((++nr % 100_000L) == 0) {
 						LOG.info("Parsing address {}", nr);
 					}
 				} else if (obj != null) {
 					if (el.equals(MUNICIPALITY)) {
-						inAssigned = true;
+						withinObj = obj.getCity();
+					} else if (el.equals(POSTAL)) {
+						withinObj = obj.getPostal();
+					} else if (el.equals(STREETNAME)) {
+						withinObj = obj.getStreet();
 					} else if (el.equals(NAMESPACE)) {
 						String txt = reader.getElementText();
-						if (inAssigned) { 
-							obj.getCity().setNamespace(txt);
-						} else {
-							 obj.setNamespace(txt);
-						}
+						withinObj.setNamespace(txt);
 					} else if (el.equals(OBJECTID)) {
 						String txt = reader.getElementText();
-						if (inAssigned) {
-							obj.getCity().setId(txt);
-						} else {
-							obj.setId(txt);
-						}
+						withinObj.setId(txt);
+					} else if (el.equals(VERSIONID)) {
+						String txt = reader.getElementText();
+						withinObj.setVersion(txt);
+					} else if (el.equals(HOUSENUMBER)) {
+						String txt = reader.getElementText();
+						obj.setNumber(txt);
+					} else if (el.equals(BOXNUMBER)) {
+						String txt = reader.getElementText();
+						obj.setBox(txt);
 					} else if (el.equals(POS)) {
-						Object attr = reader.getProperty(SRSNAME);
+						Object attr = event.asStartElement().getAttributeByName(SRSNAME).getValue();
 						String srs = (attr == null) ? "" : attr.toString();
 						String txt = reader.getElementText();
-						
-						if (txt != null && txt.contains(" ")) {
-							String[] coords = txt.split(" ");
-							try {
-								float x = Float.valueOf(coords[0]);
-								float y = Float.valueOf(coords[1]);
-								obj.getPoint().set(x, y, srs);
-							} catch (NumberFormatException nfe) {
-								LOG.warn("Error geoposition {} for {} ", nfe, obj.getId());
-							}
+						try {
+							obj.getPoint().setXY(txt, srs);
+						} catch (NumberFormatException nfe) {
+							LOG.warn("Error geoposition {} for {} ", nfe, obj.getId());
 						}
 					} else if (el.equals(STATUS)) {
 						String txt = reader.getElementText();
@@ -119,9 +125,12 @@ public class AddressReader extends AbstractXMLReader<Address> {
 			if (event.isEndElement()) {
 				QName el = event.asEndElement().getName();
 				if (el.equals(MUNICIPALITY)) {
-					inAssigned = false;
-				}
-				if (el.equals(ADDRESS)) {
+					withinObj = obj;
+				} else if (el.equals(POSTAL)) {
+					withinObj = obj;				
+				} else if (el.equals(STREETNAME)) {
+					withinObj = obj;
+				} else if (el.equals(ADDRESS)) {
 					return obj;
 				}
 			}

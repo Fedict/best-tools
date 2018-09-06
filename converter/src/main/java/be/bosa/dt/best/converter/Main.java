@@ -103,7 +103,7 @@ public class Main {
 			Map<String, String[]> cachePostals = writer.writePostals(region, outPath, postals);
 			Map<String, String[]> cacheStreets = writer.writeStreets(region, outPath, streets, cacheCities);
 			
-			writer.writeAddresses(region, outPath, addresses, cacheCities, cacheStreets);
+			writer.writeAddresses(region, outPath, addresses, cacheCities, cacheStreets, cachePostals);
 		}
 	}
 	
