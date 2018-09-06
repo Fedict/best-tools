@@ -92,13 +92,6 @@ public class BestWriterCSV implements BestWriter {
 		return cache;
 	}
 
-	/**
-	 * Process the input file and return a stream of BeSt objects
-	 * 
-	 * @param region
-	 * @param outdir
-	 * @param postals
-	 */
 	@Override
 	public Map<String,String[]> writePostals(BestRegion region, Path outdir, Stream<Postal> postals) {
 		Path file = BestWriter.getPath(outdir, region, BestType.POSTALINFO, "csv");
@@ -116,8 +109,7 @@ public class BestWriterCSV implements BestWriter {
 		
 		return cache;
 	}
-	
-	
+		
 	@Override
 	public Map<String,String[]> writeStreets(BestRegion region, Path outdir, Stream<Streetname> streets,
 											Map<String,String[]> cities) {
