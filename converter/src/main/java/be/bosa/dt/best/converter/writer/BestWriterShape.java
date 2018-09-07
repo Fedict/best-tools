@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 import org.geotools.data.DefaultTransaction;
+import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 
 import org.geotools.data.collection.ListFeatureCollection;
@@ -115,11 +116,10 @@ public class BestWriterShape implements BestWriter {
 	 */
 	private ShapefileDataStore getDatastore(Path file) throws IOException {
 		ShapefileDataStoreFactory factory = new ShapefileDataStoreFactory();
-		Map<String, Serializable> params = new HashMap<>();
-		params.put("url", file.toUri().toURL());
-		params.put("create spatial index", Boolean.TRUE);
-		ShapefileDataStore store = (ShapefileDataStore) factory.createDataStore(params);
-
+		ShapefileDataStore store = (ShapefileDataStore) factory.createDataStore(file.toUri().toURL());
+		store.setMemoryMapped(true);
+		store.setBufferCachingEnabled(true);
+		
 		return store;
 	}
 	
@@ -183,24 +183,22 @@ public class BestWriterShape implements BestWriter {
 	/**
 	 * Store features into shapefile
 	 * 
-	 * @param fstore
-	 * @param ftype
-	 * @param features 
-	 * @throws java.io.IOException 
+	 * @param writer
+	 * @param features
+	 * @throws IOException
 	 */
-	private void storeFeatures(SimpleFeatureStore fstore, SimpleFeatureType ftype,
-								List<SimpleFeature> features) throws IOException {	
-		if (features.isEmpty()) {
-			return;
+	private void writeFeatures(FeatureWriter<SimpleFeatureType,SimpleFeature> writer, 
+								List<SimpleFeature> features) throws IOException {
+		for (SimpleFeature f: features) {
+			SimpleFeature toWrite = writer.next();
+			for (int j = 0; j < toWrite.getType().getAttributeCount(); j++) {
+				String name = toWrite.getType().getDescriptor(j).getLocalName();
+				toWrite.setAttribute(name, f.getAttribute(name));
+			}
+			writer.write();
 		}
-		
-		try (Transaction t = new DefaultTransaction()) {
-			fstore.setTransaction(t);
-			fstore.addFeatures(new ListFeatureCollection(ftype, features));
-			t.commit();
-		} 
 	}
-		
+	
 	@Override
 	public void writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses,
 			Map<String,String[]> streets, Map<String,String[]> cities, Map<String,String[]> postals) {
@@ -211,10 +209,15 @@ public class BestWriterShape implements BestWriter {
 			SimpleFeatureType ftype = getFeatureType();
 			
 			ShapefileDataStore datastore = getDatastore(file);
+			datastore.setIndexCreationEnabled(false);
 			datastore.createSchema(ftype);
 			
 			SimpleFeatureBuilder builder = new SimpleFeatureBuilder(ftype);
-			SimpleFeatureStore fstore = (SimpleFeatureStore) datastore.getFeatureSource();
+			//SimpleFeatureStore fstore = (SimpleFeatureStore) datastore.getFeatureSource();
+			
+			// much faster for large inserts than high-level API
+			FeatureWriter<SimpleFeatureType, SimpleFeature> writer = 
+				datastore.getFeatureWriter(datastore.getTypeNames()[0], Transaction.AUTO_COMMIT);
 			
 			int i = 0;
 			Iterator iterator = addresses.iterator();
@@ -225,16 +228,19 @@ public class BestWriterShape implements BestWriter {
 
 				String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[2]);
 				String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[2]);
-				String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[2]);
-				
+				String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[2]);				
 				features.add(buildFeature(builder, s, cCities, cStreet, cPostal));
-					
+	
 				if (++i % 100_000 == 0) {
-					storeFeatures(fstore, ftype, features);
+					writeFeatures(writer, features);
 					features.clear();
 				}
 			}
-			storeFeatures(fstore, ftype, features);
+			writeFeatures(writer, features);
+			features.clear();
+			writer.close();
+
+			datastore.setIndexCreationEnabled(true);
 		} catch (IOException ioe) {
 			LOG.error("Can't write shapefile", ioe);
 		} catch (FactoryException fe) {
