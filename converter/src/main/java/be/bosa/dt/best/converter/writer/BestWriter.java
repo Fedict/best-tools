@@ -83,6 +83,7 @@ public interface BestWriter {
 	 * @param region
 	 * @param outdir output directory
 	 * @param streetnames
+	 * @param cities city names cache
 	 * @return 
 	 */
 	public Map<String,String[]> writeStreets(BestRegion region, Path outdir, Stream<Streetname> streetnames,
@@ -94,9 +95,9 @@ public interface BestWriter {
 	 * @param region
 	 * @param outdir output directory
 	 * @param addresses
-	 * @param streets
-	 * @param cities
-	 * @param postals
+	 * @param streets street name cache
+	 * @param cities city names cache
+	 * @param postals postal info cache
 	 */
 	public void writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses, 
 			Map<String,String[]> streets, Map<String,String[]> cities, Map<String,String[]> postals);

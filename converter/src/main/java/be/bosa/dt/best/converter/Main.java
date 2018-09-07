@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Small tool to unzip the various BeST zipfiles
+ * Conversion tool to convert XML files to various formats
  * 
  * @author Bart Hanssens
  */
@@ -109,6 +109,13 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * Write address info for a specific region to a shapefile
+	 * 
+	 * @param region Belgian region
+	 * @param inPath input directory
+	 * @param outPath output directory
+	 */
 	private static void writeRegionShape(BestRegion region, Path inPath, Path outPath) {	
 		try( Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
 			Stream<Postal> postals = new PostalReader().read(region, inPath);
@@ -121,7 +128,7 @@ public class Main {
 			Map<String, String[]> cachePostals = writer.writePostals(region, outPath, postals);
 			Map<String, String[]> cacheStreets = writer.writeStreets(region, outPath, streets, cacheCities);
 			
-			writer.writeAddresses(region, outPath, addresses, cacheCities, cacheCities, cachePostals);
+			writer.writeAddresses(region, outPath, addresses, cacheStreets, cacheCities, cachePostals);
 		}
 	}
 	
@@ -145,7 +152,7 @@ public class Main {
 		for (BestRegion region: BestRegion.values()) {
 			if (cli.hasOption(region.getCode())) {
 				LOG.info("Region {}", region.getName());
-				//writeRegionCSV(region, inPath, outPath);
+				writeRegionCSV(region, inPath, outPath);
 				writeRegionShape(region, inPath, outPath);
 			}
 		}
