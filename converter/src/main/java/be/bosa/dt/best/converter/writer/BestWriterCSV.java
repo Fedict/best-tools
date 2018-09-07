@@ -163,5 +163,4 @@ public class BestWriterCSV implements BestWriter {
 		
 		write(file, header, addresses, func);
 	}
-
 }

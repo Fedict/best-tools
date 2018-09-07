@@ -33,24 +33,18 @@ import be.bosa.dt.best.converter.dao.Postal;
 import be.bosa.dt.best.converter.dao.Streetname;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.stream.Stream;
-import org.geotools.data.DefaultTransaction;
+
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
-
-import org.geotools.data.collection.ListFeatureCollection;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
-import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
@@ -209,37 +203,37 @@ public class BestWriterShape implements BestWriter {
 			SimpleFeatureType ftype = getFeatureType();
 			
 			ShapefileDataStore datastore = getDatastore(file);
-			datastore.setIndexCreationEnabled(false);
 			datastore.createSchema(ftype);
 			
 			SimpleFeatureBuilder builder = new SimpleFeatureBuilder(ftype);
-			//SimpleFeatureStore fstore = (SimpleFeatureStore) datastore.getFeatureSource();
 			
-			// much faster for large inserts than high-level API
-			FeatureWriter<SimpleFeatureType, SimpleFeature> writer = 
-				datastore.getFeatureWriter(datastore.getTypeNames()[0], Transaction.AUTO_COMMIT);
-			
+			//write batches of 100_000 features to the shape file
 			int i = 0;
 			Iterator iterator = addresses.iterator();
 			List<SimpleFeature> features = new ArrayList<>(100_000);
+			String typeName = datastore.getTypeNames()[0];
 			
-			while (iterator.hasNext()) {
-				Address s = (Address) iterator.next();
-
-				String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[2]);
-				String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[2]);
-				String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[2]);				
-				features.add(buildFeature(builder, s, cCities, cStreet, cPostal));
-	
-				if (++i % 100_000 == 0) {
-					writeFeatures(writer, features);
-					features.clear();
+			// low-level API is much faster for large numbers of addresses
+			try( FeatureWriter<SimpleFeatureType, SimpleFeature> writer = 
+				datastore.getFeatureWriter(typeName, Transaction.AUTO_COMMIT)) {
+				datastore.setIndexCreationEnabled(false);
+				
+				while (iterator.hasNext()) {
+					Address s = (Address) iterator.next();
+					
+					String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[2]);
+					String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[2]);
+					String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[2]);
+					features.add(buildFeature(builder, s, cCities, cStreet, cPostal));
+					
+					if (++i % 100_000 == 0) {
+						writeFeatures(writer, features);
+						features.clear();
+					}
 				}
+				writeFeatures(writer, features);
+				features.clear();
 			}
-			writeFeatures(writer, features);
-			features.clear();
-			writer.close();
-
 			datastore.setIndexCreationEnabled(true);
 		} catch (IOException ioe) {
 			LOG.error("Can't write shapefile", ioe);
@@ -247,5 +241,4 @@ public class BestWriterShape implements BestWriter {
 			LOG.error("Coordinate system not supported", fe);
 		}
 	}
-
 }
