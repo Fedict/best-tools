@@ -36,10 +36,15 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.stream.Stream;
+import org.geotools.data.DefaultTransaction;
+import org.geotools.data.Transaction;
 
 import org.geotools.data.collection.ListFeatureCollection;
 import org.geotools.data.shapefile.ShapefileDataStore;
@@ -175,6 +180,27 @@ public class BestWriterShape implements BestWriter {
 		return builder.buildFeature(address.getId());
 	}
 	
+	/**
+	 * Store features into shapefile
+	 * 
+	 * @param fstore
+	 * @param ftype
+	 * @param features 
+	 * @throws java.io.IOException 
+	 */
+	private void storeFeatures(SimpleFeatureStore fstore, SimpleFeatureType ftype,
+								List<SimpleFeature> features) throws IOException {	
+		if (features.isEmpty()) {
+			return;
+		}
+		
+		try (Transaction t = new DefaultTransaction()) {
+			fstore.setTransaction(t);
+			fstore.addFeatures(new ListFeatureCollection(ftype, features));
+			t.commit();
+		} 
+	}
+		
 	@Override
 	public void writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses,
 			Map<String,String[]> streets, Map<String,String[]> cities, Map<String,String[]> postals) {
@@ -188,28 +214,28 @@ public class BestWriterShape implements BestWriter {
 			datastore.createSchema(ftype);
 			
 			SimpleFeatureBuilder builder = new SimpleFeatureBuilder(ftype);
-			SimpleFeatureStore fstore = (SimpleFeatureStore) datastore.getFeatureSource("Addresses");
+			SimpleFeatureStore fstore = (SimpleFeatureStore) datastore.getFeatureSource();
 			
+			int i = 0;
+			Iterator iterator = addresses.iterator();
 			List<SimpleFeature> features = new ArrayList<>(100_000);
 			
-			addresses.forEach(s -> {
-				int i = 0;
+			while (iterator.hasNext()) {
+				Address s = (Address) iterator.next();
+
 				String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[2]);
 				String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[2]);
 				String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[2]);
-				features.add(buildFeature(builder, s, cCities, cStreet, cPostal));
 				
-				if (++i == 100_000) {
-					try {
-						fstore.addFeatures(new ListFeatureCollection(ftype, features));
-					} catch (IOException ioe) {
-						LOG.error("Error adding features", ioe);
-					}
+				features.add(buildFeature(builder, s, cCities, cStreet, cPostal));
+					
+				if (++i % 100_000 == 0) {
+					storeFeatures(fstore, ftype, features);
 					features.clear();
 				}
-			});
-			fstore.addFeatures(new ListFeatureCollection(ftype, features));			
-			} catch (IOException ioe) {
+			}
+			storeFeatures(fstore, ftype, features);
+		} catch (IOException ioe) {
 			LOG.error("Can't write shapefile", ioe);
 		} catch (FactoryException fe) {
 			LOG.error("Coordinate system not supported", fe);
