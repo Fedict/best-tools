@@ -45,7 +45,7 @@ import javax.xml.stream.events.XMLEvent;
  */
 public class PostalReader extends AbstractXMLReader<Postal> {
 	private final static QName POSTAL = new QName(AbstractXMLReader.TNS, "PostalInfo");
-	private final static QName POST_NAME = new QName(AbstractXMLReader.ADD, "postalname");
+	private final static QName POSTNAME = new QName(AbstractXMLReader.ADD, "postname");
 	private final static QName NAMESPACE = new QName(AbstractXMLReader.ADD, "namespace");
 	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");
 	private final static QName VERSIONID = new QName(AbstractXMLReader.ADD, "versionIdentifier");
@@ -79,7 +79,7 @@ public class PostalReader extends AbstractXMLReader<Postal> {
 					} else if (el.equals(VERSIONID)) {
 						String txt = reader.getElementText();
 						obj.setVersion(txt);
-					} else if (el.equals(POST_NAME)) {
+					} else if (el.equals(POSTNAME)) {
 						lang = "";
 						spelling = "";
 					} else if (el.equals(LANGUAGE)) {
@@ -91,7 +91,7 @@ public class PostalReader extends AbstractXMLReader<Postal> {
 			}
 			if (event.isEndElement()) {
 				QName el = event.asEndElement().getName();
-				if (el.equals(POST_NAME)) {
+				if (el.equals(POSTNAME)) {
 					obj.setName(spelling, lang);
 				}
 				if (el.equals(POSTAL)) {
