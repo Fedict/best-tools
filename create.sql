@@ -9,7 +9,7 @@ CREATE EXTENSION fuzzystrmatch;
 CREATE ROLE best_writer WITH PASSWORD 'best_writer';
 GRANT CONNECT ON DATABASE data TO best_writer;
 GRANT USAGE ON SCHEMA best TO best_writer;
-GRANT SELECT, UPDATE, INSERT ON ALL TABLES IN SCHEMA best_writer;
+GRANT SELECT, UPDATE, INSERT ON ALL TABLES IN SCHEMA best TO best_writer;
 
 CREATE ROLE best_reader WITH PASSWORD 'best_reader';
 GRANT CONNECT ON DATABASE data TO best_reader;
