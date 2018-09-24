@@ -7,14 +7,13 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <groupId>be.bosa.dt.best</groupId>
-    <artifactId>converter</artifactId>
+    <artifactId>loader-standalone</artifactId>
     <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
-    <name>BeSt converters</name>
-    <description>Belgian Streets and Addresses converter (XML to other formats)</description>
+    <name>BeSt loader standalone</name>
     <build>
         <plugins>
             <plugin>
@@ -57,7 +56,7 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>be.bosa.dt.best.converter.Main</mainClass>
+                                    <mainClass>be.bosa.dt.best.loader.Main</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -68,21 +67,6 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>4.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-shapefile</artifactId>
-            <version>21-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-epsg-wkt</artifactId>
-            <version>21-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>dao</artifactId>
             <version>${project.version}</version>
@@ -92,20 +76,20 @@
             <artifactId>xmlreader</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jdbi</groupId>
+            <artifactId>jdbi3-postgres</artifactId>
+            <version>3.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.25</version>
+        </dependency>
     </dependencies>
-    <repositories>
-        <repository>
-            <id>osgeo</id>
-            <name>Open Source Geospatial Foundation Repository</name>
-            <url>http://download.osgeo.org/webdav/geotools/</url>
-        </repository>
-        <repository>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-          <id>boundless</id>
-          <name>Boundless Maven Repository</name>
-          <url>http://repo.boundlessgeo.com/main</url>
-        </repository>
-    </repositories>
 </project>

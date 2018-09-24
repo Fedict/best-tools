@@ -25,13 +25,13 @@
  */
 package be.bosa.dt.best.converter.writer;
 
-import be.bosa.dt.best.converter.dao.Address;
-import be.bosa.dt.best.converter.dao.BestObject;
-import be.bosa.dt.best.converter.dao.BestRegion;
-import be.bosa.dt.best.converter.dao.BestType;
-import be.bosa.dt.best.converter.dao.Municipality;
-import be.bosa.dt.best.converter.dao.Postal;
-import be.bosa.dt.best.converter.dao.Streetname;
+import be.bosa.dt.best.dao.Address;
+import be.bosa.dt.best.dao.BestObject;
+import be.bosa.dt.best.dao.BestRegion;
+import be.bosa.dt.best.dao.BestType;
+import be.bosa.dt.best.dao.Municipality;
+import be.bosa.dt.best.dao.Postal;
+import be.bosa.dt.best.dao.Streetname;
 
 import com.opencsv.CSVWriter;
 
@@ -119,7 +119,7 @@ public class BestWriterCSV implements BestWriter {
 		
 		String[] header = { "namespace", "id", "name_nl", "name_fr", 
 							"city_ns", "city_id", "city_nl", "city_fr",
-							"status", "from" };
+							"version", "status", "from" };
 		Function<Streetname,String[]> func = (Streetname s) -> { 
 			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr")});
 			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[2]);
@@ -127,7 +127,7 @@ public class BestWriterCSV implements BestWriter {
 			return new String[] 
 				{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr"),
 				s.getCity().getNamespace(), s.getCity().getId(), cCities[0], cCities[1],
-				s.getStatus(), s.getDate() };
+				s.getVersion(), s.getStatus(), s.getDate() };
 		};
 		
 		write(file, header, streets, func);
@@ -145,7 +145,7 @@ public class BestWriterCSV implements BestWriter {
 							"street_id", "street_nl", "street_fr",
 							"city_id", "city_nl", "city_fr",
 							"postal_id", "postal_nl", "postal_fr",
-							"status" };
+							"version", "status" };
 		Function<Address,String[]> func = (Address s) -> {
 			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[2]);
 			String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[2]);
@@ -158,7 +158,7 @@ public class BestWriterCSV implements BestWriter {
 				s.getStreet().getId(), cStreet[0], cStreet[1],
 				s.getCity().getId(), cCities[0], cCities[1],
 				s.getPostal().getId(), cPostal[0], cPostal[1],
-				s.getStatus() };
+				s.getVersion(), s.getStatus() };
 		};
 		
 		write(file, header, addresses, func);

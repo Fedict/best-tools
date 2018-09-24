@@ -1,1 +1,7 @@
 /converter/target/
+/xml/target/
+/util/target/
+/dao/target/
+/loader/target/
+/xmlreader/target/
+/loader-standalone/target/

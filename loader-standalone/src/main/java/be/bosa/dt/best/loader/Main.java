@@ -23,7 +23,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.converter;
+package be.bosa.dt.best.loader;
 
 import be.bosa.dt.best.dao.Address;
 import be.bosa.dt.best.dao.BestRegion;
@@ -35,12 +35,9 @@ import be.bosa.dt.best.xmlreader.AddressReader;
 import be.bosa.dt.best.xmlreader.MunicipalityReader;
 import be.bosa.dt.best.xmlreader.PostalReader;
 import be.bosa.dt.best.xmlreader.StreetnameReader;
-import be.bosa.dt.best.converter.writer.BestWriterCSV;
-import be.bosa.dt.best.converter.writer.BestWriterShape;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
@@ -50,12 +47,16 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import org.jdbi.v3.core.Handle;
+import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.Update;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 /**
- * Conversion tool to convert XML files to various formats
+ * Standalone tool to load data into postgresql database
  * 
  * @author Bart Hanssens
  */
@@ -64,7 +65,7 @@ public class Main {
 	
 	private final static Options OPTS = new Options()
 		.addRequiredOption("i", "indir", true, "input directory")
-		.addOption("o", "outdir", true, "output directory")
+		.addOption("d", "database", true, "database JDBC string")
 		.addOption("B", "Brussels", false, "process files for Brussels")
 		.addOption("F", "Flanders", false, "process files for Flanders")
 		.addOption("W", "Wallonia", false, "process files for Wallonia");
@@ -74,7 +75,7 @@ public class Main {
 	 */
 	private static void printHelp() {
 		HelpFormatter fmt = new HelpFormatter();
-		fmt.printHelp("BeST converters", OPTS);
+		fmt.printHelp("BeST loader", OPTS);
 	}
 	
 	/**
@@ -94,45 +95,30 @@ public class Main {
 	}
 
 	
-	private static void writeRegionCSV(BestRegion region, Path inPath, Path outPath) {	
-		try( Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
-			Stream<Postal> postals = new PostalReader().read(region, inPath);
-			Stream<Streetname> streets = new StreetnameReader().read(region, inPath);
-			Stream<Address> addresses = new AddressReader().read(region, inPath)) {
-
-			BestWriterCSV writer = new BestWriterCSV();
-				
-			Map<String, String[]> cacheCities = writer.writeMunicipalities(region, outPath, cities);
-			Map<String, String[]> cachePostals = writer.writePostals(region, outPath, postals);
-			Map<String, String[]> cacheStreets = writer.writeStreets(region, outPath, streets, cacheCities);
+	private static void writeRegion(BestRegion region, Path inPath, String jdbc) {
+		Jdbi jdbi = Jdbi.create(jdbc);
+		String code = region.getCode();
+		
+		String DEL = "DELETE FROM best.cities WHERE region = ?";
+		String INS = "INSERT INTO best.cities VALUES(:id, :region, :nl, :fr)";
+		
+		try(	Handle handle = jdbi.open();
+			Stream<Municipality> cities = new MunicipalityReader().read(region, inPath)) {
 			
-			writer.writeAddresses(region, outPath, addresses, cacheStreets, cacheCities, cachePostals);
+			handle.execute(DEL, code);
+			Update upd = handle.createUpdate(INS);
+			cities.forEach(c -> {
+				upd.bind("id", c.getId())
+					.bind("region", code)
+					.bind("nl", c.getName("nl"))
+					.bind("fr", c.getName("fr")).execute();
+			});
 		}
+		/*
+		Stream<Streetname> streets = new StreetnameReader().read(region, inPath);
+			Stream<Address> addresses = new AddressReader().read(region, inPath)) { */
 	}
-	
-	/**
-	 * Write address info for a specific region to a shapefile
-	 * 
-	 * @param region Belgian region
-	 * @param inPath input directory
-	 * @param outPath output directory
-	 */
-	private static void writeRegionShape(BestRegion region, Path inPath, Path outPath) {	
-		try( Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
-			Stream<Postal> postals = new PostalReader().read(region, inPath);
-			Stream<Streetname> streets = new StreetnameReader().read(region, inPath);
-			Stream<Address> addresses = new AddressReader().read(region, inPath)) {
 
-			BestWriterShape writer = new BestWriterShape();
-				
-			Map<String, String[]> cacheCities = writer.writeMunicipalities(region, outPath, cities);
-			Map<String, String[]> cachePostals = writer.writePostals(region, outPath, postals);
-			Map<String, String[]> cacheStreets = writer.writeStreets(region, outPath, streets, cacheCities);
-			
-			writer.writeAddresses(region, outPath, addresses, cacheStreets, cacheCities, cachePostals);
-		}
-	}
-	
 	/**
 	 * Main
 	 * 
@@ -145,16 +131,14 @@ public class Main {
 		}
 		
 		String indir = cli.getOptionValue("i");
-		String outdir = cli.getOptionValue(indir, indir);
+		String jdbc = cli.getOptionValue("d");
 		
 		Path inPath = Paths.get(indir);
-		Path outPath = Paths.get(outdir);
 		
 		for (BestRegion region: BestRegion.values()) {
 			if (cli.hasOption(region.getCode())) {
 				LOG.info("Region {}", region.getName());
-				writeRegionCSV(region, inPath, outPath);
-				writeRegionShape(region, inPath, outPath);
+				writeRegion(region, inPath, jdbc);
 			}
 		}
 	}

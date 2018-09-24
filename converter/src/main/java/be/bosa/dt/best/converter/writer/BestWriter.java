@@ -25,12 +25,12 @@
  */
 package be.bosa.dt.best.converter.writer;
 
-import be.bosa.dt.best.converter.dao.Address;
-import be.bosa.dt.best.converter.dao.BestRegion;
-import be.bosa.dt.best.converter.dao.BestType;
-import be.bosa.dt.best.converter.dao.Municipality;
-import be.bosa.dt.best.converter.dao.Postal;
-import be.bosa.dt.best.converter.dao.Streetname;
+import be.bosa.dt.best.dao.Address;
+import be.bosa.dt.best.dao.BestRegion;
+import be.bosa.dt.best.dao.BestType;
+import be.bosa.dt.best.dao.Municipality;
+import be.bosa.dt.best.dao.Postal;
+import be.bosa.dt.best.dao.Streetname;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
