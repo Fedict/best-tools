@@ -9,12 +9,10 @@ CREATE EXTENSION fuzzystrmatch;
 CREATE ROLE best_writer WITH LOGIN PASSWORD 'best_writer';
 GRANT CONNECT ON DATABASE data TO best_writer;
 GRANT USAGE ON SCHEMA best TO best_writer;
-GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA best TO best_writer;
 
 CREATE ROLE best_reader WITH LOGIN PASSWORD 'best_reader';
 GRANT CONNECT ON DATABASE data TO best_reader;
 GRANT USAGE ON SCHEMA best TO best_reader;
-GRANT SELECT ON ALL TABLES IN SCHEMA best TO best_reader;
 
 CREATE UNLOGGED TABLE best.cities (
     id VARCHAR(16) PRIMARY KEY,
@@ -28,7 +26,7 @@ CREATE UNLOGGED TABLE best.streets (
     region CHAR(1) NOT NULL,
     name_nl VARCHAR(60),
     name_fr VARCHAR(60),
-    city_id VARCHAR(16) REFERENCES best.cities(id)
+    city_id VARCHAR(16)
 );
 
 CREATE UNLOGGED TABLE best.addresses (
@@ -42,3 +40,6 @@ CREATE UNLOGGED TABLE best.addresses (
     y DOUBLE PRECISION NOT NULL,
     geom GEOMETRY(Point, 4326) NOT NULL
 );
+
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA best TO best_writer;
+GRANT SELECT ON ALL TABLES IN SCHEMA best TO best_reader;
