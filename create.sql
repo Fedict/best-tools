@@ -26,7 +26,7 @@ CREATE UNLOGGED TABLE best.streets (
     region CHAR(1) NOT NULL,
     name_nl VARCHAR(60),
     name_fr VARCHAR(60),
-    city_id VARCHAR(16) REFERENCES best.cities(id)
+    city_id VARCHAR(16)
 );
 
 CREATE UNLOGGED TABLE best.addresses (
