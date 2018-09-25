@@ -38,6 +38,14 @@ import be.bosa.dt.best.xmlreader.StreetnameReader;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.time.Instant;
+
+import java.sql.Date;
+
 import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
@@ -46,12 +54,6 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-
-import org.jdbi.v3.core.Handle;
-import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.statement.UnableToCreateStatementException;
-import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
-import org.jdbi.v3.core.statement.Update;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +73,8 @@ public class Main {
 		.addOption("B", "Brussels", false, "process files for Brussels")
 		.addOption("F", "Flanders", false, "process files for Flanders")
 		.addOption("W", "Wallonia", false, "process files for Wallonia");
+	
+	private final static Date TODAY = new Date(Instant.now().toEpochMilli());
 	
 	/**
 	 * Print help info
@@ -99,32 +103,37 @@ public class Main {
 	/**
 	 * Write data to cities table
 	 * 
-	 * @param jdbi
+	 * @param conn
 	 * @param region
 	 * @param inPath 
 	 */
-	private static void writeCities(Jdbi jdbi, BestRegion region, Path inPath) {
+	private static void writeCities(Connection conn, BestRegion region, Path inPath) {
+		LOG.info("Cities{}", region.getName());
 		String code = region.getCode();
-		String DEL = "DELETE FROM best.cities WHERE region = ?";
+
 		String INS = 
-			"INSERT INTO best.cities VALUES(:id, :region, :nl, :fr) "
+			"INSERT INTO best.cities VALUES(?, ?, ?, ?, ?) "
 			+ "ON CONFLICT(id) DO "
 			+ "UPDATE SET region = EXCLUDED.region, "
 			+ " name_nl = EXCLUDED.name_nl, "
-			+ " name_fr = EXCLUDED.name_fr";
+			+ " name_fr = EXCLUDED.name_fr, "
+			+ " stamp = EXCLUDED.stamp ";
 		
-		try(Handle handle = jdbi.open();
-			Stream<Municipality> cities = new MunicipalityReader().read(region, inPath)) {
-			
-			handle.execute(DEL, code);
-			Update upd = handle.createUpdate(INS);
+		try(Stream<Municipality> cities = new MunicipalityReader().read(region, inPath)) {
+			PreparedStatement upd = conn.prepareStatement(INS);
 			cities.forEach(c -> {
-					upd.bind("id", c.getId())
-						.bind("region", code)
-						.bind("nl", c.getName("nl"))
-						.bind("fr", c.getName("fr")).execute();
+				try {
+					upd.setString(1, c.getId());
+					upd.setString(2, code);
+					upd.setString(3, c.getName("nl"));
+					upd.setString(4, c.getName("fr"));
+					upd.setDate(5, TODAY);
+					upd.execute();
+				} catch (SQLException se) {
+					LOG.warn("Error inserting city", se);					
+				}
 			});
-		} catch (UnableToExecuteStatementException ue) {
+		} catch (SQLException ue) {
 			LOG.warn("Error inserting city", ue);
 		}
 	}
@@ -132,37 +141,38 @@ public class Main {
 	/**
 	 * Write data to streets table
 	 * 
-	 * @param jdbi
+	 * @param conn
 	 * @param region
 	 * @param inPath 
 	 */
-	private static void writeStreets(Jdbi jdbi, BestRegion region, Path inPath) {
+	private static void writeStreets(Connection conn, BestRegion region, Path inPath) {
+		LOG.info("Streets {}", region.getName());
 		String code = region.getCode();
-		String DEL = "DELETE FROM best.streets WHERE region = ?";
+
 		String INS = 
-			"INSERT INTO best.streets VALUES(:id, :region, :nl, :fr, :city_id) "
+			"INSERT INTO best.streets VALUES(?, ?, ?, ?, ?, ?) "
 			+ "ON CONFLICT(id) DO "
 			+ "UPDATE SET region = EXCLUDED.region, "
 			+ " name_nl = EXCLUDED.name_nl, "
-			+ " name_fr = EXCLUDED.name_fr";
+			+ " name_fr = EXCLUDED.name_fr, "
+			+ " stamp = EXCLUDED.stamp";
 		
-		try(Handle handle = jdbi.open();
-			Stream<Streetname> streets = new StreetnameReader().read(region, inPath)) {
-			
-			handle.execute(DEL, code);
-			Update upd = handle.createUpdate(INS);
-			streets.forEach(s -> {
+		try(Stream<Streetname> streets = new StreetnameReader().read(region, inPath)) {
+			PreparedStatement upd = conn.prepareStatement(INS);
+			streets.filter(s -> s.getStatus().equals("current")).sequential().forEach(s -> {
 				try {
-					upd.bind("id", s.getId())
-						.bind("region", code)
-						.bind("nl", s.getName("nl"))
-						.bind("fr", s.getName("fr"))
-						.bind("city_id", s.getCity().getId()).execute();
-				} catch (UnableToExecuteStatementException|UnableToCreateStatementException ue) {
-					LOG.warn("Error inserting {} street {}", code, s.getId());
+					upd.setString(1, s.getId());
+					upd.setString(2, code);
+					upd.setString(3, s.getName("nl"));
+					upd.setString(4, s.getName("fr"));
+					upd.setString(5, s.getCity().getId());
+					upd.setDate(6, TODAY);
+					upd.execute();
+				} catch (SQLException ue) {
+					LOG.warn("Error inserting {} street {}, {}", code, s.getId());
 				}
 			});
-		} catch (UnableToExecuteStatementException ue) {
+		} catch (SQLException ue) {
 			LOG.warn("Error deleting streets", ue);
 		}
 	}
@@ -174,47 +184,47 @@ public class Main {
 	 * @param region
 	 * @param inPath 
 	 */
-	private static void writeAddresses(Jdbi jdbi, BestRegion region, Path inPath) {
+	private static void writeAddresses(Connection conn, BestRegion region, Path inPath) {
+		LOG.info("Addresses {}", region.getName());
 		String code = region.getCode();
 		
-		String DEL = "DELETE FROM best.addresses WHERE region = ?";
 		String INS = 
-			"INSERT INTO addresses VALUES(:id, :region, :streetno, :boxno, "
-			+ " :street_id, :city_id, :x, :y, "
-			+ "ST_Transform(ST_SetSRID(ST_MakePoint(:x2, :y2), 31370), 4326)) "
+			"INSERT INTO best.addresses VALUES(?, ?, ?, ?, ?, ?, ?, ?, "
+			+ " ST_Transform(ST_SetSRID(ST_MakePoint(?, ?), 31370), 4326), "
+			+ " ?) "
 			+ " ON CONFLICT(id) DO "
 			+ "UPDATE SET region = EXCLUDED.region, "
 			+ " streetno = EXCLUDED.streetno, "
 			+ " boxno = EXCLUDED.boxno, "
 			+ " street_id = EXCLUDED.street_id, "
-			+ " city_id = EXCLUDED.city_id,"
-			+ " x = EXCLUDED.x,"
-			+ " y = EXCLUDED.y,"
-			+ " geom = ST_Transform(ST_SetSRID(ST_MakePoint(EXCLUDED.x2, EXCLUDED.y2), 31370), 4326))";
+			+ " city_id = EXCLUDED.city_id, "
+			+ " x = EXCLUDED.x, "
+			+ " y = EXCLUDED.y, "
+			+ " geom = EXCLUDED.geom, "
+			+ " stamp = EXCLUDED.stamp";
 		
-		try(Handle handle = jdbi.open();
-			Stream<Address> addresses = new AddressReader().read(region, inPath)) {
-			
-			handle.execute(DEL, code);
-			Update upd = handle.createUpdate(INS);
-			addresses.forEach(a -> {
+		try(Stream<Address> addresses = new AddressReader().read(region, inPath)) {
+			PreparedStatement upd = conn.prepareStatement(INS);
+			addresses.filter(a -> a.getStatus().equals("current")).sequential().forEach(a -> {
 				try {
-					upd.bind("id", a.getId())
-						.bind("region", code)
-						.bind("streetno", a.getNumber())
-						.bind("boxno", a.getBox())
-						.bind("street_id", a.getStreet().getId())
-						.bind("city_id", a.getCity().getId())
-						.bind("x", a.getPoint().getX())
-						.bind("y", a.getPoint().getY())
-						.bind("x2", a.getPoint().getX())
-						.bind("y2", a.getPoint().getY())
-						.execute();
-				} catch (UnableToExecuteStatementException ue) {
-					LOG.warn("Error inserting address {}", a.getId());
+					upd.clearParameters();
+					upd.setString(1, a.getId());
+					upd.setString(2, code);
+					upd.setString(3, a.getNumber());
+					upd.setString(4, a.getBox());
+					upd.setString(5, a.getStreet().getId());
+					upd.setString(6, a.getCity().getId());
+					upd.setFloat(7, a.getPoint().getX());
+					upd.setFloat(8, a.getPoint().getY());
+					upd.setFloat(9, a.getPoint().getX());
+					upd.setFloat(10, a.getPoint().getY());
+					upd.setDate(11, TODAY);
+					upd.execute();
+				} catch (SQLException ue) {
+					LOG.warn("Error inserting {} address {}", code, a.getId(), ue);
 				}
 			});
-		} catch (UnableToExecuteStatementException ue) {
+		} catch (SQLException ue) {
 			LOG.warn("Error deleting addresses", ue);
 		}
 	}
@@ -233,15 +243,23 @@ public class Main {
 		String indir = cli.getOptionValue("i");
 		String jdbc = cli.getOptionValue("d");
 		
-		Jdbi jdbi = Jdbi.create(jdbc);		
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection(jdbc);
+			conn.setAutoCommit(true);
+		} catch (SQLException ex) {
+			System.exit(-2);
+		}
+		
 		Path inPath = Paths.get(indir);
 		
 		for (BestRegion region: BestRegion.values()) {
 			if (cli.hasOption(region.getCode())) {
 				LOG.info("Region {}", region.getName());
-				writeCities(jdbi, region, inPath);
-				writeStreets(jdbi, region, inPath);
-				writeAddresses(jdbi, region, inPath);
+				
+				writeCities(conn, region, inPath);
+				writeStreets(conn, region, inPath);
+				writeAddresses(conn, region, inPath);
 			}
 		}
 	}
