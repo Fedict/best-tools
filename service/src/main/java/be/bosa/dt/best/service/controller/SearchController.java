@@ -24,17 +24,34 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package be.bosa.dt.best.service;
+package be.bosa.dt.best.service.controller;
 
-import io.micronaut.runtime.Micronaut;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Produces;
+
+import io.reactiverse.reactivex.pgclient.PgPool;
+import io.reactiverse.reactivex.pgclient.PgRowSet;
+import io.reactivex.Single;
+
+import javax.inject.Inject;
 
 /**
- * BeSt geocoding / reverse geocoding service
+ * Controller for searching an address
  * 
- * @author Bart Hanssens
+ * @author Bart.Hanssens
  */
-public class Main {
-	public static void main(String[] args) {
-		Micronaut.run(Main.class);
+@Controller("/search")
+public class SearchController {
+	@Inject PgPool client;
+	
+	@Get("/")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String byName() {
+		Single<PgRowSet> map = client.rxQuery("SELECT name_nl FROM best.streets LIMIT 1");
+		return map.map( res -> res.iterator().next().getString(1)).blockingGet();
 	}
+	
+	
 }

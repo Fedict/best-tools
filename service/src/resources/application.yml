@@ -1,0 +1,13 @@
+micronaut:
+    server:
+       port: 8080       
+    application:
+       name: best
+postgres:
+	reactive:
+        port: 5432
+        host: localhost
+        database: best
+        user: best_reader
+        password: best_reader
+        maxSize: 5

@@ -9,7 +9,6 @@
         <module>unzip</module>
         <module>converter</module>
         <module>service</module>
-        <module>loader</module>
         <module>dao</module>
         <module>loader-standalone</module>
         <module>xmlreader</module>
