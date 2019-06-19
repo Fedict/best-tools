@@ -1,0 +1,1215 @@
+B,Anderlecht + Brussel (Dauwstraat),nl,1070
+B,Anderlecht + Bruxelles (Rue de la Rosée),fr,1070
+B,Assemblée Communauté Communautaire Française,fr,1007
+B,Assemblée Communauté Communautaire Néerlandophone,fr,1006
+B,Auderghem,fr,1160
+B,Belgische Senaat,nl,1009
+B,Berchem-Sainte-Agathe,fr,1082
+B,Brussel (Centrum),nl,1000
+B,Brussel (Haren),nl,1130
+B,Brussel (Laken),nl,1020
+B,Brussel (Neder-Over-Hembeek),nl,1120
+B,Brusselse Hoofdstedelijke Raad,nl,1005
+B,Bruxelles (Centre),fr,1000
+B,Bruxelles (Haren),fr,1130
+B,Bruxelles (Laeken),fr,1020
+B,Bruxelles (Neder-Over-Hembeek),fr,1120
+B,CCN,fr,1035
+B,CCN,nl,1035
+B,Chambre des représentants,fr,1008
+B,Christelijke Sociale Organisaties,nl,1031
+B,Cité Administrative de l'Etat,fr,1010
+B,Conseil Flamand - Parlement Flamand,fr,1011
+B,Conseil de la Région de Bruxelles-Capitale,fr,1005
+B,D.I.V. (uitsluitend roze formulieren),nl,1045
+B,D.I.V. (uniquement formulaires roses),fr,1045
+B,Elsene + Brussel (Louiza-Roosevelt),nl,1050
+B,Etterbeek + Brussel (Europa),nl,1040
+B,Etterbeek + Bruxelles (Europe),fr,1040
+B,Europees Parlement,nl,1047
+B,Europese Unie - Commissie,nl,1049
+B,Europese Unie - Raad,nl,1048
+B,Evere,fr,1140
+B,Evere,nl,1140
+B,Forest,fr,1190
+B,Ganshoren,fr,1083
+B,Ganshoren,nl,1083
+B,International Press Center,fr,1041
+B,International Press Center,nl,1041
+B,Ixelles + Bruxelles (Louise-Roosevelt),fr,1050
+B,Jette,fr,1090
+B,Jette,nl,1090
+B,Kamer van Volksvertegenwoordigers,nl,1008
+B,Koekelberg,fr,1081
+B,Koekelberg,nl,1081
+B,Molenbeek-Saint-Jean,fr,1080
+B,NATO - OTAN - NAVO,fr,1110
+B,NATO - OTAN - NAVO,nl,1110
+B,Organisations Sociales Chrétiennes,fr,1031
+B,Oudergem,nl,1160
+B,Parlement Européen,fr,1047
+B,Parlement de la Communauté Française,fr,1012
+B,Parlement van Franse Gemeenschap,nl,1012
+B,Postcheque,nl,1100
+B,Postchèque,fr,1100
+B,RTBF,fr,1044
+B,RTBF,nl,1044
+B,RTL-TVI,fr,1201
+B,RTL-TVI,nl,1201
+B,Raad van de Franstalige Gemeenschapcommissie,nl,1007
+B,Raad van de Vlaamse Gemeenschapcommissie,nl,1006
+B,Rijksadministratief Centrum,nl,1010
+B,SOC,fr,1105
+B,SOC,nl,1105
+B,Saint-Gilles,fr,1060
+B,Saint-Josse-ten-Noode,fr,1210
+B,Schaarbeek + Brussel (Van Praet, Teichmann Brug),nl,1030
+B,Schaerbeek + Bruxelles (Pont Van Praet, Teichmann),fr,1030
+B,Sint-Agatha-Berchem,nl,1082
+B,Sint-Gillis,nl,1060
+B,Sint-Jans-Molenbeek,nl,1080
+B,Sint-Joost-ten-Node,nl,1210
+B,Sint-Lambrechts-Woluwe,nl,1200
+B,Sint-Pieters-Woluwe,nl,1150
+B,Sénat de Belgique,fr,1009
+B,Uccle,fr,1180
+B,Ukkel,nl,1180
+B,Union Européenne - Commission,fr,1049
+B,Union Européenne - Conseil,fr,1048
+B,VRT,fr,1043
+B,VRT,nl,1043
+B,Vlaamse Raad - Vlaams Parlement,nl,1011
+B,Vorst,nl,1190
+B,Watermaal-Bosvoorde,nl,1170
+B,Watermael-Boitsfort,fr,1170
+B,Woluwe-Saint-Lambert,fr,1200
+B,Woluwe-Saint-Pierre,fr,1150
+F,Aaigem/Bambrugge/Burst/Erondegem/Erpe/Erpe-Mere/Mere/Ottergem/Vlekkem,nl,9420
+F,Aalbeke,nl,8511
+F,Aalst (Limb.)/Brustem/Engelmanshoven/Gelinden/Groot-Gelmen/Halmaal/Kerkom-bij-Sint-Truiden/Ordingen/Sint-Truiden/Zepperen,nl,3800
+F,Aalst,nl,9300
+F,Aalter/Lotenhulle/Poeke,nl,9880
+F,Aarschot/Gelrode,nl,3200
+F,Aarsele/Kanegem/Schuiferskapelle/Tielt,nl,8700
+F,Aartrijke,nl,8211
+F,Aartselaar,nl,2630
+F,Achel/Hamont/Hamont-Achel,nl,3930
+F,Adegem,nl,9991
+F,Adinkerke/De Panne,nl,8660
+F,Affligem/Essene/Hekelgem/Teralfene,nl,1790
+F,Afsnee/Sint-Denijs-Westrem,nl,9051
+F,Alken,nl,3570
+F,Alsemberg,nl,1652
+F,Alveringem/Hoogstade/Oeren/Sint-Rijkers,nl,8690
+F,Antwerpen,nl,2000
+F,Antwerpen,nl,2018
+F,Antwerpen,nl,2020
+F,Antwerpen,nl,2030
+F,Antwerpen,nl,2050
+F,Antwerpen,nl,2060
+F,Antwerpen/Berendrecht/Lillo/Zandvliet,nl,2040
+F,Anzegem/Gijzelbrechtegem/Ingooigem/Vichte/» Wortegem-Petegem «,nl,8570
+F,Appels/Baasrode/Dendermonde/Grembergen/Mespelare/Oudegem/Schoonaarde/Sint-Gillis-bij-Dendermonde,nl,9200
+F,Appelterre-Eichem/Denderwindeke/Lieferinge/Nederhasselt/Ninove/Okegem/Voorde,nl,9400
+F,Ardooie,nl,8850
+F,Arendonk,nl,2370
+F,As,nl,3665
+F,Aspelare,nl,9404
+F,Asper/Baaigem/Dikkelvenne/Gavere/Semmerzake/Vurste,nl,9890
+F,Asse/Bekkerzeel/Kobbegem/Mollem,nl,1730
+F,Assebroek/Sint-Kruis (Brugge),nl,8310
+F,Assenede,nl,9960
+F,Assent/Bekkevoort,nl,3460
+F,Astene/Bachte-Maria-Leerne/Deinze/Gottem/Grammene/Meigem/Petegem-aan-de-Leie/Sint-Martens-Leerne/Vinkt/Wontergem/Zeveren,nl,9800
+F,Attenhoven/Neerlanden,nl,3404
+F,Attenrode,nl,3384
+F,Avekapelle/Beauvoorde/Booitshoeke/Bulskamp/De Moeren/Eggewaartskapelle/Houtem (W.-Vl.)/Steenkerke (W.-Vl.)/Veurne/Vinkem/Wulveringem/Zoutenaaie,nl,8630
+F,Avelgem,nl,8580
+F,Averbode/Zichem,nl,3271
+F,Baal,nl,3128
+F,Baardegem/Herdersem/Meldert (O.-Vl.)/Moorsel,nl,9310
+F,Baarle-Hertog,nl,2387
+F,Balegem/Gijzenzele/Landskouter/Moortsele/Oosterzele/Scheldewindeke,nl,9860
+F,Balen,nl,2490
+F,Bassevelde/Oosteeklo,nl,9968
+F,Batsheers/Bovelingen/Gutschoven/Heers/Heks/Horpmaal/Klein-Gelmen/Mechelen-Bovelingen/Mettekoven/Opheers/Rukkelingen-Loon/Vechmaal/Veulen,nl,3870
+F,Bavegem/Sint-Lievens-Houtem/Vlierzele/Zonnegem,nl,9520
+F,Bavikhove/Hulste,nl,8531
+F,Bazel/Kruibeke/Rupelmonde,nl,9150
+F,Beek/Bree/Gerdingen/Opitter/Tongerlo (Limb.),nl,3960
+F,Beerlegem/Dikkele/Hundelgem/Meilegem/Munkzwalm/Paulatem/Roborst/Rozebeke/Sint-Blasius-Boekel/Sint-Denijs-Boekel/Sint-Maria-Latem/Zwalm,nl,9630
+F,Beernem/Oedelem/Sint-Joris (Beernem),nl,8730
+F,Beerse/Vlimmeren,nl,2340
+F,Beersel,nl,1650
+F,Beerst/Diksmuide/Driekapellen/Esen/Kaaskerke/Keiem/Lampernisse/Leke/Nieuwkapelle/Oostkerke (Diksmuide)/Oudekapelle/Pervijze/Sint-Jacobs-Kapelle/Stuivekenskerke/Vladslo/Woumen,nl,8600
+F,Beert,nl,1673
+F,Beervelde/Lochristi/Zaffelare/Zeveneken,nl,9080
+F,Beerzel/Putte,nl,2580
+F,Begijnendijk/Betekom,nl,3130
+F,Beigem,nl,1852
+F,Bekegem/Eernegem/Ichtegem,nl,8480
+F,Bellegem/Kooigem/Marke (Kortrijk)/Rollegem,nl,8510
+F,Bellem,nl,9881
+F,Bellingen,nl,1674
+F,Belsele (Sint-Niklaas),nl,9111
+F,Berbroek/Donk/Herk-de-Stad/Schulen,nl,3540
+F,Berchem (Antwerpen),nl,2600
+F,Berchem (O.-Vl.)/Kluisbergen/Kwaremont/Ruien/Zulzeke,nl,9690
+F,Berg (Bt.)/Buken/Kampenhout/Nederokkerzeel,nl,1910
+F,Berg (Limb.)/Diets-Heur/Haren (Tongeren)/Henis/Kolmont (Tongeren)/Koninksem/Lauw/Mal/Neerrepen/Nerem/Overrepen (Kolmont)/Piringen (Haren)/Riksingen/Rutten/'s Herenelderen/Sluizen/Tongeren/Vreren/Widooie (Haren),nl,3700
+F,Beringen,nl,3580
+F,Berlaar/Gestel,nl,2590
+F,Berlare/Overmere/Uitbergen,nl,9290
+F,Berlingen/Wellen,nl,3830
+F,Bertem/Korbeek-Dijle,nl,3060
+F,Beselare/Geluveld/Passendale/Zandvoorde (Zonnebeke)/Zonnebeke,nl,8980
+F,Bevel/Kessel/Nijlen,nl,2560
+F,Bever,nl,1547
+F,Bevere/Edelare/Eine/Ename/Heurne/Leupegem/Mater/Melden/Mullem/Nederename/Oudenaarde/Volkegem/Welden,nl,9700
+F,Beveren (Leie),nl,8791
+F,Beveren (Roeselare)/Oekene/Roeselare/Rumbeke,nl,8800
+F,Beveren-Waas/Haasdonk/Kallo (Beveren-Waas)/Melsele/Vrasene,nl,9120
+F,Beveren-aan-den-Ijzer/Gijverinkhove/Izenberge/Leisele/Stavele,nl,8691
+F,Beverlo,nl,3581
+F,Beverst/Bilzen/Eigenbilzen/Grote-Spouwen/Hees/Kleine-Spouwen/Mopertingen/Munsterbilzen/Rijkhoven/Rosmeer/Spouwen/Waltwilder,nl,3740
+F,Bierbeek/Korbeek-Lo/Lovenjoel/Opvelp,nl,3360
+F,Bievene,fr,1547
+F,Bikschote/Langemark/Langemark-Poelkapelle/Poelkapelle,nl,8920
+F,Binderveld/Kozen/Nieuwerkerken (Limb.)/Wijer,nl,3850
+F,Binkom,nl,3211
+F,Bissegem/Heule,nl,8501
+F,Blaasveld/Heindonk/Tisselt/Willebroek,nl,2830
+F,Blanden,nl,3052
+F,Blankenberge/Uitkerke,nl,8370
+F,Bocholt/Kaulille/Reppel,nl,3950
+F,Boechout,nl,2530
+F,Boekhout/Gingelom/Jeuk/Kortijs/Montenaken/Niel-bij-Sint-Truiden/Vorsen,nl,3890
+F,Boekhoute,nl,9961
+F,Boezinge/Zuidschote,nl,8904
+F,Bogaarden/Heikruis/Pepingen,nl,1670
+F,Bommershoven (Haren)/Borgloon/Broekom/Gors-Opleeuw/Gotem/Groot-Loon/Haren (Borgloon)/Hendrieken/Hoepertingen/Jesseren (Kolmont)/Kerniel/Kolmont (Borgloon)/Kuttekoven/Rijkel/Voort,nl,3840
+F,Bonheiden/Rijmenam,nl,2820
+F,Booischot,nl,2221
+F,Boom,nl,2850
+F,Boorsem/Uikhoven,nl,3631
+F,Boortmeerbeek,nl,3190
+F,Borchtlombeek,nl,1761
+F,Borgerhout (Antwerpen),nl,2140
+F,Borlo/Buvingen/Mielen-Boven-Aalst/Muizen (Limb.),nl,3891
+F,Bornem/Hingene/Mariekerke (Bornem)/Weert,nl,2880
+F,Borsbeek (Antw.),nl,2150
+F,Borsbeke,nl,9552
+F,Bossuit,nl,8583
+F,Bost/Goetsenhoven/Hakendover/Kumtich/Oorbeek/Oplinter/Sint-Margriete-Houtem (Tienen)/Tienen/Vissenaken,nl,3300
+F,Bottelare/Lemberge/Melsen/Merelbeke/Munte/Schelderode,nl,9820
+F,Boutersem/Kerkom/Neervelp/Roosbeek/Vertrijk/Willebringen,nl,3370
+F,Bouwel,nl,2288
+F,Bovekerke/Koekelare/Zande,nl,8680
+F,Brakel/Elst/Everbeek/Michelbeke/Nederbrakel/Opbrakel/Zegelsem,nl,9660
+F,Brasschaat,nl,2930
+F,Brecht/Sint-Job-in-'t-Goor/Sint-Lenaarts,nl,2960
+F,Bredene,nl,8450
+F,Breendonk/Liezele/Puurs/Ruisbroek (Antw.),nl,2870
+F,Brielen/Dikkebus/Ieper/Sint-Jan,nl,8900
+F,Broechem/Emblem/Oelegem/Ranst,nl,2520
+F,Brugge/Koolkerke,nl,8000
+F,Brussegem/Hamme (Bt.)/Merchtem,nl,1785
+F,Budingen/Dormaal/Halle-Booienhoven/Helen-Bos/Zoutleeuw,nl,3440
+F,Buggenhout/Opdorp,nl,9255
+F,Buizingen,nl,1501
+F,Bunsbeek/Glabbeek-Zuurbemde,nl,3380
+F,Burcht/Zwijndrecht,nl,2070
+F,Dadizele/Moorslede,nl,8890
+F,Daknam/Eksaarde/Lokeren,nl,9160
+F,Damme/Hoeke/Lapscheure/Moerkerke/Oostkerke (Damme)/Sijsele,nl,8340
+F,De Haan/Klemskerke/Wenduine,nl,8420
+F,De Klinge/Meerdonk/Sint-Gillis-Waas/Sint-Pauwels,nl,9170
+F,De Pinte/Zevergem,nl,9840
+F,Deerlijk,nl,8540
+F,Deftinge/Lierde/Sint-Maria-Lierde,nl,9570
+F,Denderbelle/Lebbeke/Wieze,nl,9280
+F,Denderhoutem/Haaltert/Heldergem,nl,9450
+F,Denderleeuw,nl,9470
+F,Dentergem/Markegem/Oeselgem/Wakken,nl,8720
+F,Dessel,nl,2480
+F,Desselgem,nl,8792
+F,Destelbergen/Heusden (O.-Vl.),nl,9070
+F,Desteldonk/Mendonk/Sint-Kruis-Winkel,nl,9042
+F,Deurle,nl,9831
+F,Deurne (Antwerpen),nl,2100
+F,Deurne (Bt.)/Diest/Schaffen/Webbekom,nl,3290
+F,Diegem,nl,1831
+F,Diepenbeek,nl,3590
+F,Dilbeek/Sint-Martens-Bodegem/Sint-Ulriks-Kapelle,nl,1700
+F,Dilsen-Stokkem/Elen/Lanklaar/Rotem/Stokkem,nl,3650
+F,Doel/Kallo (Kieldrecht)/Kieldrecht (Beveren)/Verrebroek,nl,9130
+F,Dranouter,nl,8951
+F,Drieslinter/Linter/Melkwezer/Neerhespen/Neerlinter/Orsmaal-Gussenhoven/Overhespen/Wommersom,nl,3350
+F,Drogenbos,nl,1620
+F,Drongen,nl,9031
+F,Dudzele/Lissewege/Zeebrugge (Brugge),nl,8380
+F,Duffel,nl,2570
+F,Duisburg/Tervuren/Vossem,nl,3080
+F,Duras/Gorsem/Runkelen/Wilderen,nl,3803
+F,Dworp,nl,1653
+F,Edegem,nl,2650
+F,Eeklo,nl,9900
+F,Egem/Pittem,nl,8740
+F,Eindhout/Laakdal/Vorst (Kempen),nl,2430
+F,Eisden/Leut/Maasmechelen/Mechelen-aan-de-Maas/Meeswijk/Opgrimbie/Vucht,nl,3630
+F,Eke/Nazareth,nl,9810
+F,Eksel,nl,3941
+F,Elene/Erwetegem/Godveerdegem/Grotenberge/Leeuwergem/Oombergen (Zottegem)/Sint-Goriks-Oudenhove/Sint-Maria-Oudenhove (Zottegem)/Strijpen/Velzeke-Ruddershove/Zottegem,nl,9620
+F,Elewijt/Weerde,nl,1982
+F,Eliksem/Ezemaal/Laar/Landen/Neerwinden/Overwinden/Rumsdorp/Wange,nl,3400
+F,Elingen,nl,1671
+F,Ellikom/Gruitrode/Meeuwen/Meeuwen-Gruitrode/Neerglabbeek/Wijshagen,nl,3670
+F,Elsegem/Moregem/Ooike (Wortegem-Petegem)/Petegem-aan-de-Schelde/Wortegem/Wortegem-Petegem,nl,9790
+F,Elverdinge,nl,8906
+F,Elversele/Steendorp/Temse/Tielrode,nl,9140
+F,Emelgem/Izegem/Kachtem,nl,8870
+F,Eppegem/Zemst,nl,1980
+F,Erembodegem (Aalst)/Nieuwerkerken (Aalst),nl,9320
+F,Erps-Kwerps,nl,3071
+F,Ertvelde/Evergem/Kluizen/Sleidinge,nl,9940
+F,Espierres/Espierres-Helchin/Helchin,fr,8587
+F,Essen,nl,2910
+F,Etikhove/Maarkedal/Maarke-Kerkem,nl,9680
+F,Ettelgem/Oudenburg/Roksem/Westkerke,nl,8460
+F,Everberg/Meerbeek,nl,3078
+F,Fouron-Saint-Pierre,fr,3792
+F,Fouron-le-Comte,fr,3798
+F,Fourons/Fouron-Saint-Martin/Mouland,fr,3790
+F,Gaasbeek/Lennik/Sint-Kwintens-Lennik/Sint-Martens-Lennik,nl,1750
+F,Galmaarden/Tollembeek/Vollezele,nl,1570
+F,Geel,nl,2440
+F,Geetbets/Grazen,nl,3450
+F,Gellik/Lanaken/Neerharen/Veldwezelt,nl,3620
+F,Geluwe/Wervik,nl,8940
+F,Genk,nl,3600
+F,Genoelselderen/Herderen/Kanne/Membruggen/Millen/Riemst/Val-Meer/Vlijtingen/Vroenhoven/Zichen-Zussen-Bolder,nl,3770
+F,Gent,nl,9000
+F,Gentbrugge/Ledeberg (Gent),nl,9050
+F,Geraardsbergen/Goeferdinge/Moerbeke/Nederboelare/Onkerzele/Ophasselt/Overboelare/Viane/Zarlardinge,nl,9500
+F,Gierle/Lille/Poederlee/Wechelderzande,nl,2275
+F,Gijzegem/Hofstade (O.-Vl.),nl,9308
+F,Gistel/Moere/Snaaskerke/Zevekote,nl,8470
+F,Gits/Hooglede,nl,8830
+F,Gontrode/Melle,nl,9090
+F,Gooik/Kester/Leerbeek/Oetingen,nl,1755
+F,Grimbergen,nl,1850
+F,Grimminge/Idegem/Nieuwenhove/Schendelbeke/Smeerebbe-Vloerzegem/Waarbeke/Zandbergen,nl,9506
+F,Grobbendonk,nl,2280
+F,Groot-Bijgaarden,nl,1702
+F,Grote-Brogel/Kleine-Brogel/Peer/Wijchmaal,nl,3990
+F,Guigoven,nl,3723
+F,Gullegem/Moorsele/Wevelgem,nl,8560
+F,Haacht/Tildonk/Wespelaar,nl,3150
+F,Haasrode,nl,3053
+F,Halen/Loksbergen/Zelem,nl,3545
+F,Hallaar/Heist-op-den-Berg,nl,2220
+F,Halle (Kempen)/Zoersel,nl,2980
+F,Halle,nl,1500
+F,Ham/Kwaadmechelen/Oostham,nl,3945
+F,Hamme (O.-Vl.)/Moerzeke,nl,9220
+F,Handzame/Kortemark/Werken/Zarren,nl,8610
+F,Hansbeke/Landegem/Merendree/Nevele/Poesele/Vosselare,nl,9850
+F,Harelbeke,nl,8530
+F,Hasselt/Sint-Lambrechts-Herk,nl,3500
+F,Hechtel/Hechtel-Eksel,nl,3940
+F,Heestert,nl,8551
+F,Heffen,nl,2801
+F,Heist-aan-Zee/Ramskapelle (Knokke-Heist),nl,8301
+F,Helchteren/Houthalen/Houthalen-Helchteren,nl,3530
+F,Helkijn/Spiere/Spiere-Helkijn,nl,8587
+F,Hemelveerdegem,nl,9571
+F,Hemiksem/» Wilrijk (Antwerpen) «,nl,2620
+F,Heppen,nl,3971
+F,Herent/Veltem-Beisem/Winksele,nl,3020
+F,Herentals/Morkhoven/Noorderwijk,nl,2200
+F,Herenthout,nl,2270
+F,Herfelingen/Herne,nl,1540
+F,Herselt/Ramsel,nl,2230
+F,Herstappe,nl,3717
+F,Herten,nl,3831
+F,Hertsberge/Oostkamp/Ruddervoorde/Waardamme,nl,8020
+F,Herzele/Hillegem/Sint-Antelinks/Sint-Lievens-Esse/Steenhuize-Wijnhuize/Woubrechtegem,nl,9550
+F,Heusden (Limb.)/Heusden-Zolder/Zolder,nl,3550
+F,Heuvelland/Nieuwkerke,nl,8950
+F,Hever,nl,3191
+F,Heverlee,nl,3001
+F,Hoboken (Antwerpen),nl,2660
+F,Hoegaarden/Meldert (Bt.),nl,3320
+F,Hoeilaart,nl,1560
+F,Hoelbeek,nl,3746
+F,Hoeleden,nl,3471
+F,Hoeselt/Romershoven/Sint-Huibrechts-Hern/Werm,nl,3730
+F,Hoevenen/Stabroek,nl,2940
+F,Hofstade (Bt.),nl,1981
+F,Hollebeke/Voormezele/Zillebeke,nl,8902
+F,Holsbeek/Kortrijk-Dutsel/Sint-Pieters-Rode,nl,3220
+F,Hombeek/Leest,nl,2811
+F,Hoogstraten,nl,2320
+F,Horebeke/Sint-Kornelis-Horebeke/Sint-Maria-Horebeke,nl,9667
+F,Houtave/Meetkerke/Nieuwmunster/Zuienkerke,nl,8377
+F,Houthulst/Klerken/Merkem,nl,8650
+F,Houtvenne/Hulshout/Westmeerbeek,nl,2235
+F,Houwaart/Sint-Joris-Winge/Tielt (Bt.)/Tielt-Winge,nl,3390
+F,Hove,nl,2540
+F,Huise/Ouwegem/Zingem,nl,9750
+F,Huizingen,nl,1654
+F,Huldenberg/Loonbeek/Neerijse/Ottenburg/Sint-Agatha-Rode,nl,3040
+F,Humbeek,nl,1851
+F,Iddergem,nl,9472
+F,Impe/Lede/Oordegem/Smetlede/Wanzele,nl,9340
+F,Ingelmunster,nl,8770
+F,Itegem/Wiekevorst,nl,2222
+F,Itterbeek,nl,1701
+F,Jabbeke/Snellegem/Stalhille/Varsenare/Zerkegem,nl,8490
+F,Kaggevinne,nl,3293
+F,Kalken/Laarne,nl,9270
+F,Kalmthout,nl,2920
+F,Kapelle-op-den-Bos/Nieuwenrode/Ramsdonk,nl,1880
+F,Kapellen (Antw.),nl,2950
+F,Kapellen (Bt.),nl,3381
+F,Kaprijke,nl,9970
+F,Kaster,nl,8572
+F,Kasterlee/Lichtaart/Tielen,nl,2460
+F,Keerbergen,nl,3140
+F,Kemmel,nl,8956
+F,Kemzeke/Stekene,nl,9190
+F,Kerkhove/Waarmaarde,nl,8581
+F,Kerksken,nl,9451
+F,Kermt (Hasselt)/Spalbeek,nl,3510
+F,Kersbeek-Miskom,nl,3472
+F,Kessel-Lo (Leuven),nl,3010
+F,Kessenich/Kinrooi/Molenbeersel/Ophoven,nl,3640
+F,Knesselare/Ursel,nl,9910
+F,Knokke/Knokke-Heist/Westkapelle,nl,8300
+F,Koersel,nl,3582
+F,Koksijde/Oostduinkerke/Wulpen,nl,8670
+F,Koningshooikt/Lier,nl,2500
+F,Kontich/Waarloos,nl,2550
+F,Koolskamp,nl,8851
+F,Kortenaken/Ransberg,nl,3470
+F,Kortenberg,nl,3070
+F,Kortessem,nl,3720
+F,Kortrijk,nl,8500
+F,Kraainem,nl,1950
+F,Krombeke/Proven/Roesbrugge-Haringe,nl,8972
+F,Kruishoutem,nl,9770
+F,Kuringen/Stokrooie,nl,3511
+F,Kuurne,nl,8520
+F,Langdorp,nl,3201
+F,Lauwe/Menen/Rekkem,nl,8930
+F,Ledegem/Rollegem-Kapelle/Sint-Eloois-Winkel,nl,8880
+F,Leefdaal,nl,3061
+F,Leffinge,nl,8432
+F,Lembeek,nl,1502
+F,Lembeke,nl,9971
+F,Lendelede,nl,8860
+F,Leopoldsburg,nl,3970
+F,Letterhoutem,nl,9521
+F,Leuven,nl,3000
+F,Lichtervelde,nl,8810
+F,Liedekerke,nl,1770
+F,Linden/Lubbeek,nl,3210
+F,Linkebeek,nl,1630
+F,Linkhout/Lummen/Meldert (Limb.),nl,3560
+F,Lint,nl,2547
+F,Lippelo/Oppuurs/Sint-Amands,nl,2890
+F,Lo/Lo-Reninge/Noordschote/Pollinkhove/Reninge,nl,8647
+F,Loker,nl,8958
+F,Lombardsijde/Westende,nl,8434
+F,Lommel,nl,3920
+F,Londerzeel/Malderen/Steenhuffel,nl,1840
+F,Loppem/Veldegem/Zedelgem,nl,8210
+F,Lot,nl,1651
+F,Lovendegem,nl,9920
+F,Maaseik/Neeroeteren/Opoeteren,nl,3680
+F,Machelen (Bt.),nl,1830
+F,Machelen (O.-Vl.)/Olsene/Zulte,nl,9870
+F,Maldegem,nl,9990
+F,Malle/Oostmalle/Westmalle,nl,2390
+F,Mannekensvere/Schore/Sint-Pieters-Kapelle (W.-Vl.)/Slijpe/Spermalie,nl,8433
+F,Mariakerke (Gent),nl,9030
+F,Martenslinde,nl,3742
+F,Massemen/Westrem/Wetteren,nl,9230
+F,Massenhoven/Viersel/Zandhoven,nl,2240
+F,Mazenzele/Opwijk,nl,1745
+F,Mechelen/Walem,nl,2800
+F,Meensel-Kiezegem,nl,3391
+F,Meer,nl,2321
+F,Meerbeke,nl,9402
+F,Meerhout,nl,2450
+F,Meerle,nl,2328
+F,Meise,nl,1860
+F,Melsbroek/Perk/Steenokkerzeel,nl,1820
+F,Merksem (Antwerpen),nl,2170
+F,Merksplas,nl,2330
+F,Mesen,nl,8957
+F,Messelbroek/Testelt,nl,3272
+F,Messines,fr,8957
+F,Meulebeke,nl,8760
+F,Middelburg,nl,9992
+F,Middelkerke,nl,8430
+F,Minderhout,nl,2322
+F,Moelingen/Sint-Martens-Voeren/Voeren,nl,3790
+F,Moen,nl,8552
+F,Moerbeke-Waas,nl,9180
+F,Mol,nl,2400
+F,Molenbeek-Wersbeek,nl,3461
+F,Molenstede,nl,3294
+F,Mortsel,nl,2640
+F,Muizen (Mechelen),nl,2812
+F,Nederzwalm-Hermelgem,nl,9636
+F,Neerpelt/Sint-Huibrechts-Lille,nl,3910
+F,Neigem,nl,9403
+F,Niel,nl,2845
+F,Niel-bij-As,nl,3668
+F,Nieuwkerken-Waas/Sint-Niklaas,nl,9100
+F,Nieuwpoort/Ramskapelle (Nieuwpoort)/Sint-Joris (Nieuwpoort),nl,8620
+F,Nieuwrode,nl,3221
+F,Nokere,nl,9771
+F,Nossegem/Zaventem,nl,1930
+F,Nukerke,nl,9681
+F,Oevel/Tongerlo (Antw.)/Westerlo/Zoerle-Parwijs,nl,2260
+F,Olen,nl,2250
+F,Olmen,nl,2491
+F,Onze-Lieve-Vrouw-Lombeek/Pamel/Roosdaal/Strijtem,nl,1760
+F,Onze-Lieve-Vrouw-Waver,nl,2861
+F,Ooigem/Sint-Baafs-Vijve/Wielsbeke,nl,8710
+F,Oostakker,nl,9041
+F,Oostende/Stene/Zandvoorde (Oostende),nl,8400
+F,Oostnieuwkerke/Staden/Westrozebeke,nl,8840
+F,Oostrozebeke,nl,8780
+F,Oostvleteren/Vleteren/Westvleteren/Woesten,nl,8640
+F,Oostwinkel,nl,9931
+F,Otegem,nl,8553
+F,Oud-Heverlee,nl,3050
+F,Oud-Turnhout,nl,2360
+F,Oudenaken/Sint-Laureins-Berchem/Sint-Pieters-Leeuw,nl,1600
+F,Outer,nl,9406
+F,Outgaarden,nl,3321
+F,Outrijve,nl,8582
+F,Overijse,nl,3090
+F,Overpelt,nl,3900
+F,Paal,nl,3583
+F,Parike,nl,9661
+F,Pellenberg,nl,3212
+F,Peutie/Vilvoorde,nl,1800
+F,Pollare,nl,9401
+F,Poperinge/Reningelst,nl,8970
+F,Poppel,nl,2382
+F,Pulderbos,nl,2242
+F,Pulle,nl,2243
+F,Ravels,nl,2380
+F,Reet/Rumst/Terhagen,nl,2840
+F,Rekem,nl,3621
+F,Relegem/Zellik,nl,1731
+F,Remersdaal,nl,3791
+F,Renaix,fr,9600
+F,Ressegem,nl,9551
+F,Retie,nl,2470
+F,Rhode-Saint-Genese,fr,1640
+F,Rijkevorsel,nl,2310
+F,Rillaar,nl,3202
+F,Ronse,nl,9600
+F,Ronsele,nl,9932
+F,Rotselaar,nl,3110
+F,Ruisbroek (Bt.),nl,1601
+F,Ruiselede,nl,8755
+F,Rummen,nl,3454
+F,Schalkhoven,nl,3732
+F,Schelle,nl,2627
+F,Schellebelle/Serskamp/Wichelen,nl,9260
+F,Schepdaal,nl,1703
+F,Scherpenheuvel/Scherpenheuvel-Zichem,nl,3270
+F,Schorisse,nl,9688
+F,Schoten,nl,2900
+F,Schriek,nl,2223
+F,Sinaai-Waas,nl,9112
+F,Sint-Amandsberg (Gent),nl,9040
+F,Sint-Andries/Sint-Michiels,nl,8200
+F,Sint-Denijs,nl,8554
+F,Sint-Eloois-Vijve,nl,8793
+F,Sint-Genesius-Rode,nl,1640
+F,Sint-Jan-in-Eremo,nl,9982
+F,Sint-Joris-Weert,nl,3051
+F,Sint-Katelijne-Waver,nl,2860
+F,Sint-Katherina-Lombeek,nl,1742
+F,Sint-Laureins,nl,9980
+F,Sint-Margriete,nl,9981
+F,Sint-Martens-Latem,nl,9830
+F,Sint-Martens-Lierde,nl,9572
+F,Sint-Pieters-Kapelle (Bt.),nl,1541
+F,Sint-Pieters-Voeren,nl,3792
+F,Sint-Stevens-Woluwe,nl,1932
+F,Sterrebeek,nl,1933
+F,Stevoort,nl,3512
+F,Strombeek-Bever,nl,1853
+F,Ternat,nl,1740
+F,Tessenderlo,nl,3980
+F,Teuven,nl,3793
+F,Tiegem,nl,8573
+F,Torhout,nl,8820
+F,Tremelo,nl,3120
+F,Turnhout,nl,2300
+F,Ulbeek,nl,3832
+F,Vaalbeek,nl,3054
+F,Varendonk/Veerle,nl,2431
+F,Velm,nl,3806
+F,Vinderhoute,nl,9921
+F,Vlamertinge,nl,8908
+F,Vlezenbeek,nl,1602
+F,Vliermaal,nl,3724
+F,Vliermaalroot,nl,3721
+F,Vlissegem,nl,8421
+F,Vorselaar,nl,2290
+F,Vosselaar,nl,2350
+F,Vremde,nl,2531
+F,Waanrode,nl,3473
+F,Waarschoot,nl,9950
+F,Waasmont/Walsbets/Walshoutem/Wezeren,nl,3401
+F,Waasmunster,nl,9250
+F,Wachtebeke,nl,9185
+F,Wambeek,nl,1741
+F,Wannegem-Lede,nl,9772
+F,Waregem,nl,8790
+F,Waterland-Oudeman/Watervliet,nl,9988
+F,Watou,nl,8978
+F,Weelde,nl,2381
+F,Welle,nl,9473
+F,Wemmel,nl,1780
+F,Werchter,nl,3118
+F,Westouter,nl,8954
+F,Wezemaal,nl,3111
+F,Wezembeek-Oppem,nl,1970
+F,Wijgmaal (Brabant),nl,3018
+F,Wijnegem,nl,2110
+F,Wijtschate,nl,8953
+F,Wilrijk (Antwerpen),nl,2610
+F,Wilsele,nl,3012
+F,Wilskerke,nl,8431
+F,Wimmertingen,nl,3501
+F,Wingene/Zwevezele,nl,8750
+F,Wintershoven,nl,3722
+F,Wolvertem,nl,1861
+F,Wommelgem,nl,2160
+F,Wondelgem,nl,9032
+F,Wortel,nl,2323
+F,Wulvergem,nl,8952
+F,Zele,nl,9240
+F,Zelzate,nl,9060
+F,Zomergem,nl,9930
+F,Zonhoven,nl,3520
+F,Zutendaal,nl,3690
+F,Zwevegem,nl,8550
+F,Zwijnaarde,nl,9052
+F,s Gravenvoeren,nl,3798
+F,s Gravenwezel/Schilde,nl,2970
+F,» Antwerpen «/Ekeren (Antwerpen),nl,2180
+F,» Brecht «/Loenhout/Wuustwezel,nl,2990
+F,» Meeuwen-Gruitrode «/Opglabbeek,nl,3660
+W,,,1300
+W,,,1301
+W,,,1310
+W,,,1315
+W,,,1320
+W,,,1325
+W,,,1330
+W,,,1331
+W,,,1332
+W,,,1340
+W,,,1341
+W,,,1342
+W,,,1348
+W,,,1350
+W,,,1357
+W,,,1360
+W,,,1367
+W,,,1370
+W,,,1380
+W,,,1390
+W,,,1400
+W,,,1401
+W,,,1402
+W,,,1404
+W,,,1410
+W,,,1420
+W,,,1421
+W,,,1428
+W,,,1430
+W,,,1435
+W,,,1440
+W,,,1450
+W,,,1457
+W,,,1460
+W,,,1461
+W,,,1470
+W,,,1471
+W,,,1472
+W,,,1473
+W,,,1474
+W,,,1476
+W,,,1480
+W,,,1490
+W,,,1495
+W,,,4000
+W,,,4020
+W,,,4030
+W,,,4031
+W,,,4032
+W,,,4040
+W,,,4041
+W,,,4042
+W,,,4050
+W,,,4051
+W,,,4052
+W,,,4053
+W,,,4100
+W,,,4101
+W,,,4102
+W,,,4120
+W,,,4121
+W,,,4122
+W,,,4130
+W,,,4140
+W,,,4141
+W,,,4160
+W,,,4161
+W,,,4162
+W,,,4163
+W,,,4170
+W,,,4171
+W,,,4180
+W,,,4181
+W,,,4190
+W,,,4210
+W,,,4217
+W,,,4218
+W,,,4219
+W,,,4250
+W,,,4252
+W,,,4253
+W,,,4254
+W,,,4257
+W,,,4260
+W,,,4261
+W,,,4263
+W,,,4280
+W,,,4287
+W,,,4300
+W,,,4317
+W,,,4340
+W,,,4342
+W,,,4347
+W,,,4350
+W,,,4351
+W,,,4357
+W,,,4360
+W,,,4367
+W,,,4400
+W,,,4420
+W,,,4430
+W,,,4431
+W,,,4432
+W,,,4450
+W,,,4451
+W,,,4452
+W,,,4453
+W,,,4458
+W,,,4460
+W,,,4470
+W,,,4480
+W,,,4500
+W,,,4520
+W,,,4530
+W,,,4537
+W,,,4540
+W,,,4550
+W,,,4557
+W,,,4560
+W,,,4570
+W,,,4577
+W,,,4590
+W,,,4600
+W,,,4601
+W,,,4602
+W,,,4606
+W,,,4607
+W,,,4608
+W,,,4610
+W,,,4620
+W,,,4621
+W,,,4623
+W,,,4624
+W,,,4630
+W,,,4631
+W,,,4632
+W,,,4633
+W,,,4650
+W,,,4651
+W,,,4652
+W,,,4653
+W,,,4654
+W,,,4670
+W,,,4671
+W,,,4672
+W,,,4680
+W,,,4681
+W,,,4682
+W,,,4683
+W,,,4684
+W,,,4690
+W,,,4700
+W,,,4701
+W,,,4710
+W,,,4711
+W,,,4720
+W,,,4721
+W,,,4728
+W,,,4730
+W,,,4731
+W,,,4750
+W,,,4760
+W,,,4761
+W,,,4770
+W,,,4771
+W,,,4780
+W,,,4782
+W,,,4783
+W,,,4784
+W,,,4790
+W,,,4800
+W,,,4801
+W,,,4802
+W,,,4820
+W,,,4821
+W,,,4830
+W,,,4831
+W,,,4834
+W,,,4837
+W,,,4840
+W,,,4841
+W,,,4845
+W,,,4850
+W,,,4851
+W,,,4852
+W,,,4860
+W,,,4861
+W,,,4870
+W,,,4877
+W,,,4880
+W,,,4890
+W,,,4900
+W,,,4910
+W,,,4920
+W,,,4950
+W,,,4960
+W,,,4970
+W,,,4980
+W,,,4983
+W,,,4987
+W,,,4990
+W,,,5000
+W,,,5001
+W,,,5002
+W,,,5003
+W,,,5004
+W,,,5020
+W,,,5021
+W,,,5022
+W,,,5024
+W,,,5030
+W,,,5031
+W,,,5032
+W,,,5060
+W,,,5070
+W,,,5080
+W,,,5081
+W,,,5100
+W,,,5101
+W,,,5140
+W,,,5150
+W,,,5170
+W,,,5190
+W,,,5300
+W,,,5310
+W,,,5330
+W,,,5332
+W,,,5333
+W,,,5334
+W,,,5336
+W,,,5340
+W,,,5350
+W,,,5351
+W,,,5352
+W,,,5353
+W,,,5354
+W,,,5360
+W,,,5361
+W,,,5362
+W,,,5363
+W,,,5364
+W,,,5370
+W,,,5372
+W,,,5374
+W,,,5376
+W,,,5377
+W,,,5380
+W,,,5500
+W,,,5501
+W,,,5502
+W,,,5503
+W,,,5504
+W,,,5520
+W,,,5521
+W,,,5522
+W,,,5523
+W,,,5524
+W,,,5530
+W,,,5537
+W,,,5540
+W,,,5541
+W,,,5542
+W,,,5543
+W,,,5544
+W,,,5550
+W,,,5555
+W,,,5560
+W,,,5561
+W,,,5562
+W,,,5563
+W,,,5564
+W,,,5570
+W,,,5571
+W,,,5572
+W,,,5573
+W,,,5574
+W,,,5575
+W,,,5576
+W,,,5580
+W,,,5590
+W,,,5600
+W,,,5620
+W,,,5621
+W,,,5630
+W,,,5640
+W,,,5641
+W,,,5644
+W,,,5646
+W,,,5650
+W,,,5651
+W,,,5660
+W,,,5670
+W,,,5680
+W,,,6000
+W,,,6001
+W,,,6010
+W,,,6020
+W,,,6030
+W,,,6031
+W,,,6032
+W,,,6040
+W,,,6041
+W,,,6042
+W,,,6043
+W,,,6044
+W,,,6060
+W,,,6061
+W,,,6110
+W,,,6111
+W,,,6120
+W,,,6140
+W,,,6141
+W,,,6142
+W,,,6150
+W,,,6180
+W,,,6181
+W,,,6182
+W,,,6183
+W,,,6200
+W,,,6210
+W,,,6211
+W,,,6220
+W,,,6221
+W,,,6222
+W,,,6223
+W,,,6224
+W,,,6230
+W,,,6238
+W,,,6240
+W,,,6250
+W,,,6280
+W,,,6440
+W,,,6441
+W,,,6460
+W,,,6461
+W,,,6462
+W,,,6463
+W,,,6464
+W,,,6470
+W,,,6500
+W,,,6511
+W,,,6530
+W,,,6531
+W,,,6532
+W,,,6533
+W,,,6534
+W,,,6536
+W,,,6540
+W,,,6542
+W,,,6543
+W,,,6560
+W,,,6567
+W,,,6590
+W,,,6591
+W,,,6592
+W,,,6593
+W,,,6594
+W,,,6596
+W,,,6600
+W,,,6630
+W,,,6637
+W,,,6640
+W,,,6660
+W,,,6661
+W,,,6662
+W,,,6663
+W,,,6666
+W,,,6670
+W,,,6671
+W,,,6672
+W,,,6673
+W,,,6674
+W,,,6680
+W,,,6681
+W,,,6686
+W,,,6687
+W,,,6690
+W,,,6692
+W,,,6698
+W,,,6700
+W,,,6704
+W,,,6706
+W,,,6717
+W,,,6720
+W,,,6721
+W,,,6723
+W,,,6724
+W,,,6730
+W,,,6740
+W,,,6741
+W,,,6742
+W,,,6743
+W,,,6747
+W,,,6750
+W,,,6760
+W,,,6761
+W,,,6762
+W,,,6767
+W,,,6769
+W,,,6780
+W,,,6781
+W,,,6782
+W,,,6790
+W,,,6791
+W,,,6792
+W,,,6800
+W,,,6810
+W,,,6811
+W,,,6812
+W,,,6813
+W,,,6820
+W,,,6821
+W,,,6823
+W,,,6824
+W,,,6830
+W,,,6831
+W,,,6832
+W,,,6833
+W,,,6834
+W,,,6836
+W,,,6838
+W,,,6840
+W,,,6850
+W,,,6851
+W,,,6852
+W,,,6853
+W,,,6856
+W,,,6860
+W,,,6870
+W,,,6880
+W,,,6887
+W,,,6890
+W,,,6900
+W,,,6920
+W,,,6921
+W,,,6922
+W,,,6924
+W,,,6927
+W,,,6929
+W,,,6940
+W,,,6941
+W,,,6950
+W,,,6951
+W,,,6952
+W,,,6953
+W,,,6960
+W,,,6970
+W,,,6971
+W,,,6972
+W,,,6980
+W,,,6982
+W,,,6983
+W,,,6984
+W,,,6986
+W,,,6987
+W,,,6990
+W,,,6997
+W,,,7000
+W,,,7011
+W,,,7012
+W,,,7020
+W,,,7021
+W,,,7022
+W,,,7024
+W,,,7030
+W,,,7031
+W,,,7032
+W,,,7033
+W,,,7034
+W,,,7040
+W,,,7041
+W,,,7050
+W,,,7060
+W,,,7061
+W,,,7062
+W,,,7063
+W,,,7070
+W,,,7080
+W,,,7090
+W,,,7100
+W,,,7110
+W,,,7120
+W,,,7130
+W,,,7131
+W,,,7133
+W,,,7134
+W,,,7140
+W,,,7141
+W,,,7160
+W,,,7170
+W,,,7180
+W,,,7181
+W,,,7190
+W,,,7191
+W,,,7300
+W,,,7301
+W,,,7320
+W,,,7321
+W,,,7322
+W,,,7330
+W,,,7331
+W,,,7332
+W,,,7333
+W,,,7334
+W,,,7340
+W,,,7350
+W,,,7370
+W,,,7380
+W,,,7382
+W,,,7387
+W,,,7390
+W,,,7500
+W,,,7501
+W,,,7502
+W,,,7503
+W,,,7504
+W,,,7506
+W,,,7520
+W,,,7521
+W,,,7522
+W,,,7530
+W,,,7531
+W,,,7532
+W,,,7533
+W,,,7534
+W,,,7536
+W,,,7538
+W,,,7540
+W,,,7542
+W,,,7543
+W,,,7548
+W,,,7600
+W,,,7601
+W,,,7602
+W,,,7603
+W,,,7604
+W,,,7608
+W,,,7610
+W,,,7611
+W,,,7618
+W,,,7620
+W,,,7621
+W,,,7622
+W,,,7623
+W,,,7624
+W,,,7640
+W,,,7641
+W,,,7642
+W,,,7643
+W,,,7700
+W,,,7711
+W,,,7712
+W,,,7730
+W,,,7740
+W,,,7742
+W,,,7743
+W,,,7750
+W,,,7760
+W,,,7780
+W,,,7781
+W,,,7782
+W,,,7783
+W,,,7784
+W,,,7800
+W,,,7801
+W,,,7802
+W,,,7803
+W,,,7804
+W,,,7810
+W,,,7811
+W,,,7812
+W,,,7822
+W,,,7823
+W,,,7830
+W,,,7850
+W,,,7860
+W,,,7861
+W,,,7862
+W,,,7863
+W,,,7864
+W,,,7866
+W,,,7870
+W,,,7880
+W,,,7890
+W,,,7900
+W,,,7901
+W,,,7903
+W,,,7904
+W,,,7906
+W,,,7910
+W,,,7911
+W,,,7912
+W,,,7940
+W,,,7941
+W,,,7942
+W,,,7943
+W,,,7950
+W,,,7951
+W,,,7970
+W,,,7971
+W,,,7972
+W,,,7973
