@@ -1,7 +1,13 @@
+#-------------------------------------#
+# Python script for BEST address      #
+# Author: Marc Bruyland (FOD BOSA)    #
+# Contact: marc.bruyland@bosa.fgov.be #
+# June 2019                           #
+#-------------------------------------#
 import sys
 import operator
 import json #issue with quotes as double quote is mandatory for json
-import ast #reading dictionaries from a file without problems with quotes
+import ast  #reading dictionaries from a file without problems with quotes
 import os
 import time
 import datetime
@@ -18,9 +24,9 @@ ENCODING_AAPD = "latin-1"
 
 THRESHOLD_STREET = 0.9
 
-BEST_B_CONSOLIDATEDRESULT = '_BEST_B_consolidatedResult.txt'
-BEST_F_CONSOLIDATEDRESULT = '_BEST_F_consolidatedResult.txt'
-BEST_W_CONSOLIDATEDRESULT = '_BEST_W_consolidatedResult.txt'
+BEST_B_CONSOLIDATEDRESULT = 'ConsolidatedResult_B.txt'
+BEST_F_CONSOLIDATEDRESULT = 'ConsolidatedResult_F.txt'
+BEST_W_CONSOLIDATEDRESULT = 'ConsolidatedResult_W.txt'
 
 SRC_RR_B_ORI = './RR/RR_B'
 SRC_RR_B_IN = 'RR_B.txt'
@@ -101,7 +107,7 @@ fMapStreetCode_RRtoBEST = 'MAP_StreetCode_RRtoBEST.txt'
 fMapStreetCode_POLtoBEST = 'MAP_StreetCode_POLtoBEST.txt'
 fMapStreetCode_AAPDtoBEST = 'MAP_StreetCode_AAPDtoBEST.txt'
 
-fMToP = "DIC_MtoP.txt" 	#Municipality to PostalInfo
+fMtoP = "DIC_MtoP.txt" 	#Municipality to PostalInfo
 fMtoPM = "DIC_MtoPM.txt" #Municipality to PartOfMunicipality
 fPtoM = "DIC_PtoM.txt" 	#PostalInfo to Municipality
 fPtoPM = "DIC_PtoPM.txt" #PostalInfo to PartOfMunicipality
@@ -2268,7 +2274,7 @@ def makeExtractAddressesOfStreet(dicA, R, idM, idS):
 	filename = "Adresses_" +R + "_" + idM + "_" + idS + ".txt"
 	saveDic(dic, filename)
 
-def makeDicsFromDicA(dicA, dicM, dicPM, dicP, fMToP, fMtoPM, fPtoM, fPtoPM, fPMtoM, fPMtoP):
+def makeDicsFromDicA(dicA, dicM, dicPM, dicP, fMtoP, fMtoPM, fPtoM, fPtoPM, fPMtoM, fPMtoP):
 	cnt= 0 
 	lst = []
 	for R, dicR in dicA.items():
@@ -2322,7 +2328,7 @@ def makeDicsFromDicA(dicA, dicM, dicPM, dicP, fMToP, fMtoPM, fPtoM, fPtoPM, fPMt
 		if pm not in dic_P_PM[p]:
 			dic_P_PM[p].append(pm)
 	saveDic(dic_M_PM, fMtoPM)
-	saveDic(dic_M_P, fMToP)
+	saveDic(dic_M_P, fMtoP)
 	saveDic(dic_PM_M, fPMtoM)
 	saveDic(dic_PM_P, fPMtoP)
 	saveDic(dic_P_M, fPtoM)
@@ -3133,7 +3139,7 @@ def mapBx(R, idS, hs, lstHouseNrs, bxTransformed, dicMapBoxNumbers):
 				# bestMatch, pcBx = transformBoxAndMap(bestMatch, pcBx, dicMapBoxNumbers[keyRShs].keys(), bxTransformed)
 				# bx2 = dicMapBoxNumbers[keyRShs][bestMatch]['bx']
 				#print('$$$$$$', bx2, pcBx)
-			if pcBx > highestPcBx:
+			if pcBx >= highestPcBx:
 				bestBx = bx2
 				highestPcBx = pcBx
 				idA = dicMapBoxNumbers[keyRShs][bestMatch]['idA']
@@ -3172,8 +3178,11 @@ def getBxNrDoMapping(dicAddress, counters, dicMapBoxNumbers, src):
 	if pcBx == 1 and dicAddress['pc2'] > THRESHOLD_STREET :
 		counters['cntOk'] += 1
 	if pcBx != 1:
-		#if bx2 == "NO BOX NR":
-		if bx != "" and bx2 == "":						#case: house nr ok, SRC has bx nr, while BEST doesn't have a box nr
+		if src in ["RR_B", "RR_W", "RR_F"] and hs !=hs2 and bx == "" and bx2 == "":	#e.g. only for RR: RR  hs = "157", bx = "" and BEST hs2 = "157A", bx2 = "" => C2 means housnrs differ (instead of D2 where hs=, bx<>)
+			if not isAlreadyCounted(dicAddress, "C"):
+				counters['cntC2'] += 1
+			dicAddress['warningC'] = warningC2 
+		elif bx != "" and bx2 == "":						#case: house nr ok, SRC has bx nr, while BEST doesn't have a box nr
 			if not isAlreadyCounted(dicAddress, "D"):
 				counters['cntD1'] += 1
 			dicAddress['warningD'] = warningD1 
@@ -3182,7 +3191,7 @@ def getBxNrDoMapping(dicAddress, counters, dicMapBoxNumbers, src):
 			if not isAlreadyCounted(dicAddress, "D"):
 				counters['cntD3'] += 1
 			dicAddress['warningD'] = warningD3 
-			#print("***4***", bx2, warningD1)
+			#print("***4***", bx2, warningD3)
 		else:											#case: house nr ok, SRC and BEST have box nrs, however none of them matches
 			if not isAlreadyCounted(dicAddress, "D"):
 				counters['cntD2'] += 1

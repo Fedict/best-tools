@@ -6,11 +6,11 @@
 #-------------------------------------#
 from BEST_Lib import *	
 
-start = datetime.datetime.now()
+src = "POL" 
+inFile = SRC_POL_IN
+outFile = SRC_POL_RESULT
 
-src = "AAPD" 
-inFile = SRC_AAPD_IN
-outFile = SRC_AAPD_RESULT
+start = datetime.datetime.now()
 
 print("mapping", src, inFile, outFile)
 mapDb(src, inFile, outFile)
