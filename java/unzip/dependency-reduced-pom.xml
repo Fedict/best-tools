@@ -37,7 +37,7 @@
               <transformers>
                 <transformer />
                 <transformer>
-                  <mainClass>be.bosa.dgd.unzip.Main</mainClass>
+                  <mainClass>be.bosa.dt.unzip.Main</mainClass>
                 </transformer>
               </transformers>
             </configuration>
