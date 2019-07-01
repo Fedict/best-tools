@@ -16,7 +16,7 @@ Currently the addresses are available in (fairly large) XML files, but organizat
 
 Required command-line conversions to
 
-* CSV
+* CSV (one big file with everything in it + separate file with only streetnames+cities / no house numbers nor geocoordinates)
 * GeoPackage
 
 Nice to have:
@@ -37,6 +37,7 @@ Nice to have:
 * Tool to get a list of similar streetnames in two different cities.
 When municipalities merge, they have to be sure that the new municipality does not contain duplicate street names (e.g. Church Street is quite common).
 Either exact same, or similar (e.g. Church Lane / Church Street / Churchill Street / Churn Street...)
+* Linked data: link streets to DBPedia concepts
 
 ## Dev Communication
 
