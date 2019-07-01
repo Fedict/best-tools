@@ -41,7 +41,13 @@ Either exact same, or similar (e.g. Church Lane / Church Street / Churchill Stre
 
 ## Dev Communication
 
-Required:
+Define an approach to publish and manage documentation for developers in an appealing way. 
+Not just for this project, but what if we would have 10, 20...100 of these projects ?
 
-* CSV
-* GeoPackage
+* some generic, format specific things: e.g. what is GeoJSON ? What's Lambert ?  (Idea: "Dealing with Data" eBook with code examples)
+* file specific: "gotcha's" / unexpected things and comments when working with BeST
+
+Preferably using open source tools and/or free services.
+What are popular media for dev-oriented people ? E.g. medium.com ? Github pages and/or gitpitch ? 
+Or a wiki... Or an open source tool like pandoc ?
+
