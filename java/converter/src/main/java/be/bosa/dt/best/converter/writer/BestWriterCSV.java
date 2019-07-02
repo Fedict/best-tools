@@ -43,6 +43,15 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
+
+import org.locationtech.jts.geom.Coordinate;
+
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +61,20 @@ import org.slf4j.LoggerFactory;
  * @author Bart Hanssens
  */
 public class BestWriterCSV implements BestWriter {
+	private static MathTransform TRANS;
 	private final static Logger LOG = LoggerFactory.getLogger(BestWriterCSV.class);
-	
+
+	/**
+	 * Constructor
+	 */
+	public BestWriterCSV() {
+		try {
+			TRANS = CRS.findMathTransform(CRS.decode("EPSG:31370"), CRS.decode("EPSG:4326"), false);
+		} catch (FactoryException fe) {
+			LOG.error("No conversion found");
+		}
+	}
+
 	/**
 	 * Write a series of Best object to a file
 	 * 
@@ -140,25 +161,38 @@ public class BestWriterCSV implements BestWriter {
 			Map<String,String[]> streets, Map<String,String[]> cities, Map<String,String[]> postals) {
 		Path file = BestWriter.getPath(outdir, region, BestType.ADDRESSES, "csv");
 
-		String[] header = { "id", "x", "y",
-							"number", "box",
+		String[] header = { "id", 
 							"street_id", "street_nl", "street_fr",
 							"city_id", "city_nl", "city_fr",
+							"number", "box",
 							"postal_id", "postal_nl", "postal_fr",
-							"version", "status" };
+							"version", "status",
+							"lambertx", "lamberty",
+							"gpsx", "gpsy" };
 		Function<Address,String[]> func = (Address s) -> {
 			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[2]);
 			String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[2]);
 			String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[2]);
-						
+			
+			Coordinate src = new Coordinate(s.getPoint().getX(), s.getPoint().getY());
+			Coordinate dest = new Coordinate();
+			
+			try {
+				JTS.transform(src, dest, TRANS);
+			} catch (TransformException ex) {
+				LOG.warn("Transformation to GPS failed");
+			}
+
 			return new String[] 
 				{ s.getId(),
-				String.valueOf(s.getPoint().getX()), String.valueOf(s.getPoint().getY()),
-				s.getNumber(), s.getBox(),
 				s.getStreet().getId(), cStreet[0], cStreet[1],
+				s.getNumber(), s.getBox(),
 				s.getCity().getId(), cCities[0], cCities[1],
 				s.getPostal().getId(), cPostal[0], cPostal[1],
-				s.getVersion(), s.getStatus() };
+				s.getVersion(), s.getStatus(),
+				String.valueOf(s.getPoint().getX()), String.valueOf(s.getPoint().getY()),
+				String.format("%.4f", dest.x),String.format("%.4f", dest.y)
+			};
 		};
 		
 		write(file, header, addresses, func);
