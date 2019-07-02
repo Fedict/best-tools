@@ -12,6 +12,7 @@ def getFileNamesForExtract(lstSysArgv):
 	src = ""
 	warnings = []
 	wars = ""
+	full = False
 	iParam = 0
 	for item in lstSysArgv:
 		if iParam == 1:
@@ -50,7 +51,8 @@ def getFileNamesForExtract(lstSysArgv):
 				warnings.append(warningD2)
 			elif lstSysArgv[iParam] == "D3":
 				warnings.append(warningD3)
-				
+			elif lstSysArgv[iParam] == "full":
+				full = True
 			wars += lstSysArgv[iParam]
 		iParam += 1
 
@@ -68,15 +70,15 @@ def getFileNamesForExtract(lstSysArgv):
 	elif src == "AAPD":
 		filenameIn = SRC_AAPD_RESULT
 	filenameOut = filenameIn[:-4] + '_Extract_' + wars + ".txt"
-	return src, warnings, filenameIn, filenameOut
+	return src, warnings, full, filenameIn, filenameOut
 	
-def writeExtractFromResultFile(src, warnings, filenameIn, filenameOut):
+def writeExtractFromResultFile(src, warnings, full, filenameIn, filenameOut):
 #in: lst with structure [{k1:v1, k2:v2, ...}, ...]
 #in: filename
 #result: file with filename contains data from lst (1 line for each {k1:v1, k2:v2, ...})
 	fileIn = open(filenameIn,"r", encoding=PREFERRED_ENCODING)
 	fileOut = open(filenameOut,"w", encoding=PREFERRED_ENCODING)
-	
+	lstAlreadyTreated = []
 	cnt = 0
 	line = fileIn.readline()
 	while line:
@@ -89,7 +91,26 @@ def writeExtractFromResultFile(src, warnings, filenameIn, filenameOut):
 		else:
 			for warning in warnings:
 				if warning in line:
-					keepLine = True
+					if warning in [warningA1, warningA2] and not full: #avoid repetition of information for municipality issues
+						start = line.find('"idM_SRC"')
+						end = line.find('"P"')
+						syn = line[start:end]
+						if syn in lstAlreadyTreated:
+							keepLine = False
+						else:
+							keepLine = True
+							lstAlreadyTreated.append(syn)
+					elif warning in [warningB1, warningB2] and not full: #avoid repetition of information for street issues
+						start = line.find('"idS_SRC"')
+						end = line.find('"hs"')
+						syn = line[start:end]
+						if syn in lstAlreadyTreated:
+							keepLine = False
+						else:
+							keepLine = True
+							lstAlreadyTreated.append(syn)
+					else:
+						keepLine = True
 		if keepLine:
 			try:	
 				fileOut.write(line)
@@ -108,19 +129,21 @@ print("start: ", start)
 
 nParams = len(sys.argv) - 1		#-1 cfr sys.argv[0] contains the name of the python script
 if nParams < 2:
-	print("required parameters: src, one or more selection criteria")
+	print("required parameters: src, one or more selection criteria, optional parameter full")
 	print("src in ['AAPD', 'RR_B', 'RR_F', 'RR_W', 'KBO', 'POL']")
 	print("selection criteria: either 'idA' for selecting correct address id's")
 	print("selection criteria: or ['A', 'A1', 'A2', 'B', 'B1', 'B2, 'C', 'C1', 'C2', 'D', 'D1', 'D2', 'D3'] for selecting one or more warnings")
-	print("example 1:   BEST_Tools_ExtractFromResultsFile.py POL idA      will extract correct BEST address id's from the results file of the Police")
-	print("example 2:   BEST_Tools_ExtractFromResultsFile.py POL A B2     will extract warnings A1, A2 and B2 from the results file of the Police")
+	print("optional parameter 'full': relevant for A- and B-warnings to include all addresses with this kind of issue")
+	print("example 1:   BEST_Tools_ExtractFromResultsFile.py POL idA      	will extract correct BEST address id's from the results file of the Police")
+	print("example 2:   BEST_Tools_ExtractFromResultsFile.py POL A B2     	will extract warnings A1, A2 and B2 from the results file of the Police (with address filtering)")
+	print("example 3:   BEST_Tools_ExtractFromResultsFile.py POL A B2 full  will extract warnings A1, A2 and B2 from the results file of the Police (without address filtering)")
 	quit()
-src, warnings, filenameIn, filenameOut = getFileNamesForExtract(sys.argv)
+src, warnings, full, filenameIn, filenameOut = getFileNamesForExtract(sys.argv)
 # print(nParams, sys.argv)
 # print(filenameIn, filenameOut)
 # print(src, warnings)
 
-writeExtractFromResultFile(src, warnings, filenameIn, filenameOut)
+writeExtractFromResultFile(src, warnings, full, filenameIn, filenameOut)
 	
 end = datetime.datetime.now()
 print("start: ", start)
