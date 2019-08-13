@@ -144,11 +144,11 @@ public class BestWriterCSV implements BestWriter {
 							"version", "status", "from" };
 		Function<Streetname,String[]> func = (Streetname s) -> { 
 			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr"), s.getName("de")});
-			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[2]);
+			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[3]);
 			
 			return new String[] 
 				{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr"), s.getName("de"),
-				s.getCity().getNamespace(), s.getCity().getId(), cCities[0], cCities[1],
+				s.getCity().getNamespace(), s.getCity().getId(), cCities[0], cCities[1], cCities[2],
 				s.getVersion(), s.getStatus(), s.getDate() };
 		};
 		
@@ -164,16 +164,16 @@ public class BestWriterCSV implements BestWriter {
 
 		String[] header = { "id", 
 							"street_id", "street_nl", "street_fr", "street_de",
-							"city_id", "city_nl", "city_fr", "city_de",
 							"number", "box",
-							"postal_id", "postal_nl", "postal_fr",
+							"city_id", "city_nl", "city_fr", "city_de",
+							"postal_id", "postal_nl", "postal_fr", "postal_de",
 							"version", "status",
 							"lambertx", "lamberty",
 							"gpsx", "gpsy" };
 		Function<Address,String[]> func = (Address s) -> {
 			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[3]);
 			String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[3]);
-			String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[2]);
+			String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[3]);
 			
 			Coordinate src = new Coordinate(s.getPoint().getX(), s.getPoint().getY());
 			Coordinate dest = new Coordinate();
@@ -189,7 +189,7 @@ public class BestWriterCSV implements BestWriter {
 				s.getStreet().getId(), cStreet[0], cStreet[1], cStreet[2],
 				s.getNumber(), s.getBox(),
 				s.getCity().getId(), cCities[0], cCities[1], cCities[2],
-				s.getPostal().getId(), cPostal[0], cPostal[1],
+				s.getPostal().getId(), cPostal[0], cPostal[1], cPostal[2],
 				s.getVersion(), s.getStatus(),
 				String.valueOf(s.getPoint().getX()), String.valueOf(s.getPoint().getY()),
 				String.format(Locale.US, "%.4f", dest.x), String.format(Locale.US, "%.4f", dest.y)
