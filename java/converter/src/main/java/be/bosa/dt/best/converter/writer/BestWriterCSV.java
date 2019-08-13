@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -101,11 +102,11 @@ public class BestWriterCSV implements BestWriter {
 		
 		Map<String,String[]> cache = new HashMap<>();
 		
-		String[] header = { "namespace", "id", "version", "name_nl", "name_fr" };
+		String[] header = { "namespace", "id", "version", "name_nl", "name_fr", "name_de" };
 		Function<Municipality,String[]> func = (Municipality s) -> { 
-			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr")});
+			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr"), s.getName("de")});
 			return new String[] 
-				{ s.getNamespace(), s.getId(), s.getVersion(), s.getName("nl"), s.getName("fr") };
+				{ s.getNamespace(), s.getId(), s.getVersion(), s.getName("nl"), s.getName("fr"), s.getName("de") };
 		};
 		
 		write(file, header, cities, func);
@@ -119,11 +120,11 @@ public class BestWriterCSV implements BestWriter {
 		
 		Map<String,String[]> cache = new HashMap<>();
 		
-		String[] header = { "namespace", "id", "name_nl", "name_fr", "status" };
+		String[] header = { "namespace", "id", "name_nl", "name_fr", "name_de", "status" };
 		Function<Postal,String[]> func = (Postal s) -> { 
-			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr")});
+			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr"), s.getName("de")});
 			return new String[] 
-				{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr") };
+				{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr"), s.getName("de") };
 		};
 				
 		write(file, header, postals, func);
@@ -138,15 +139,15 @@ public class BestWriterCSV implements BestWriter {
 	
 		Map<String,String[]> cache = new HashMap<>();
 		
-		String[] header = { "namespace", "id", "name_nl", "name_fr", 
-							"city_ns", "city_id", "city_nl", "city_fr",
+		String[] header = { "namespace", "id", "name_nl", "name_fr", "name_de",
+							"city_ns", "city_id", "city_nl", "city_fr", "city_de",
 							"version", "status", "from" };
 		Function<Streetname,String[]> func = (Streetname s) -> { 
-			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr")});
+			cache.put(s.getId(), new String[] { s.getName("nl"), s.getName("fr"), s.getName("de")});
 			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[2]);
 			
 			return new String[] 
-				{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr"),
+				{ s.getNamespace(), s.getId(), s.getName("nl"), s.getName("fr"), s.getName("de"),
 				s.getCity().getNamespace(), s.getCity().getId(), cCities[0], cCities[1],
 				s.getVersion(), s.getStatus(), s.getDate() };
 		};
@@ -162,16 +163,16 @@ public class BestWriterCSV implements BestWriter {
 		Path file = BestWriter.getPath(outdir, region, BestType.ADDRESSES, "csv");
 
 		String[] header = { "id", 
-							"street_id", "street_nl", "street_fr",
-							"city_id", "city_nl", "city_fr",
+							"street_id", "street_nl", "street_fr", "street_de",
+							"city_id", "city_nl", "city_fr", "city_de",
 							"number", "box",
 							"postal_id", "postal_nl", "postal_fr",
 							"version", "status",
 							"lambertx", "lamberty",
 							"gpsx", "gpsy" };
 		Function<Address,String[]> func = (Address s) -> {
-			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[2]);
-			String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[2]);
+			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[3]);
+			String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[3]);
 			String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[2]);
 			
 			Coordinate src = new Coordinate(s.getPoint().getX(), s.getPoint().getY());
@@ -185,13 +186,13 @@ public class BestWriterCSV implements BestWriter {
 
 			return new String[] 
 				{ s.getId(),
-				s.getStreet().getId(), cStreet[0], cStreet[1],
+				s.getStreet().getId(), cStreet[0], cStreet[1], cStreet[2],
 				s.getNumber(), s.getBox(),
-				s.getCity().getId(), cCities[0], cCities[1],
+				s.getCity().getId(), cCities[0], cCities[1], cCities[2],
 				s.getPostal().getId(), cPostal[0], cPostal[1],
 				s.getVersion(), s.getStatus(),
 				String.valueOf(s.getPoint().getX()), String.valueOf(s.getPoint().getY()),
-				String.format("%.4f", dest.x),String.format("%.4f", dest.y)
+				String.format(Locale.US, "%.4f", dest.x), String.format(Locale.US, "%.4f", dest.y)
 			};
 		};
 		
