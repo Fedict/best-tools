@@ -10,7 +10,9 @@ Unzip the various zip files from nested ZIP
 ### Converter
 
 Convert the BeST XML files to CSV and/or Shapefiles.
-Requires Java 8 runtime and 20 GB disk space
+Requires Java 8 or 11 runtime and +/- 20 GB disk space, 8 GB RAM
+
+Usage: java -Xmx2536m -jar converter -BWF -i indir -o outdir
 
 ## Postgres
 ### Standalone loader
