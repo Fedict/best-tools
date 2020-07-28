@@ -25,6 +25,7 @@
  */
 package be.bosa.dt.best.converter;
 
+import be.bosa.dt.best.converter.writer.BestWriter;
 import be.bosa.dt.best.dao.Address;
 import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.dao.Municipality;
@@ -37,6 +38,7 @@ import be.bosa.dt.best.xmlreader.PostalReader;
 import be.bosa.dt.best.xmlreader.StreetnameReader;
 import be.bosa.dt.best.converter.writer.BestWriterCSV;
 import be.bosa.dt.best.converter.writer.BestWriterShape;
+import be.bosa.dt.best.xmlreader.MunicipalityPartReader;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -93,46 +95,32 @@ public class Main {
 		return null;
 	}
 
-	
-	private static void writeRegionCSV(BestRegion region, Path inPath, Path outPath) {	
-		try( Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
-			Stream<Postal> postals = new PostalReader().read(region, inPath);
-			Stream<Streetname> streets = new StreetnameReader().read(region, inPath);
-			Stream<Address> addresses = new AddressReader().read(region, inPath)) {
-
-			BestWriterCSV writer = new BestWriterCSV();
-				
-			Map<String, String[]> cacheCities = writer.writeMunicipalities(region, outPath, cities);
-			Map<String, String[]> cachePostals = writer.writePostals(region, outPath, postals);
-			Map<String, String[]> cacheStreets = writer.writeStreets(region, outPath, streets, cacheCities);
-			
-			writer.writeAddresses(region, outPath, addresses, cacheStreets, cacheCities, cachePostals);
-		}
-	}
-	
 	/**
-	 * Write address info for a specific region to a shapefile
+	 * Write files for a specific region
 	 * 
-	 * @param region Belgian region
+	 * @param writer
+	 * @param region
 	 * @param inPath input directory
 	 * @param outPath output directory
 	 */
-	private static void writeRegionShape(BestRegion region, Path inPath, Path outPath) {	
+	private static void writeRegion(BestWriter writer, BestRegion region, Path inPath, Path outPath) {
 		try( Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
+			Stream<Municipality> cityParts = region.equals(region.WALLONIA) 
+													? new MunicipalityPartReader().read(region, inPath) 
+													: Stream.empty();
 			Stream<Postal> postals = new PostalReader().read(region, inPath);
 			Stream<Streetname> streets = new StreetnameReader().read(region, inPath);
 			Stream<Address> addresses = new AddressReader().read(region, inPath)) {
-
-			BestWriterShape writer = new BestWriterShape();
 				
 			Map<String, String[]> cacheCities = writer.writeMunicipalities(region, outPath, cities);
+			Map<String, String[]> cacheCityParts = writer.writeMunicipalityParts(region, outPath, cityParts);
 			Map<String, String[]> cachePostals = writer.writePostals(region, outPath, postals);
 			Map<String, String[]> cacheStreets = writer.writeStreets(region, outPath, streets, cacheCities);
 			
-			writer.writeAddresses(region, outPath, addresses, cacheStreets, cacheCities, cachePostals);
+			writer.writeAddresses(region, outPath, addresses, cacheStreets, cacheCities, cacheCityParts, cachePostals);
 		}
 	}
-	
+
 	/**
 	 * Main
 	 * 
@@ -153,8 +141,8 @@ public class Main {
 		for (BestRegion region: BestRegion.values()) {
 			if (cli.hasOption(region.getCode())) {
 				LOG.info("Region {}", region.getName());
-				writeRegionCSV(region, inPath, outPath);
-				writeRegionShape(region, inPath, outPath);
+				writeRegion(new BestWriterCSV(), region, inPath, outPath);
+				writeRegion(new BestWriterShape(), region, inPath, outPath);
 			}
 		}
 	}

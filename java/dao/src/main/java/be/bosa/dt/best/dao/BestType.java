@@ -33,6 +33,7 @@ package be.bosa.dt.best.dao;
 public enum BestType {
 	ADDRESSES("Address"),
 	MUNICIPALITIES("Municipality"),
+	MUNICIPALITY_PARTS("PartOfMunicipality"),
 	POSTALINFO("Postalinfo"),
 	STREETNAMES("Streetname");
 	

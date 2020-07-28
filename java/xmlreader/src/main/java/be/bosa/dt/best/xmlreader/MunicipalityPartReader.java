@@ -42,9 +42,9 @@ import javax.xml.stream.events.XMLEvent;
  * 
  * @author Bart Hanssens
  */
-public class MunicipalityReader extends AbstractXMLReader<Municipality> {
-	private final static QName MUNICIPALITY = new QName(AbstractXMLReader.TNS, "Municipality");
-	private final static QName MUNICIPALITY_NAME = new QName(AbstractXMLReader.ADD, "municipalityName");
+public class MunicipalityPartReader extends AbstractXMLReader<Municipality> {
+	private final static QName MUNICIPALITY_PART = new QName(AbstractXMLReader.TNS, "PartOfMunicipality");
+	private final static QName MUNICIPALITY_NAME = new QName(AbstractXMLReader.ADD, "partOfMunicipalityName");
 	private final static QName NAMESPACE = new QName(AbstractXMLReader.ADD, "namespace");
 	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");
 	private final static QName VERSIONID = new QName(AbstractXMLReader.ADD, "versionIdentifier");
@@ -53,7 +53,7 @@ public class MunicipalityReader extends AbstractXMLReader<Municipality> {
 
 	@Override
 	protected QName getRoot() {
-		return MUNICIPALITY;
+		return MUNICIPALITY_PART;
 	}
 	
 	@Override
@@ -66,7 +66,7 @@ public class MunicipalityReader extends AbstractXMLReader<Municipality> {
 			XMLEvent event = reader.nextEvent();
 			if (event.isStartElement()) {
 				QName el = event.asStartElement().getName();
-				if (el.equals(MUNICIPALITY)) {
+				if (el.equals(MUNICIPALITY_PART)) {
 					obj = new Municipality();
 				} else if (obj != null) {
 					if (el.equals(NAMESPACE)) {
@@ -92,7 +92,7 @@ public class MunicipalityReader extends AbstractXMLReader<Municipality> {
 				QName el = event.asEndElement().getName();
 				if (el.equals(MUNICIPALITY_NAME)) {
 					obj.setName(spelling, lang);
-				} else if (el.equals(MUNICIPALITY)) {
+				} else if (el.equals(MUNICIPALITY_PART)) {
 					return obj;
 				}
 			}
@@ -101,13 +101,13 @@ public class MunicipalityReader extends AbstractXMLReader<Municipality> {
 	}
 	
 	/**
-	 * Get a Java stream of municipalities
+	 * Get a Java stream of municipality parts
 	 * 
 	 * @param region region
 	 * @param indir input directory
 	 * @return 
 	 */
 	public Stream<Municipality> read(BestRegion region, Path indir) {
-		return read(region, BestType.MUNICIPALITIES, indir);
+		return read(region, BestType.MUNICIPALITY_PARTS, indir);
 	}
 }

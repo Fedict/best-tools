@@ -33,6 +33,7 @@ package be.bosa.dt.best.dao;
 public class Address extends BestObject {
 	private final Geopoint point = new Geopoint();
 	private final Municipality city = new Municipality();
+	private final Municipality cityPart = new Municipality();
 	private final Postal postal = new Postal();
 	private final Streetname street = new Streetname();
 	private String number = "";
@@ -55,6 +56,15 @@ public class Address extends BestObject {
 	 */
 	public Municipality getCity() {
 		return city;
+	}
+
+	/**
+	 * Get the municipality part of the address
+	 * 
+	 * @return municipality object
+	 */
+	public Municipality getCityPart() {
+		return cityPart;
 	}
 	
 	/**

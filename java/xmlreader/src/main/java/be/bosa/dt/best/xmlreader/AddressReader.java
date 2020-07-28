@@ -92,7 +92,7 @@ public class AddressReader extends AbstractXMLReader<Address> {
 					if (el.equals(MUNICIPALITY)) {
 						withinObj = obj.getCity();
 					} else  if (el.equals(MUNICIPALITY_PART)) {
-						withinObj = dummy;
+						withinObj = obj.getCityPart();
 					} else if (el.equals(POSTAL)) {
 						withinObj = obj.getPostal();
 					} else if (el.equals(STREETNAME)) {
