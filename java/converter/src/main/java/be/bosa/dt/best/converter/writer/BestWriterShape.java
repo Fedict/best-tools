@@ -35,6 +35,7 @@ import be.bosa.dt.best.dao.Streetname;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -209,9 +210,10 @@ public class BestWriterShape implements BestWriter {
 	}
 
 	@Override
-	public void writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses,
+	public Map<String, Map<String, String[]>> writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses,
 		Map<String, String[]> streets, Map<String, String[]> cities, Map<String, String[]> cityParts,
 		Map<String, String[]> postals) {
+
 		Path file = BestWriter.getPath(outdir, region, BestType.ADDRESSES, "shp");
 		LOG.info("Writing {}", file);
 
@@ -256,5 +258,12 @@ public class BestWriterShape implements BestWriter {
 		} catch (FactoryException fe) {
 			LOG.error("Coordinate system not supported", fe);
 		}
+		
+		return Collections.EMPTY_MAP;
+	}
+	
+	@Override
+	public void writePostalStreets(BestRegion region, Path outdir, Map<String, Map<String, String[]>> cache) {
+		//
 	}
 }

@@ -99,9 +99,7 @@ public class BestObject {
 	 * @return 
 	 */
 	public String getIDVersion() {
-		return this.version.isEmpty()
-			? this.namespace + "/" + this.id
-			: this.namespace + "/" + this.id + "/" + this.version;
+		return String.join(this.namespace, this.id, this.version);
 	}
 	
 	/**

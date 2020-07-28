@@ -39,13 +39,14 @@ import java.util.stream.Stream;
 
 /**
  * BeST result file writer interface
- * 
+ *
  * @author Bart Hanssens
  */
 public interface BestWriter {
+
 	/**
 	 * Construct the name for an output file
-	 * 
+	 *
 	 * @param outdir output directory
 	 * @param region BeST region
 	 * @param type BeST type
@@ -56,52 +57,52 @@ public interface BestWriter {
 		String suffix = type.toString().toLowerCase();
 		return Paths.get(outdir.toString(), region.getName() + "_" + suffix + "." + ext);
 	}
-	
+
 	/**
 	 * Write a stream of BeSt municipalities objects to a file
-	 * 
+	 *
 	 * @param region
 	 * @param outdir output directory
-	 * @param cities 
+	 * @param cities
 	 * @return cache
 	 */
-	public Map<String,String[]> writeMunicipalities(BestRegion region, Path outdir, Stream<Municipality> cities);
-	
+	public Map<String, String[]> writeMunicipalities(BestRegion region, Path outdir, Stream<Municipality> cities);
+
 	/**
 	 * Write a stream of BeSt municipality part objects to a file
-	 * 
+	 *
 	 * @param region
 	 * @param outdir output directory
 	 * @param cityParts
 	 * @return cache
 	 */
-	public Map<String,String[]> writeMunicipalityParts(BestRegion region, Path outdir, Stream<Municipality> cityParts);
+	public Map<String, String[]> writeMunicipalityParts(BestRegion region, Path outdir, Stream<Municipality> cityParts);
 
 	/**
 	 * Write a stream of stream of BeSt postcode objects to a file
-	 * 
+	 *
 	 * @param region
 	 * @param outdir output directory
-	 * @param postals 
+	 * @param postals
 	 * @return cache
 	 */
-	public Map<String,String[]> writePostals(BestRegion region, Path outdir, Stream<Postal> postals);
+	public Map<String, String[]> writePostals(BestRegion region, Path outdir, Stream<Postal> postals);
 
 	/**
 	 * Write a stream of BeSt streetname objects to a file
-	 * 
+	 *
 	 * @param region
 	 * @param outdir output directory
 	 * @param streetnames street names cache
 	 * @param cities city names cache
 	 * @return cache
 	 */
-	public Map<String,String[]> writeStreets(BestRegion region, Path outdir, Stream<Streetname> streetnames,
-											Map<String,String[]> cities);
-	
+	public Map<String, String[]> writeStreets(BestRegion region, Path outdir, Stream<Streetname> streetnames,
+		Map<String, String[]> cities);
+
 	/**
 	 * Write a stream of BeSt addresses to a file
-	 * 
+	 *
 	 * @param region
 	 * @param outdir output directory
 	 * @param addresses
@@ -109,8 +110,19 @@ public interface BestWriter {
 	 * @param cities city names cache
 	 * @param cityParts city parts cache
 	 * @param postals postal info cache
+	 * @return cache
 	 */
-	public void writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses, 
-			Map<String,String[]> streets, Map<String,String[]> cities, Map<String,String[]> cityParts,
-			Map<String,String[]> postals);
+	public Map<String, Map<String, String[]>> writeAddresses(BestRegion region, Path outdir, Stream<Address> addresses,
+		Map<String, String[]> streets, Map<String, String[]> cities, Map<String, String[]> cityParts,
+		Map<String, String[]> postals);
+	
+	/**
+	 * Write a list of streets and postal codes + additional city / postal names. 
+	 * A street can have multiple postal codes.
+	 * 
+	 * @param region
+	 * @param dir
+	 * @param cache
+	 */
+	public void writePostalStreets(BestRegion region, Path outdir, Map<String, Map<String, String[]>> cache);
 }
