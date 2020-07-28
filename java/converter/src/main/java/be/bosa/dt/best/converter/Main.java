@@ -42,6 +42,7 @@ import be.bosa.dt.best.xmlreader.MunicipalityPartReader;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -105,15 +106,17 @@ public class Main {
 	 */
 	private static void writeRegion(BestWriter writer, BestRegion region, Path inPath, Path outPath) {
 		try( Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
-			Stream<Municipality> cityParts = region.equals(region.WALLONIA) 
-													? new MunicipalityPartReader().read(region, inPath) 
-													: Stream.empty();
 			Stream<Postal> postals = new PostalReader().read(region, inPath);
 			Stream<Streetname> streets = new StreetnameReader().read(region, inPath);
 			Stream<Address> addresses = new AddressReader().read(region, inPath)) {
 				
 			Map<String, String[]> cacheCities = writer.writeMunicipalities(region, outPath, cities);
-			Map<String, String[]> cacheCityParts = writer.writeMunicipalityParts(region, outPath, cityParts);
+
+			Map<String, String[]> cacheCityParts = Collections.EMPTY_MAP;
+			if (region.equals(region.WALLONIA)) {
+				Stream<Municipality> cityParts = new MunicipalityPartReader().read(region, inPath);
+				cacheCityParts = writer.writeMunicipalityParts(region, outPath, cityParts);
+			}
 			Map<String, String[]> cachePostals = writer.writePostals(region, outPath, postals);
 			Map<String, String[]> cacheStreets = writer.writeStreets(region, outPath, streets, cacheCities);
 			

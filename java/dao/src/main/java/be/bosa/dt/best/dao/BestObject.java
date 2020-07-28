@@ -52,7 +52,7 @@ public class BestObject {
 	 * @param namespace 
 	 */
 	public void setNamespace(String namespace) {
-		this.namespace = namespace;
+		this.namespace = namespace.intern();
 	}
 
 	/**
