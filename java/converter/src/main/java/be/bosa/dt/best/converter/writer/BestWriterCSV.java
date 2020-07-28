@@ -234,7 +234,7 @@ public class BestWriterCSV implements BestWriter {
 	
 	@Override
 	public void writePostalStreets(BestRegion region, Path outdir, Map<String, Map<String, String[]>> cache) {
-		Path file = BestWriter.getPath(outdir, region, BestType.POSTAL_STREET, "csv");
+		Path file = BestWriter.getPath(outdir, region, "postal_street", "csv");
 
 		String[] header = {
 			"street_id", "street_nl", "street_fr", "street_de",

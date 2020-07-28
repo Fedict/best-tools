@@ -35,7 +35,6 @@ public enum BestType {
 	MUNICIPALITIES("Municipality"),
 	MUNICIPALITY_PARTS("PartOfMunicipality"),
 	POSTALINFO("Postalinfo"),
-	POSTAL_STREET("PostalStreet"),
 	STREETNAMES("Streetname");
 	
 	private final String name;

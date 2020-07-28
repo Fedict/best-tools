@@ -52,7 +52,9 @@ public class BestObject {
 	 * @param namespace 
 	 */
 	public void setNamespace(String namespace) {
-		this.namespace = namespace.intern();
+		this.namespace = namespace.endsWith("/") 
+							? namespace.substring(0, namespace.length() - 1).intern()
+							: namespace.intern();
 	}
 
 	/**
@@ -99,7 +101,7 @@ public class BestObject {
 	 * @return 
 	 */
 	public String getIDVersion() {
-		return String.join(this.namespace, this.id, this.version);
+		return String.join("/", this.namespace, this.id, this.version);
 	}
 	
 	/**

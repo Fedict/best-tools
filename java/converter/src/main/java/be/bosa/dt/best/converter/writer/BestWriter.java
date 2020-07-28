@@ -57,6 +57,18 @@ public interface BestWriter {
 		String suffix = type.toString().toLowerCase();
 		return Paths.get(outdir.toString(), region.getName() + "_" + suffix + "." + ext);
 	}
+	/**
+	 * Construct the name for an output file
+	 *
+	 * @param outdir output directory
+	 * @param region BeST region
+	 * @param suffix
+	 * @param ext file extension
+	 * @return full path to file
+	 */
+	public static Path getPath(Path outdir, BestRegion region, String suffix, String ext) {
+		return Paths.get(outdir.toString(), region.getName() + "_" + suffix + "." + ext);
+	}
 
 	/**
 	 * Write a stream of BeSt municipalities objects to a file
