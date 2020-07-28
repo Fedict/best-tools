@@ -25,6 +25,7 @@
  */
 package be.bosa.dt.best.unzip;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,6 +33,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
 
 import java.util.zip.ZipFile;
 
@@ -88,10 +91,12 @@ public class Main {
 	 * 
 	 * @param pin input file
 	 * @param pout output directory
+	 * @return false in case of error
 	 */
-	private static void unzip(Path pin, Path pout) {
+	private static boolean unzip(Path pin, Path pout) {
+		boolean ok = true;
 		try (ZipFile zip = new ZipFile(pin.toFile())) {
-			zip.stream().forEach(f -> {
+			for (ZipEntry f: zip.stream().toArray(ZipEntry[]::new)) {
 				String name = f.getName();
 				Path p = Paths.get(pout.toString(), name);
 				LOG.info("Unzipping {}", p);
@@ -104,37 +109,60 @@ public class Main {
 						Files.delete(p);
 					}
 				} catch (IOException e) {
+					ok = false;
 					LOG.error("Error extracting {}", p);
 				}
-			});
+			}
 		} catch (IOException ioe) {
+			ok = false;
 			LOG.error("Error extracting {}", pin.toFile());
 		}
+		return ok;
+	}
+
+	private static boolean verify(Path outdir) {
+		return true;
 	}
 	
 	/**
-	 * Perform some quick checks and unzip, exit on error
+	 * Perform some quick checks and unzip, return on error
 	 * 
 	 * @param infile zip input file
 	 * @param outdir output directory
 	 */
-	private static void checkUnzip(String infile, String outdir) {
+	private static boolean checkAndUnzip(String infile, String outdir) {
 		if (! infile.toLowerCase().endsWith("zip")) {
 			LOG.error("Not a zip file");
-			System.exit(-2);
+			return false;
 		}
 		Path pin = Paths.get(infile);
 		if (! (Files.exists(pin) && Files.isRegularFile(pin))) {
 			LOG.error("Could not find input file");
-			System.exit(-3);
+			return false;
 		}
 		
 		Path pout = Paths.get(outdir);
 		if (! (Files.exists(pout) && Files.isDirectory(pout))) {
 			LOG.error("Could not find output directory");
-			System.exit(-4);
+			return false;
 		}
-		unzip(pin, pout);
+		
+		try {
+			Path[] files = Files.walk(pout).filter(f -> !f.equals(pout)).toArray(Path[]::new);
+			for (Path f: files) {
+				LOG.info("Deleting {}", f);
+				Files.delete(f);
+			}
+		} catch (IOException ioe) {
+			LOG.error("Could not delete files in directory", ioe);
+			return false;
+		}
+		
+		if (! unzip(pin, pout)) {
+			return false;
+		}
+		
+		return verify(pout);
 	}
 	
 	/**
@@ -151,6 +179,8 @@ public class Main {
 		String infile = cli.getOptionValue("i");
 		String outdir = cli.getOptionValue("o");
 
-		checkUnzip(infile, outdir);	
+		if (! checkAndUnzip(infile, outdir)) {
+			System.exit(-2);
+		}
 	}
 }

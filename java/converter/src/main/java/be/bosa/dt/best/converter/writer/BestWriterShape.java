@@ -111,7 +111,7 @@ public class BestWriterShape implements BestWriter {
 	private ShapefileDataStore getDatastore(Path file) throws IOException {
 		ShapefileDataStoreFactory factory = new ShapefileDataStoreFactory();
 		ShapefileDataStore store = (ShapefileDataStore) factory.createDataStore(file.toUri().toURL());
-		store.setMemoryMapped(true);
+	//	store.setMemoryMapped(true);
 		store.setBufferCachingEnabled(true);
 		
 		return store;
@@ -204,7 +204,6 @@ public class BestWriterShape implements BestWriter {
 			
 			ShapefileDataStore datastore = getDatastore(file);
 			datastore.createSchema(ftype);
-			
 			SimpleFeatureBuilder builder = new SimpleFeatureBuilder(ftype);
 			
 			//write batches of 100_000 features to the shape file
@@ -233,8 +232,9 @@ public class BestWriterShape implements BestWriter {
 				}
 				writeFeatures(writer, features);
 				features.clear();
+				
+				datastore.setIndexCreationEnabled(true);
 			}
-			datastore.setIndexCreationEnabled(true);
 		} catch (IOException ioe) {
 			LOG.error("Can't write shapefile", ioe);
 		} catch (FactoryException fe) {
