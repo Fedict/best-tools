@@ -101,7 +101,8 @@ public class BestObject {
 	 * @return 
 	 */
 	public String getIDVersion() {
-		return String.join("/", this.namespace, this.id, this.version);
+		String str = String.join("/", this.namespace, this.id, this.version);
+		return str.length() > 2 ? str : "";
 	}
 	
 	/**
