@@ -26,7 +26,6 @@
 package be.bosa.dt.best.converter.writer;
 
 import be.bosa.dt.best.dao.Address;
-import be.bosa.dt.best.dao.BestObject;
 import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.dao.BestType;
 import be.bosa.dt.best.dao.Municipality;
@@ -208,10 +207,13 @@ public class BestWriterCSV implements BestWriter {
 			// A street can have different postal codes, so create a cache of info per street per postal code
 			Map<String, String[]> postalStreet = cache.getOrDefault(s.getPostal().getId(), new HashMap<>());
 			postalStreet.put(s.getStreet().getId(), new String[]{
-				s.getStreet().getIDVersion(), cStreet[0], cStreet[1], cStreet[2],
-				s.getCity().getIDVersion(), cCities[0], cCities[1], cCities[2],
-				s.getCityPart().getIDVersion(), cParts[0], cParts[1], cParts[2],
-				s.getPostal().getId(), cPostal[0], cPostal[1], cPostal[2]
+				s.getPostal().getId(), cPostal[0], cPostal[1], cPostal[2],
+				cStreet[0], cStreet[1], cStreet[2],
+				cCities[0], cCities[1], cCities[2],
+				cParts[0], cParts[1], cParts[2],
+				s.getStreet().getNamespace(), s.getStreet().getId(), s.getStreet().getVersion(),
+				s.getCity().getNamespace(), s.getCity().getId(), s.getCity().getVersion(),
+				s.getCityPart().getNamespace(), s.getCityPart().getId(), s.getCityPart().getVersion()
 			});
 			cache.put(s.getPostal().getId(), postalStreet);
 
@@ -237,10 +239,14 @@ public class BestWriterCSV implements BestWriter {
 		Path file = BestWriter.getPath(outdir, region, "postal_street", "csv");
 
 		String[] header = {
-			"street_id", "street_nl", "street_fr", "street_de",
-			"city_id", "city_nl", "city_fr", "city_de",
-			"citypart_id", "citypart_nl", "citypart_fr", "citypart_de",
-			"postal_id", "postal_nl", "postal_fr", "postal_de" };
+			"postal_id", "postal_nl", "postal_fr", "postal_de",
+			"street_nl", "street_fr", "street_de",
+			"city_nl", "city_fr", "city_de",
+			"citypart_nl", "citypart_fr", "citypart_de",
+			"street_prefix", "street_no", "street_version",
+			"city_prefix", "city_no", "city_version",
+			"citypart_prefix", "citypart_no", "citypart_version"
+		};
 
 		Function<String[], String[]> func = (String[] s) -> {
 			return s;
