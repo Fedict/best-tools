@@ -205,7 +205,7 @@ public class BestWriterCSV implements BestWriter {
 			}
 
 			// A street can have different postal codes, so create a cache of info per street per postal code
-			if (!s.getStatus().equals("current")) {
+			if (s.getStatus().equals("current")) {
 				Map<String, String[]> postalStreet = cache.getOrDefault(s.getPostal().getId(), new HashMap<>());
 				postalStreet.put(s.getStreet().getId(), new String[]{
 					s.getPostal().getId(), cPostal[0], cPostal[1], cPostal[2],
