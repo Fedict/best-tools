@@ -7,21 +7,28 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>be.bosa.dt.best</groupId>
-  <artifactId>unzip</artifactId>
-  <name>BeSt unzip utility</name>
-  <description>Belgian Streets and Addresses unzip utility</description>
+  <artifactId>batch</artifactId>
   <build>
+    <finalName>${project.name}</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
         <version>3.2.0</version>
         <configuration>
           <archive>
-            <manifest>
-              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-            </manifest>
+            <manifestEntries>
+              <Main-Class>${main.class}</Main-Class>
+            </manifestEntries>
           </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <mainClass>${main.class}</mainClass>
+          <arguments>best-transfer.xml</arguments>
         </configuration>
       </plugin>
       <plugin>
@@ -33,34 +40,25 @@
             <goals>
               <goal>shade</goal>
             </goals>
-            <configuration>
-              <transformers>
-                <transformer />
-                <transformer>
-                  <mainClass>be.bosa.dt.unzip.Main</mainClass>
-                </transformer>
-              </transformers>
-            </configuration>
           </execution>
         </executions>
         <configuration>
-          <createDependencyReducedPom>true</createDependencyReducedPom>
-          <filters>
-            <filter>
-              <artifact>*:*</artifact>
-              <excludes>
-                <exclude>META-INF/*.SF</exclude>
-                <exclude>META-INF/*.DSA</exclude>
-                <exclude>META-INF/*.RSA</exclude>
-              </excludes>
-            </filter>
-          </filters>
+          <transformers>
+            <transformer>
+              <mainClass>${main.class}</mainClass>
+            </transformer>
+            <transformer />
+            <transformer>
+              <resource>META-INF/batch.xml</resource>
+            </transformer>
+          </transformers>
         </configuration>
       </plugin>
     </plugins>
   </build>
   <properties>
     <maven.compiler.target>11</maven.compiler.target>
+    <main.class>org.jberet.se.Main</main.class>
     <maven.compiler.source>11</maven.compiler.source>
   </properties>
 </project>

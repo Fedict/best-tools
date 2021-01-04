@@ -205,18 +205,19 @@ public class BestWriterCSV implements BestWriter {
 			}
 
 			// A street can have different postal codes, so create a cache of info per street per postal code
-			Map<String, String[]> postalStreet = cache.getOrDefault(s.getPostal().getId(), new HashMap<>());
-			postalStreet.put(s.getStreet().getId(), new String[]{
-				s.getPostal().getId(), cPostal[0], cPostal[1], cPostal[2],
-				cStreet[0], cStreet[1], cStreet[2],
-				cCities[0], cCities[1], cCities[2],
-				cParts[0], cParts[1], cParts[2],
-				s.getStreet().getNamespace(), s.getStreet().getId(), s.getStreet().getVersion(),
-				s.getCity().getNamespace(), s.getCity().getId(), s.getCity().getVersion(),
-				s.getCityPart().getNamespace(), s.getCityPart().getId(), s.getCityPart().getVersion()
-			});
-			cache.put(s.getPostal().getId(), postalStreet);
-
+			if (!s.getStatus().equals("current")) {
+				Map<String, String[]> postalStreet = cache.getOrDefault(s.getPostal().getId(), new HashMap<>());
+				postalStreet.put(s.getStreet().getId(), new String[]{
+					s.getPostal().getId(), cPostal[0], cPostal[1], cPostal[2],
+					cStreet[0], cStreet[1], cStreet[2],
+					cCities[0], cCities[1], cCities[2],
+					cParts[0], cParts[1], cParts[2],
+					s.getStreet().getNamespace(), s.getStreet().getId(), s.getStreet().getVersion(),
+					s.getCity().getNamespace(), s.getCity().getId(), s.getCity().getVersion(),
+					s.getCityPart().getNamespace(), s.getCityPart().getId(), s.getCityPart().getVersion()
+				});
+				cache.put(s.getPostal().getId(), postalStreet);
+			}
 			return new String[]{s.getIDVersion(),
 				s.getStreet().getIDVersion(), cStreet[0], cStreet[1], cStreet[2],
 				s.getNumber(), s.getBox(),

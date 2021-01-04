@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<job id="bestTransfer" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"
+	 version="1.0">
+	<listeners>
+		<listener ref="mailLogListener">
+			<properties>
+				<property name="from" value="bart.hanssens@bosa.fgov.be"/>
+				<property name="to" value="bart.hanssens@bosa.fgov.be"/>
+				<property name="subject" value="Best transfer batch"/>
+				<property name="message" value=""/>
+			</properties>
+		</listener>
+	</listeners>
+	<flow id="get" next="verify">
+		<fail on="FAILED" exit-status="GET_FAILED"/>
+		<!--
+	<step id="download" next="zipsize">
+		<batchlet ref="httpGetBatchlet">
+			<properties>
+				<property name="fromURL" value="https://opendata.bosa.be/download/best/best-full-latest.zip"/>
+				<property name="toFile" value="#{systemProperties['java.io.tmpdir']}/best-full-latest.zip"/>
+			</properties>
+		</batchlet>
+	</step>
+		-->
+		<step id="zipsize" next="unpack">
+			<batchlet ref="verifyFileBatchlet">
+				<properties>
+					<property name="file" value="#{systemProperties['java.io.tmpdir']}/best-full-latest.zip"/>
+					<property name="minSize" value="290000000"/>
+				</properties>			
+			</batchlet>
+		</step>
+		<step id="unpack">
+			<batchlet ref="unpackBatchlet">
+				<properties>
+					<property name="inputFile" value="#{systemProperties['java.io.tmpdir']}/best-full-latest.zip"/>
+					<property name="outputDir" value="#{systemProperties['java.io.tmpdir']}/best"/>
+				</properties>
+			</batchlet>
+		</step>
+	</flow>
+	<flow id="verify" next="put">
+		<fail on="FAILED" exit-status="VERIFY_FAILED"/>
+		<step id="vl" next="bxl">
+			<batchlet ref="verifyFileBatchlet">
+				<properties>
+					<property name="directory" value="#{systemProperties['java.io.tmpdir']}/best"/>
+					<property name="filterPattern" value="FlandersAddress.*zip"/>
+					<property name="minSize" value="200000000"/>
+				</properties>
+			</batchlet>
+		</step>
+		<step id="bxl" next="wal">
+			<batchlet ref="verifyFileBatchlet">
+				<properties>
+					<property name="directory" value="#{systemProperties['java.io.tmpdir']}/best"/>
+					<property name="filterPattern" value="BrusselsAddress.*zip"/>
+					<property name="minSize" value="30000000"/>
+				</properties>
+			</batchlet>
+		</step>
+		<step id="wal">
+			<batchlet ref="verifyFileBatchlet">
+				<properties>
+					<property name="directory" value="#{systemProperties['java.io.tmpdir']}/best"/>
+					<property name="filterPattern" value="WalloniaAddress.*zip"/>
+					<property name="minSize" value="70000000"/>
+				</properties>
+			</batchlet>
+		</step>
+	</flow>
+	<flow id="put" next="mail">
+		<fail on="FAILED" exit-status="SFTP_FAILED"/>
+		<step id="upload">
+			<batchlet ref="sftpBatchlet">
+				<properties>
+					<property name="fromFile" value="#{systemProperties['java.io.tmpdir']}/best-full-latest.zip"/>
+					<property name="toSite" value=""/>
+					<property name="toUser" value=""/>
+					<property name="toPass" value=""/>
+				</properties>
+			</batchlet>
+		</step>
+	</flow>
+</job>

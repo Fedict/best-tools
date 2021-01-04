@@ -3,13 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>be.bosa.dt</groupId>
     <artifactId>best</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <packaging>pom</packaging>
     <modules>
         <module>unzip</module>
         <module>converter</module>
         <module>dao</module>
         <module>xmlreader</module>
+        <module>batch</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
