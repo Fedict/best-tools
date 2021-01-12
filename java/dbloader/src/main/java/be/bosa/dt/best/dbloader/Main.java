@@ -27,7 +27,14 @@ package be.bosa.dt.best.dbloader;
 
 import be.bosa.dt.best.dao.Address;
 import be.bosa.dt.best.dao.BestRegion;
+import be.bosa.dt.best.dao.Municipality;
+import be.bosa.dt.best.dao.Postal;
+import be.bosa.dt.best.dao.Streetname;
+
 import be.bosa.dt.best.xmlreader.AddressReader;
+import be.bosa.dt.best.xmlreader.StreetnameReader;
+import be.bosa.dt.best.xmlreader.MunicipalityReader;
+import be.bosa.dt.best.xmlreader.PostalReader;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,6 +56,196 @@ import org.h2gis.ext.H2GISExtension;
  */
 public class Main {
 
+	/**
+	 * Initialize database and create tables
+	 * 
+	 * @param jdbc database string
+	 * @throws SQLException
+	 */
+	private static void initDb(String jdbc) throws SQLException {
+		try(Connection conn = DriverManager.getConnection(jdbc, "sa", "sa")) {
+			H2GISExtension.load(conn);
+		}
+
+		// We could use an ORM tool like MyBatis or Hibernate, but let's use plain JDBC
+		try(Connection conn = DriverManager.getConnection(jdbc, "sa", "sa")) {
+			Statement stmt = conn.createStatement();
+
+			stmt.execute("CREATE TABLE postals(" +
+							"id VARCHAR(96) NOT NULL, " +
+							"zipcode VARCHAR(4), " +
+							"name_nl VARCHAR(240), " +
+							"name_fr VARCHAR(240), " +
+							"name_de VARCHAR(240))");
+
+			stmt.execute("CREATE TABLE municipalities(" +
+							"id VARCHAR(96) NOT NULL, " +
+							"name_nl VARCHAR(80), " +
+							"name_fr VARCHAR(80), " +
+							"name_de VARCHAR(80))");
+
+			stmt.execute("CREATE TABLE streets(" +
+							"id VARCHAR(96) NOT NULL, " +
+							"city_id VARCHAR(96) NOT NULL, " +
+							"name_nl VARCHAR(80), " +
+							"name_fr VARCHAR(80), " +
+							"name_de VARCHAR(80))");
+
+			stmt.execute("CREATE TABLE addresses(" +
+							"id VARCHAR(96) NOT NULL, " +
+							"city_id VARCHAR(96) NOT NULL, " +
+							"part_id VARCHAR(96) NOT NULL, " +
+							"street_id VARCHAR(96) NOT NULL, " +
+							"postal_id VARCHAR(96) NOT NULL, " +
+							"houseno VARCHAR(12), " +
+							"boxno VARCHAR(40))");
+		}
+	}
+
+	/**
+	 * Add additional constraints and indices
+	 * 
+	 * @param jdbc database string
+	 * @throws SQLException
+	 */
+	private static void addConstraints(String jdbc) throws SQLException {
+		// add primary keys and constraints after loading data, for performance
+		try(Connection conn = DriverManager.getConnection(jdbc, "sa", "sa")) {
+			Statement stmt = conn.createStatement();
+
+			// unfortunately not unique in files
+			stmt.execute("CREATE INDEX ON postals(id)");
+
+			// unfortunately not consistent in files
+			stmt.execute("CREATE PRIMARY KEY ON addresses(postal_id)");
+			stmt.execute("CREATE PRIMARY KEY ON addresses(street_id)");
+			stmt.execute("CREATE PRIMARY KEY ON addresses(city_id)");
+			
+			stmt.execute("CREATE PRIMARY KEY ON municipalities(id)");
+			stmt.execute("CREATE PRIMARY KEY ON streets(id)");
+			stmt.execute("CREATE PRIMARY KEY ON addresses(id)");
+		}
+	}
+
+	/**
+	 * Load postal code info
+	 * 
+	 * @param prep prepared statement
+	 * @param xmlPath XML BeST directory
+	 * @throws SQLException 
+	 */
+	private static void loadPostals(PreparedStatement prep, Path xmlPath) throws SQLException {
+		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
+			System.out.println("Starting postals " + reg.getName());
+			int cnt = 0;
+
+			PostalReader reader = new PostalReader();
+			Stream<Postal> postals = reader.read(reg, xmlPath);
+			Iterator<Postal> iter = postals.iterator();
+
+			while (iter.hasNext()) {
+				Postal a = iter.next();
+				prep.setString(1, a.getIDVersion());
+				prep.setString(2, a.getId());
+				prep.setString(3, a.getName("nl"));
+				prep.setString(4, a.getName("fr"));
+				prep.setString(5, a.getName("de"));
+				
+				prep.addBatch();
+				// insert per 10000 records
+				if (++cnt % 10_000 == 0) {
+					prep.executeBatch();
+					System.out.println("Inserted " + cnt);
+				}
+			}
+			prep.executeBatch();
+			System.out.println("Inserted " + cnt);
+		}
+	}
+
+	/**
+	 * Load municipality info
+	 * 
+	 * @param prep prepared statement
+	 * @param xmlPath XML BeST directory
+	 * @throws SQLException 
+	 */
+	private static void loadMunicipalities(PreparedStatement prep, Path xmlPath) throws SQLException {
+		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
+			System.out.println("Starting municipalities " + reg.getName());
+			int cnt = 0;
+
+			MunicipalityReader reader = new MunicipalityReader();
+			Stream<Municipality> municipalities = reader.read(reg, xmlPath);
+			Iterator<Municipality> iter = municipalities.iterator();
+
+			while (iter.hasNext()) {
+				Municipality a = iter.next();
+				prep.setString(1, a.getIDVersion());
+				prep.setString(2, a.getName("nl"));
+				prep.setString(3, a.getName("fr"));
+				prep.setString(4, a.getName("de"));
+
+				prep.addBatch();
+				// insert per 10000 records
+				if (++cnt % 10_000 == 0) {
+					prep.executeBatch();
+					System.out.println("Inserted " + cnt);
+				}
+			}
+			prep.executeBatch();
+			System.out.println("Inserted " + cnt);
+		}
+	}
+
+	/**
+	 * Load streets
+	 * 
+	 * @param prep prepared statement
+	 * @param xmlPath XML BeST directory
+	 * @throws SQLException 
+	 */
+	private static void loadStreets(PreparedStatement prep, Path xmlPath) throws SQLException {
+		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
+			System.out.println("Starting streets " + reg.getName());
+			int cnt = 0;
+
+			StreetnameReader reader = new StreetnameReader();
+			Stream<Streetname> streets = reader.read(reg, xmlPath);
+			Iterator<Streetname> iter = streets.iterator();
+
+			while (iter.hasNext()) {
+				Streetname a = iter.next();
+
+				if (!a.getStatus().equals("current")) {
+					System.out.println("Skipping " + a.getStatus());
+					continue;
+				}
+				prep.setString(1, a.getIDVersion());
+				prep.setString(2, a.getCity().getIDVersion());
+				prep.setString(3, a.getName("nl"));
+				prep.setString(4, a.getName("fr"));
+				prep.setString(5, a.getName("de"));
+				
+				prep.addBatch();
+				// insert per 10000 records
+				if (++cnt % 10_000 == 0) {
+					prep.executeBatch();
+					System.out.println("Inserted " + cnt);
+				}
+			}
+			prep.executeBatch();
+			System.out.println("Inserted " + cnt);
+		}
+	}
+
+	/**
+	 * Load addresses
+	 * 
+	 * @param prep prepared statement
+	 * @param xmlPath XML BeST directory
+	 * @throws SQLException 
+	 */
 	private static void loadAddresses(PreparedStatement prep, Path xmlPath) throws SQLException {
 		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
 			System.out.println("Starting addresses " + reg.getName());
@@ -60,15 +257,24 @@ public class Main {
 
 			while (iter.hasNext()) {
 				Address a = iter.next();
+				
+				if (!a.getStatus().equals("current")) {
+					System.out.println("Skipping " + a.getStatus());
+					continue;
+				}
+
 				prep.setString(1, a.getIDVersion());
 				prep.setString(2, a.getCity().getIDVersion());
 				prep.setString(3, a.getCityPart().getIDVersion());
 				prep.setString(4, a.getStreet().getIDVersion());
-				prep.setString(5, a.getNumber());
-				prep.setString(6, a.getBox());
+				prep.setString(5, a.getPostal().getIDVersion());
+				prep.setString(6, a.getNumber());
+				prep.setString(7, a.getBox());
+
 				//prep.setString(7, a.getPoint());
 			
 				prep.addBatch();
+				// insert per 10000 records
 				if (++cnt % 10_000 == 0) {
 					prep.executeBatch();
 					System.out.println("Inserted " + cnt);
@@ -79,37 +285,54 @@ public class Main {
 		}
 	}
 
+	/**
+	 * Load XML BeST data files in a database file.
+	 * 
+	 * @param dbPath path to database
+	 * @param xmlPath path to XML BeST files
+	 * @throws ClassNotFoundException
+	 * @throws SQLException 
+	 */
 	private static void loadData(Path dbPath, Path xmlPath) throws ClassNotFoundException, SQLException {
+		// check for database driver
 		Class.forName("org.h2.Driver");
 		String str = "jdbc:h2:" + dbPath.toString();
 
+		// init db
+		initDb(str);
+
 		try(Connection conn = DriverManager.getConnection(str, "sa", "sa")) {
-			H2GISExtension.load(conn);
+			PreparedStatement prep = conn.prepareStatement("INSERT INTO postals"
+				+ " VALUES (?, ?, ?, ?, ?)");
+			loadPostals(prep, xmlPath);
 		}
 
 		try(Connection conn = DriverManager.getConnection(str, "sa", "sa")) {
-			Statement stmt = conn.createStatement();
-			stmt.execute("CREATE TABLE addresses(" +
-							"id VARCHAR(96) NOT NULL, " +
-							"city_id VARCHAR(96), " +
-							"part_id VARCHAR(96), " +
-							"street_id VARCHAR(96), " +
-							"houseno VARCHAR(12), " +
-							"boxno VARCHAR(40))");
-		}
-			
-		try(Connection conn = DriverManager.getConnection(str, "sa", "sa")) {
-			PreparedStatement prep = conn.prepareStatement("INSERT INTO addresses"
-				+ " VALUES (?, ?, ?, ?, ?, ?)");
-			loadAddresses(prep, xmlPath);
+			PreparedStatement prep = conn.prepareStatement("INSERT INTO municipalities"
+				+ " VALUES (?, ?, ?, ?)");
+			loadMunicipalities(prep, xmlPath);
 		}
 		
 		try(Connection conn = DriverManager.getConnection(str, "sa", "sa")) {
-			Statement stmt = conn.createStatement();
-			stmt.execute("CREATE PRIMARY KEY ON addresses(id)");
+			PreparedStatement prep = conn.prepareStatement("INSERT INTO streets"
+				+ " VALUES (?, ?, ?, ?, ?)");
+			loadStreets(prep, xmlPath);
 		}
+		
+		try(Connection conn = DriverManager.getConnection(str, "sa", "sa")) {
+			PreparedStatement prep = conn.prepareStatement("INSERT INTO addresses"
+				+ " VALUES (?, ?, ?, ?, ?, ?, ?)");
+			loadAddresses(prep, xmlPath);
+		}
+		
+		addConstraints(str);
 	}
 
+	/**
+	 * Main
+	 * 
+	 * @param args 
+	 */
 	public static void main(String[] args) {
 		if (args.length < 2) {
 			System.err.println("Usage: dbloader xml-directory db-directory");
