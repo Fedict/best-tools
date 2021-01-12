@@ -44,9 +44,19 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
-import org.h2gis.ext.H2GISExtension;
+import org.cts.CRSFactory;
+import org.cts.crs.CRSException;
+import org.cts.crs.CoordinateReferenceSystem;
+import org.cts.crs.GeodeticCRS;
+import org.cts.op.CoordinateOperation;
+import org.cts.op.CoordinateOperationException;
+import org.cts.op.CoordinateOperationFactory;
+import org.cts.registry.EPSGRegistry;
+import org.cts.registry.RegistryManager;
 
 /**
  * Loads XML BeST data into an RDBMS, in this case H2GIS
@@ -64,7 +74,10 @@ public class Main {
 	 */
 	private static void initDb(String jdbc) throws SQLException {
 		try(Connection conn = DriverManager.getConnection(jdbc, "sa", "sa")) {
-			H2GISExtension.load(conn);
+			Statement stmt = conn.createStatement();
+			stmt.execute("CREATE ALIAS IF NOT EXISTS H2GIS_SPATIAL FOR " +
+						"\"org.h2gis.functions.factory.H2GISFunctions.load\" ");
+			stmt.execute("CALL H2GIS_SPATIAL()");
 		}
 
 		// We could use an ORM tool like MyBatis or Hibernate, but let's use plain JDBC
@@ -72,33 +85,34 @@ public class Main {
 			Statement stmt = conn.createStatement();
 
 			stmt.execute("CREATE TABLE postals(" +
-							"id VARCHAR(96) NOT NULL, " +
+							"id VARCHAR(88) NOT NULL, " +
 							"zipcode VARCHAR(4), " +
 							"name_nl VARCHAR(240), " +
 							"name_fr VARCHAR(240), " +
 							"name_de VARCHAR(240))");
 
 			stmt.execute("CREATE TABLE municipalities(" +
-							"id VARCHAR(96) NOT NULL, " +
+							"id VARCHAR(88) NOT NULL, " +
 							"name_nl VARCHAR(80), " +
 							"name_fr VARCHAR(80), " +
 							"name_de VARCHAR(80))");
 
 			stmt.execute("CREATE TABLE streets(" +
-							"id VARCHAR(96) NOT NULL, " +
-							"city_id VARCHAR(96) NOT NULL, " +
+							"id VARCHAR(88) NOT NULL, " +
+							"city_id VARCHAR(88) NOT NULL, " +
 							"name_nl VARCHAR(80), " +
 							"name_fr VARCHAR(80), " +
 							"name_de VARCHAR(80))");
 
 			stmt.execute("CREATE TABLE addresses(" +
-							"id VARCHAR(96) NOT NULL, " +
-							"city_id VARCHAR(96) NOT NULL, " +
-							"part_id VARCHAR(96) NOT NULL, " +
-							"street_id VARCHAR(96) NOT NULL, " +
-							"postal_id VARCHAR(96) NOT NULL, " +
+							"id VARCHAR(88) NOT NULL, " +
+							"city_id VARCHAR(88) NOT NULL, " +
+							"part_id VARCHAR(88) NOT NULL, " +
+							"street_id VARCHAR(88) NOT NULL, " +
+							"postal_id VARCHAR(88) NOT NULL, " +
 							"houseno VARCHAR(12), " +
-							"boxno VARCHAR(40))");
+							"boxno VARCHAR(40), " +
+							"geom GEOMETRY)");
 		}
 	}
 
@@ -117,13 +131,17 @@ public class Main {
 			stmt.execute("CREATE INDEX ON postals(id)");
 
 			// unfortunately not consistent in files
-			stmt.execute("CREATE PRIMARY KEY ON addresses(postal_id)");
-			stmt.execute("CREATE PRIMARY KEY ON addresses(street_id)");
-			stmt.execute("CREATE PRIMARY KEY ON addresses(city_id)");
+			stmt.execute("CREATE INDEX ON streets(city_id)");
+
+			stmt.execute("CREATE INDEX ON addresses(postal_id)");
+			stmt.execute("CREATE INDEX ON addresses(street_id)");
+			stmt.execute("CREATE INDEX ON addresses(city_id)");
 			
 			stmt.execute("CREATE PRIMARY KEY ON municipalities(id)");
 			stmt.execute("CREATE PRIMARY KEY ON streets(id)");
 			stmt.execute("CREATE PRIMARY KEY ON addresses(id)");
+			
+			stmt.execute("CREATE SPATIAL INDEX ON address(geom)");
 		}
 	}
 
@@ -247,6 +265,21 @@ public class Main {
 	 * @throws SQLException 
 	 */
 	private static void loadAddresses(PreparedStatement prep, Path xmlPath) throws SQLException {
+		CoordinateOperation op = null;
+		try {
+			CRSFactory factory = new CRSFactory();
+			RegistryManager manager = factory.getRegistryManager();
+			manager.addRegistry(new EPSGRegistry());
+			CoordinateReferenceSystem source = factory.getCRS("EPSG:31370");
+			CoordinateReferenceSystem target = factory.getCRS("EPSG:4326");
+			Set<CoordinateOperation> ops = CoordinateOperationFactory.
+											createCoordinateOperations((GeodeticCRS) source,(GeodeticCRS) target);
+			op = ops.iterator().next();
+
+		} catch(CRSException | CoordinateOperationException ex) {
+			throw new SQLException(ex);
+		}
+
 		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
 			System.out.println("Starting addresses " + reg.getName());
 			int cnt = 0;
@@ -270,8 +303,7 @@ public class Main {
 				prep.setString(5, a.getPostal().getIDVersion());
 				prep.setString(6, a.getNumber());
 				prep.setString(7, a.getBox());
-
-				//prep.setString(7, a.getPoint());
+//				prep.setString(8, a.getPoint());
 			
 				prep.addBatch();
 				// insert per 10000 records
