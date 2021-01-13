@@ -35,11 +35,12 @@ import javax.persistence.Entity;
 @Entity(name = "Addresses")
 public class AddressEntity extends PanacheEntity {
 	public String id;
-	public String houseNo;
-	public String boxNo;
+	public String houseno;
+	public String boxno;
 	public String geom;
 	
 	public static AddressEntity findNearest(double posx, double posy) {
-        return find("geom", "ST_ClosestPoint('POINT(" + posx + " " + posy +")')").firstResult();
+        return find("SELECT a.id, a.houseno, a.boxno, a.geom FROM Addresses a " +
+					"WHERE ST_INTERSECTS(ST_BUFFER('POINT(" + posx + " " + posy +")', 100), geom) = TRUE").firstResult();
     }
 }

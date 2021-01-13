@@ -41,4 +41,5 @@ public class LookupResource {
 	public AddressEntity nearestAddress(@QueryParam("posx") double posx, @QueryParam("posy") double posy) {
 		return AddressEntity.findNearest(posx, posy);
 	}
+
 }
