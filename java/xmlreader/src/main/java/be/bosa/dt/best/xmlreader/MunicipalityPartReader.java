@@ -44,7 +44,7 @@ import javax.xml.stream.events.XMLEvent;
  */
 public class MunicipalityPartReader extends AbstractXMLReader<Municipality> {
 	private final static QName MUNICIPALITY_PART = new QName(AbstractXMLReader.TNS, "PartOfMunicipality");
-	private final static QName MUNICIPALITY_NAME = new QName(AbstractXMLReader.ADD, "partOfMunicipalityName");
+	private final static QName MUNICIPALITY_PART_NAME = new QName(AbstractXMLReader.ADD, "partOfMunicipalityName");
 	private final static QName NAMESPACE = new QName(AbstractXMLReader.ADD, "namespace");
 	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");
 	private final static QName VERSIONID = new QName(AbstractXMLReader.ADD, "versionIdentifier");
@@ -78,7 +78,7 @@ public class MunicipalityPartReader extends AbstractXMLReader<Municipality> {
 					} else if (el.equals(VERSIONID)) {
 						String txt = reader.getElementText();
 						obj.setVersion(txt);
-					} else if (el.equals(MUNICIPALITY_NAME)) {
+					} else if (el.equals(MUNICIPALITY_PART_NAME)) {
 						lang = "";
 						spelling = "";
 					} else if (el.equals(LANGUAGE)) {
@@ -90,7 +90,7 @@ public class MunicipalityPartReader extends AbstractXMLReader<Municipality> {
 			}
 			if (event.isEndElement()) {
 				QName el = event.asEndElement().getName();
-				if (el.equals(MUNICIPALITY_NAME)) {
+				if (el.equals(MUNICIPALITY_PART_NAME)) {
 					obj.setName(spelling, lang);
 				} else if (el.equals(MUNICIPALITY_PART)) {
 					return obj;
