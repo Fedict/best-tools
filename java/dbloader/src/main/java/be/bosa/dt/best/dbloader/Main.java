@@ -27,14 +27,14 @@ package be.bosa.dt.best.dbloader;
 
 import be.bosa.dt.best.dao.Address;
 import be.bosa.dt.best.dao.BestRegion;
+import be.bosa.dt.best.dao.Geopoint;
 import be.bosa.dt.best.dao.Municipality;
 import be.bosa.dt.best.dao.Postal;
 import be.bosa.dt.best.dao.Streetname;
-
 import be.bosa.dt.best.xmlreader.AddressReader;
-import be.bosa.dt.best.xmlreader.StreetnameReader;
 import be.bosa.dt.best.xmlreader.MunicipalityReader;
 import be.bosa.dt.best.xmlreader.PostalReader;
+import be.bosa.dt.best.xmlreader.StreetnameReader;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,11 +44,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import org.cts.CRSFactory;
+import org.cts.IllegalCoordinateException;
 import org.cts.crs.CRSException;
 import org.cts.crs.CoordinateReferenceSystem;
 import org.cts.crs.GeodeticCRS;
@@ -57,15 +57,17 @@ import org.cts.op.CoordinateOperationException;
 import org.cts.op.CoordinateOperationFactory;
 import org.cts.registry.EPSGRegistry;
 import org.cts.registry.RegistryManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Loads XML BeST data into an RDBMS, in this case H2GIS
- * Requires directory of unzipped
+ * Requires (flat) directory of unzipped XML files
  * 
  * @author Bart Hanssens
  */
 public class Main {
-
+	private static Logger LOG = LoggerFactory.getLogger(Main.class);
 	/**
 	 * Initialize database and create tables
 	 * 
@@ -73,6 +75,7 @@ public class Main {
 	 * @throws SQLException
 	 */
 	private static void initDb(String jdbc) throws SQLException {
+		// Spatial features
 		try(Connection conn = DriverManager.getConnection(jdbc, "sa", "sa")) {
 			Statement stmt = conn.createStatement();
 			stmt.execute("CREATE ALIAS IF NOT EXISTS H2GIS_SPATIAL FOR " +
@@ -123,25 +126,23 @@ public class Main {
 	 * @throws SQLException
 	 */
 	private static void addConstraints(String jdbc) throws SQLException {
-		// add primary keys and constraints after loading data, for performance
+		// add primary keys, indices and constraints after loading data, for performance
 		try(Connection conn = DriverManager.getConnection(jdbc, "sa", "sa")) {
 			Statement stmt = conn.createStatement();
 
-			// unfortunately not unique in files
-			stmt.execute("CREATE INDEX ON postals(id)");
-
-			// unfortunately not consistent in files
+			LOG.info("Constraints and indices");
+			// unfortunately not guaranteed to be unique in files / constraints issues
 			stmt.execute("CREATE INDEX ON streets(city_id)");
-
 			stmt.execute("CREATE INDEX ON addresses(postal_id)");
-			stmt.execute("CREATE INDEX ON addresses(street_id)");
 			stmt.execute("CREATE INDEX ON addresses(city_id)");
 			
+			LOG.info("Set primary keys");
 			stmt.execute("CREATE PRIMARY KEY ON municipalities(id)");
 			stmt.execute("CREATE PRIMARY KEY ON streets(id)");
 			stmt.execute("CREATE PRIMARY KEY ON addresses(id)");
-			
-			stmt.execute("CREATE SPATIAL INDEX ON address(geom)");
+
+			LOG.info("Set spatial index");			
+			stmt.execute("CREATE SPATIAL INDEX ON addresses(geom)");
 		}
 	}
 
@@ -173,11 +174,11 @@ public class Main {
 				// insert per 10000 records
 				if (++cnt % 10_000 == 0) {
 					prep.executeBatch();
-					System.out.println("Inserted " + cnt);
+					LOG.info("Inserted {}", cnt);
 				}
 			}
 			prep.executeBatch();
-			System.out.println("Inserted " + cnt);
+			LOG.info("Inserted {}", cnt);
 		}
 	}
 
@@ -190,7 +191,7 @@ public class Main {
 	 */
 	private static void loadMunicipalities(PreparedStatement prep, Path xmlPath) throws SQLException {
 		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
-			System.out.println("Starting municipalities " + reg.getName());
+			LOG.info("Starting municipalities {}", reg.getName());
 			int cnt = 0;
 
 			MunicipalityReader reader = new MunicipalityReader();
@@ -208,11 +209,11 @@ public class Main {
 				// insert per 10000 records
 				if (++cnt % 10_000 == 0) {
 					prep.executeBatch();
-					System.out.println("Inserted " + cnt);
+					LOG.info("Inserted {}", cnt);
 				}
 			}
 			prep.executeBatch();
-			System.out.println("Inserted " + cnt);
+			LOG.info("Inserted {}", cnt);
 		}
 	}
 
@@ -225,7 +226,7 @@ public class Main {
 	 */
 	private static void loadStreets(PreparedStatement prep, Path xmlPath) throws SQLException {
 		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
-			System.out.println("Starting streets " + reg.getName());
+			LOG.info("Starting streets {} ", reg.getName());
 			int cnt = 0;
 
 			StreetnameReader reader = new StreetnameReader();
@@ -236,7 +237,7 @@ public class Main {
 				Streetname a = iter.next();
 
 				if (!a.getStatus().equals("current")) {
-					System.out.println("Skipping " + a.getStatus());
+					LOG.warn("Skipping {}", a.getStatus());
 					continue;
 				}
 				prep.setString(1, a.getIDVersion());
@@ -249,11 +250,45 @@ public class Main {
 				// insert per 10000 records
 				if (++cnt % 10_000 == 0) {
 					prep.executeBatch();
-					System.out.println("Inserted " + cnt);
+					LOG.info("Inserted {}", cnt);
 				}
 			}
 			prep.executeBatch();
-			System.out.println("Inserted " + cnt);
+			LOG.info("Inserted {}", cnt);
+		}
+	}
+	
+	/**
+	 * Get converter operation for convertion Lambert72 into WGS84 / GPS
+	 * 
+	 * @return operator
+	 * @throws CRSException
+	 * @throws CoordinateOperationException
+	 */
+	private static CoordinateOperation getGeoConverter() throws CRSException, CoordinateOperationException {
+		CRSFactory factory = new CRSFactory();
+		RegistryManager manager = factory.getRegistryManager();
+		manager.addRegistry(new EPSGRegistry());
+		CoordinateReferenceSystem source = factory.getCRS("EPSG:31370");
+		CoordinateReferenceSystem target = factory.getCRS("EPSG:4326");
+		Set<CoordinateOperation> ops = CoordinateOperationFactory.
+											createCoordinateOperations((GeodeticCRS) source,(GeodeticCRS) target);
+		return ops.iterator().next();
+	}
+
+	/**
+	 * 
+	 * @param point
+	 * @param op
+	 * @return WKT POINT or null
+	 */
+	private static String getWKT(Geopoint point, CoordinateOperation op) {
+		double[] lambert = new double[] { point.getX(), point.getY() };
+		try {
+			double[] gps = op.transform(lambert);
+			return "POINT(" + gps[0] + " " + gps[1] + ")";
+		} catch (IllegalCoordinateException| CoordinateOperationException ex) {
+			return null;
 		}
 	}
 
@@ -267,21 +302,13 @@ public class Main {
 	private static void loadAddresses(PreparedStatement prep, Path xmlPath) throws SQLException {
 		CoordinateOperation op = null;
 		try {
-			CRSFactory factory = new CRSFactory();
-			RegistryManager manager = factory.getRegistryManager();
-			manager.addRegistry(new EPSGRegistry());
-			CoordinateReferenceSystem source = factory.getCRS("EPSG:31370");
-			CoordinateReferenceSystem target = factory.getCRS("EPSG:4326");
-			Set<CoordinateOperation> ops = CoordinateOperationFactory.
-											createCoordinateOperations((GeodeticCRS) source,(GeodeticCRS) target);
-			op = ops.iterator().next();
-
+			op = getGeoConverter();
 		} catch(CRSException | CoordinateOperationException ex) {
 			throw new SQLException(ex);
 		}
 
 		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
-			System.out.println("Starting addresses " + reg.getName());
+			LOG.info("Starting addresses {}", reg.getName());
 			int cnt = 0;
 
 			AddressReader reader = new AddressReader();
@@ -292,7 +319,12 @@ public class Main {
 				Address a = iter.next();
 				
 				if (!a.getStatus().equals("current")) {
-					System.out.println("Skipping " + a.getStatus());
+					LOG.info("Skipping {}", a.getStatus());
+					continue;
+				}
+				String gps = getWKT(a.getPoint(), op);
+				if (gps == null) {
+					LOG.warn("No GPS coordinates, skipping " + a.getPoint().toString());
 					continue;
 				}
 
@@ -303,17 +335,17 @@ public class Main {
 				prep.setString(5, a.getPostal().getIDVersion());
 				prep.setString(6, a.getNumber());
 				prep.setString(7, a.getBox());
-//				prep.setString(8, a.getPoint());
+				prep.setString(8, gps);
 			
 				prep.addBatch();
 				// insert per 10000 records
 				if (++cnt % 10_000 == 0) {
 					prep.executeBatch();
-					System.out.println("Inserted " + cnt);
+					LOG.info("Inserted {}", cnt);
 				}
 			}
 			prep.executeBatch();
-			System.out.println("Inserted " + cnt);
+			LOG.info("Inserted {}", cnt);
 		}
 	}
 
@@ -353,7 +385,7 @@ public class Main {
 		
 		try(Connection conn = DriverManager.getConnection(str, "sa", "sa")) {
 			PreparedStatement prep = conn.prepareStatement("INSERT INTO addresses"
-				+ " VALUES (?, ?, ?, ?, ?, ?, ?)");
+				+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 			loadAddresses(prep, xmlPath);
 		}
 		
@@ -367,13 +399,13 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		if (args.length < 2) {
-			System.err.println("Usage: dbloader xml-directory db-directory");
+			System.out.println("Usage: dbloader xml-directory db-directory");
 			System.exit(-1);
 		}
 		
 		Path xmlPath = Paths.get(args[0]);
 		if (!xmlPath.toFile().exists()) {
-			System.err.println("BEST directory does not exist");
+			LOG.error("BEST directory does not exist");
 			System.exit(-2);
 		}
 		Path dbPath = Paths.get(args[1]);
@@ -381,10 +413,9 @@ public class Main {
 		try {
 			loadData(dbPath, xmlPath);
 		} catch (Exception e) {
-			System.err.println("Failed: " + e.getMessage());
-			e.printStackTrace();
+			LOG.error("Failed: " + e.getMessage());
 			System.exit(-3);
 		}
-		System.out.println("Done");
+		LOG.info("Done");
 	}
 }
