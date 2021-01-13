@@ -10,9 +10,9 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath be.bosa.dt.best.dbloader.Main c:\data\best\xml c:\data\best\db</exec.args>
+                <exec.args>-classpath %classpath be.bosa.dt.best.dbloader.Main c:\data\best\xml c:\data\best\db index</exec.args>
                 <exec.executable>java</exec.executable>
-                <exec.workingdir>c</exec.workingdir>
+                <exec.workingdir></exec.workingdir>
             </properties>
         </action>
         <action>
@@ -25,10 +25,10 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath be.bosa.dt.best.dbloader.Main c:\data\best\xml c:\data\best\db</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath be.bosa.dt.best.dbloader.Main c:\data\best\xml c:\data\best\db index</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
-                <exec.workingdir>c</exec.workingdir>
+                <exec.workingdir></exec.workingdir>
             </properties>
         </action>
         <action>
@@ -41,9 +41,9 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath be.bosa.dt.best.dbloader.Main c:\data\best\xml c:\data\best\db</exec.args>
+                <exec.args>-classpath %classpath be.bosa.dt.best.dbloader.Main c:\data\best\xml c:\data\best\db index</exec.args>
                 <exec.executable>java</exec.executable>
-                <exec.workingdir>c</exec.workingdir>
+                <exec.workingdir></exec.workingdir>
             </properties>
         </action>
     </actions>

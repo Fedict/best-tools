@@ -32,6 +32,7 @@ import be.bosa.dt.best.dao.Municipality;
 import be.bosa.dt.best.dao.Postal;
 import be.bosa.dt.best.dao.Streetname;
 import be.bosa.dt.best.xmlreader.AddressReader;
+import be.bosa.dt.best.xmlreader.MunicipalityPartReader;
 import be.bosa.dt.best.xmlreader.MunicipalityReader;
 import be.bosa.dt.best.xmlreader.PostalReader;
 import be.bosa.dt.best.xmlreader.StreetnameReader;
@@ -100,6 +101,12 @@ public class Main {
 							"name_fr VARCHAR(80), " +
 							"name_de VARCHAR(80))");
 
+			stmt.execute("CREATE TABLE municipalityparts(" +
+							"id VARCHAR(88) NOT NULL, " +
+							"name_nl VARCHAR(80), " +
+							"name_fr VARCHAR(80), " +
+							"name_de VARCHAR(80))");
+
 			stmt.execute("CREATE TABLE streets(" +
 							"id VARCHAR(88) NOT NULL, " +
 							"city_id VARCHAR(88) NOT NULL, " +
@@ -135,9 +142,11 @@ public class Main {
 			stmt.execute("CREATE INDEX ON streets(city_id)");
 			stmt.execute("CREATE INDEX ON addresses(postal_id)");
 			stmt.execute("CREATE INDEX ON addresses(city_id)");
+			stmt.execute("CREATE INDEX ON addresses(part_id)");
 			
 			LOG.info("Set primary keys");
 			stmt.execute("CREATE PRIMARY KEY ON municipalities(id)");
+			stmt.execute("CREATE PRIMARY KEY ON municipalityparts(id)");
 			stmt.execute("CREATE PRIMARY KEY ON streets(id)");
 			stmt.execute("CREATE PRIMARY KEY ON addresses(id)");
 
@@ -197,6 +206,40 @@ public class Main {
 			MunicipalityReader reader = new MunicipalityReader();
 			Stream<Municipality> municipalities = reader.read(reg, xmlPath);
 			Iterator<Municipality> iter = municipalities.iterator();
+
+			while (iter.hasNext()) {
+				Municipality a = iter.next();
+				prep.setString(1, a.getIDVersion());
+				prep.setString(2, a.getName("nl"));
+				prep.setString(3, a.getName("fr"));
+				prep.setString(4, a.getName("de"));
+
+				prep.addBatch();
+				// insert per 10000 records
+				if (++cnt % 10_000 == 0) {
+					prep.executeBatch();
+					LOG.info("Inserted {}", cnt);
+				}
+			}
+			prep.executeBatch();
+			LOG.info("Inserted {}", cnt);
+		}
+	}
+	/**
+	 * Load municipality part info
+	 * 
+	 * @param prep prepared statement
+	 * @param xmlPath XML BeST directory
+	 * @throws SQLException 
+	 */
+	private static void loadMunicipalityParts(PreparedStatement prep, Path xmlPath) throws SQLException {
+		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
+			LOG.info("Starting municipality parts {}", reg.getName());
+			int cnt = 0;
+
+			MunicipalityPartReader reader = new MunicipalityPartReader();
+			Stream<Municipality> parts = reader.read(reg, xmlPath);
+			Iterator<Municipality> iter = parts.iterator();
 
 			while (iter.hasNext()) {
 				Municipality a = iter.next();
@@ -354,10 +397,11 @@ public class Main {
 	 * 
 	 * @param dbPath path to database
 	 * @param xmlPath path to XML BeST files
+	 * @param index create indices
 	 * @throws ClassNotFoundException
 	 * @throws SQLException 
 	 */
-	private static void loadData(Path dbPath, Path xmlPath) throws ClassNotFoundException, SQLException {
+	private static void loadData(Path dbPath, Path xmlPath, boolean index) throws ClassNotFoundException, SQLException {
 		// check for database driver
 		Class.forName("org.h2.Driver");
 		String str = "jdbc:h2:" + dbPath.toString();
@@ -376,7 +420,13 @@ public class Main {
 				+ " VALUES (?, ?, ?, ?)");
 			loadMunicipalities(prep, xmlPath);
 		}
-		
+
+		try(Connection conn = DriverManager.getConnection(str, "sa", "sa")) {
+			PreparedStatement prep = conn.prepareStatement("INSERT INTO municipalityparts"
+				+ " VALUES (?, ?, ?, ?)");
+			loadMunicipalityParts(prep, xmlPath);
+		}
+
 		try(Connection conn = DriverManager.getConnection(str, "sa", "sa")) {
 			PreparedStatement prep = conn.prepareStatement("INSERT INTO streets"
 				+ " VALUES (?, ?, ?, ?, ?)");
@@ -389,7 +439,9 @@ public class Main {
 			loadAddresses(prep, xmlPath);
 		}
 		
-		addConstraints(str);
+		if (index) {
+			addConstraints(str);
+		}
 	}
 
 	/**
@@ -399,7 +451,7 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		if (args.length < 2) {
-			System.out.println("Usage: dbloader xml-directory db-directory");
+			System.out.println("Usage: dbloader xml-directory db-directory [index]");
 			System.exit(-1);
 		}
 		
@@ -410,8 +462,10 @@ public class Main {
 		}
 		Path dbPath = Paths.get(args[1]);
 		
+		boolean index = (args.length == 3);
+
 		try {
-			loadData(dbPath, xmlPath);
+			loadData(dbPath, xmlPath, index);
 		} catch (Exception e) {
 			LOG.error("Failed: " + e.getMessage());
 			System.exit(-3);
