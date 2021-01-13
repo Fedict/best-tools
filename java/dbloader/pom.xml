@@ -14,7 +14,7 @@
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
     <description>Database loader</description>
-    <name>BeST DB loader</name>
+    <name>BeSt DB loader</name>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

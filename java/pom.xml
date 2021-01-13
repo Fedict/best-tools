@@ -12,6 +12,7 @@
         <module>xmlreader</module>
         <module>batch</module>
         <module>dbloader</module>
+        <module>webservice</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
