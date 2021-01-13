@@ -25,20 +25,19 @@
  */
 package be.bosa.dt.best.webservice;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Application;
+import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
+import org.eclipse.microprofile.openapi.annotations.info.Info;
 
 /**
- *
+ * Dummy class to add openapi info to
+ * 
  * @author Bart Hanssens
  */
-@Path("/search")
-public class LookupResource {
-
-	@GET
-	@Path("/gps")
-	public AddressEntity nearestAddress(@QueryParam("posx") double posx, @QueryParam("posy") double posy) {
-		return AddressEntity.findNearest(posx, posy);
-	}
+@OpenAPIDefinition(
+	 info = @Info(
+        title="Demo BeST API application",
+        version = "1.0.0")
+)
+public class ApiApplication extends Application {	
 }

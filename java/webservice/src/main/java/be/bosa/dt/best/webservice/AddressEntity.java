@@ -25,20 +25,21 @@
  */
 package be.bosa.dt.best.webservice;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import javax.persistence.Entity;
 
 /**
  *
  * @author Bart Hanssens
  */
-@Path("/search")
-public class LookupResource {
-
-	@GET
-	@Path("/gps")
-	public AddressEntity nearestAddress(@QueryParam("posx") double posx, @QueryParam("posy") double posy) {
-		return AddressEntity.findNearest(posx, posy);
-	}
+@Entity(name = "Addresses")
+public class AddressEntity extends PanacheEntity {
+	public String id;
+	public String houseNo;
+	public String boxNo;
+	public String geom;
+	
+	public static AddressEntity findNearest(double posx, double posy) {
+        return find("geom", "ST_ClosestPoint('POINT(" + posx + " " + posy +")')").firstResult();
+    }
 }
