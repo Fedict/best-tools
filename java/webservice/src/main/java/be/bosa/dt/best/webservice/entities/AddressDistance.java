@@ -23,42 +23,48 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.webservice;
+package be.bosa.dt.best.webservice.entities;
 
-import be.bosa.dt.best.webservice.entities.AddressDistance;
-import be.bosa.dt.best.webservice.entities.Municipality;
-
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import java.util.List;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
+import java.util.Locale;
+import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 /**
  *
  * @author Bart Hanssens
  */
-@Path("/search")
-public class LookupResource {
-	@GET
-	@Path("/nearest")
-	public List<AddressDistance> nearestAddress(@QueryParam("posx") double posx, @QueryParam("posy") double posy) {
-		return AddressDistance.findNearest(posx, posy);
-	}
+@Entity
+public class AddressDistance extends PanacheEntity {
+	@Transient
+	public Address address;
+	@Transient
+	public double distance;
 
-	@GET
-	@Path("/municipalities")
-	public List<Municipality> allMunicipalities() {
-		return Municipality.findAll().list();
-	}
-	
-/*	@GET
-	@Path("/municipality")
-	public List<Municipality> find(@QueryParam("id") String id, @QueryParam("postal") String postal) {
+	public AddressDistance() {
 		
 	}
+	public AddressDistance(Address address, double distance) {
+		this.address = address;
+		this.distance = distance;
+	}
 
-	@GET
-	@Path("/street")
-*/	
+	/**
+	 * Find nearest address
+	 * 
+	 * @param posx
+	 * @param posy
+	 * @return 
+	 */
+	public static List<AddressDistance> findNearest(double posx, double posy) {
+		String point = String.format(Locale.US, "ST_GeomFromText('POINT(%f %f)', 4326)", posx, posy);
+		String qry = String.format("SELECT NEW AddressDistance(a, " +
+				"CAST(ST_Distance(a.geom, %s) as double) as distance) " +
+				"FROM Addresses a " +
+				"WHERE ST_DWithin(a.geom, %s, 0.002) = TRUE " +
+				"ORDER BY distance", point, point);
+
+		return find(qry).list();
+	}
 }

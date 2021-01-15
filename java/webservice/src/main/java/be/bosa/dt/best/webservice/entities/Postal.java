@@ -23,24 +23,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.webservice;
+package be.bosa.dt.best.webservice.entities;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+
 import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
  *
  * @author Bart Hanssens
  */
-@Entity(name = "Addresses")
-public class AddressEntity extends PanacheEntity {
-	public String id;
-	public String houseno;
-	public String boxno;
-	public String geom;
-	
-	public static AddressEntity findNearest(double posx, double posy) {
-        return find("SELECT a.id, a.houseno, a.boxno, a.geom FROM Addresses a " +
-					"WHERE ST_INTERSECTS(ST_BUFFER('POINT(" + posx + " " + posy +")', 100), geom) = TRUE").firstResult();
-    }
+@Entity(name = "Postals")
+public class Postal extends PanacheEntityBase {
+	@Id public String id;
+	public String zipcode;
+	public String name_nl;
+	public String name_fr;
+	public String name_de;
 }

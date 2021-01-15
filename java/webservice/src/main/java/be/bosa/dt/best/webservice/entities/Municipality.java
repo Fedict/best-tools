@@ -23,42 +23,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.webservice;
+package be.bosa.dt.best.webservice.entities;
 
-import be.bosa.dt.best.webservice.entities.AddressDistance;
-import be.bosa.dt.best.webservice.entities.Municipality;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
-import java.util.List;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
  *
  * @author Bart Hanssens
  */
-@Path("/search")
-public class LookupResource {
-	@GET
-	@Path("/nearest")
-	public List<AddressDistance> nearestAddress(@QueryParam("posx") double posx, @QueryParam("posy") double posy) {
-		return AddressDistance.findNearest(posx, posy);
-	}
-
-	@GET
-	@Path("/municipalities")
-	public List<Municipality> allMunicipalities() {
-		return Municipality.findAll().list();
-	}
-	
-/*	@GET
-	@Path("/municipality")
-	public List<Municipality> find(@QueryParam("id") String id, @QueryParam("postal") String postal) {
-		
-	}
-
-	@GET
-	@Path("/street")
-*/	
+@Entity(name = "Municipalities")
+public class Municipality extends PanacheEntityBase {
+	@Id public String id;
+	public String name_nl;
+	public String name_fr;
+	public String name_de;
 }
