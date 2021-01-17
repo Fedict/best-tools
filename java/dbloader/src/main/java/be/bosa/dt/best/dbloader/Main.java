@@ -45,19 +45,15 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.stream.Stream;
 
-import org.cts.CRSFactory;
-import org.cts.IllegalCoordinateException;
-import org.cts.crs.CRSException;
-import org.cts.crs.CoordinateReferenceSystem;
-import org.cts.crs.GeodeticCRS;
-import org.cts.op.CoordinateOperation;
-import org.cts.op.CoordinateOperationException;
-import org.cts.op.CoordinateOperationFactory;
-import org.cts.registry.EPSGRegistry;
-import org.cts.registry.RegistryManager;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +65,35 @@ import org.slf4j.LoggerFactory;
  */
 public class Main {
 	private static Logger LOG = LoggerFactory.getLogger(Main.class);
+
+	private final static Options OPTS = new Options()
+		.addRequiredOption("x", "xmldir", true, "directory with unzipped BeST XML files")
+		.addRequiredOption("d", "db", true, "database connection string");
+
+	/**
+	 * Print help info
+	 */
+	private static void printHelp() {
+		HelpFormatter fmt = new HelpFormatter();
+		fmt.printHelp("Load unzipped BeST files to a database", OPTS);
+	}
+	
+	/**
+	 * Parse command line arguments
+	 * 
+	 * @param args
+	 * @return 
+	 */
+	private static CommandLine parse(String[] args) {
+		CommandLineParser cli = new DefaultParser();
+		try {
+			return cli.parse(OPTS, args);
+		} catch (ParseException ex) {
+			printHelp();
+		}
+		return null;
+	}
+
 	/**
 	 * Initialize database and create tables
 	 * 
@@ -77,15 +102,13 @@ public class Main {
 	 */
 	private static void initDb(String jdbc) throws SQLException {
 		// Spatial features
-		try(Connection conn = DriverManager.getConnection(jdbc, "sa", "sa")) {
+		try(Connection conn = DriverManager.getConnection(jdbc)) {
 			Statement stmt = conn.createStatement();
-			stmt.execute("CREATE ALIAS IF NOT EXISTS H2GIS_SPATIAL FOR " +
-						"\"org.h2gis.functions.factory.H2GISFunctions.load\" ");
-			stmt.execute("CALL H2GIS_SPATIAL()");
+			stmt.execute("CREATE EXTENSION postgis");
 		}
 
 		// We could use an ORM tool like MyBatis or Hibernate, but let's use plain JDBC
-		try(Connection conn = DriverManager.getConnection(jdbc, "sa", "sa")) {
+		try(Connection conn = DriverManager.getConnection(jdbc)) {
 			Statement stmt = conn.createStatement();
 
 			stmt.execute("CREATE TABLE postals(" +
@@ -112,7 +135,8 @@ public class Main {
 							"city_id VARCHAR(88) NOT NULL, " +
 							"name_nl VARCHAR(80), " +
 							"name_fr VARCHAR(80), " +
-							"name_de VARCHAR(80))");
+							"name_de VARCHAR(80), " +
+							"status VARCHAR(10))");
 
 			stmt.execute("CREATE TABLE addresses(" +
 							"id VARCHAR(88) NOT NULL, " +
@@ -122,7 +146,8 @@ public class Main {
 							"postal_id VARCHAR(88) NOT NULL, " +
 							"houseno VARCHAR(12), " +
 							"boxno VARCHAR(40), " +
-							"geom GEOMETRY)");
+							"geom GEOMETRY, " +
+							"status VARCHAR(10))");
 		}
 	}
 
@@ -134,7 +159,7 @@ public class Main {
 	 */
 	private static void addConstraints(String jdbc) throws SQLException {
 		// add primary keys, indices and constraints after loading data, for performance
-		try(Connection conn = DriverManager.getConnection(jdbc, "sa", "sa")) {
+		try(Connection conn = DriverManager.getConnection(jdbc)) {
 			Statement stmt = conn.createStatement();
 
 			LOG.info("Constraints and indices");
@@ -178,7 +203,7 @@ public class Main {
 				prep.setString(3, a.getName("nl"));
 				prep.setString(4, a.getName("fr"));
 				prep.setString(5, a.getName("de"));
-				
+
 				prep.addBatch();
 				// insert per 10000 records
 				if (++cnt % 10_000 == 0) {
@@ -279,15 +304,12 @@ public class Main {
 			while (iter.hasNext()) {
 				Streetname a = iter.next();
 
-				if (!a.getStatus().equals("current")) {
-					LOG.warn("Skipping {}", a.getStatus());
-					continue;
-				}
 				prep.setString(1, a.getIDVersion());
 				prep.setString(2, a.getCity().getIDVersion());
 				prep.setString(3, a.getName("nl"));
 				prep.setString(4, a.getName("fr"));
 				prep.setString(5, a.getName("de"));
+				prep.setString(6, a.getStatus());
 				
 				prep.addBatch();
 				// insert per 10000 records
@@ -300,40 +322,6 @@ public class Main {
 			LOG.info("Inserted {}", cnt);
 		}
 	}
-	
-	/**
-	 * Get converter operation for convertion Lambert72 into WGS84 / GPS
-	 * 
-	 * @return operator
-	 * @throws CRSException
-	 * @throws CoordinateOperationException
-	 */
-	private static CoordinateOperation getGeoConverter() throws CRSException, CoordinateOperationException {
-		CRSFactory factory = new CRSFactory();
-		RegistryManager manager = factory.getRegistryManager();
-		manager.addRegistry(new EPSGRegistry());
-		CoordinateReferenceSystem source = factory.getCRS("EPSG:31370");
-		CoordinateReferenceSystem target = factory.getCRS("EPSG:4326");
-		Set<CoordinateOperation> ops = CoordinateOperationFactory.
-											createCoordinateOperations((GeodeticCRS) source,(GeodeticCRS) target);
-		return ops.iterator().next();
-	}
-
-	/**
-	 * 
-	 * @param point
-	 * @param op
-	 * @return WKT POINT or null
-	 */
-	private static String getWKT(Geopoint point, CoordinateOperation op) {
-		double[] lambert = new double[] { point.getX(), point.getY() };
-		try {
-			double[] gps = op.transform(lambert);
-			return "POINT(" + gps[0] + " " + gps[1] + ")";
-		} catch (IllegalCoordinateException| CoordinateOperationException ex) {
-			return null;
-		}
-	}
 
 	/**
 	 * Load addresses
@@ -343,13 +331,6 @@ public class Main {
 	 * @throws SQLException 
 	 */
 	private static void loadAddresses(PreparedStatement prep, Path xmlPath) throws SQLException {
-		CoordinateOperation op = null;
-		try {
-			op = getGeoConverter();
-		} catch(CRSException | CoordinateOperationException ex) {
-			throw new SQLException(ex);
-		}
-
 		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
 			LOG.info("Starting addresses {}", reg.getName());
 			int cnt = 0;
@@ -360,17 +341,9 @@ public class Main {
 
 			while (iter.hasNext()) {
 				Address a = iter.next();
-				
-				if (!a.getStatus().equals("current")) {
-					LOG.info("Skipping {}", a.getStatus());
-					continue;
-				}
-				String gps = getWKT(a.getPoint(), op);
-				if (gps == null) {
-					LOG.warn("No GPS coordinates, skipping " + a.getPoint().toString());
-					continue;
-				}
 
+				Geopoint p = a.getPoint();
+				String geom = "ST_GeomFromText('POINT(%s %s)', %s)".formatted(p.getX(), p.getY(), p.getSrs());
 				prep.setString(1, a.getIDVersion());
 				prep.setString(2, a.getCity().getIDVersion());
 				prep.setString(3, a.getCityPart().getIDVersion());
@@ -378,8 +351,9 @@ public class Main {
 				prep.setString(5, a.getPostal().getIDVersion());
 				prep.setString(6, a.getNumber());
 				prep.setString(7, a.getBox());
-				prep.setString(8, gps);
-			
+				prep.setString(8, geom);
+				prep.setString(9, a.getStatus());
+
 				prep.addBatch();
 				// insert per 10000 records
 				if (++cnt % 10_000 == 0) {
@@ -395,53 +369,33 @@ public class Main {
 	/**
 	 * Load XML BeST data files in a database file.
 	 * 
-	 * @param dbPath path to database
+	 * @param dbstr JDBC connection string to database
 	 * @param xmlPath path to XML BeST files
-	 * @param index create indices
 	 * @throws ClassNotFoundException
 	 * @throws SQLException 
 	 */
-	private static void loadData(Path dbPath, Path xmlPath, boolean index) throws ClassNotFoundException, SQLException {
-		// check for database driver
-		Class.forName("org.h2.Driver");
-		String str = "jdbc:h2:" + dbPath.toString();
-
+	private static void loadData(String dbstr, Path xmlPath) throws ClassNotFoundException, SQLException {
 		// init db
-		initDb(str);
+		initDb(dbstr);
 
-		try(Connection conn = DriverManager.getConnection(str, "sa", "sa")) {
-			PreparedStatement prep = conn.prepareStatement("INSERT INTO postals"
-				+ " VALUES (?, ?, ?, ?, ?)");
+		try(Connection conn = DriverManager.getConnection(dbstr)) {
+			PreparedStatement prep = conn.prepareStatement("INSERT INTO postals VALUES (?, ?, ?, ?, ?)");
 			loadPostals(prep, xmlPath);
-		}
 
-		try(Connection conn = DriverManager.getConnection(str, "sa", "sa")) {
-			PreparedStatement prep = conn.prepareStatement("INSERT INTO municipalities"
-				+ " VALUES (?, ?, ?, ?)");
+			prep = conn.prepareStatement("INSERT INTO municipalities VALUES (?, ?, ?, ?)");
 			loadMunicipalities(prep, xmlPath);
-		}
 
-		try(Connection conn = DriverManager.getConnection(str, "sa", "sa")) {
-			PreparedStatement prep = conn.prepareStatement("INSERT INTO municipalityparts"
-				+ " VALUES (?, ?, ?, ?)");
+			prep = conn.prepareStatement("INSERT INTO municipalityparts VALUES (?, ?, ?, ?)");
 			loadMunicipalityParts(prep, xmlPath);
-		}
 
-		try(Connection conn = DriverManager.getConnection(str, "sa", "sa")) {
-			PreparedStatement prep = conn.prepareStatement("INSERT INTO streets"
-				+ " VALUES (?, ?, ?, ?, ?)");
+			prep = conn.prepareStatement("INSERT INTO streets VALUES (?, ?, ?, ?, ?, ?, ?)");
 			loadStreets(prep, xmlPath);
-		}
-		
-		try(Connection conn = DriverManager.getConnection(str, "sa", "sa")) {
-			PreparedStatement prep = conn.prepareStatement("INSERT INTO addresses"
-				+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+
+			prep = conn.prepareStatement("INSERT INTO addresses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			loadAddresses(prep, xmlPath);
 		}
-		
-		if (index) {
-			addConstraints(str);
-		}
+
+		addConstraints(dbstr);
 	}
 
 	/**
@@ -450,22 +404,22 @@ public class Main {
 	 * @param args 
 	 */
 	public static void main(String[] args) {
-		if (args.length < 2) {
-			System.out.println("Usage: dbloader xml-directory db-directory [index]");
+		CommandLine cli  = parse(args);
+		if (cli == null) {
 			System.exit(-1);
 		}
+
+		String xmldir = cli.getOptionValue("x");
+		String dbstr = cli.getOptionValue("d");
 		
-		Path xmlPath = Paths.get(args[0]);
+		Path xmlPath = Paths.get(xmldir);
 		if (!xmlPath.toFile().exists()) {
 			LOG.error("BEST directory does not exist");
 			System.exit(-2);
 		}
-		Path dbPath = Paths.get(args[1]);
-		
-		boolean index = (args.length == 3);
 
 		try {
-			loadData(dbPath, xmlPath, index);
+			loadData(dbstr, xmlPath);
 		} catch (Exception e) {
 			LOG.error("Failed: " + e.getMessage());
 			System.exit(-3);

@@ -25,30 +25,15 @@
  */
 package be.bosa.dt.best.unzip;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-
-import java.util.zip.ZipFile;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.IOUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Small tool to unzip the various BeST zipfiles
@@ -57,7 +42,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Main {
 	private final static Logger LOG = LoggerFactory.getLogger(Main.class);
-		
+
 	private final static Options OPTS = new Options()
 		.addRequiredOption("i", "infile", true, "zipped file")
 		.addRequiredOption("o", "outdir", true, "output directory");
@@ -85,86 +70,7 @@ public class Main {
 		}
 		return null;
 	}
-	
-	/**
-	 * Unzip a zip file into a directory
-	 * 
-	 * @param pin input file
-	 * @param pout output directory
-	 * @return false in case of error
-	 */
-	private static boolean unzip(Path pin, Path pout) {
-		boolean ok = true;
-		try (ZipFile zip = new ZipFile(pin.toFile())) {
-			for (ZipEntry f: zip.stream().toArray(ZipEntry[]::new)) {
-				String name = f.getName();
-				Path p = Paths.get(pout.toString(), name);
-				LOG.info("Unzipping {}", p);
-				
-				try (InputStream is = zip.getInputStream(f);
-					OutputStream os = Files.newOutputStream(p)) {
-					IOUtils.copyLarge(is, os);
-					if (name.endsWith("zip")) { // zip within zip
-						unzip(p, pout);
-						Files.delete(p);
-					}
-				} catch (IOException e) {
-					ok = false;
-					LOG.error("Error extracting {}", p);
-				}
-			}
-		} catch (IOException ioe) {
-			ok = false;
-			LOG.error("Error extracting {}", pin.toFile());
-		}
-		return ok;
-	}
 
-	private static boolean verify(Path outdir) {
-		return true;
-	}
-	
-	/**
-	 * Perform some quick checks and unzip, return on error
-	 * 
-	 * @param infile zip input file
-	 * @param outdir output directory
-	 */
-	private static boolean checkAndUnzip(String infile, String outdir) {
-		if (! infile.toLowerCase().endsWith("zip")) {
-			LOG.error("Not a zip file");
-			return false;
-		}
-		Path pin = Paths.get(infile);
-		if (! (Files.exists(pin) && Files.isRegularFile(pin))) {
-			LOG.error("Could not find input file");
-			return false;
-		}
-		
-		Path pout = Paths.get(outdir);
-		if (! (Files.exists(pout) && Files.isDirectory(pout))) {
-			LOG.error("Could not find output directory");
-			return false;
-		}
-		
-		try {
-			Path[] files = Files.walk(pout).filter(f -> !f.equals(pout)).toArray(Path[]::new);
-			for (Path f: files) {
-				LOG.info("Deleting {}", f);
-				Files.delete(f);
-			}
-		} catch (IOException ioe) {
-			LOG.error("Could not delete files in directory", ioe);
-			return false;
-		}
-		
-		if (! unzip(pin, pout)) {
-			return false;
-		}
-		
-		return verify(pout);
-	}
-	
 	/**
 	 * Main
 	 * 
@@ -179,7 +85,7 @@ public class Main {
 		String infile = cli.getOptionValue("i");
 		String outdir = cli.getOptionValue("o");
 
-		if (! checkAndUnzip(infile, outdir)) {
+		if (! Unzipper.checkAndUnzip(infile, outdir)) {
 			System.exit(-2);
 		}
 	}
