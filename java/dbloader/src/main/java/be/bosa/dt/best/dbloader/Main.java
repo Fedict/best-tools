@@ -146,8 +146,8 @@ public class Main {
 							"postal_id VARCHAR(88) NOT NULL, " +
 							"houseno VARCHAR(12), " +
 							"boxno VARCHAR(40), " +
-							"geom GEOMETRY, " +
-							"status VARCHAR(10))");
+							"status VARCHAR(10), " + 
+							"geom GEOMETRY)");
 		}
 	}
 
@@ -170,13 +170,16 @@ public class Main {
 			stmt.execute("CREATE INDEX ON addresses(part_id)");
 			
 			LOG.info("Set primary keys");
-			stmt.execute("CREATE PRIMARY KEY ON municipalities(id)");
-			stmt.execute("CREATE PRIMARY KEY ON municipalityparts(id)");
-			stmt.execute("CREATE PRIMARY KEY ON streets(id)");
-			stmt.execute("CREATE PRIMARY KEY ON addresses(id)");
+			stmt.execute("ALTER TABLE municipalities ADD PRIMARY KEY(id)");
+			stmt.execute("ALTER TABLE municipalityparts ADD PRIMARY KEY(id)");
+			stmt.execute("ALTER TABLE streets ADD PRIMARY KEY(id)");
+			stmt.execute("ALTER TABLE addresses ADD PRIMARY KEY(id)");
 
 			LOG.info("Set spatial index");			
-			stmt.execute("CREATE SPATIAL INDEX ON addresses(geom)");
+			stmt.execute("CREATE INDEX ON addresses USING GIST(geom)");
+			
+			LOG.info("Update statistics");
+			stmt.execute("VACUUM FULL ANALYZE");
 		}
 	}
 
@@ -343,7 +346,7 @@ public class Main {
 				Address a = iter.next();
 
 				Geopoint p = a.getPoint();
-				String geom = "ST_GeomFromText('POINT(%s %s)', %s)".formatted(p.getX(), p.getY(), p.getSrs());
+				String geom = "POINT(%s %s)".formatted(p.getX(), p.getY());
 				prep.setString(1, a.getIDVersion());
 				prep.setString(2, a.getCity().getIDVersion());
 				prep.setString(3, a.getCityPart().getIDVersion());
@@ -351,8 +354,8 @@ public class Main {
 				prep.setString(5, a.getPostal().getIDVersion());
 				prep.setString(6, a.getNumber());
 				prep.setString(7, a.getBox());
-				prep.setString(8, geom);
-				prep.setString(9, a.getStatus());
+				prep.setString(8, a.getStatus());
+				prep.setString(9, geom);
 
 				prep.addBatch();
 				// insert per 10000 records
@@ -388,10 +391,10 @@ public class Main {
 			prep = conn.prepareStatement("INSERT INTO municipalityparts VALUES (?, ?, ?, ?)");
 			loadMunicipalityParts(prep, xmlPath);
 
-			prep = conn.prepareStatement("INSERT INTO streets VALUES (?, ?, ?, ?, ?, ?, ?)");
+			prep = conn.prepareStatement("INSERT INTO streets VALUES (?, ?, ?, ?, ?, ?)");
 			loadStreets(prep, xmlPath);
 
-			prep = conn.prepareStatement("INSERT INTO addresses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			prep = conn.prepareStatement("INSERT INTO addresses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ST_GeomFromText(?, 31370))");
 			loadAddresses(prep, xmlPath);
 		}
 
