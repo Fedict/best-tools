@@ -104,7 +104,7 @@ public class Main {
 		// Spatial features
 		try(Connection conn = DriverManager.getConnection(jdbc)) {
 			Statement stmt = conn.createStatement();
-			stmt.execute("CREATE EXTENSION postgis");
+			stmt.execute("CREATE EXTENSION IF NOT EXISTS postgis");
 		}
 
 		// We could use an ORM tool like MyBatis or Hibernate, but let's use plain JDBC
