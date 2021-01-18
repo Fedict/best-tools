@@ -23,52 +23,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.webservice.entities;
+package be.bosa.dt.best.webservice;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import java.util.List;
-import java.util.Locale;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.quarkus.jackson.ObjectMapperCustomizer;
+import javax.inject.Singleton;
+import org.n52.jackson.datatype.jts.JtsModule;
 
 /**
- *
+ * Mapper for geometry / geography types to JSON
+ * 
  * @author Bart Hanssens
  */
-@Entity
-public class AddressDistance extends PanacheEntity {
-	@Transient
-	public Address address;
-	@Transient
-	public double distance;
-
-	public AddressDistance() {
-		
-	}
-	public AddressDistance(Address address, double distance) {
-		this.address = address;
-		this.distance = distance;
-	}
-
-	/**
-	 * Find nearest address base on GPS coordinates
-	 * 
-	 * @param posx
-	 * @param posy
-	 * @return 
-	 */
-	public static List<AddressDistance> findNearest(double posx, double posy) {
-		// make sure to use a '.' as decimal separator
-		String point = String.format(Locale.US, 
-									"TRANSFORM(ST_GeomFromText('POINT(%f %f)', 4326), 31370)", 
-									posx, posy);
-
-		String qry = String.format("SELECT NEW AddressDistance(a, " +
-				"DISTANCE(a.geom, %s) as distance) " +
-				"FROM Addresses a " +
-				"WHERE DWITHIN(a.geom, %s, 100) = TRUE " +
-				"ORDER BY distance", point, point);
-
-		return find(qry).list();
-	}
+@Singleton
+public class JtsObjectMapperCustomizer implements ObjectMapperCustomizer {
+	@Override
+	public void customize(ObjectMapper mapper) {
+		mapper.registerModule(new JtsModule());
+    }
 }

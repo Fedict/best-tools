@@ -26,13 +26,16 @@
 package be.bosa.dt.best.webservice.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import javax.persistence.Column;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.locationtech.jts.geom.Point;
 
 /**
  *
@@ -60,5 +63,7 @@ public class Address extends PanacheEntityBase {
 
 	public String houseno;
 	public String boxno;
-	public String geom;
+
+	@Column(columnDefinition = "geometry")
+	public Point geom;
 }
