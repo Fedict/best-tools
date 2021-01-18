@@ -57,7 +57,7 @@ public class AddressDistance extends PanacheEntity {
 	 * @param posy
 	 * @return 
 	 */
-	public static List<AddressDistance> findNearest(double posx, double posy) {
+	public static List<AddressDistance> findNearestByGPS(double posx, double posy) {
 		// make sure to use a '.' as decimal separator
 		String point = String.format(Locale.US, 
 									"TRANSFORM(ST_GeomFromText('POINT(%f %f)', 4326), 31370)", 

@@ -23,31 +23,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.webservice.entities;
+package be.bosa.dt.best.webservice.health;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import java.util.List;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.enterprise.context.ApplicationScoped;
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.Liveness;
 
 /**
  *
- * @author Bart Hanssens
+ * @author Bart.Hanssens
  */
-@Entity(name = "Streets")
-public class Street extends PanacheEntityBase {
-	@Id public String id;
-	public String city_id;
-	public String name_nl;
-	public String name_fr;
-	public String name_de;
-	
-	public static List<Street> findByPostal(String postal) {
-		return find("SELECT DISTINCT s " + 
-				"FROM Addresses a " + 
-				"JOIN a.street AS s " + 
-				"JOIN a.postal AS p " +
-				"WHERE p.zipcode = ?1", postal).list();
-	}
+@Liveness
+@ApplicationScoped
+public class SimpleHealthCheck implements HealthCheck {
+	@Override
+    public HealthCheckResponse call() {
+        return HealthCheckResponse.up("Service is running");
+    }
 }

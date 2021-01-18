@@ -27,31 +27,49 @@ package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.AddressDistance;
 import be.bosa.dt.best.webservice.entities.Municipality;
+import be.bosa.dt.best.webservice.entities.Street;
 
 import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.PathParam;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 
 /**
  *
  * @author Bart Hanssens
  */
-@Path("/search")
+@Path("/best")
 public class LookupResource {
 	@GET
-	@Path("/nearest")
-	public List<AddressDistance> nearestAddress(@QueryParam("posx") double posx, @QueryParam("posy") double posy) {
-		return AddressDistance.findNearest(posx, posy);
+	@Path("/nearest/gps/{x}/{y}")
+	@Operation(summary = "Get nearest addresses by coordinates")
+	public List<AddressDistance> nearestAddress(
+			@Parameter(description = "X coordinate (longitude)", required = true, example = "4.23")
+			@PathParam("x") double x, 
+			@Parameter(description = "Y coordinate (latitude)", required = true, example = "50.73")	
+			@PathParam("y") double y) {
+		return AddressDistance.findNearestByGPS(x, y);
 	}
 
 	@GET
 	@Path("/municipalities")
+	@Operation(summary = "Get all municipalities")
 	public List<Municipality> allMunicipalities() {
 		return Municipality.findAll().list();
 	}
-	
+
+	@GET
+	@Path("/streets/by-postal/{code}")
+	@Operation(summary = "Get all streets by postal code")
+	public List<Street> streetsByPostal(
+			@Parameter(description = "postal code", required = true, example = "1500")	
+			@PathParam("code") String code) {
+		return Street.findByPostal(code);
+	}
+
 /*	@GET
 	@Path("/municipality")
 	public List<Municipality> find(@QueryParam("id") String id, @QueryParam("postal") String postal) {
