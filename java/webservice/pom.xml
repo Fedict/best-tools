@@ -89,17 +89,15 @@
 					</dependency>
 				</dependencies>
 				<configuration>
+					<from>
+						<image>adoptopenjdk:11-jre-openj9-bionic</image>
+					</from>
+					<to>
+						<image>barthanssens/best-webservice:latest</image>
+						<credHelper>wincred</credHelper>
+					</to>
 					<container>
-						<!-- to suppress Jib warning about missing main class -->
-						<mainClass>bogus</mainClass>
-						<jvmFlags>
-							<flag>-Dquarkus.http.host=0.0.0.0</flag>
-							<flag>-Djava.util.logging.manager=org.jboss.logmanager.LogManager</flag>
-						</jvmFlags>
-						<ports>
-							<port>8080</port>
-						</ports>
-						<user>1001</user>
+						<mainClass>io.quarkus.runner.GeneratedMain</mainClass>
 					</container>
 					<pluginExtensions>
 						<pluginExtension>

@@ -346,7 +346,7 @@ public class Main {
 				Address a = iter.next();
 
 				Geopoint p = a.getPoint();
-				String geom = "POINT(%s %s)".formatted(p.getX(), p.getY());
+				String geom = String.format("POINT(%s %s)", p.getX(), p.getY());
 				prep.setString(1, a.getIDVersion());
 				prep.setString(2, a.getCity().getIDVersion());
 				prep.setString(3, a.getCityPart().getIDVersion());
