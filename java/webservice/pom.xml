@@ -90,7 +90,7 @@
 				</dependencies>
 				<configuration>
 					<from>
-						<image>adoptopenjdk:11-jre-openj9-bionic</image>
+						<image>adoptopenjdk:15-jre-openj9-bionic</image>
 					</from>
 					<to>
 						<image>barthanssens/best-webservice:latest</image>
