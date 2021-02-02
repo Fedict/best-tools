@@ -82,6 +82,13 @@
 						<phase>package</phase>
 					</execution>
 				</executions>
+				<configuration>
+					<skip>false</skip>
+					<imageName>example</imageName>
+					<buildArgs>
+						--no-fallback
+					</buildArgs>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>com.google.cloud.tools</groupId>
