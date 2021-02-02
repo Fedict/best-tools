@@ -133,7 +133,7 @@ public interface BestWriter {
 	 * A street can have multiple postal codes.
 	 * 
 	 * @param region
-	 * @param dir
+	 * @param outdir output directory
 	 * @param cache
 	 */
 	public void writePostalStreets(BestRegion region, Path outdir, Map<String, Map<String, String[]>> cache);
