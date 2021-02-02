@@ -41,8 +41,6 @@ import java.time.Duration;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipFile;
 
 import jakarta.mail.Message;
@@ -58,6 +56,8 @@ import net.jodah.failsafe.RetryPolicy;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Copy Belgian Streets and Addresses (BeST) zipped XML file from an SFTP server to a web site
@@ -65,7 +65,7 @@ import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
  * @author Bart Hanssens
  */
 public class Main {
-	private final static Logger LOG  = Logger.getLogger(Main.class.getName());
+	private final static Logger LOG  = LoggerFactory.getLogger(Main.class);
 
 	private final static Set<String> FILE_STARTS = Set.of("Flanders");
 	private final static File BEST_FILE = Paths.get("best.zip").toFile();
@@ -217,7 +217,7 @@ public class Main {
 		String downPass = System.getenv("DOWNLOAD_PASS");
 		String minSize = System.getenv("MIN_SIZE_M");
 		
-		LOG.log(Level.INFO, "Downloading from {0} {1}", new String[] { downServer, downPath});
+		LOG.info("Downloading from {} {}", downServer, downPath);
 
 		Failsafe.with(policy).run(() -> {
 			BEST_FILE.delete();
@@ -225,7 +225,7 @@ public class Main {
 			verifyZip(BEST_FILE, strToLong(minSize));
 		});
 
-		LOG.log(Level.INFO, "File size {0}", BEST_FILE.length());
+		LOG.info("File size {}", BEST_FILE.length());
 
 		String upServer = System.getenv("UPLOAD_SERVER");
 		String upPath = System.getenv("UPLOAD_PATH");
@@ -233,7 +233,7 @@ public class Main {
 		String upPass = System.getenv("UPLOAD_PASS");		
 		String webfile = System.getenv("WEBSITE_FILE");		
 
-		LOG.log(Level.INFO, "Uploading to {0} {1}", new String[] { upServer, upPath});
+		LOG.info("Uploading to {} {}", upServer, upPath);
 
 		Failsafe.with(policy).run(() -> {
 			upload(upServer, upUser, upPass, upPath, BEST_FILE);
