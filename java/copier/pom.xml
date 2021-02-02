@@ -6,32 +6,32 @@
         <artifactId>best</artifactId>
         <version>1.0.2</version>
     </parent>
-    <groupId>be.bosa.dt.best</groupId>
-    <artifactId>dbloader</artifactId>
+    <artifactId>copier</artifactId>
     <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
-    <description>Database loader</description>
-    <name>BeSt DB loader</name>
+    <groupId>be.bosa.dt.best</groupId>
+    <name>BeSt Copier</name>
+    <description>Copies BeSt open data from MFT to open data</description>
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>xmlreader</artifactId>
-            <version>1.0.2</version>
+            <groupId>com.hierynomus</groupId>
+            <artifactId>sshj</artifactId>
+            <version>0.30.0</version>
         </dependency>
         <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-            <version>1.4</version>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+            <version>1.6.2</version>
         </dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>42.2.18</version>
-		</dependency>
-    </dependencies>
+        <dependency>
+            <groupId>net.jodah</groupId>
+            <artifactId>failsafe</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
@@ -47,7 +47,7 @@
 						<configuration>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>be.bosa.dt.best.dbloader.Main</mainClass>
+									<mainClass>be.bosa.dt.best.copier</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>
