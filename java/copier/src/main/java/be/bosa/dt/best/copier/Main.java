@@ -72,10 +72,10 @@ public class Main {
 	
 	// in case of an error, retry download / upload 
 	private final static RetryPolicy<Object> policy = new RetryPolicy<>()
-							.handle(IOException.class,InterruptedException.class, MessagingException.class)
 							.withDelay(Duration.ofSeconds(30))
-							.withMaxRetries(3);
-
+							.withMaxRetries(3)
+							.onRetry(e -> LOG.warn("Failure, retrying..."))
+							.onRetriesExceeded(e -> LOG.error("Max retries exceeded"));
 
 	/**
 	 * Return size as long value
@@ -187,7 +187,7 @@ public class Main {
 	 * @param mailto destination
 	 * @throws MessagingException 
 	 */
-	private static void mail(String server, String port, String mailto) throws MessagingException {
+	private static void mail(String server, String port, String mailfrom, String mailto) throws MessagingException {
 		Properties prop = new Properties();
 		prop.put("mail.smtp.starttls.enable", "true");
 		prop.put("mail.smtp.host", server);
@@ -196,9 +196,9 @@ public class Main {
 		Session session = Session.getInstance(prop);
 
 		Message msg = new MimeMessage(session);
-		msg.setFrom(new InternetAddress("opendata@belgium.be"));
-		msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(mailto));
-		msg.setSubject("Mail Subject");
+		msg.setFrom(new InternetAddress(mailfrom));
+		msg.setRecipient(Message.RecipientType.TO, new InternetAddress(mailto));
+		msg.setSubject("Copier report");
 
 		Transport.send(msg);
 	}
@@ -242,10 +242,13 @@ public class Main {
 
 		String mailServer = System.getenv("MAIL_SERVER");
 		String mailPort = System.getenv("MAIL_PORT");
+		String mailFrom= System.getenv("MAIL_FROM");
 		String mailTo = System.getenv("MAIL_TO");
+
+		LOG.info("Mailing to {}", mailTo);
 		
 		Failsafe.with(policy).run(() -> {
-			mail(mailServer, mailPort, mailTo);
+			mail(mailServer, mailPort, mailFrom, mailTo);
 		});
 	}
 }
