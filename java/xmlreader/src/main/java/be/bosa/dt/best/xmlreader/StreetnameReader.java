@@ -28,7 +28,7 @@ package be.bosa.dt.best.xmlreader;
 import be.bosa.dt.best.dao.BestObject;
 import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.dao.BestType;
-import be.bosa.dt.best.dao.Streetname;
+import be.bosa.dt.best.dao.Street;
 
 import java.nio.file.Path;
 import java.util.stream.Stream;
@@ -43,7 +43,7 @@ import javax.xml.stream.events.XMLEvent;
  * 
  * @author Bart Hanssens
  */
-public class StreetnameReader extends AbstractXMLReader<Streetname> {
+public class StreetnameReader extends AbstractXMLReader<Street> {
 	private final static QName STREETNAME = new QName(AbstractXMLReader.TNS, "Streetname");
 	//private final static QName STREETNAME_CODE = new QName(AbstractXMLReader.ADD, "streetnameCode");
 	private final static QName STREETNAME_NAME = new QName(AbstractXMLReader.ADD, "streetname");
@@ -62,8 +62,8 @@ public class StreetnameReader extends AbstractXMLReader<Streetname> {
 	}
 
 	@Override
-	protected Streetname getNextObj(XMLEventReader reader) throws XMLStreamException {
-		Streetname obj = null;
+	protected Street getNextObj(XMLEventReader reader) throws XMLStreamException {
+		Street obj = null;
 		BestObject withinObj = null;
 		String lang = "";
 		String spelling = "";
@@ -73,7 +73,7 @@ public class StreetnameReader extends AbstractXMLReader<Streetname> {
 			if (event.isStartElement()) {
 				QName el = event.asStartElement().getName();
 				if (el.equals(STREETNAME)) {
-					obj = new Streetname();
+					obj = new Street();
 					withinObj = obj;
 				} else if (obj != null) {
 					if (el.equals(MUNICIPALITY)) {
@@ -124,7 +124,7 @@ public class StreetnameReader extends AbstractXMLReader<Streetname> {
 	 * @param indir input directory
 	 * @return 
 	 */
-	public Stream<Streetname> read(BestRegion region, Path indir) {
+	public Stream<Street> read(BestRegion region, Path indir) {
 		return read(region, BestType.STREETNAMES, indir);
 	}
 }

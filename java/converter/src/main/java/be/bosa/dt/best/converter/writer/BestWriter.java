@@ -30,7 +30,7 @@ import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.dao.BestType;
 import be.bosa.dt.best.dao.Municipality;
 import be.bosa.dt.best.dao.Postal;
-import be.bosa.dt.best.dao.Streetname;
+import be.bosa.dt.best.dao.Street;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -109,7 +109,7 @@ public interface BestWriter {
 	 * @param cities city names cache
 	 * @return cache
 	 */
-	public Map<String, String[]> writeStreets(BestRegion region, Path outdir, Stream<Streetname> streetnames,
+	public Map<String, String[]> writeStreets(BestRegion region, Path outdir, Stream<Street> streetnames,
 		Map<String, String[]> cities);
 
 	/**

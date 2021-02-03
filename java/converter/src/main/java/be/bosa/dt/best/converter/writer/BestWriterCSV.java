@@ -30,7 +30,7 @@ import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.dao.BestType;
 import be.bosa.dt.best.dao.Municipality;
 import be.bosa.dt.best.dao.Postal;
-import be.bosa.dt.best.dao.Streetname;
+import be.bosa.dt.best.dao.Street;
 
 import com.opencsv.CSVWriter;
 
@@ -147,7 +147,7 @@ public class BestWriterCSV implements BestWriter {
 	}
 
 	@Override
-	public Map<String, String[]> writeStreets(BestRegion region, Path outdir, Stream<Streetname> streets,
+	public Map<String, String[]> writeStreets(BestRegion region, Path outdir, Stream<Street> streets,
 		Map<String, String[]> cities) {
 		Path file = BestWriter.getPath(outdir, region, BestType.STREETNAMES, "csv");
 
@@ -157,7 +157,7 @@ public class BestWriterCSV implements BestWriter {
 			"city_id", "city_nl", "city_fr", "city_de",
 			"version", "status", "from"};
 
-		Function<Streetname, String[]> func = (Streetname s) -> {
+		Function<Street, String[]> func = (Street s) -> {
 			cache.put(s.getId(), new String[]{s.getName("nl"), s.getName("fr"), s.getName("de"), s.getIDVersion()});
 			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[3]);
 

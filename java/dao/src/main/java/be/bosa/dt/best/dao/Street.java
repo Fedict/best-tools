@@ -33,7 +33,7 @@ import java.util.Map;
  * 
  * @author Bart Hanssens
  */
-public class Streetname extends BestObject {
+public class Street extends BestObject {
 	private final Map<String,String> names = new HashMap<>();
 	private final Municipality city = new Municipality();
 	private String status = "";
@@ -70,6 +70,6 @@ public class Streetname extends BestObject {
 	public String getDate() {
 		return date;
 	}
-	public Streetname() {
+	public Street() {
 	}
 }

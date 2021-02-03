@@ -30,7 +30,7 @@ import be.bosa.dt.best.dao.Address;
 import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.dao.Municipality;
 import be.bosa.dt.best.dao.Postal;
-import be.bosa.dt.best.dao.Streetname;
+import be.bosa.dt.best.dao.Street;
 
 import be.bosa.dt.best.xmlreader.AddressReader;
 import be.bosa.dt.best.xmlreader.MunicipalityReader;
@@ -107,7 +107,7 @@ public class Main {
 	private static void writeRegion(BestWriter writer, BestRegion region, Path inPath, Path outPath) {
 		try( Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
 			Stream<Postal> postals = new PostalReader().read(region, inPath);
-			Stream<Streetname> streets = new StreetnameReader().read(region, inPath);
+			Stream<Street> streets = new StreetnameReader().read(region, inPath);
 			Stream<Address> addresses = new AddressReader().read(region, inPath)) {
 				
 			Map<String, String[]> cacheCities = writer.writeMunicipalities(region, outPath, cities);

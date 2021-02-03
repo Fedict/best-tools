@@ -30,7 +30,7 @@ import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.dao.Geopoint;
 import be.bosa.dt.best.dao.Municipality;
 import be.bosa.dt.best.dao.Postal;
-import be.bosa.dt.best.dao.Streetname;
+import be.bosa.dt.best.dao.Street;
 import be.bosa.dt.best.xmlreader.AddressReader;
 import be.bosa.dt.best.xmlreader.MunicipalityPartReader;
 import be.bosa.dt.best.xmlreader.MunicipalityReader;
@@ -301,11 +301,11 @@ public class Main {
 			int cnt = 0;
 
 			StreetnameReader reader = new StreetnameReader();
-			Stream<Streetname> streets = reader.read(reg, xmlPath);
-			Iterator<Streetname> iter = streets.iterator();
+			Stream<Street> streets = reader.read(reg, xmlPath);
+			Iterator<Street> iter = streets.iterator();
 
 			while (iter.hasNext()) {
-				Streetname a = iter.next();
+				Street a = iter.next();
 
 				prep.setString(1, a.getIDVersion());
 				prep.setString(2, a.getCity().getIDVersion());

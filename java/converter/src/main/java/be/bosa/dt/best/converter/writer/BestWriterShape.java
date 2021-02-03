@@ -30,7 +30,7 @@ import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.dao.BestType;
 import be.bosa.dt.best.dao.Municipality;
 import be.bosa.dt.best.dao.Postal;
-import be.bosa.dt.best.dao.Streetname;
+import be.bosa.dt.best.dao.Street;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -147,7 +147,7 @@ public class BestWriterShape implements BestWriter {
 	}
 
 	@Override
-	public Map<String, String[]> writeStreets(BestRegion region, Path outdir, Stream<Streetname> streets,
+	public Map<String, String[]> writeStreets(BestRegion region, Path outdir, Stream<Street> streets,
 		Map<String, String[]> cities) {
 		Map<String, String[]> cache = new HashMap<>();
 		streets.forEach(s -> cache.put(s.getId(), new String[]{s.getName("nl"), s.getName("fr"), s.getName("de")}));

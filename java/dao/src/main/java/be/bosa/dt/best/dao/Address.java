@@ -35,7 +35,7 @@ public class Address extends BestObject {
 	private final Municipality city = new Municipality();
 	private final Municipality cityPart = new Municipality();
 	private final Postal postal = new Postal();
-	private final Streetname street = new Streetname();
+	private final Street street = new Street();
 	private String number = "";
 	private String box = "";
 	private String status = "";
@@ -81,7 +81,7 @@ public class Address extends BestObject {
 	 * 
 	 * @return street object
 	 */
-	public Streetname getStreet() {
+	public Street getStreet() {
 		return street;
 	}
 	
