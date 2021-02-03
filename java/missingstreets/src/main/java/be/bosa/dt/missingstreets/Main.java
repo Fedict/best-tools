@@ -1,0 +1,133 @@
+/*
+ * Copyright (c) 2021, FPS BOSA DG DT
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+package be.bosa.dt.missingstreets;
+
+import be.bosa.dt.best.converter.writer.BestWriter;
+import be.bosa.dt.best.converter.writer.BestWriterCSV;
+import be.bosa.dt.best.dao.Address;
+import be.bosa.dt.best.dao.BestRegion;
+import be.bosa.dt.best.dao.Municipality;
+import be.bosa.dt.best.dao.Postal;
+import be.bosa.dt.best.dao.Streetname;
+import be.bosa.dt.best.xmlreader.AddressReader;
+import be.bosa.dt.best.xmlreader.MunicipalityReader;
+import be.bosa.dt.best.xmlreader.PostalReader;
+import be.bosa.dt.best.xmlreader.StreetnameReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ *
+ * @author Bart Hanssens
+ */
+public class Main {
+	private final static Logger LOG = LoggerFactory.getLogger(Main.class);
+	
+	private final static Options OPTS = new Options()
+		.addRequiredOption("i", "indir", true, "input directory")
+		.addOption("o", "outdir", true, "output directory")
+		.addOption("B", "Brussels", false, "process files for Brussels")
+		.addOption("F", "Flanders", false, "process files for Flanders")
+		.addOption("W", "Wallonia", false, "process files for Wallonia");
+
+	/**
+	 * Print help info
+	 */
+	private static void printHelp() {
+		HelpFormatter fmt = new HelpFormatter();
+		fmt.printHelp("BeST converters", OPTS);
+	}
+	
+	/**
+	 * Parse command line arguments
+	 * 
+	 * @param args
+	 * @return 
+	 */
+	private static CommandLine parse(String[] args) {
+		CommandLineParser cli = new DefaultParser();
+		try {
+			return cli.parse(OPTS, args);
+		} catch (ParseException ex) {
+			printHelp();
+		}
+		return null;
+	}
+
+	/**
+	 * Write files for a specific region
+	 * 
+	 * @param writer
+	 * @param region
+	 * @param inPath input directory
+	 * @param outPath output directory
+	 */
+	private static void writeRegion(BestWriter writer, BestRegion region, Path inPath, Path outPath) {
+		try( Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
+			Stream<Postal> postals = new PostalReader().read(region, inPath);
+			Stream<Streetname> streets = new StreetnameReader().read(region, inPath);
+			Stream<Address> addresses = new AddressReader().read(region, inPath)) {
+			
+			Set<String> used = addresses.map(a -> a.getStreet().getIDVersion()).collect(Collectors.toSet());
+			streets.filter(s -> !used.contains(s.getIDVersion()));
+			
+			//writer.writePostalStreets(region, outPath, cachePostalStreets);
+		}
+	}
+
+	public void main(String[] args) {
+		CommandLine cli  = parse(args);
+		if (cli == null) {
+			System.exit(-1);
+		}
+		
+		String indir = cli.getOptionValue("i");
+		String outdir = cli.getOptionValue(indir, indir);
+		
+		Path inPath = Paths.get(indir);
+		Path outPath = Paths.get(outdir);
+		
+		for (BestRegion region: BestRegion.values()) {
+			if (cli.hasOption(region.getCode())) {
+				LOG.info("Region {}", region.getName());
+				writeRegion(new BestWriterCSV(), region, inPath, outPath);
+			}
+		}
+	}
+}

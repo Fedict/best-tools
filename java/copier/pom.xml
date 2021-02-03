@@ -13,7 +13,7 @@
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
     <groupId>be.bosa.dt.best</groupId>
-    <name>BeSt Copier</name>
+    <name>BeSt copier</name>
     <description>Copies BeSt open data from MFT to open data</description>
     <dependencies>
         <dependency>
@@ -93,45 +93,59 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.graalvm.nativeimage</groupId>
-				<artifactId>native-image-maven-plugin</artifactId>
-				<version>21.0.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>native-image</goal>
-						</goals>
-						<phase>package</phase>
-					</execution>
-				</executions>
-				<configuration>
-					<skip>false</skip>
-					<imageName>example</imageName>
-					<buildArgs>
-						--no-fallback
-					</buildArgs>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>com.google.cloud.tools</groupId>
-				<artifactId>jib-maven-plugin</artifactId>
-				<version>2.7.1</version>
-				<dependencies>
-					<dependency>
-						<groupId>com.google.cloud.tools</groupId>
-						<artifactId>jib-native-image-extension-maven</artifactId>
-						<version>0.1.0</version>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<pluginExtensions>
-						<pluginExtension>
-							<implementation>com.google.cloud.tools.jib.maven.extension.nativeimage.JibNativeImageExtension</implementation>
-						</pluginExtension>
-					</pluginExtensions>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>native-img</id>
+			<activation>
+				<property>
+					<name>native</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.graalvm.nativeimage</groupId>
+						<artifactId>native-image-maven-plugin</artifactId>
+						<version>21.0.0</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>native-image</goal>
+								</goals>
+								<phase>package</phase>
+							</execution>
+						</executions>
+						<configuration>
+							<skip>false</skip>
+							<imageName>example</imageName>
+							<buildArgs>
+								--no-fallback
+							</buildArgs>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>com.google.cloud.tools</groupId>
+						<artifactId>jib-maven-plugin</artifactId>
+						<version>2.7.1</version>
+						<dependencies>
+							<dependency>
+								<groupId>com.google.cloud.tools</groupId>
+								<artifactId>jib-native-image-extension-maven</artifactId>
+								<version>0.1.0</version>
+							</dependency>
+						</dependencies>
+						<configuration>
+							<pluginExtensions>
+								<pluginExtension>
+									<implementation>com.google.cloud.tools.jib.maven.extension.nativeimage.JibNativeImageExtension</implementation>
+								</pluginExtension>
+							</pluginExtensions>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

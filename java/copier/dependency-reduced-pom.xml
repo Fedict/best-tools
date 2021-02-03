@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>be.bosa.dt.best</groupId>
   <artifactId>copier</artifactId>
-  <name>BeSt Copier</name>
+  <name>BeSt copier</name>
   <description>Copies BeSt open data from MFT to open data</description>
   <build>
     <plugins>
@@ -41,51 +41,100 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.graalvm.nativeimage</groupId>
-        <artifactId>native-image-maven-plugin</artifactId>
-        <version>21.0.0</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>native-image</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <skip>false</skip>
-          <imageName>example</imageName>
-          <buildArgs>--no-fallback</buildArgs>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>com.google.cloud.tools</groupId>
-        <artifactId>jib-maven-plugin</artifactId>
-        <version>2.7.1</version>
-        <dependencies>
-          <dependency>
-            <groupId>com.google.cloud.tools</groupId>
-            <artifactId>jib-native-image-extension-maven</artifactId>
-            <version>0.1.0</version>
-          </dependency>
-        </dependencies>
-        <configuration>
-          <pluginExtensions>
-            <pluginExtension>
-              <implementation>com.google.cloud.tools.jib.maven.extension.nativeimage.JibNativeImageExtension</implementation>
-            </pluginExtension>
-          </pluginExtensions>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>native-img</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.graalvm.nativeimage</groupId>
+            <artifactId>native-image-maven-plugin</artifactId>
+            <version>21.0.0</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>native-image</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <skip>false</skip>
+              <imageName>example</imageName>
+              <buildArgs>--no-fallback</buildArgs>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>com.google.cloud.tools</groupId>
+            <artifactId>jib-maven-plugin</artifactId>
+            <version>2.7.1</version>
+            <dependencies>
+              <dependency>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-native-image-extension-maven</artifactId>
+                <version>0.1.0</version>
+              </dependency>
+            </dependencies>
+            <configuration>
+              <pluginExtensions>
+                <pluginExtension>
+                  <implementation>com.google.cloud.tools.jib.maven.extension.nativeimage.JibNativeImageExtension</implementation>
+                </pluginExtension>
+              </pluginExtensions>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
   <dependencies>
     <dependency>
       <groupId>org.graalvm.sdk</groupId>
       <artifactId>graal-sdk</artifactId>
       <version>21.0.0</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.stefanbirkner</groupId>
+      <artifactId>fake-sftp-server-rule</artifactId>
+      <version>2.0.1</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>memoryfilesystem</artifactId>
+          <groupId>com.github.marschall</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>sshd-core</artifactId>
+          <groupId>org.apache.sshd</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.icegreen</groupId>
+      <artifactId>greenmail-junit4</artifactId>
+      <version>1.6.1</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>greenmail</artifactId>
+          <groupId>com.icegreen</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.1</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>hamcrest-core</artifactId>
+          <groupId>org.hamcrest</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <properties>
