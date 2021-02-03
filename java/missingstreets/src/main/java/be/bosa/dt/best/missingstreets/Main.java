@@ -23,7 +23,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.missingstreets;
+package be.bosa.dt.best.missingstreets;
 
 import be.bosa.dt.best.converter.writer.BestWriter;
 import be.bosa.dt.best.converter.writer.BestWriterCSV;
@@ -31,13 +31,14 @@ import be.bosa.dt.best.dao.Address;
 import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.dao.Municipality;
 import be.bosa.dt.best.dao.Postal;
-import be.bosa.dt.best.dao.Streetname;
+import be.bosa.dt.best.dao.Street;
 import be.bosa.dt.best.xmlreader.AddressReader;
 import be.bosa.dt.best.xmlreader.MunicipalityReader;
 import be.bosa.dt.best.xmlreader.PostalReader;
 import be.bosa.dt.best.xmlreader.StreetnameReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -101,17 +102,31 @@ public class Main {
 	private static void writeRegion(BestWriter writer, BestRegion region, Path inPath, Path outPath) {
 		try( Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
 			Stream<Postal> postals = new PostalReader().read(region, inPath);
-			Stream<Streetname> streets = new StreetnameReader().read(region, inPath);
+			Stream<Street> streets = new StreetnameReader().read(region, inPath);
 			Stream<Address> addresses = new AddressReader().read(region, inPath)) {
 			
-			Set<String> used = addresses.map(a -> a.getStreet().getIDVersion()).collect(Collectors.toSet());
-			streets.filter(s -> !used.contains(s.getIDVersion()));
+			Set<String> used = addresses.filter(a -> a.getStatus().equals("current"))
+										.map(a -> a.getStreet().getId())
+										.collect(Collectors.toSet());
+			List<Street> filtered = streets.filter(s -> s.getStatus().equals("current"))
+											.filter(s -> !used.contains(s.getId()))
+															.collect(Collectors.toList());
+			
+			for (Street s: filtered) {
+				System.err.println(s.getIDVersion() + "," + s.getName("nl") + "," + s.getName("fr") + "," + s.getName("de")  );
+			}
+			LOG.info("{} missing streets", filtered.size());
 			
 			//writer.writePostalStreets(region, outPath, cachePostalStreets);
 		}
 	}
 
-	public void main(String[] args) {
+	/**
+	 * Main
+	 * 
+	 * @param args 
+	 */
+	public static void main(String[] args) {
 		CommandLine cli  = parse(args);
 		if (cli == null) {
 			System.exit(-1);

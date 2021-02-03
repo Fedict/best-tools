@@ -6,13 +6,13 @@
 		<artifactId>best</artifactId>
 		<version>1.0.2</version>
 	</parent>
+	<groupId>be.bosa.dt.best</groupId>
 	<artifactId>missingstreets</artifactId>
 	<packaging>jar</packaging>
 	<properties>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 	</properties>
-	<groupId>be.bosa.dt.best</groupId>
 	<name>BeSt missing streets</name>
 	<description>Find streets without addresses</description>
 	<dependencies>
