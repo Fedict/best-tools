@@ -26,14 +26,11 @@
 package be.bosa.dt.best.emptystreets;
 
 import be.bosa.dt.best.converter.writer.BestWriter;
-import be.bosa.dt.best.converter.writer.BestWriterCSV;
 import be.bosa.dt.best.dao.Address;
-import be.bosa.dt.best.dao.BestNamedObject;
 import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.dao.Municipality;
 import be.bosa.dt.best.dao.Street;
 import be.bosa.dt.best.xmlreader.AddressReader;
-import be.bosa.dt.best.xmlreader.MunicipalityPartReader;
 import be.bosa.dt.best.xmlreader.MunicipalityReader;
 import be.bosa.dt.best.xmlreader.StreetnameReader;
 
@@ -43,9 +40,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
@@ -59,7 +56,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Create a list of streets without addresses (e.g. pedestrian maps, but could also be empty by mistake)
+ * 
  * @author Bart Hanssens
  */
 public class Main {
@@ -103,51 +101,38 @@ public class Main {
 	 * @param file CSV file to write to
 	 * @param header header as array of strings
 	 * @param lines stream of lines
-	 * @param func function to create a row in the CSV
 	 */
-	private <T> void write(Path file, String[] header, Stream<T> lines, Function<T, String[]> func) {
+	private static void write(Path file, String[] header, Stream<String[]> lines) {
 		LOG.info("Writing {}", file);
 		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(file))) {
 			w.writeNext(header);
-			lines.forEach(s -> w.writeNext(func.apply(s)));
+			lines.forEach(s -> w.writeNext(s));
 		} catch (IOException ioe) {
 			LOG.error("Error writing to file", ioe);
 		}
 	}
 
 	/**
-	 * Put names of named object into a cache
-	 * 
-	 * @param cache
-	 * @param b named object
-	 */
-	private static void putNames(Map<String, String[]> cache, BestNamedObject b) {
-		cache.put(b.getId(), new String[]{ b.getName("nl"), b.getName("fr"), b.getName("de"), b.getIDVersion()});
-	}
-
-	/**
 	 * Write files for a specific region
 	 * 
-	 * @param writer
 	 * @param region
 	 * @param inPath input directory
 	 * @param outPath output directory
 	 */
-	private static void writeRegion(BestWriter writer, BestRegion region, Path inPath, Path outPath) {
+	private static void writeRegion(BestRegion region, Path inPath, Path outPath) {
 		Map<String, String[]> cacheCities = new HashMap<>();
-		Map<String, String[]> cacheCityParts = new HashMap<>();
 		Map<String, String[]> cacheStreets = new HashMap<>();
 	
 		try (Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
 			Stream<Street> streets = new StreetnameReader().read(region, inPath)) {
-				cities.forEach(s -> putNames(cacheCities, s));
-				streets.filter(s -> s.getStatus().equals("current")).forEach(s -> putNames(cacheStreets, s));
-		}
-
-		if (region.equals(BestRegion.WALLONIA)) { // only Walloon Region provides "municipality parts"
-			try ( Stream<Municipality> cityParts = new MunicipalityPartReader().read(region, inPath)) {
-				cityParts.forEach(s -> putNames(cacheCityParts, s));
-			}
+				cities.forEach(s -> cacheCities.put(s.getIDVersion(), new String[]{ 
+									s.getName("nl"), s.getName("fr"), s.getName("de"), 
+									s.getNamespace(), s.getId(), s.getVersion()}));
+				streets.filter(s -> s.getStatus().equals("current")).forEach(s -> 
+					cacheStreets.put(s.getIDVersion(), new String[]{ 
+									s.getName("nl"), s.getName("fr"), s.getName("de"), 
+									s.getNamespace(), s.getId(), s.getVersion(),
+									s.getCity().getIDVersion()}));
 		}
 		
 		try(Stream<Address> addresses = new AddressReader().read(region, inPath)) {
@@ -161,7 +146,7 @@ public class Main {
 	
 		Path file = BestWriter.getPath(outPath, region, "empty_street", "csv");
 		
-		// mimic the structure of the postalstreet CSV, even when there is no postal info
+		// mimic the structure of the postalstreet CSV, even when there is no postal and no city part info
 		String[] header = {
 			"postal_id", "postal_nl", "postal_fr", "postal_de",
 			"street_nl", "street_fr", "street_de",
@@ -172,6 +157,23 @@ public class Main {
 			"citypart_prefix", "citypart_no", "citypart_version"
 		};
 
+		// order by city
+		Stream<String[]> stream = cacheStreets.values().stream()
+			.sorted(Comparator.comparing(s -> s[6]))
+			.map(s -> {
+				String[] c = cacheCities.getOrDefault(s[6], new String[6]);
+				return new String[] { 
+					"", "", "", "",
+					s[0], s[1], s[2], 
+					c[0], c[1], c[2],
+					"", "", "", "",
+					s[3], s[4], s[5],
+					c[3], c[4], c[5],
+					"", "", "", "",
+				}; 
+			});
+
+		write(file, header, stream);
 	}
 
 	/**
@@ -194,7 +196,7 @@ public class Main {
 		for (BestRegion region: BestRegion.values()) {
 			if (cli.hasOption(region.getCode())) {
 				LOG.info("Region {}", region.getName());
-				writeRegion(new BestWriterCSV(), region, inPath, outPath);
+				writeRegion(region, inPath, outPath);
 			}
 		}
 	}
