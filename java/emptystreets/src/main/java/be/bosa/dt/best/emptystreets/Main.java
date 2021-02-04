@@ -23,24 +23,29 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.missingstreets;
+package be.bosa.dt.best.emptystreets;
 
 import be.bosa.dt.best.converter.writer.BestWriter;
 import be.bosa.dt.best.converter.writer.BestWriterCSV;
 import be.bosa.dt.best.dao.Address;
+import be.bosa.dt.best.dao.BestNamedObject;
 import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.dao.Municipality;
-import be.bosa.dt.best.dao.Postal;
 import be.bosa.dt.best.dao.Street;
 import be.bosa.dt.best.xmlreader.AddressReader;
+import be.bosa.dt.best.xmlreader.MunicipalityPartReader;
 import be.bosa.dt.best.xmlreader.MunicipalityReader;
-import be.bosa.dt.best.xmlreader.PostalReader;
 import be.bosa.dt.best.xmlreader.StreetnameReader;
+
+import com.opencsv.CSVWriter;
+
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
@@ -90,6 +95,35 @@ public class Main {
 		}
 		return null;
 	}
+	
+	/**
+	 * Write a series of Best object to a file
+	 *
+	 * @param <T>
+	 * @param file CSV file to write to
+	 * @param header header as array of strings
+	 * @param lines stream of lines
+	 * @param func function to create a row in the CSV
+	 */
+	private <T> void write(Path file, String[] header, Stream<T> lines, Function<T, String[]> func) {
+		LOG.info("Writing {}", file);
+		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(file))) {
+			w.writeNext(header);
+			lines.forEach(s -> w.writeNext(func.apply(s)));
+		} catch (IOException ioe) {
+			LOG.error("Error writing to file", ioe);
+		}
+	}
+
+	/**
+	 * Put names of named object into a cache
+	 * 
+	 * @param cache
+	 * @param b named object
+	 */
+	private static void putNames(Map<String, String[]> cache, BestNamedObject b) {
+		cache.put(b.getId(), new String[]{ b.getName("nl"), b.getName("fr"), b.getName("de"), b.getIDVersion()});
+	}
 
 	/**
 	 * Write files for a specific region
@@ -100,25 +134,44 @@ public class Main {
 	 * @param outPath output directory
 	 */
 	private static void writeRegion(BestWriter writer, BestRegion region, Path inPath, Path outPath) {
-		try( Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
-			Stream<Postal> postals = new PostalReader().read(region, inPath);
-			Stream<Street> streets = new StreetnameReader().read(region, inPath);
-			Stream<Address> addresses = new AddressReader().read(region, inPath)) {
-			
-			Set<String> used = addresses.filter(a -> a.getStatus().equals("current"))
-										.map(a -> a.getStreet().getId())
-										.collect(Collectors.toSet());
-			List<Street> filtered = streets.filter(s -> s.getStatus().equals("current"))
-											.filter(s -> !used.contains(s.getId()))
-															.collect(Collectors.toList());
-			
-			for (Street s: filtered) {
-				System.err.println(s.getIDVersion() + "," + s.getName("nl") + "," + s.getName("fr") + "," + s.getName("de")  );
-			}
-			LOG.info("{} missing streets", filtered.size());
-			
-			//writer.writePostalStreets(region, outPath, cachePostalStreets);
+		Map<String, String[]> cacheCities = new HashMap<>();
+		Map<String, String[]> cacheCityParts = new HashMap<>();
+		Map<String, String[]> cacheStreets = new HashMap<>();
+	
+		try (Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
+			Stream<Street> streets = new StreetnameReader().read(region, inPath)) {
+				cities.forEach(s -> putNames(cacheCities, s));
+				streets.filter(s -> s.getStatus().equals("current")).forEach(s -> putNames(cacheStreets, s));
 		}
+
+		if (region.equals(BestRegion.WALLONIA)) { // only Walloon Region provides "municipality parts"
+			try ( Stream<Municipality> cityParts = new MunicipalityPartReader().read(region, inPath)) {
+				cityParts.forEach(s -> putNames(cacheCityParts, s));
+			}
+		}
+		
+		try(Stream<Address> addresses = new AddressReader().read(region, inPath)) {
+			// get the street IDs of "current" (active) addresses and remove these streets from the cache
+			addresses.filter(a -> a.getStatus().equals("current"))
+					.map(a -> a.getStreet().getIDVersion())
+					.forEach(s -> cacheStreets.remove(s));
+		}
+		// now the map only constains streets without any address
+		LOG.info("{} empty streets", cacheStreets.size());
+	
+		Path file = BestWriter.getPath(outPath, region, "empty_street", "csv");
+		
+		// mimic the structure of the postalstreet CSV, even when there is no postal info
+		String[] header = {
+			"postal_id", "postal_nl", "postal_fr", "postal_de",
+			"street_nl", "street_fr", "street_de",
+			"city_nl", "city_fr", "city_de",
+			"citypart_nl", "citypart_fr", "citypart_de",
+			"street_prefix", "street_no", "street_version",
+			"city_prefix", "city_no", "city_version",
+			"citypart_prefix", "citypart_no", "citypart_version"
+		};
+
 	}
 
 	/**

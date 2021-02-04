@@ -7,9 +7,9 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>be.bosa.dt.best</groupId>
-  <artifactId>missingstreets</artifactId>
-  <name>BeSt missing streets</name>
-  <description>Find streets without addresses</description>
+  <artifactId>emptystreets</artifactId>
+  <name>BeSt empty streets</name>
+  <description>Find streets without addresses (e.g. pedestrian paths)</description>
   <build>
     <plugins>
       <plugin>
@@ -37,7 +37,7 @@
               <transformers>
                 <transformer />
                 <transformer>
-                  <mainClass>be.bosa.dt.best.missingstreets.Main</mainClass>
+                  <mainClass>be.bosa.dt.best.emptystreets.Main</mainClass>
                 </transformer>
               </transformers>
             </configuration>

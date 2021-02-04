@@ -75,8 +75,6 @@ public class AddressReader extends AbstractXMLReader<Address> {
 	protected Address getNextObj(XMLEventReader reader) throws XMLStreamException {
 		Address obj = null;
 		BestObject withinObj = null;
-		// catch unused elements
-		BestObject dummy = new BestObject();
 		
 		while(reader.hasNext()) {
 			XMLEvent event = reader.nextEvent();

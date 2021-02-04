@@ -85,8 +85,7 @@ public class BestWriterCSV implements BestWriter {
 	 * @param lines stream of lines
 	 * @param func function to create a row in the CSV
 	 */
-	private <T> void write(Path file, String[] header, Stream<T> lines,
-		Function<T, String[]> func) {
+	private <T> void write(Path file, String[] header, Stream<T> lines,	Function<T, String[]> func) {
 		LOG.info("Writing {}", file);
 		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(file))) {
 			w.writeNext(header);

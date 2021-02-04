@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, FPS BOSA DG DT
+ * Copyright (c) 2021, FPS BOSA DG DT
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,36 +25,31 @@
  */
 package be.bosa.dt.best.dao;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * Helper class for street names
+ * Helper class for BeSt objects with names
  * 
  * @author Bart Hanssens
  */
-public class Street extends BestNamedObject {
-	private final Municipality city = new Municipality();
-	private String status = "";
-	private String date;
-	
-	public Municipality getCity() {
-		return city;
-	}
-	
-	public String getStatus() {
-		return status;
-	}
-	
-	public void setStatus(String status) {
-		this.status = status;
-	}
-	
-	public void setDate(String date) {
-		this.date = date;
-	}
-	
-	public String getDate() {
-		return date;
+public abstract class BestNamedObject extends BestObject {
+	private Map<String,String> names = new HashMap<>();
+
+
+	public Map<String,String> getNames() {
+		return names;
 	}
 
-	public Street() {
+	public void setNames(Map<String,String> names) {
+		this.names = names;
+	}
+	
+	public String getName(String lang) {
+		return names.getOrDefault(lang, "");
+	}
+	
+	public void setName(String name, String lang) {
+		this.names.put(lang, name);
 	}
 }

@@ -14,7 +14,7 @@
         <module>dbloader</module>
         <module>webservice</module>
         <module>copier</module>
-        <module>missingstreets</module>
+        <module>emptystreets</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

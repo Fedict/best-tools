@@ -25,34 +25,12 @@
  */
 package be.bosa.dt.best.dao;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Helper class for postal info
  * 
  * @author Bart Hanssens
  */
-public class Postal extends BestObject {
-	private Map<String,String> names = new HashMap<>();
-
-
-	public Map<String,String> getNames() {
-		return names;
-	}
-
-	public void setNames(Map<String,String> names) {
-		this.names = names;
-	}
-	
-	public String getName(String lang) {
-		return names.getOrDefault(lang, "");
-	}
-	
-	public void setName(String name, String lang) {
-		this.names.put(lang, name);
-	}
-	
+public class Postal extends BestNamedObject {
 	public Postal() {
 	}
 }

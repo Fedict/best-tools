@@ -30,7 +30,7 @@ package be.bosa.dt.best.dao;
  * 
  * @author Bart Hanssens
  */
-public class BestObject {
+public abstract class BestObject {
 	private String namespace = "";
 	private String id = "";
 	private String version = "";

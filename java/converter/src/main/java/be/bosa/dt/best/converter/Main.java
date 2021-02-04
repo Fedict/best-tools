@@ -113,9 +113,10 @@ public class Main {
 			Map<String, String[]> cacheCities = writer.writeMunicipalities(region, outPath, cities);
 
 			Map<String, String[]> cacheCityParts = Collections.EMPTY_MAP;
-			if (region.equals(region.WALLONIA)) { // only Walloon Region provides "municipality parts"
-				Stream<Municipality> cityParts = new MunicipalityPartReader().read(region, inPath);
-				cacheCityParts = writer.writeMunicipalityParts(region, outPath, cityParts);
+			if (region.equals(BestRegion.WALLONIA)) { // only Walloon Region provides "municipality parts"
+				try ( Stream<Municipality> cityParts = new MunicipalityPartReader().read(region, inPath)) {
+					cacheCityParts = writer.writeMunicipalityParts(region, outPath, cityParts);
+				}
 			}
 			Map<String, String[]> cachePostals = writer.writePostals(region, outPath, postals);
 			Map<String, String[]> cacheStreets = writer.writeStreets(region, outPath, streets, cacheCities);
