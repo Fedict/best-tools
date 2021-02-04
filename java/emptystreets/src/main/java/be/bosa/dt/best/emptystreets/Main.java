@@ -125,20 +125,20 @@ public class Main {
 	
 		try (Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
 			Stream<Street> streets = new StreetnameReader().read(region, inPath)) {
-				cities.forEach(s -> cacheCities.put(s.getIDVersion(), new String[]{ 
+				cities.forEach(s -> cacheCities.put(s.getId(), new String[]{ 
 									s.getName("nl"), s.getName("fr"), s.getName("de"), 
 									s.getNamespace(), s.getId(), s.getVersion()}));
 				streets.filter(s -> s.getStatus().equals("current")).forEach(s -> 
-					cacheStreets.put(s.getIDVersion(), new String[]{ 
+					cacheStreets.put(s.getId(), new String[]{ 
 									s.getName("nl"), s.getName("fr"), s.getName("de"), 
 									s.getNamespace(), s.getId(), s.getVersion(),
-									s.getCity().getIDVersion()}));
+									s.getCity().getId()}));
 		}
 		
 		try(Stream<Address> addresses = new AddressReader().read(region, inPath)) {
 			// get the street IDs of "current" (active) addresses and remove these streets from the cache
 			addresses.filter(a -> a.getStatus().equals("current"))
-					.map(a -> a.getStreet().getIDVersion())
+					.map(a -> a.getStreet().getId())
 					.forEach(s -> cacheStreets.remove(s));
 		}
 		// now the map only constains streets without any address

@@ -33,8 +33,9 @@ package be.bosa.dt.best.dao;
 public class Street extends BestNamedObject {
 	private final Municipality city = new Municipality();
 	private String status = "";
-	private String date;
-	
+	private String fromDate;
+	private String tillDate;
+
 	public Municipality getCity() {
 		return city;
 	}
@@ -47,12 +48,20 @@ public class Street extends BestNamedObject {
 		this.status = status;
 	}
 	
-	public void setDate(String date) {
-		this.date = date;
+	public void setFromDate(String date) {
+		this.fromDate = date;
 	}
 	
-	public String getDate() {
-		return date;
+	public String getFromDate() {
+		return fromDate;
+	}
+
+	public void setTillDate(String date) {
+		this.tillDate = date;
+	}
+
+	public String getTillDate() {
+		return tillDate;
 	}
 
 	public Street() {

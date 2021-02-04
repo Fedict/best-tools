@@ -107,7 +107,7 @@ public class BestWriterCSV implements BestWriter {
 
 		String[] header = {"id", "version", "name_nl", "name_fr", "name_de"};
 		Function<Municipality, String[]> func = (Municipality s) -> {
-			cache.put(s.getIDVersion(), new String[]{s.getName("nl"), s.getName("fr"), s.getName("de"), s.getIDVersion()});
+			cache.put(s.getId(), new String[]{s.getName("nl"), s.getName("fr"), s.getName("de"), s.getIDVersion()});
 			return new String[]{s.getIDVersion(), s.getName("nl"), s.getName("fr"), s.getName("de")};
 		};
 
@@ -136,7 +136,7 @@ public class BestWriterCSV implements BestWriter {
 
 		String[] header = {"id", "name_nl", "name_fr", "name_de", "status"};
 		Function<Postal, String[]> func = (Postal s) -> {
-			cache.put(s.getIDVersion(), new String[]{s.getName("nl"), s.getName("fr"), s.getName("de")});
+			cache.put(s.getId(), new String[]{s.getName("nl"), s.getName("fr"), s.getName("de")});
 			return new String[]{s.getId(), s.getName("nl"), s.getName("fr"), s.getName("de")};
 		};
 
@@ -157,12 +157,12 @@ public class BestWriterCSV implements BestWriter {
 			"version", "status", "from"};
 
 		Function<Street, String[]> func = (Street s) -> {
-			cache.put(s.getIDVersion(), new String[]{s.getName("nl"), s.getName("fr"), s.getName("de"), s.getIDVersion()});
-			String[] cCities = cities.getOrDefault(s.getCity().getIDVersion(), new String[3]);
+			cache.put(s.getId(), new String[]{s.getName("nl"), s.getName("fr"), s.getName("de"), s.getIDVersion()});
+			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[3]);
 
 			return new String[]{s.getIDVersion(), s.getName("nl"), s.getName("fr"), s.getName("de"),
 				s.getCity().getIDVersion(), cCities[0], cCities[1], cCities[2],
-				s.getVersion(), s.getStatus(), s.getDate()};
+				s.getVersion(), s.getStatus(), s.getFromDate()};
 		};
 
 		write(file, header, streets, func);
@@ -189,9 +189,9 @@ public class BestWriterCSV implements BestWriter {
 			"gpsx", "gpsy",
 			"status"};
 		Function<Address, String[]> func = (Address s) -> {
-			String[] cCities = cities.getOrDefault(s.getCity().getIDVersion(), new String[3]);
-			String[] cParts = cityParts.getOrDefault(s.getCityPart().getIDVersion(), new String[3]);
-			String[] cStreet = streets.getOrDefault(s.getStreet().getIDVersion(), new String[3]);
+			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[3]);
+			String[] cParts = cityParts.getOrDefault(s.getCityPart().getId(), new String[3]);
+			String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[3]);
 			String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[3]);
 
 			Coordinate src = new Coordinate(s.getPoint().getX(), s.getPoint().getY());
@@ -206,7 +206,7 @@ public class BestWriterCSV implements BestWriter {
 			// A street can have different postal codes, so create a cache of info per street per postal code
 			if (s.getStatus().equals("current")) {
 				Map<String, String[]> postalStreet = cache.getOrDefault(s.getPostal().getId(), new HashMap<>());
-				postalStreet.put(s.getStreet().getIDVersion(), new String[]{
+				postalStreet.put(s.getStreet().getId(), new String[]{
 					s.getPostal().getId(), cPostal[0], cPostal[1], cPostal[2],
 					cStreet[0], cStreet[1], cStreet[2],
 					cCities[0], cCities[1], cCities[2],
