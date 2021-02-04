@@ -128,22 +128,37 @@ public class Main {
 				cities.forEach(s -> cacheCities.put(s.getId(), new String[]{ 
 									s.getName("nl"), s.getName("fr"), s.getName("de"), 
 									s.getNamespace(), s.getId(), s.getVersion()}));
-				streets.filter(s -> s.getStatus().equals("current")).forEach(s -> 
-					cacheStreets.put(s.getId(), new String[]{ 
+				streets.filter(s -> s.getStatus().equals("current"))
+					.filter(s -> s.getTillDate() == null) // also remove Flanders streets with end date
+					.forEach(s -> cacheStreets.put(s.getId(), new String[]{ 
 									s.getName("nl"), s.getName("fr"), s.getName("de"), 
 									s.getNamespace(), s.getId(), s.getVersion(),
 									s.getCity().getId()}));
 		}
+
+		Map<String,String[]> NL = new HashMap<>();
+		Map<String,String[]> FR = new HashMap<>();
+		Map<String,String[]> DE = new HashMap<>();
 		
 		try(Stream<Address> addresses = new AddressReader().read(region, inPath)) {
 			// get the street IDs of "current" (active) addresses and remove these streets from the cache
 			addresses.filter(a -> a.getStatus().equals("current"))
+					.peek(a -> { 		// create lookup tables for postal info based on name
+						String[] city = cacheCities.get(a.getCity().getId());
+						NL.put(city[0], new String[] { a.getPostal().getId(), city[0], city[1], city[2] });
+						FR.put(city[1], new String[] { a.getPostal().getId(), city[0], city[1], city[2] });
+						DE.put(city[2], new String[] { a.getPostal().getId(), city[0], city[1], city[2] });
+					})
 					.map(a -> a.getStreet().getId())
 					.forEach(s -> cacheStreets.remove(s));
 		}
+		NL.remove("");
+		FR.remove("");
+		DE.remove("");
+
 		// now the map only constains streets without any address
 		LOG.info("{} empty streets", cacheStreets.size());
-	
+
 		Path file = BestWriter.getPath(outPath, region, "empty_street", "csv");
 		
 		// mimic the structure of the postalstreet CSV, even when there is no postal and no city part info
@@ -162,8 +177,11 @@ public class Main {
 			.sorted(Comparator.comparing(s -> s[6]))
 			.map(s -> {
 				String[] c = cacheCities.getOrDefault(s[6], new String[6]);
+				String[] p = NL.getOrDefault(c[0], 
+								FR.getOrDefault(c[1],
+								DE.getOrDefault(c[2], new String[4])));
 				return new String[] { 
-					"", "", "", "",
+					p[0], p[1], p[2], p[3],
 					s[0], s[1], s[2], 
 					c[0], c[1], c[2],
 					"", "", "", "",

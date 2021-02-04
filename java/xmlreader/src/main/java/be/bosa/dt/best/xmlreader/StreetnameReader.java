@@ -103,7 +103,7 @@ public class StreetnameReader extends AbstractXMLReader<Street> {
 						obj.setFromDate(txt);
 					} else if (el.equals(VALID_TO)) {
 						String txt = reader.getElementText();
-						obj.setFromDate(txt);
+						obj.setTillDate(txt);
 					}
 				}
 			}
