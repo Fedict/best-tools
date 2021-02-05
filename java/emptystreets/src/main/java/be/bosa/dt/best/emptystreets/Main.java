@@ -192,8 +192,6 @@ public class Main {
 					.forEach(s -> cacheStreets.remove(s));
 		}
 
-		FR.forEach((k,v) -> System.err.println(k + " " + v[0]));
-		
 		// now the map only constains streets without any address
 		LOG.info("{} empty streets", cacheStreets.size());
 
