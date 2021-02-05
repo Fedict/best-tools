@@ -112,6 +112,50 @@ public class Main {
 		}
 	}
 
+
+	/**
+	 * Fill postal map.
+	 * If the postal code is already in the map, the replace the values if the new postal code is lower than
+	 * the current postal code (since the lowest postal code often refers to the main city)
+	 * E.g. 2060 Antwerpen will be replaced by 2000 Antwerpen
+	 * 
+	 * @param postal
+	 * @param code key
+	 * @param values values
+	 */
+	private static void fillPostal(Map<String, String[]> postal, String key, String[] values) {
+		if (!key.isEmpty()) {
+			String[] current = postal.get(key);
+			if (current == null || (current[0].compareTo(values[0]) > 0)) {
+				postal.put(key, values);
+			}
+		}
+	}
+
+	/**
+	 * Fill lookup maps for postal info.
+	 * This zip code is only available via an address (i.e. with house number), not on a street level.
+	 * So use addresses to collect city/postal names and postal codes, and use the city names to guess the
+	 * postal code when a street has no addresses attached to it.
+	 * This will not work 100% correct, because a city can have multiple postal codes
+	 * 
+	 * @param a address
+	 * @param cacheCities cities
+	 * @param postalNL map with Duth city name as key
+	 * @param postalFR map with French city name as key
+	 * @param postalDE map with German city name as key
+	 */
+	private static void fillPostals(Address a, Map<String, String[]> cacheCities,
+							Map<String, String[]> postalNL, Map<String, String[]> postalFR, 
+							Map<String, String[]> postalDE) {
+		String[] city = cacheCities.get(a.getCity().getId());
+		String[] values = new String[] { a.getPostal().getId(), city[0], city[1], city[2] };
+		
+		fillPostal(postalNL, city[0], values);
+		fillPostal(postalFR, city[1], values);
+		fillPostal(postalDE, city[2], values);
+	}
+
 	/**
 	 * Write files for a specific region
 	 * 
@@ -143,19 +187,13 @@ public class Main {
 		try(Stream<Address> addresses = new AddressReader().read(region, inPath)) {
 			// get the street IDs of "current" (active) addresses and remove these streets from the cache
 			addresses.filter(a -> a.getStatus().equals("current"))
-					.peek(a -> { 		// create lookup tables for postal info based on name
-						String[] city = cacheCities.get(a.getCity().getId());
-						NL.put(city[0], new String[] { a.getPostal().getId(), city[0], city[1], city[2] });
-						FR.put(city[1], new String[] { a.getPostal().getId(), city[0], city[1], city[2] });
-						DE.put(city[2], new String[] { a.getPostal().getId(), city[0], city[1], city[2] });
-					})
+					.peek(a -> fillPostals(a, cacheCities, NL, FR, DE))
 					.map(a -> a.getStreet().getId())
 					.forEach(s -> cacheStreets.remove(s));
 		}
-		NL.remove("");
-		FR.remove("");
-		DE.remove("");
 
+		FR.forEach((k,v) -> System.err.println(k + " " + v[0]));
+		
 		// now the map only constains streets without any address
 		LOG.info("{} empty streets", cacheStreets.size());
 
