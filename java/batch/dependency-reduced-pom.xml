@@ -10,28 +10,7 @@
   <artifactId>batch</artifactId>
   <name>BeSt batch</name>
   <build>
-    <finalName>${project.name}</finalName>
     <plugins>
-      <plugin>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.0</version>
-        <configuration>
-          <archive>
-            <manifestEntries>
-              <Main-Class>${main.class}</Main-Class>
-            </manifestEntries>
-          </archive>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>3.0.0</version>
-        <configuration>
-          <mainClass>${main.class}</mainClass>
-          <arguments>best-transfer.xml</arguments>
-        </configuration>
-      </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.2.4</version>
@@ -44,10 +23,8 @@
           </execution>
         </executions>
         <configuration>
+          <keepDependenciesWithProvidedScope>false</keepDependenciesWithProvidedScope>
           <transformers>
-            <transformer>
-              <mainClass>${main.class}</mainClass>
-            </transformer>
             <transformer />
             <transformer>
               <resource>META-INF/batch.xml</resource>

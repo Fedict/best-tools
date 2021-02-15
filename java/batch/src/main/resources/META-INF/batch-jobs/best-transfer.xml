@@ -1,40 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <job id="bestTransfer" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"
-	 version="1.0">
+     version="1.0">
 	<listeners>
 		<listener ref="mailLogListener">
 			<properties>
-				<property name="from" value="bart.hanssens@bosa.fgov.be"/>
-				<property name="to" value="bart.hanssens@bosa.fgov.be"/>
+				<property name="server" value="#{jobParameters['mail.server]}"/>				
+				<property name="from" value="#{jobParameters['mail.from]}"/>
+				<property name="to" value="#{jobParameters['mail.to]}"/>
 				<property name="subject" value="Best transfer batch"/>
 				<property name="message" value=""/>
 			</properties>
 		</listener>
 	</listeners>
-	<flow id="get" next="verify">
-		<fail on="FAILED" exit-status="GET_FAILED"/>
-		<!--
-	<step id="download" next="zipsize">
-		<batchlet ref="httpGetBatchlet">
-			<properties>
-				<property name="fromURL" value="https://opendata.bosa.be/download/best/best-full-latest.zip"/>
-				<property name="toFile" value="#{systemProperties['java.io.tmpdir']}/best-full-latest.zip"/>
-			</properties>
-		</batchlet>
-	</step>
-		-->
-		<step id="zipsize" next="unpack">
+	<flow id="download-flow" next="unzip-flow">
+		<fail on="FAILED" exit-status="DOWNLOAD_FAILED"/>
+		<step id="download-step" start-limit="3" allow-start-if-complete="true">
+			<batchlet ref="sftpBatchlet">
+				<properties>
+					<property name="fromSite" value="#{jobParameters['sftp.from.site']}"/>
+					<property name="fromUser" value="#{jobParameters['sftp.from.user]}"/>
+					<property name="fromPass" value="#{jobParameters['sftp.from.pass']}"/>
+					<property name="fromFile" value="#{jobParameters['sftp.from.file']}"/>
+					<property name="toFile" value="#{systemProperties['java.io.tmpdir']}/best-full-latest.zip"/>
+				</properties>
+			</batchlet>
+		</step>
+	</flow>
+	<flow id="unzip-flow" next="verify-flow">
+		<fail on="FAILED" exit-status="UNZIP_FAILED"/>
+		<step id="zipsize-step" next="unpack-step">
 			<batchlet ref="verifyFileBatchlet">
 				<properties>
 					<property name="file" value="#{systemProperties['java.io.tmpdir']}/best-full-latest.zip"/>
-					<property name="minSize" value="290000000"/>
+					<property name="minSize" value="300000000"/>
 				</properties>			
 			</batchlet>
 		</step>
-		<step id="unpack">
+		<step id="unpack-step">
 			<batchlet ref="unpackBatchlet">
 				<properties>
 					<property name="inputFile" value="#{systemProperties['java.io.tmpdir']}/best-full-latest.zip"/>
@@ -43,9 +47,9 @@
 			</batchlet>
 		</step>
 	</flow>
-	<flow id="verify" next="put">
+	<flow id="verify-flow" next="upload-flow">
 		<fail on="FAILED" exit-status="VERIFY_FAILED"/>
-		<step id="vl" next="bxl">
+		<step id="vl-step" next="bxl-step">
 			<batchlet ref="verifyFileBatchlet">
 				<properties>
 					<property name="directory" value="#{systemProperties['java.io.tmpdir']}/best"/>
@@ -54,7 +58,7 @@
 				</properties>
 			</batchlet>
 		</step>
-		<step id="bxl" next="wal">
+		<step id="bxl-step" next="wal-step">
 			<batchlet ref="verifyFileBatchlet">
 				<properties>
 					<property name="directory" value="#{systemProperties['java.io.tmpdir']}/best"/>
@@ -63,7 +67,7 @@
 				</properties>
 			</batchlet>
 		</step>
-		<step id="wal">
+		<step id="wal-step">
 			<batchlet ref="verifyFileBatchlet">
 				<properties>
 					<property name="directory" value="#{systemProperties['java.io.tmpdir']}/best"/>
@@ -73,15 +77,16 @@
 			</batchlet>
 		</step>
 	</flow>
-	<flow id="put" next="mail">
-		<fail on="FAILED" exit-status="SFTP_FAILED"/>
-		<step id="upload">
+	<flow id="upload-flow">
+		<fail on="FAILED" exit-status="UPLOAD_FAILED"/>
+		<step id="upload-step" start-limit="3" allow-start-if-complete="true">
 			<batchlet ref="sftpBatchlet">
 				<properties>
 					<property name="fromFile" value="#{systemProperties['java.io.tmpdir']}/best-full-latest.zip"/>
-					<property name="toSite" value=""/>
-					<property name="toUser" value=""/>
-					<property name="toPass" value=""/>
+					<property name="toFile" value="#{jobParameters['sftp.to.file']}"/>
+					<property name="toSite" value="#{jobParameters['sftp.to.site']}"/>
+					<property name="toUser" value="#{jobParameters['sftp.to.user]}"/>
+					<property name="toPass" value="#{jobParameters['sftp.to.pass']}"/>
 				</properties>
 			</batchlet>
 		</step>
