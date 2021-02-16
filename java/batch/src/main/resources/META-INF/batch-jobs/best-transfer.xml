@@ -6,9 +6,9 @@
 	<listeners>
 		<listener ref="mailLogListener">
 			<properties>
-				<property name="server" value="#{jobParameters['mail.server]}"/>				
-				<property name="from" value="#{jobParameters['mail.from]}"/>
-				<property name="to" value="#{jobParameters['mail.to]}"/>
+				<property name="server" value="#{jobParameters['mail.server']}"/>				
+				<property name="from" value="#{jobParameters['mail.from']}"/>
+				<property name="to" value="#{jobParameters['mail.to']}"/>
 				<property name="subject" value="Best transfer batch"/>
 				<property name="message" value=""/>
 			</properties>
@@ -20,7 +20,7 @@
 			<batchlet ref="sftpBatchlet">
 				<properties>
 					<property name="fromSite" value="#{jobParameters['sftp.from.site']}"/>
-					<property name="fromUser" value="#{jobParameters['sftp.from.user]}"/>
+					<property name="fromUser" value="#{jobParameters['sftp.from.user']}"/>
 					<property name="fromPass" value="#{jobParameters['sftp.from.pass']}"/>
 					<property name="fromFile" value="#{jobParameters['sftp.from.file']}"/>
 					<property name="toFile" value="#{systemProperties['java.io.tmpdir']}/best-full-latest.zip"/>
@@ -85,7 +85,7 @@
 					<property name="fromFile" value="#{systemProperties['java.io.tmpdir']}/best-full-latest.zip"/>
 					<property name="toFile" value="#{jobParameters['sftp.to.file']}"/>
 					<property name="toSite" value="#{jobParameters['sftp.to.site']}"/>
-					<property name="toUser" value="#{jobParameters['sftp.to.user]}"/>
+					<property name="toUser" value="#{jobParameters['sftp.to.user']}"/>
 					<property name="toPass" value="#{jobParameters['sftp.to.pass']}"/>
 				</properties>
 			</batchlet>
