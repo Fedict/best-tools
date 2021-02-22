@@ -25,25 +25,13 @@
  */
 package be.bosa.dt.best.emptystreets;
 
-import be.bosa.dt.best.converter.writer.BestWriter;
-import be.bosa.dt.best.dao.Address;
 import be.bosa.dt.best.dao.BestRegion;
-import be.bosa.dt.best.dao.Municipality;
-import be.bosa.dt.best.dao.Street;
-import be.bosa.dt.best.xmlreader.AddressReader;
-import be.bosa.dt.best.xmlreader.MunicipalityReader;
-import be.bosa.dt.best.xmlreader.StreetnameReader;
 
-import com.opencsv.CSVWriter;
-
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
+import java.util.logging.Level;
+
+import java.util.logging.Logger;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -52,16 +40,13 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Create a list of streets without addresses (e.g. pedestrian maps, but could also be empty by mistake)
  * 
  * @author Bart Hanssens
  */
 public class Main {
-	private final static Logger LOG = LoggerFactory.getLogger(Main.class);
+	private final static Logger LOG = Logger.getLogger(Main.class.getName());
 	
 	private final static Options OPTS = new Options()
 		.addRequiredOption("i", "indir", true, "input directory")
@@ -93,142 +78,6 @@ public class Main {
 		}
 		return null;
 	}
-	
-	/**
-	 * Write a series of Best object to a file
-	 *
-	 * @param <T>
-	 * @param file CSV file to write to
-	 * @param header header as array of strings
-	 * @param lines stream of lines
-	 */
-	private static void write(Path file, String[] header, Stream<String[]> lines) {
-		LOG.info("Writing {}", file);
-		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(file))) {
-			w.writeNext(header);
-			lines.forEach(s -> w.writeNext(s));
-		} catch (IOException ioe) {
-			LOG.error("Error writing to file", ioe);
-		}
-	}
-
-
-	/**
-	 * Fill postal map.
-	 * If the postal code is already in the map, the replace the values if the new postal code is lower than
-	 * the current postal code (since the lowest postal code often refers to the main city)
-	 * E.g. 2060 Antwerpen will be replaced by 2000 Antwerpen
-	 * 
-	 * @param postal
-	 * @param code key
-	 * @param values values
-	 */
-	private static void fillPostal(Map<String, String[]> postal, String key, String[] values) {
-		if (!key.isEmpty()) {
-			String[] current = postal.get(key);
-			if (current == null || (current[0].compareTo(values[0]) > 0)) {
-				postal.put(key, values);
-			}
-		}
-	}
-
-	/**
-	 * Fill lookup maps for postal info.
-	 * This zip code is only available via an address (i.e. with house number), not on a street level.
-	 * So use addresses to collect city/postal names and postal codes, and use the city names to guess the
-	 * postal code when a street has no addresses attached to it.
-	 * This will not work 100% correct, because a city can have multiple postal codes
-	 * 
-	 * @param a address
-	 * @param cacheCities cities
-	 * @param postalNL map with Duth city name as key
-	 * @param postalFR map with French city name as key
-	 * @param postalDE map with German city name as key
-	 */
-	private static void fillPostals(Address a, Map<String, String[]> cacheCities,
-							Map<String, String[]> postalNL, Map<String, String[]> postalFR, 
-							Map<String, String[]> postalDE) {
-		String[] city = cacheCities.get(a.getCity().getId());
-		String[] values = new String[] { a.getPostal().getId(), city[0], city[1], city[2] };
-		
-		fillPostal(postalNL, city[0], values);
-		fillPostal(postalFR, city[1], values);
-		fillPostal(postalDE, city[2], values);
-	}
-
-	/**
-	 * Write files for a specific region
-	 * 
-	 * @param region
-	 * @param inPath input directory
-	 * @param outPath output directory
-	 */
-	private static void writeRegion(BestRegion region, Path inPath, Path outPath) {
-		Map<String, String[]> cacheCities = new HashMap<>();
-		Map<String, String[]> cacheStreets = new HashMap<>();
-	
-		try (Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
-			Stream<Street> streets = new StreetnameReader().read(region, inPath)) {
-				cities.forEach(s -> cacheCities.put(s.getId(), new String[]{ 
-									s.getName("nl"), s.getName("fr"), s.getName("de"), 
-									s.getNamespace(), s.getId(), s.getVersion()}));
-				streets.filter(s -> s.getStatus().equals("current"))
-					.filter(s -> s.getTillDate() == null) // also remove Flanders streets with end date
-					.forEach(s -> cacheStreets.put(s.getId(), new String[]{ 
-									s.getName("nl"), s.getName("fr"), s.getName("de"), 
-									s.getNamespace(), s.getId(), s.getVersion(),
-									s.getCity().getId()}));
-		}
-
-		Map<String,String[]> NL = new HashMap<>();
-		Map<String,String[]> FR = new HashMap<>();
-		Map<String,String[]> DE = new HashMap<>();
-		
-		try(Stream<Address> addresses = new AddressReader().read(region, inPath)) {
-			// get the street IDs of "current" (active) addresses and remove these streets from the cache
-			addresses.filter(a -> a.getStatus().equals("current"))
-					.peek(a -> fillPostals(a, cacheCities, NL, FR, DE))
-					.map(a -> a.getStreet().getId())
-					.forEach(s -> cacheStreets.remove(s));
-		}
-
-		// now the map only constains streets without any address
-		LOG.info("{} empty streets", cacheStreets.size());
-
-		Path file = BestWriter.getPath(outPath, region, "empty_street", "csv");
-		
-		// mimic the structure of the postalstreet CSV, even when there is no postal and no city part info
-		String[] header = {
-			"postal_id", "postal_nl", "postal_fr", "postal_de",
-			"street_nl", "street_fr", "street_de",
-			"city_nl", "city_fr", "city_de",
-			"citypart_nl", "citypart_fr", "citypart_de",
-			"street_prefix", "street_no", "street_version",
-			"city_prefix", "city_no", "city_version",
-			"citypart_prefix", "citypart_no", "citypart_version"
-		};
-
-		// order by city
-		Stream<String[]> stream = cacheStreets.values().stream()
-			.sorted(Comparator.comparing(s -> s[6]))
-			.map(s -> {
-				String[] c = cacheCities.getOrDefault(s[6], new String[6]);
-				String[] p = NL.getOrDefault(c[0], 
-								FR.getOrDefault(c[1],
-								DE.getOrDefault(c[2], new String[4])));
-				return new String[] { 
-					p[0], p[1], p[2], p[3],
-					s[0], s[1], s[2], 
-					c[0], c[1], c[2],
-					"", "", "", "",
-					s[3], s[4], s[5],
-					c[3], c[4], c[5],
-					"", "", "", "",
-				}; 
-			});
-
-		write(file, header, stream);
-	}
 
 	/**
 	 * Main
@@ -247,10 +96,12 @@ public class Main {
 		Path inPath = Paths.get(indir);
 		Path outPath = Paths.get(outdir);
 		
+		EmptyStreetWriter esw = new EmptyStreetWriter();
+
 		for (BestRegion region: BestRegion.values()) {
 			if (cli.hasOption(region.getCode())) {
-				LOG.info("Region {}", region.getName());
-				writeRegion(region, inPath, outPath);
+				LOG.log(Level.INFO, "Region {0}", region.getName());
+				esw.writeRegion(region, inPath, outPath);
 			}
 		}
 	}

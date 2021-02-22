@@ -25,26 +25,16 @@
  */
 package be.bosa.dt.best.converter;
 
-import be.bosa.dt.best.converter.writer.BestWriter;
-import be.bosa.dt.best.dao.Address;
+import be.bosa.dt.best.converter.writer.BestRegionWriter;
 import be.bosa.dt.best.dao.BestRegion;
-import be.bosa.dt.best.dao.Municipality;
-import be.bosa.dt.best.dao.Postal;
-import be.bosa.dt.best.dao.Street;
-
-import be.bosa.dt.best.xmlreader.AddressReader;
-import be.bosa.dt.best.xmlreader.MunicipalityReader;
-import be.bosa.dt.best.xmlreader.PostalReader;
-import be.bosa.dt.best.xmlreader.StreetnameReader;
 import be.bosa.dt.best.converter.writer.BestWriterCSV;
 import be.bosa.dt.best.converter.writer.BestWriterShape;
-import be.bosa.dt.best.xmlreader.MunicipalityPartReader;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.Map;
-import java.util.stream.Stream;
+import java.util.logging.Level;
+
+import java.util.logging.Logger;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -53,17 +43,13 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 /**
  * Conversion tool to convert XML files to various formats
  * 
  * @author Bart Hanssens
  */
 public class Main {
-	private final static Logger LOG = LoggerFactory.getLogger(Main.class);
+	private final static Logger LOG = Logger.getLogger(Main.class.getName());
 	
 	private final static Options OPTS = new Options()
 		.addRequiredOption("i", "indir", true, "input directory")
@@ -97,38 +83,6 @@ public class Main {
 	}
 
 	/**
-	 * Write files for a specific region
-	 * 
-	 * @param writer
-	 * @param region
-	 * @param inPath input directory
-	 * @param outPath output directory
-	 */
-	private static void writeRegion(BestWriter writer, BestRegion region, Path inPath, Path outPath) {
-		try( Stream<Municipality> cities = new MunicipalityReader().read(region, inPath);
-			Stream<Postal> postals = new PostalReader().read(region, inPath);
-			Stream<Street> streets = new StreetnameReader().read(region, inPath);
-			Stream<Address> addresses = new AddressReader().read(region, inPath)) {
-				
-			Map<String, String[]> cacheCities = writer.writeMunicipalities(region, outPath, cities);
-
-			Map<String, String[]> cacheCityParts = Collections.EMPTY_MAP;
-			if (region.equals(BestRegion.WALLONIA)) { // only Walloon Region provides "municipality parts"
-				try ( Stream<Municipality> cityParts = new MunicipalityPartReader().read(region, inPath)) {
-					cacheCityParts = writer.writeMunicipalityParts(region, outPath, cityParts);
-				}
-			}
-			Map<String, String[]> cachePostals = writer.writePostals(region, outPath, postals);
-			Map<String, String[]> cacheStreets = writer.writeStreets(region, outPath, streets, cacheCities);
-			
-			Map<String, Map<String, String[]>> cachePostalStreets = 
-				writer.writeAddresses(region, outPath, addresses, cacheStreets, cacheCities, cacheCityParts, cachePostals);
-			
-			writer.writePostalStreets(region, outPath, cachePostalStreets);
-		}
-	}
-
-	/**
 	 * Main
 	 * 
 	 * @param args 
@@ -145,11 +99,12 @@ public class Main {
 		Path inPath = Paths.get(indir);
 		Path outPath = Paths.get(outdir);
 		
+		BestRegionWriter rw = new BestRegionWriter();
 		for (BestRegion region: BestRegion.values()) {
 			if (cli.hasOption(region.getCode())) {
-				LOG.info("Region {}", region.getName());
-				writeRegion(new BestWriterCSV(), region, inPath, outPath);
-				writeRegion(new BestWriterShape(), region, inPath, outPath);
+				LOG.log(Level.INFO, "Region {0}", region.getName());
+				rw.writeRegion(new BestWriterCSV(), region, inPath, outPath);
+				rw.writeRegion(new BestWriterShape(), region, inPath, outPath);
 			}
 		}
 	}

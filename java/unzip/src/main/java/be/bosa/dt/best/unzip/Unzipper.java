@@ -32,15 +32,13 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.IOUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  * Unzip class
@@ -48,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * @author Bart Hanssens
  */
 public class Unzipper {
-	private final static Logger LOG = LoggerFactory.getLogger(Unzipper.class);
+	private final static Logger LOG = Logger.getLogger(Unzipper.class.getName());
 	
 	/**
 	 * Unzip a zip file into a directory
@@ -57,13 +55,13 @@ public class Unzipper {
 	 * @param pout output directory
 	 * @return false in case of error
 	 */
-	public static boolean unzip(Path pin, Path pout) {
+	public boolean unzip(Path pin, Path pout) {
 		boolean ok = true;
 		try (ZipFile zip = new ZipFile(pin.toFile())) {
 			for (ZipEntry f: zip.stream().toArray(ZipEntry[]::new)) {
 				String name = f.getName();
 				Path p = Paths.get(pout.toString(), name);
-				LOG.info("Unzipping {}", p);
+				LOG.log(Level.INFO, "Unzipping {}", p);
 				
 				try (InputStream is = zip.getInputStream(f);
 					OutputStream os = Files.newOutputStream(p)) {
@@ -74,12 +72,12 @@ public class Unzipper {
 					}
 				} catch (IOException e) {
 					ok = false;
-					LOG.error("Error extracting {}", p);
+					LOG.log(Level.SEVERE, "Error extracting {}", p);
 				}
 			}
 		} catch (IOException ioe) {
 			ok = false;
-			LOG.error("Error extracting {}", pin.toFile());
+			LOG.log(Level.SEVERE, "Error extracting {}", pin.toFile());
 		}
 		return ok;
 	}
@@ -89,38 +87,36 @@ public class Unzipper {
 	 * 
 	 * @param infile zip input file
 	 * @param outdir output directory
+	 * @return false on error
 	 */
-	public static boolean checkAndUnzip(String infile, String outdir) {
+	public boolean checkAndUnzip(String infile, String outdir) {
 		if (! infile.toLowerCase().endsWith("zip")) {
-			LOG.error("Not a zip file");
+			LOG.severe("Not a zip file");
 			return false;
 		}
 		Path pin = Paths.get(infile);
 		if (! (Files.exists(pin) && Files.isRegularFile(pin))) {
-			LOG.error("Could not find input file");
+			LOG.severe("Could not find input file");
 			return false;
 		}
 		
 		Path pout = Paths.get(outdir);
 		if (! (Files.exists(pout) && Files.isDirectory(pout))) {
-			LOG.error("Could not find output directory");
+			LOG.severe("Could not find output directory");
 			return false;
 		}
 		
 		try {
 			Path[] files = Files.walk(pout).filter(f -> !f.equals(pout)).toArray(Path[]::new);
 			for (Path f: files) {
-				LOG.info("Deleting {}", f);
+				LOG.log(Level.INFO, "Deleting {}", f);
 				Files.delete(f);
 			}
 		} catch (IOException ioe) {
-			LOG.error("Could not delete files in directory", ioe);
+			LOG.log(Level.SEVERE, "Could not delete files in directory", ioe);
 			return false;
 		}
 		
-		if (! unzip(pin, pout)) {
-			return false;
-		}
-		return true;
+		return unzip(pin, pout);
 	}
 }

@@ -41,6 +41,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import org.geotools.geometry.jts.JTS;
@@ -52,18 +54,14 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * BeST result CSV file writer
  *
  * @author Bart Hanssens
  */
 public class BestWriterCSV implements BestWriter {
-
 	private static MathTransform TRANS;
-	private final static Logger LOG = LoggerFactory.getLogger(BestWriterCSV.class);
+	private final static Logger LOG = Logger.getLogger(BestWriterCSV.class.getName());
 
 	/**
 	 * Constructor
@@ -72,7 +70,7 @@ public class BestWriterCSV implements BestWriter {
 		try {
 			TRANS = CRS.findMathTransform(CRS.decode("EPSG:31370"), CRS.decode("EPSG:4326"), false);
 		} catch (FactoryException fe) {
-			LOG.error("No conversion found");
+			LOG.severe("No conversion found");
 		}
 	}
 
@@ -86,12 +84,12 @@ public class BestWriterCSV implements BestWriter {
 	 * @param func function to create a row in the CSV
 	 */
 	private <T> void write(Path file, String[] header, Stream<T> lines,	Function<T, String[]> func) {
-		LOG.info("Writing {}", file);
+		LOG.log(Level.INFO, "Writing {0}", file);
 		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(file))) {
 			w.writeNext(header);
 			lines.forEach(s -> w.writeNext(func.apply(s)));
 		} catch (IOException ioe) {
-			LOG.error("Error writing to file", ioe);
+			LOG.log(Level.SEVERE, "Error writing to file", ioe);
 		}
 	}
 
@@ -200,7 +198,7 @@ public class BestWriterCSV implements BestWriter {
 			try {
 				JTS.transform(src, dest, TRANS);
 			} catch (TransformException ex) {
-				LOG.warn("Transformation to GPS failed");
+				LOG.warning("Transformation to GPS failed");
 			}
 
 			// A street can have different postal codes, so create a cache of info per street per postal code

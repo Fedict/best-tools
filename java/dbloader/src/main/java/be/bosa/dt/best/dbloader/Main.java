@@ -45,6 +45,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
@@ -54,17 +56,14 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
- * Loads XML BeST data into an RDBMS, in this case H2GIS
+ * Loads XML BeST data into an RDBMS, in this case PostGIS
  * Requires (flat) directory of unzipped XML files
  * 
  * @author Bart Hanssens
  */
 public class Main {
-	private static Logger LOG = LoggerFactory.getLogger(Main.class);
+	private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
 	private final static Options OPTS = new Options()
 		.addRequiredOption("x", "xmldir", true, "directory with unzipped BeST XML files")
@@ -211,11 +210,11 @@ public class Main {
 				// insert per 10000 records
 				if (++cnt % 10_000 == 0) {
 					prep.executeBatch();
-					LOG.info("Inserted {}", cnt);
+					LOG.log(Level.INFO, "Inserted {0}", cnt);
 				}
 			}
 			prep.executeBatch();
-			LOG.info("Inserted {}", cnt);
+			LOG.log(Level.INFO, "Inserted {0}", cnt);
 		}
 	}
 
@@ -228,7 +227,7 @@ public class Main {
 	 */
 	private static void loadMunicipalities(PreparedStatement prep, Path xmlPath) throws SQLException {
 		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
-			LOG.info("Starting municipalities {}", reg.getName());
+			LOG.log(Level.INFO, "Starting municipalities {0}", reg.getName());
 			int cnt = 0;
 
 			MunicipalityReader reader = new MunicipalityReader();
@@ -246,11 +245,11 @@ public class Main {
 				// insert per 10000 records
 				if (++cnt % 10_000 == 0) {
 					prep.executeBatch();
-					LOG.info("Inserted {}", cnt);
+					LOG.log(Level.INFO, "Inserted {0}", cnt);
 				}
 			}
 			prep.executeBatch();
-			LOG.info("Inserted {}", cnt);
+			LOG.log(Level.INFO, "Inserted {0}", cnt);
 		}
 	}
 	/**
@@ -262,7 +261,7 @@ public class Main {
 	 */
 	private static void loadMunicipalityParts(PreparedStatement prep, Path xmlPath) throws SQLException {
 		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
-			LOG.info("Starting municipality parts {}", reg.getName());
+			LOG.log(Level.INFO, "Starting municipality parts {0}", reg.getName());
 			int cnt = 0;
 
 			MunicipalityPartReader reader = new MunicipalityPartReader();
@@ -280,11 +279,11 @@ public class Main {
 				// insert per 10000 records
 				if (++cnt % 10_000 == 0) {
 					prep.executeBatch();
-					LOG.info("Inserted {}", cnt);
+					LOG.log(Level.INFO, "Inserted {0}", cnt);
 				}
 			}
 			prep.executeBatch();
-			LOG.info("Inserted {}", cnt);
+			LOG.log(Level.INFO, "Inserted {0}", cnt);
 		}
 	}
 
@@ -297,7 +296,7 @@ public class Main {
 	 */
 	private static void loadStreets(PreparedStatement prep, Path xmlPath) throws SQLException {
 		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
-			LOG.info("Starting streets {} ", reg.getName());
+			LOG.log(Level.INFO, "Starting streets {0} ", reg.getName());
 			int cnt = 0;
 
 			StreetnameReader reader = new StreetnameReader();
@@ -318,11 +317,11 @@ public class Main {
 				// insert per 10000 records
 				if (++cnt % 10_000 == 0) {
 					prep.executeBatch();
-					LOG.info("Inserted {}", cnt);
+					LOG.log(Level.INFO, "Inserted {0}", cnt);
 				}
 			}
 			prep.executeBatch();
-			LOG.info("Inserted {}", cnt);
+			LOG.log(Level.INFO, "Inserted {0}", cnt);
 		}
 	}
 
@@ -335,7 +334,7 @@ public class Main {
 	 */
 	private static void loadAddresses(PreparedStatement prep, Path xmlPath) throws SQLException {
 		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
-			LOG.info("Starting addresses {}", reg.getName());
+			LOG.log(Level.INFO, "Starting addresses {0}", reg.getName());
 			int cnt = 0;
 
 			AddressReader reader = new AddressReader();
@@ -361,11 +360,11 @@ public class Main {
 				// insert per 10000 records
 				if (++cnt % 10_000 == 0) {
 					prep.executeBatch();
-					LOG.info("Inserted {}", cnt);
+					LOG.log(Level.INFO, "Inserted {0}", cnt);
 				}
 			}
 			prep.executeBatch();
-			LOG.info("Inserted {}", cnt);
+			LOG.log(Level.INFO, "Inserted {0}", cnt);
 		}
 	}
 
@@ -417,14 +416,14 @@ public class Main {
 		
 		Path xmlPath = Paths.get(xmldir);
 		if (!xmlPath.toFile().exists()) {
-			LOG.error("BEST directory does not exist");
+			LOG.severe("BEST directory does not exist");
 			System.exit(-2);
 		}
 
 		try {
 			loadData(dbstr, xmlPath);
 		} catch (Exception e) {
-			LOG.error("Failed: " + e.getMessage());
+			LOG.log(Level.SEVERE, "Failed", e);
 			System.exit(-3);
 		}
 		LOG.info("Done");

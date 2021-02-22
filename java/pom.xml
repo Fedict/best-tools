@@ -3,18 +3,17 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>be.bosa.dt</groupId>
     <artifactId>best</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <packaging>pom</packaging>
     <modules>
-        <module>unzip</module>
         <module>converter</module>
-        <module>dao</module>
-        <module>xmlreader</module>
-        <module>batch</module>
-        <module>dbloader</module>
-        <module>webservice</module>
         <module>copier</module>
+        <module>dao</module>
+        <module>dbloader</module>
         <module>emptystreets</module>
+        <module>unzip</module>
+        <module>webservice</module>
+        <module>xmlreader</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

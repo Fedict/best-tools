@@ -25,6 +25,7 @@
  */
 package be.bosa.dt.best.unzip;
 
+import java.util.logging.Logger;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -32,16 +33,13 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Small tool to unzip the various BeST zipfiles
  * 
  * @author Bart Hanssens
  */
 public class Main {
-	private final static Logger LOG = LoggerFactory.getLogger(Main.class);
+	private final static Logger LOG = Logger.getLogger(Main.class.getName());
 
 	private final static Options OPTS = new Options()
 		.addRequiredOption("i", "infile", true, "zipped file")
@@ -85,7 +83,8 @@ public class Main {
 		String infile = cli.getOptionValue("i");
 		String outdir = cli.getOptionValue("o");
 
-		if (! Unzipper.checkAndUnzip(infile, outdir)) {
+		Unzipper uz = new Unzipper();
+		if (! uz.checkAndUnzip(infile, outdir)) {
 			System.exit(-2);
 		}
 	}

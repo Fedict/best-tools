@@ -4,7 +4,7 @@
     <parent>
         <groupId>be.bosa.dt</groupId>
         <artifactId>best</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.0</version>
     </parent>
     <groupId>be.bosa.dt.best</groupId>
     <artifactId>dbloader</artifactId>
@@ -19,7 +19,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>xmlreader</artifactId>
-            <version>1.1.0</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>

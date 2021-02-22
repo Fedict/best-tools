@@ -40,6 +40,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import org.geotools.data.FeatureWriter;
@@ -59,9 +61,6 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * BeST result Shapefile writer
  *
@@ -71,7 +70,7 @@ public class BestWriterShape implements BestWriter {
 
 	private final GeometryFactory FAC = JTSFactoryFinder.getGeometryFactory();
 
-	private final static Logger LOG = LoggerFactory.getLogger(BestWriterShape.class);
+	private final static Logger LOG = Logger.getLogger(BestWriterShape.class.getName());
 
 	/**
 	 * Get shapefile feature type
@@ -215,7 +214,7 @@ public class BestWriterShape implements BestWriter {
 		Map<String, String[]> postals) {
 
 		Path file = BestWriter.getPath(outdir, region, BestType.ADDRESSES, "shp");
-		LOG.info("Writing {}", file);
+		LOG.log(Level.INFO, "Writing {0}", file);
 
 		try {
 			SimpleFeatureType ftype = getFeatureType();
@@ -254,11 +253,11 @@ public class BestWriterShape implements BestWriter {
 				datastore.setIndexCreationEnabled(true);
 			}
 		} catch (IOException ioe) {
-			LOG.error("Can't write shapefile", ioe);
+			LOG.log(Level.SEVERE, "Can't write shapefile", ioe);
 		} catch (FactoryException fe) {
-			LOG.error("Coordinate system not supported", fe);
+			LOG.log(Level.SEVERE, "Coordinate system not supported", fe);
 		}
-		
+
 		return Collections.EMPTY_MAP;
 	}
 	

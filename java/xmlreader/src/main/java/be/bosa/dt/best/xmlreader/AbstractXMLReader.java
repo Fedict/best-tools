@@ -35,6 +35,8 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -45,10 +47,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 import org.codehaus.stax2.XMLInputFactory2;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  * BeST XML file processor interface
@@ -63,7 +61,7 @@ public abstract class AbstractXMLReader<T> implements BestReader {
 	public final static String ADD = "http://vocab.belgif.be/ns/inspire/";
 	
 	private final static XMLInputFactory2 FAC = (XMLInputFactory2) XMLInputFactory.newInstance();
-	private final static Logger LOG = LoggerFactory.getLogger(AbstractXMLReader.class);
+	private final static Logger LOG = Logger.getLogger(AbstractXMLReader.class.getName());
 	
 	private BufferedInputStream bis;
 	private XMLEventReader reader;
@@ -151,7 +149,7 @@ public abstract class AbstractXMLReader<T> implements BestReader {
 				try {
 					return hasNextObj(reader);
 				} catch (XMLStreamException ex) {
-					LOG.error("Error peeking at next object", ex);
+					LOG.log(Level.SEVERE, "Error peeking at next object", ex);
 					closeReader();
 				}
 				return false;
@@ -162,7 +160,7 @@ public abstract class AbstractXMLReader<T> implements BestReader {
 				try {
 					return getNextObj(reader);
 				} catch (XMLStreamException ex) {
-					LOG.error("Error getting next object", ex);
+					LOG.log(Level.SEVERE, "Error getting next object", ex);
 					closeReader();
 				}
 				return null;
@@ -178,7 +176,7 @@ public abstract class AbstractXMLReader<T> implements BestReader {
 			try {
 				reader.close();
 			} catch (XMLStreamException xse) {
-				LOG.warn("Error closing reader", xse);
+				LOG.log(Level.WARNING, "Error closing reader", xse);
 				// do nothing
 			}
 		}
@@ -186,7 +184,7 @@ public abstract class AbstractXMLReader<T> implements BestReader {
 			try {
 				bis.close();
 			} catch (IOException ioe) {
-				LOG.warn("Error closing buffered input stream", ioe);
+				LOG.log(Level.WARNING, "Error closing buffered input stream", ioe);
 			}
 		}
 	}
@@ -198,11 +196,12 @@ public abstract class AbstractXMLReader<T> implements BestReader {
 		try {
 			file = checkFile(indir, region, type, "xml");
 		} catch (IOException ex) {
-			LOG.error("Error, no XML file found for {} in {}", region.getName(), indir);
+			LOG.log(Level.SEVERE, "Error, no XML file found for {0} in {1}", 
+									new String[] { region.getName(), indir.toFile().toString() });
 			return Stream.empty();
 		}	
-		LOG.info("Reading {}", file);
-		
+		LOG.log(Level.INFO, "Reading {0}", file);
+	
 		FAC.configureForSpeed();
 		
 		try {
@@ -217,7 +216,7 @@ public abstract class AbstractXMLReader<T> implements BestReader {
 			return StreamSupport.stream(split, true);
 		} catch (XMLStreamException|IOException ex) {
 			closeReader();
-			LOG.error("Error parsing XML", ex);
+			LOG.log(Level.SEVERE, "Error parsing XML", ex);
 			return Stream.empty();
 		}
 	}

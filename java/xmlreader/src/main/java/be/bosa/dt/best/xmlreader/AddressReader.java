@@ -31,15 +31,14 @@ import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.dao.BestType;
 
 import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * BeST XML file processor interface
@@ -61,7 +60,7 @@ public class AddressReader extends AbstractXMLReader<Address> {
 	private final static QName STATUS = new QName(AbstractXMLReader.ADD, "status");
 	private final static QName SRSNAME = new QName("", "srsName");
 
-	private final static Logger LOG = LoggerFactory.getLogger(AddressReader.class);
+	private final static Logger LOG = Logger.getLogger(AddressReader.class.getName());
 	
 	private int nr = 0;
 		
@@ -84,7 +83,7 @@ public class AddressReader extends AbstractXMLReader<Address> {
 					obj = new Address();
 					withinObj = obj;
 					if ((++nr % 100_000L) == 0) {
-						LOG.info("Parsing address {}", nr);
+						LOG.log(Level.INFO, "Parsing address {0}", nr);
 					}
 				} else if (obj != null) {
 					if (el.equals(MUNICIPALITY)) {
@@ -117,7 +116,7 @@ public class AddressReader extends AbstractXMLReader<Address> {
 						try {
 							obj.getPoint().setXY(txt, srs);
 						} catch (NumberFormatException nfe) {
-							LOG.warn("Error geoposition {} for {} ", nfe, obj.getId());
+							LOG.log(Level.WARNING, "Error geoposition {0} for {1} ", new Object[]{ nfe, obj.getId()});
 						}
 					} else if (el.equals(STATUS)) {
 						String txt = reader.getElementText();

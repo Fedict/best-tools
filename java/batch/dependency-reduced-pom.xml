@@ -22,15 +22,6 @@
             </goals>
           </execution>
         </executions>
-        <configuration>
-          <keepDependenciesWithProvidedScope>false</keepDependenciesWithProvidedScope>
-          <transformers>
-            <transformer />
-            <transformer>
-              <resource>META-INF/batch.xml</resource>
-            </transformer>
-          </transformers>
-        </configuration>
       </plugin>
     </plugins>
   </build>
