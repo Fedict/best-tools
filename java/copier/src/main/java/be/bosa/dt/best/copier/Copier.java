@@ -35,8 +35,6 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 
-import java.util.Enumeration;
-import java.util.zip.ZipFile;
 
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;
@@ -101,12 +99,6 @@ public class Copier {
 		long len = f.length();
 		if (len < minLen) {
 			throw new IOException("File to small: " + len);
-		}
-		
-		ZipFile zip = new ZipFile(f);
-		Enumeration entries = zip.entries();
-		while(entries.hasMoreElements()) {
-		//	= entries.nextElement();
 		}
 	}
 
