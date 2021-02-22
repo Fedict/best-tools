@@ -102,9 +102,10 @@ public class CopyBean {
 	@Scheduled(cron = "{copier.cron.expr}")
 	void scheduledCopy() {
 		Mail mail;
+		Path p = null;
 
 		try {
-			Path p = Files.createTempFile("best", "local");
+			p = Files.createTempFile("best", "local");
 			String localFile = p.toAbsolutePath().toString();
 			String fileName = getFileName(mftFile);
 	
@@ -118,6 +119,10 @@ public class CopyBean {
 			mail = Mail.withText(mailTo, "Copy ok", "File copied: " + fileName);
 		} catch (IOException | InterruptedException e) {
 			mail = Mail.withText(mailTo, "Copy failed", e.getMessage());		
+		} finally {
+			if (p != null) {
+				p.toFile().delete();
+			}
 		}
 		mailer.send(mail);
 	}
