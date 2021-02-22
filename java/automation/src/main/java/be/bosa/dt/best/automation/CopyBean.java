@@ -100,7 +100,7 @@ public class CopyBean {
 		return df.format(yesterday);
 	}
 
-	@Scheduled(cron = "{cron.expr.copy}")
+	@Scheduled(cron = "{copier.cron.expr}")
 	void scheduledCopy() {
 		Mail mail;
 

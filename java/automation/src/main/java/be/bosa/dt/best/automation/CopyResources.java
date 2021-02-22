@@ -40,12 +40,12 @@ public class CopyResources {
 		
 	@GET
 	@Path("/status")
-	void getStatus() {
+	public void getStatus() {
 	}
 	
 	@GET
 	@Path("/execute")
-	void execute() {
+	public void execute() {
 		copier.scheduledCopy();
 	}
 }
