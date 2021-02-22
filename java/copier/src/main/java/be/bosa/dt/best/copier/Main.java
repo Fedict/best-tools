@@ -61,8 +61,8 @@ public class Main {
 		// get all data from environment variables (so this app can be used in e.g. openshift)
 
 		String downServer = System.getenv("DOWNLOAD_SERVER");
+		String downPort = System.getenv("DOWNLOAD_PORT");
 		String downPath = System.getenv("DOWNLOAD_PATH");
-
 		String downUser = System.getenv("DOWNLOAD_USER");
 		String downPass = System.getenv("DOWNLOAD_PASS");
 		String minSize = System.getenv("MIN_SIZE_M");
@@ -74,13 +74,14 @@ public class Main {
 				
 		Failsafe.with(policy).run(() -> {
 			f.delete();
-			copier.download(downServer, downUser, downPass, downPath, f.getAbsolutePath());
-			copier.verifyZip(f, Copier.strToLong(minSize));
+			copier.download(downServer, 22, downUser, downPass, downPath, f.getAbsolutePath());
+			copier.verifyZip(localFile, Copier.strToLong(minSize));
 		});
 
 		LOG.log(Level.INFO, "File size {0}", f.length());
 
 		String upServer = System.getenv("UPLOAD_SERVER");
+		String upPort = System.getenv("UPLOAD_PORT");
 		String upPath = System.getenv("UPLOAD_PATH");
 		String upUser = System.getenv("UPLOAD_USER");
 		String upPass = System.getenv("UPLOAD_PASS");		
@@ -89,7 +90,7 @@ public class Main {
 		LOG.log(Level.INFO, "Uploading to {0} {1}", new String[] { upServer, upPath });
 
 		Failsafe.with(policy).run(() -> {
-			copier.upload(upServer, upUser, upPass, upPath, f.getAbsolutePath());
+			copier.upload(upServer, 22, upUser, upPass, upPath, f.getAbsolutePath());
 			copier.verifyUpload(upFile, f.length());
 		});
 	}

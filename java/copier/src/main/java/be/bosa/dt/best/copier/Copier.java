@@ -69,16 +69,17 @@ public class Copier {
 	 * Download data file via SFTP (typically from BOSA "Managed File Transfer" service) and save it to a local file.
 	 * 
 	 * @param server remote host
+	 * @param port port
 	 * @param user user name
 	 * @param pass password
 	 * @param path remote location of the file
 	 * @param zip local name of zip file
 	 * @throws IOException 
 	 */
-	public void download(String server, String user, String pass, String path, String zip) throws IOException {
+	public void download(String server, int port, String user, String pass, String path, String zip) throws IOException {
 		SSHClient client = new SSHClient();
 		client.addHostKeyVerifier(new PromiscuousVerifier());
-		client.connect(server);
+		client.connect(server, port);
 		client.authPassword(user, pass);
 
 		try (SFTPClient sftp = client.newSFTPClient()) {
@@ -91,11 +92,12 @@ public class Copier {
 	/**
 	 * Quick verification of the zip file containing BeST XML files
 	 * 
-	 * @param f file name
+	 * @param name file name
 	 * @param minLen minimum size 
 	 * @throws IOException 
 	 */
-	public void verifyZip(File f, long minLen) throws IOException {
+	public void verifyZip(String name, long minLen) throws IOException {
+		File f = new File(name);
 		long len = f.length();
 		if (len < minLen) {
 			throw new IOException("File to small: " + len);
@@ -103,22 +105,26 @@ public class Copier {
 		
 		ZipFile zip = new ZipFile(f);
 		Enumeration entries = zip.entries();
+		while(entries.hasMoreElements()) {
+		//	= entries.nextElement();
+		}
 	}
 
 	/**
 	 * Upload file to a server via SFTP
 	 * 
 	 * @param server remote host
+	 * @param port remote port
 	 * @param user user name
 	 * @param pass password
 	 * @param path remote location of the file
 	 * @param zip local zip file
 	 * @throws IOException 
 	 */
-	public void upload(String server, String user, String pass, String path, String zip) throws IOException {
+	public void upload(String server, int port, String user, String pass, String path, String zip) throws IOException {
 		SSHClient client = new SSHClient();
 		client.addHostKeyVerifier(new PromiscuousVerifier());
-		client.connect(server);
+		client.connect(server, port);
 		client.authPassword(user, pass);
 
 		try (SFTPClient sftp = client.newSFTPClient()) {
