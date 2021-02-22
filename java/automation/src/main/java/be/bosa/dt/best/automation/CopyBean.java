@@ -96,8 +96,8 @@ public class CopyBean {
 
 	private String getFileName(String fmt) {
 		LocalDate yesterday = LocalDate.now().minus(1, ChronoUnit.DAYS);
-		DateFormat df = new SimpleDateFormat(fmt);
-		return df.format(yesterday);
+		DateFormat df = new SimpleDateFormat("%Y%m%d");
+		return fmt.replace("%Y%m%d", df.format(yesterday));
 	}
 
 	@Scheduled(cron = "{copier.cron.expr}")
