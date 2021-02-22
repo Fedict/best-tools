@@ -34,9 +34,8 @@ import io.quarkus.scheduler.Scheduled;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -94,10 +93,10 @@ public class CopyBean {
 	@ConfigProperty(name = "copier.mailto")
 	String mailTo;
 
-	private String getFileName(String fmt) {
+	private String getFileName(String str) {
 		LocalDate yesterday = LocalDate.now().minus(1, ChronoUnit.DAYS);
-		DateFormat df = new SimpleDateFormat("%Y%m%d");
-		return fmt.replace("%Y%m%d", df.format(yesterday));
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd");
+		return str.replace("%Y%m%d", fmt.format(yesterday));
 	}
 
 	@Scheduled(cron = "{copier.cron.expr}")
@@ -107,17 +106,18 @@ public class CopyBean {
 		try {
 			Path p = Files.createTempFile("best", "local");
 			String localFile = p.toAbsolutePath().toString();
+			String fileName = getFileName(mftFile);
 	
-			copier.download(mftServer, mftPort, mftUser, mftPass, getFileName(mftFile), localFile);
+			copier.download(mftServer, mftPort, mftUser, mftPass, fileName, localFile);
 
 			copier.verifyZip(localFile, minSize);
 			
 			copier.upload(dataServer, dataPort, dataUser, dataPass, dataFile, localFile);
 			copier.verifyUpload(webUrl, p.toFile().length());
 
-			mail = Mail.withText(mailTo, "Copy ok", "File copied");
+			mail = Mail.withText(mailTo, "Copy ok", "File copied: " + fileName);
 		} catch (IOException | InterruptedException e) {
-			mail = Mail.withText(mailTo, "Copy failed", e.getMessage());			
+			mail = Mail.withText(mailTo, "Copy failed", e.getMessage());		
 		}
 		mailer.send(mail);
 	}
