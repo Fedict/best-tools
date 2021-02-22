@@ -10,8 +10,8 @@
     <artifactId>automation</artifactId>
     <packaging>jar</packaging>
     <properties>
-        <maven.compiler.source>15</maven.compiler.source>
-        <maven.compiler.target>15</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
     <name>BeSt automation</name>
     <description>Webservice / tool to automate copying and transforming BeSt data</description>

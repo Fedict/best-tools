@@ -34,6 +34,11 @@ import io.quarkus.scheduler.Scheduled;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -86,23 +91,34 @@ public class CopyBean {
 	@ConfigProperty(name = "copier.weburl")
 	String webUrl;
 
+	@ConfigProperty(name = "copier.mailto")
+	String mailTo;
+
+	private String getFileName(String fmt) {
+		LocalDate yesterday = LocalDate.now().minus(1, ChronoUnit.DAYS);
+		DateFormat df = new SimpleDateFormat(fmt);
+		return df.format(yesterday);
+	}
 
 	@Scheduled(cron = "{cron.expr.copy}")
 	void scheduledCopy() {
+		Mail mail;
+
 		try {
 			Path p = Files.createTempFile("best", "local");
 			String localFile = p.toAbsolutePath().toString();
-
-			copier.download(mftServer, mftPort, mftUser, mftPass, mftFile, localFile);
+	
+			copier.download(mftServer, mftPort, mftUser, mftPass, getFileName(mftFile), localFile);
 
 			copier.verifyZip(localFile, minSize);
 			
 			copier.upload(dataServer, dataPort, dataUser, dataPass, dataFile, localFile);
 			copier.verifyUpload(webUrl, p.toFile().length());
 
-			mailer.send(Mail.withText("to@acme.org", "Copy ok", "File copied"));
+			mail = Mail.withText(mailTo, "Copy ok", "File copied");
 		} catch (IOException | InterruptedException e) {
-			mailer.send(Mail.withText("to@acme.org", "Copy failed", e.getMessage()));			
+			mail = Mail.withText(mailTo, "Copy failed", e.getMessage());			
 		}
+		mailer.send(mail);
 	}
 }
