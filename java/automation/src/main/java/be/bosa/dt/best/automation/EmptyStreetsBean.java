@@ -28,6 +28,7 @@ package be.bosa.dt.best.automation;
 import be.bosa.dt.best.copier.Copier;
 
 import io.quarkus.mailer.Mail;
+import io.quarkus.mailer.Mailer;
 import io.quarkus.scheduler.Scheduled;
 
 import java.io.IOException;
@@ -38,6 +39,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.faulttolerance.Retry;
@@ -48,7 +50,9 @@ import org.eclipse.microprofile.faulttolerance.Retry;
  * @author Bart Hanssens
  */
 @ApplicationScoped
-public class CopyBean extends StatusBean {
+public class EmptyStreetsBean extends StatusBean {
+	@Inject
+	Mailer mailer;
 	
 	private final Copier copier = new Copier();
 	
@@ -119,7 +123,6 @@ public class CopyBean extends StatusBean {
 	 * @param expected expected file size
 	 * @throws IOException 
 	 */
-	@Retry(retryOn = Exception.class, maxRetries = 3, delay = 2000)
 	private void upload(String local, long expected) throws IOException, InterruptedException {
 		setStatus("Uploading");
 		copier.upload(dataServer, dataPort, dataUser, dataPass, dataFile, local);
@@ -150,7 +153,10 @@ public class CopyBean extends StatusBean {
 				p.toFile().delete();
 			}
 		}
-
-		sendMail(mail);
+		try {
+			mailer.send(mail);
+		} catch (Exception e) {
+			//
+		}
 	}
 }

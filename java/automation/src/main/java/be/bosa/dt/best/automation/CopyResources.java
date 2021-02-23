@@ -28,6 +28,8 @@ package be.bosa.dt.best.automation;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -40,6 +42,7 @@ public class CopyResources {
 		
 	@GET
 	@Path("/status")
+	@Produces(MediaType.TEXT_PLAIN)
 	public String getStatus() {
 		return copier.getStatus();
 	}

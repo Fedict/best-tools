@@ -25,6 +25,10 @@
  */
 package be.bosa.dt.best.automation;
 
+import io.quarkus.mailer.Mail;
+import io.quarkus.mailer.Mailer;
+import javax.inject.Inject;
+
 
 /**
  * Keeps track of status
@@ -33,7 +37,10 @@ package be.bosa.dt.best.automation;
  */
 
 public class StatusBean {
-	private String status;
+	@Inject
+	Mailer mailer;
+	
+	private String status = "";
 	
 	public String getStatus() {
 		return status;
@@ -41,5 +48,13 @@ public class StatusBean {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	
+	public void sendMail(Mail mail) {
+		try {
+			mailer.send(mail);
+		} catch (Exception e) {
+			//
+		}
 	}
 }
