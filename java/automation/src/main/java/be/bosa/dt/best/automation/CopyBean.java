@@ -105,7 +105,7 @@ public class CopyBean extends StatusBean {
 	 * @throws IOException 
 	 */
 	@Retry(retryOn = Exception.class, maxRetries = 3, delay = 2000)
-	private void download(String remote, String local) throws IOException {
+	void download(String remote, String local) throws IOException {
 		setStatus("Downloading " + remote);
 		copier.download(mftServer, mftPort, mftUser, mftPass, remote, local);
 		setStatus("Verifying " + remote);
@@ -120,7 +120,7 @@ public class CopyBean extends StatusBean {
 	 * @throws IOException 
 	 */
 	@Retry(retryOn = Exception.class, maxRetries = 3, delay = 2000)
-	private void upload(String local, long expected) throws IOException, InterruptedException {
+	void upload(String local, long expected) throws IOException, InterruptedException {
 		setStatus("Uploading");
 		copier.upload(dataServer, dataPort, dataUser, dataPass, dataFile, local);
 		copier.verifyUpload(webUrl, expected);
