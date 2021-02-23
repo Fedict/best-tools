@@ -42,6 +42,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.faulttolerance.Retry;
 
 /**
  *
@@ -99,6 +100,31 @@ public class CopyBean {
 		return str.replace("%Y%m%d", fmt.format(yesterday));
 	}
 
+	/**
+	 * Try to download a file from MFT
+	 * 
+	 * @param remote remote file name
+	 * @param local local file name
+	 * @throws IOException 
+	 */
+	@Retry(maxRetries = 3, delay = 2000)
+	private void download(String remote, String local) throws IOException {
+		copier.download(mftServer, mftPort, mftUser, mftPass, remote, local);
+		copier.verifyZip(local, minSize);
+	}
+
+	/**
+	 * Try to upload the file to SFTP / public site
+	 * 
+	 * @param local local file name
+	 * @param expected expected file size
+	 * @throws IOException 
+	 */
+	private void upload(String local, long expected) throws IOException, InterruptedException {
+		copier.upload(dataServer, dataPort, dataUser, dataPass, dataFile, local);
+		copier.verifyUpload(webUrl, expected);
+	}
+
 	@Scheduled(cron = "{copier.cron.expr}")
 	void scheduledCopy() {
 		Mail mail;
@@ -109,13 +135,10 @@ public class CopyBean {
 			String localFile = p.toAbsolutePath().toString();
 			String fileName = getFileName(mftFile);
 	
-			copier.download(mftServer, mftPort, mftUser, mftPass, fileName, localFile);
-
-			copier.verifyZip(localFile, minSize);
+			download(fileName, localFile);
 			
-			copier.upload(dataServer, dataPort, dataUser, dataPass, dataFile, localFile);
-			copier.verifyUpload(webUrl, p.toFile().length());
-
+			upload(localFile, p.toFile().length());
+	
 			mail = Mail.withText(mailTo, "Copy ok", "File copied: " + fileName);
 		} catch (IOException | InterruptedException e) {
 			mail = Mail.withText(mailTo, "Copy failed", e.getMessage());		
