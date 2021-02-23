@@ -25,28 +25,21 @@
  */
 package be.bosa.dt.best.automation;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 
 /**
- *
+ * Keeps track of status
+ * 
  * @author Bart Hanssens
  */
-@Path("/copy")
-public class CopyResources {
-	@Inject
-	CopyBean copier;
-		
-	@GET
-	@Path("/status")
-	public String getStatus() {
-		return copier.getStatus();
-	}
+
+public class StatusBean {
+	private String status;
 	
-	@GET
-	@Path("/execute")
-	public void execute() {
-		copier.scheduledCopy();
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }

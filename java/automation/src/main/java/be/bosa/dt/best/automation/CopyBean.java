@@ -45,11 +45,12 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.faulttolerance.Retry;
 
 /**
- *
+ * Copies zipfile from BeST MFT to public web server via SFTP
+ * 
  * @author Bart Hanssens
  */
 @ApplicationScoped
-public class CopyBean {
+public class CopyBean extends StatusBean {
 	@Inject
 	Mailer mailer;
 	
@@ -109,7 +110,9 @@ public class CopyBean {
 	 */
 	@Retry(maxRetries = 3, delay = 2000)
 	private void download(String remote, String local) throws IOException {
+		setStatus("Downloading " + remote);
 		copier.download(mftServer, mftPort, mftUser, mftPass, remote, local);
+		setStatus("Verifying " + remote);
 		copier.verifyZip(local, minSize);
 	}
 
@@ -121,6 +124,7 @@ public class CopyBean {
 	 * @throws IOException 
 	 */
 	private void upload(String local, long expected) throws IOException, InterruptedException {
+		setStatus("Uploading");
 		copier.upload(dataServer, dataPort, dataUser, dataPass, dataFile, local);
 		copier.verifyUpload(webUrl, expected);
 	}
@@ -138,15 +142,21 @@ public class CopyBean {
 			download(fileName, localFile);
 			
 			upload(localFile, p.toFile().length());
-	
+
+			setStatus("Done (OK) " + fileName);
 			mail = Mail.withText(mailTo, "Copy ok", "File copied: " + fileName);
 		} catch (IOException | InterruptedException e) {
+			setStatus("Failed");
 			mail = Mail.withText(mailTo, "Copy failed", e.getMessage());		
 		} finally {
 			if (p != null) {
 				p.toFile().delete();
 			}
 		}
-		mailer.send(mail);
+		try {
+			mailer.send(mail);
+		} catch (Exception e) {
+			//
+		}
 	}
 }
