@@ -28,6 +28,7 @@ package be.bosa.dt.best.automation;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 import javax.inject.Inject;
+import org.jboss.logging.Logger;
 
 
 /**
@@ -37,6 +38,8 @@ import javax.inject.Inject;
  */
 
 public class StatusBean {
+	private static final Logger LOG = Logger.getLogger(StatusBean.class);
+
 	@Inject
 	Mailer mailer;
 	
@@ -47,6 +50,7 @@ public class StatusBean {
 	}
 
 	public void setStatus(String status) {
+		LOG.info(status);
 		this.status = status;
 	}
 	
