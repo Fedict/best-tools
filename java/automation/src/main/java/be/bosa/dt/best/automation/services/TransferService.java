@@ -50,19 +50,19 @@ public class TransferService {
 	 * @param port port
 	 * @param user user name
 	 * @param pass password
-	 * @param path remote location of the file
-	 * @param zip local name of zip file
+	 * @param remote remote location of the file
+	 * @param local local name of zip file
 	 * @throws IOException 
 	 */
 	@Retry(retryOn = Exception.class, maxRetries = 3, delay = 2000)
-	public void download(String server, int port, String user, String pass, String path, String zip) throws IOException {
+	public void download(String server, int port, String user, String pass, String remote, String local) throws IOException {
 		SSHClient client = new SSHClient();
 		client.addHostKeyVerifier(new PromiscuousVerifier());
 		client.connect(server, port);
 		client.authPassword(user, pass);
 
 		try (SFTPClient sftp = client.newSFTPClient()) {
-			sftp.get(path, zip);
+			sftp.get(remote, local);
 		} finally {
 			client.disconnect();
 		}
@@ -75,19 +75,19 @@ public class TransferService {
 	 * @param port remote port
 	 * @param user user name
 	 * @param pass password
-	 * @param path remote location of the file
-	 * @param zip local zip file
+	 * @param remote remote location of the file
+	 * @param local local zip file
 	 * @throws IOException 
 	 */
 	@Retry(retryOn = Exception.class, maxRetries = 5, delay = 3000)
-	public void upload(String server, int port, String user, String pass, String path, String zip) throws IOException {
+	public void upload(String server, int port, String user, String pass, String remote, String local) throws IOException {
 		SSHClient client = new SSHClient();
 		client.addHostKeyVerifier(new PromiscuousVerifier());
 		client.connect(server, port);
 		client.authPassword(user, pass);
 
 		try (SFTPClient sftp = client.newSFTPClient()) {
-			sftp.put(zip, path);
+			sftp.put(local, remote);
 		} finally {
 			client.disconnect();
 		}		
