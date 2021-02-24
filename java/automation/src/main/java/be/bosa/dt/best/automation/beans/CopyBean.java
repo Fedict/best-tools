@@ -141,7 +141,7 @@ public class CopyBean extends StatusBean {
 			setStatus("Done (OK) " + fileName);
 			mail = Mail.withText(mailTo, "Copy ok", "File copied: " + fileName);
 		} catch (IOException | InterruptedException e) {
-			setStatus("Failed");
+			setStatus("Failed " + e.getMessage());
 			mail = Mail.withText(mailTo, "Copy failed", e.getMessage());		
 		} finally {
 			if (p != null) {

@@ -79,7 +79,7 @@ public class TransferService {
 	 * @param zip local zip file
 	 * @throws IOException 
 	 */
-	@Retry(retryOn = Exception.class, maxRetries = 3, delay = 2000)
+	@Retry(retryOn = Exception.class, maxRetries = 5, delay = 3000)
 	public void upload(String server, int port, String user, String pass, String path, String zip) throws IOException {
 		SSHClient client = new SSHClient();
 		client.addHostKeyVerifier(new PromiscuousVerifier());
