@@ -23,9 +23,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.automation;
+package be.bosa.dt.best.automation.beans;
 
-import be.bosa.dt.best.copier.Copier;
+import be.bosa.dt.best.automation.services.MailService;
+import be.bosa.dt.best.automation.services.TransferService;
 
 import io.quarkus.mailer.Mail;
 import io.quarkus.scheduler.Scheduled;
@@ -38,9 +39,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.microprofile.faulttolerance.Retry;
 
 /**
  * Copies zipfile from BeST MFT to public web server via SFTP
@@ -49,9 +50,12 @@ import org.eclipse.microprofile.faulttolerance.Retry;
  */
 @ApplicationScoped
 public class CopyBean extends StatusBean {
-	
-	private final Copier copier = new Copier();
-	
+	@Inject
+	TransferService sftp;
+
+	@Inject
+	MailService mailer;
+
 	@ConfigProperty(name = "copier.mft.server")
 	String mftServer;
 
@@ -104,30 +108,24 @@ public class CopyBean extends StatusBean {
 	 * @param local local file name
 	 * @throws IOException 
 	 */
-	@Retry(retryOn = Exception.class, maxRetries = 3, delay = 2000)
-	void download(String remote, String local) throws IOException {
+	private void download(String remote, String local) throws IOException {
 		setStatus("Downloading " + remote);
-		copier.download(mftServer, mftPort, mftUser, mftPass, remote, local);
-		setStatus("Verifying " + remote);
-		copier.verifyZip(local, minSize);
+		sftp.download(mftServer, mftPort, mftUser, mftPass, remote, local);
 	}
 
 	/**
 	 * Try to upload the file to SFTP / public site
 	 * 
 	 * @param local local file name
-	 * @param expected expected file size
 	 * @throws IOException 
 	 */
-	@Retry(retryOn = Exception.class, maxRetries = 3, delay = 2000)
-	void upload(String local, long expected) throws IOException, InterruptedException {
+	private void upload(String local) throws IOException, InterruptedException {
 		setStatus("Uploading");
-		copier.upload(dataServer, dataPort, dataUser, dataPass, dataFile, local);
-		copier.verifyUpload(webUrl, expected);
+		sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFile, local);
 	}
 
 	@Scheduled(cron = "{copier.cron.expr}")
-	void scheduledCopy() {
+	public void scheduledCopy() {
 		Mail mail;
 		Path p = null;
 
@@ -138,7 +136,7 @@ public class CopyBean extends StatusBean {
 	
 			download(fileName, localFile);
 			
-			upload(localFile, p.toFile().length());
+			upload(localFile);
 
 			setStatus("Done (OK) " + fileName);
 			mail = Mail.withText(mailTo, "Copy ok", "File copied: " + fileName);
@@ -151,6 +149,6 @@ public class CopyBean extends StatusBean {
 			}
 		}
 
-		sendMail(mail);
+		mailer.sendMail(mail);
 	}
 }

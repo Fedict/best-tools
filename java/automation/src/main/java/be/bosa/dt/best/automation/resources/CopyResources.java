@@ -23,42 +23,34 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.automation;
+package be.bosa.dt.best.automation.resources;
 
-import io.quarkus.mailer.Mail;
-import io.quarkus.mailer.Mailer;
+import be.bosa.dt.best.automation.beans.CopyBean;
 import javax.inject.Inject;
-import org.jboss.logging.Logger;
-
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 /**
- * Keeps track of status
- * 
+ *
  * @author Bart Hanssens
  */
-
-public class StatusBean {
-	private static final Logger LOG = Logger.getLogger(StatusBean.class);
-
+@Path("/copy")
+public class CopyResources {
 	@Inject
-	Mailer mailer;
-	
-	private String status = "";
-	
+	CopyBean copier;
+		
+	@GET
+	@Path("/status")
+	@Produces(MediaType.TEXT_PLAIN)
 	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		LOG.info(status);
-		this.status = status;
+		return copier.getStatus();
 	}
 	
-	public void sendMail(Mail mail) {
-		try {
-			mailer.send(mail);
-		} catch (Exception e) {
-			//
-		}
+	@GET
+	@Path("/execute")
+	public void execute() {
+		copier.scheduledCopy();
 	}
 }

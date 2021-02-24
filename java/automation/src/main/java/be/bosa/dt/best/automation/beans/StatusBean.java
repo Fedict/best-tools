@@ -23,40 +23,30 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.automation;
+package be.bosa.dt.best.automation.beans;
 
-import java.io.IOException;
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import org.jboss.logging.Logger;
+
 
 /**
- *
+ * Keeps track of status
+ * 
  * @author Bart Hanssens
  */
-@Path("/copy")
-public class CopyResources {
-	@Inject
-	CopyBean copier;
-		
-	@GET
-	@Path("/status")
-	@Produces(MediaType.TEXT_PLAIN)
+
+public class StatusBean {
+	private static final Logger LOG = Logger.getLogger(StatusBean.class);
+
+	private String status = "";
+	
 	public String getStatus() {
-		return copier.getStatus();
+		return status;
+	}
+
+	public void setStatus(String status) {
+		LOG.info(status);
+		this.status = status;
 	}
 	
-	@GET
-	@Path("/execute")
-	public void execute() {
-		copier.scheduledCopy();
-	}
 	
-		@GET
-	@Path("/executepart")
-	public void executepart() throws IOException, InterruptedException {
-		copier.upload("test", 15);
-	}
 }
