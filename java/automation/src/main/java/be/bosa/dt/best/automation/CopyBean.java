@@ -38,7 +38,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.faulttolerance.Retry;
@@ -50,8 +49,8 @@ import org.eclipse.microprofile.faulttolerance.Retry;
  */
 @ApplicationScoped
 public class CopyBean extends StatusBean {
-	@Inject
-	Copier copier;
+	
+	private final Copier copier = new Copier();
 	
 	@ConfigProperty(name = "copier.mft.server")
 	String mftServer;

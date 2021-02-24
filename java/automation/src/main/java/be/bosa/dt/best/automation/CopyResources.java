@@ -25,6 +25,7 @@
  */
 package be.bosa.dt.best.automation;
 
+import java.io.IOException;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -51,5 +52,11 @@ public class CopyResources {
 	@Path("/execute")
 	public void execute() {
 		copier.scheduledCopy();
+	}
+	
+		@GET
+	@Path("/executepart")
+	public void executepart() throws IOException, InterruptedException {
+		copier.upload("test", 15);
 	}
 }
