@@ -27,6 +27,9 @@ package be.bosa.dt.best.automation.beans;
 
 import be.bosa.dt.best.automation.services.MailService;
 import be.bosa.dt.best.automation.services.TransferService;
+import be.bosa.dt.best.automation.services.ZipService;
+import be.bosa.dt.best.dao.BestRegion;
+import be.bosa.dt.best.emptystreets.EmptyStreetWriter;
 
 import io.quarkus.mailer.Mail;
 import io.quarkus.scheduler.Scheduled;
@@ -41,14 +44,17 @@ import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**
- * Copies zipfile from BeST MFT to public web server via SFTP
+ * Converts BeST XML files to CSV and upload to public site via SFTP.
  * 
  * @author Bart Hanssens
  */
 @ApplicationScoped
-public class CopyBean extends StatusBean {
+public class ConverterBean extends StatusBean {
 	@Inject
 	TransferService sftp;
+	
+	@Inject
+	ZipService zip;
 
 	@Inject
 	MailService mailer;
@@ -68,9 +74,6 @@ public class CopyBean extends StatusBean {
 	@ConfigProperty(name = "copier.mft.file")
 	String mftFile;
 
-	@ConfigProperty(name = "copier.mft.size")
-	long minSize;
-
 	@ConfigProperty(name = "copier.data.server")
 	String dataServer;
 
@@ -83,10 +86,10 @@ public class CopyBean extends StatusBean {
 	@ConfigProperty(name = "copier.data.pass")
 	String dataPass;
 
-	@ConfigProperty(name = "copier.data.file")
+	@ConfigProperty(name = "emptystreets.data.file")
 	String dataFile;
 
-	@ConfigProperty(name = "copier.weburl")
+	@ConfigProperty(name = "emptystreets.weburl")
 	String webUrl;
 
 	@ConfigProperty(name = "copier.mailto")
@@ -94,23 +97,51 @@ public class CopyBean extends StatusBean {
 
 
 	/**
-	 * Copy ZIP file from MFT to public website via SFTP
+	 * Convert XML into CSV
+	 * 
+	 * @param file 
 	 */
-	@Scheduled(cron = "{copier.cron.expr}")
-	public void scheduledCopy() {
+	private void convert(String file, String zipfile) {
+		Path xmlPath = null;
+		Path csvPath = null;
+		try {
+			xmlPath = Files.createTempDirectory("emptystreets-in");
+			csvPath = Files.createTempDirectory("emptystreets-out");
+			zip.unzip(file, xmlPath.toString());
+
+			EmptyStreetWriter esw = new EmptyStreetWriter();
+			for(BestRegion region: BestRegion.values()) {
+				esw.writeRegion(region, xmlPath, csvPath);
+			}
+			zip.zip(csvPath.toString(), zipfile);
+		} catch(IOException ioe) {
+			
+		} finally {
+			Utils.recursiveDelete(xmlPath);
+			Utils.recursiveDelete(csvPath);
+		}
+	}
+
+	@Scheduled(cron = "{emptystreets.cron.expr}")
+	public void scheduledEmptyStreets() {
 		Mail mail;
-		Path tmpFile = null;
+		Path tempFile = null;
+		Path zipFile = null;
 
 		try {
-			tmpFile = Files.createTempFile("best", "local");
-			String localFile = tmpFile.toAbsolutePath().toString();
+			tempFile = Files.createTempFile("best", "local");
+			String localFile = tempFile.toAbsolutePath().toString();
 			String fileName = Utils.getFileName(mftFile);
-	
+
 			setStatus("Downloading " + fileName);
 			sftp.download(mftServer, mftPort, mftUser, mftPass, fileName, localFile);
 
+			zipFile = Files.createTempFile("best", "empty");			
+			setStatus("Converting");
+			convert(localFile, zipFile.toString());
+			
 			setStatus("Uploading");
-			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFile, localFile);
+			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFile, zipFile.toString());
 
 			setStatus("Done (OK) " + fileName);
 			mail = Mail.withText(mailTo, "Copy ok", "File copied: " + fileName);
@@ -118,11 +149,13 @@ public class CopyBean extends StatusBean {
 			setStatus("Failed " + ioe.getMessage());
 			mail = Mail.withText(mailTo, "Copy failed", ioe.getMessage());		
 		} finally {
-			if (tmpFile != null) {
-				tmpFile.toFile().delete();
+			if (tempFile != null) {
+				tempFile.toFile().delete();
+			}
+			if (zipFile != null) {
+				zipFile.toFile().delete();
 			}
 		}
-
 		mailer.sendMail(mail);
 	}
 }

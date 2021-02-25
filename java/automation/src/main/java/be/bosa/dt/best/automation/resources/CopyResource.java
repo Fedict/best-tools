@@ -37,7 +37,7 @@ import javax.ws.rs.core.MediaType;
  * @author Bart Hanssens
  */
 @Path("/copy")
-public class CopyResources {
+public class CopyResource {
 	@Inject
 	CopyBean copier;
 		
