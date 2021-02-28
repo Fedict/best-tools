@@ -88,13 +88,13 @@ public class ZipService {
 		}
 		Path pin = Paths.get(infile);
 		if (! (Files.exists(pin) && Files.isRegularFile(pin))) {
-			LOG.error("Could not find input file");
+			LOG.errorf("Could not find input file %s", pin);
 			return false;
 		}
 		
 		Path pout = Paths.get(outdir);
 		if (! (Files.exists(pout) && Files.isDirectory(pout))) {
-			LOG.error("Could not find output directory");
+			LOG.errorf("Could not find output directory %s", pout);
 			return false;
 		}
 		
@@ -139,7 +139,7 @@ public class ZipService {
 	public boolean zip(String indir, String outfile) {
 		Path pin = Paths.get(indir);
 		if (! (Files.exists(pin) && Files.isDirectory(pin))) {
-			LOG.error("Could not find output directory");
+			LOG.errorf("Could not find input directory %s", pin);
 			return false;
 		}
 
