@@ -33,7 +33,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- *
+ * Copy XML files from MFT to public open data server
+ * 
  * @author Bart Hanssens
  */
 @Path("/copy")

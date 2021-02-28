@@ -28,6 +28,8 @@ package be.bosa.dt.best.automation.beans;
 import be.bosa.dt.best.automation.services.MailService;
 import be.bosa.dt.best.automation.services.TransferService;
 import be.bosa.dt.best.automation.services.ZipService;
+import be.bosa.dt.best.converter.writer.BestRegionWriter;
+import be.bosa.dt.best.converter.writer.BestWriterCSV;
 import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.emptystreets.EmptyStreetWriter;
 
@@ -86,22 +88,53 @@ public class ConverterBean extends StatusBean {
 	@ConfigProperty(name = "copier.data.pass")
 	String dataPass;
 
+	@ConfigProperty(name = "postalstreets.data.file")
+	String dataFilePs;
+
+	@ConfigProperty(name = "postalstreets.weburl")
+	String webUrlPs;
+
 	@ConfigProperty(name = "emptystreets.data.file")
-	String dataFile;
+	String dataFileEs;
 
 	@ConfigProperty(name = "emptystreets.weburl")
-	String webUrl;
+	String webUrlEs;
 
 	@ConfigProperty(name = "copier.mailto")
 	String mailTo;
 
-
 	/**
-	 * Convert XML into CSV
+	 * Convert BeST XML into CSV files per Region.
+	 * Streets per postal code
 	 * 
 	 * @param file 
 	 */
-	private void convert(String file, String zipfile) {
+	private void convertRegion(String file, String zipfile) throws IOException {
+		Path xmlPath = null;
+		Path csvPath = null;
+		try {
+			xmlPath = Files.createTempDirectory("region-in");
+			csvPath = Files.createTempDirectory("region-out");
+			zip.unzip(file, xmlPath.toString());
+
+			BestRegionWriter brw = new BestRegionWriter();
+			for(BestRegion region: BestRegion.values()) {
+				brw.writeRegion(new BestWriterCSV(), region, xmlPath, csvPath);
+			}
+			zip.zip(csvPath.toString(), zipfile);
+		} finally {
+			Utils.recursiveDelete(xmlPath);
+			Utils.recursiveDelete(csvPath);
+		}
+	}
+
+	/**
+	 * Convert BeST XML into CSV files per Region.
+	 * Empty streets i.e. streets without any address.
+	 * 
+	 * @param file 
+	 */
+	private void convertEmptyStreets(String file, String zipfile) throws IOException {
 		Path xmlPath = null;
 		Path csvPath = null;
 		try {
@@ -113,20 +146,19 @@ public class ConverterBean extends StatusBean {
 			for(BestRegion region: BestRegion.values()) {
 				esw.writeRegion(region, xmlPath, csvPath);
 			}
-			zip.zip(csvPath.toString(), zipfile);
-		} catch(IOException ioe) {
-			
+			zip.zip(csvPath.toString(), zipfile);	
 		} finally {
 			Utils.recursiveDelete(xmlPath);
 			Utils.recursiveDelete(csvPath);
 		}
 	}
 
-	@Scheduled(cron = "{emptystreets.cron.expr}")
-	public void scheduledEmptyStreets() {
+	@Scheduled(cron = "{converter.cron.expr}")
+	public void scheduledConverter() {
 		Mail mail;
 		Path tempFile = null;
-		Path zipFile = null;
+		Path zipFilePs = null;
+		Path zipFileEs = null;
 
 		try {
 			tempFile = Files.createTempFile("best", "local");
@@ -136,24 +168,34 @@ public class ConverterBean extends StatusBean {
 			setStatus("Downloading " + fileName);
 			sftp.download(mftServer, mftPort, mftUser, mftPass, fileName, localFile);
 
-			zipFile = Files.createTempFile("best", "empty");			
-			setStatus("Converting");
-			convert(localFile, zipFile.toString());
+			zipFilePs = Files.createTempFile("best", "postal");			
+			setStatus("Converting postal streets");
+			convertRegion(localFile, zipFilePs.toString());
 			
-			setStatus("Uploading");
-			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFile, zipFile.toString());
+			zipFileEs = Files.createTempFile("best", "empty");			
+			setStatus("Converting empty streets");
+			convertEmptyStreets(localFile, zipFileEs.toString());
+			
+			setStatus("Uploading postal streets");
+			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFilePs, zipFilePs.toString());
+	
+			setStatus("Uploading empty streets");
+			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFileEs, zipFileEs.toString());
 
 			setStatus("Done (OK) " + fileName);
-			mail = Mail.withText(mailTo, "Copy ok", "File copied: " + fileName);
+			mail = Mail.withText(mailTo, "Conversion ok", "File used: " + fileName);
 		} catch (IOException ioe) {
 			setStatus("Failed " + ioe.getMessage());
-			mail = Mail.withText(mailTo, "Copy failed", ioe.getMessage());		
+			mail = Mail.withText(mailTo, "Conversion failed", ioe.getMessage());		
 		} finally {
 			if (tempFile != null) {
 				tempFile.toFile().delete();
 			}
-			if (zipFile != null) {
-				zipFile.toFile().delete();
+			if (zipFilePs != null) {
+				zipFilePs.toFile().delete();
+			}
+			if (zipFileEs != null) {
+				zipFileEs.toFile().delete();
 			}
 		}
 		mailer.sendMail(mail);

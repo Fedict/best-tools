@@ -33,24 +33,26 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- *
+ * Convert XML files into CSV and sftp to public open data server
+ * 
+ * 
  * @author Bart Hanssens
  */
-@Path("/emptystreets")
-public class EmptyStreetsResource {
+@Path("/converter")
+public class ConverterResource {
 	@Inject
-	ConverterBean emptyStreets;
+	ConverterBean converter;
 		
 	@GET
 	@Path("/status")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getStatus() {
-		return emptyStreets.getStatus();
+		return converter.getStatus();
 	}
 	
 	@GET
 	@Path("/execute")
 	public void execute() {
-		emptyStreets.scheduledEmptyStreets();
+		converter.scheduledConverter();
 	}
 }
