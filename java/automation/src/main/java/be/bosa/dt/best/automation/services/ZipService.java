@@ -95,6 +95,7 @@ public class ZipService {
 		}
 		
 		try {
+			LOG.infof("Zip file %s", infile);
 			unzip(pin, pout);
 		} catch (IOException ioe) {
 			LOG.error("Error unzipping", ioe);
@@ -140,6 +141,7 @@ public class ZipService {
 		}
 
 		Path pout = Paths.get(outfile);
+		LOG.infof("New zipfile %s", pout);
 		try (OutputStream os = Files.newOutputStream(pout);
 			ZipOutputStream zos = new ZipOutputStream(os)) {
 	
