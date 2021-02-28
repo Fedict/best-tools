@@ -7,7 +7,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>converter</module>
-        <module>copier</module>
         <module>dao</module>
         <module>dbloader</module>
         <module>emptystreets</module>
