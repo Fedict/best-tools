@@ -147,12 +147,12 @@ public class ZipService {
 		try (OutputStream os = Files.newOutputStream(pout);
 			ZipOutputStream zos = new ZipOutputStream(os)) {
 	
-			Path[] files = Files.walk(pin).toArray(Path[]::new);
+			Path[] files = Files.walk(pin).filter(f -> f.toFile().isFile()).toArray(Path[]::new);
 			for (Path f: files) {
 				zip(f, zos);
 			}
 		} catch (IOException ioe) {
-			LOG.error("Could not delete files in directory", ioe);
+			LOG.error("Could not zip files", ioe);
 			return false;
 		}
 

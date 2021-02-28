@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
+import org.jboss.logging.Logger;
 
 /**
  * Copies zipfile from BeST MFT to public web server via SFTP
@@ -40,7 +41,14 @@ import java.util.Comparator;
  * @author Bart Hanssens
  */
 public class Utils {
+	private static final Logger LOG = Logger.getLogger(Utils.class);
 
+	/**
+	 * Construct file name based on date
+	 * 
+	 * @param str
+	 * @return 
+	 */
 	protected static String getFileName(String str) {
 		LocalDate yesterday = LocalDate.now().minus(1, ChronoUnit.DAYS);
 		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -57,7 +65,9 @@ public class Utils {
 		if (p == null) {
 			return true;
 		}
-		
+
+		LOG.infof("Delete directory %s", p);
+
 		try {
 			Files.walk(p).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
 		} catch(IOException ioe) {
