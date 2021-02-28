@@ -82,10 +82,6 @@ public class ZipService {
 	 * @return false on error
 	 */
 	public boolean unzip(String infile, String outdir) {
-		if (! infile.toLowerCase().endsWith("zip")) {
-			LOG.error("Not a zip file");
-			return false;
-		}
 		Path pin = Paths.get(infile);
 		if (! (Files.exists(pin) && Files.isRegularFile(pin))) {
 			LOG.errorf("Could not find input file %s", pin);
