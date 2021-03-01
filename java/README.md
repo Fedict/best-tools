@@ -15,13 +15,21 @@ Recursively unzip the BeST-zip file: the big ZIP file contains another set of ZI
 Usage:
 `java -jar unzip.jar -i <best-latest.zip> -o <output_directory>`
 
-## Convert tool
+## Converter tool
 
 After unzipping the BeST-file, this tool can be used to convert the XML to CSV-files or SHP.
 It is possible to select one or more regions: B(russels), F(landers) or W(alloon).
 
 Usage:
 `java -jar converter.jar -i <directory_unzipped_xml> -B -F -W`
+
+## Empty streets tool
+
+After unzipping the BeST-file, this tool can be used to get the list of streets without buildings (parcs, rural roads ...) as CSV.
+It is possible to select one or more regions: B(russels), F(landers) or W(alloon).
+
+Usage:
+`java -jar emptystreets.jar -i <directory_unzipped_xml> -B -F -W`
 
 
 ## Dao
