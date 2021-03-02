@@ -31,18 +31,22 @@ package be.bosa.dt.best.dao;
  * @author Bart Hanssens
  */
 public enum BestRegion {
-	BRUSSELS("B", "Brussels"),
-	FLANDERS("F", "Flanders"),
-	WALLONIA("W", "Wallonia");
+	BRUSSELS("B", "Brussels", "bru"),
+	FLANDERS("F", "Flanders", "vlg"),
+	WALLONIA("W", "Wallonia", "wal");
 		
 	private final String code;
 	private final String name;
+	private final String abbr;
+	
 		
-	BestRegion(String code, String name) {
+	BestRegion(String code, String name, String abbr) {
 		this.code = code;
 		this.name = name;
+		this.abbr = abbr;
 	}
 		
 	public String getCode() { return this.code; }
 	public String getName() { return this.name; }
+	public String getAbbr() { return this.abbr; }
 }
