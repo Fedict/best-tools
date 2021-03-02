@@ -42,16 +42,18 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 /**
- *
- * @author Bart.Hanssens
+ * Write files for a specific region
+ * 
+ * @author Bart Hanssens
  */
 public class BestRegionWriter {
 	
 	/**
-	 * Write files for a specific region
+	 * Write files for a specific region using a dedicated writer
 	 * 
-	 * @param writer
-	 * @param region
+	 * 
+	 * @param writer writer
+	 * @param region region
 	 * @param inPath input directory
 	 * @param outPath output directory
 	 */

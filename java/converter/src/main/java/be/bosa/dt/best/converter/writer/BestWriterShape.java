@@ -62,7 +62,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 
 /**
- * BeST result Shapefile writer
+ * Write BeST to a series of Shapefiles
  *
  * @author Bart Hanssens
  */

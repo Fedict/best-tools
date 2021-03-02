@@ -53,7 +53,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opengis.referencing.operation.TransformException;
 
 /**
- * BeST result CSV file writer, write addresses in our legacy OpenAddress.io format
+ * Write addresses to a legacy format (same output as OSOC19 python tools), typically used by OpenAddresses.io
  *
  * @author Bart Hanssens
  */

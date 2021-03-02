@@ -55,7 +55,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 /**
- * BeST result CSV file writer
+ * Write BeST data to a series of CSV files.
  *
  * @author Bart Hanssens
  */
