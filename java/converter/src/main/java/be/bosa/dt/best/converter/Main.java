@@ -28,6 +28,7 @@ package be.bosa.dt.best.converter;
 import be.bosa.dt.best.converter.writer.BestRegionWriter;
 import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.converter.writer.BestWriterCSV;
+import be.bosa.dt.best.converter.writer.BestWriterCSVOpenAddresses;
 import be.bosa.dt.best.converter.writer.BestWriterShape;
 
 import java.nio.file.Path;
@@ -104,6 +105,7 @@ public class Main {
 			if (cli.hasOption(region.getCode())) {
 				LOG.log(Level.INFO, "Region {0}", region.getName());
 				rw.writeRegion(new BestWriterCSV(), region, inPath, outPath);
+				rw.writeRegion(new BestWriterCSVOpenAddresses(), region, inPath, outPath);
 				rw.writeRegion(new BestWriterShape(), region, inPath, outPath);
 			}
 		}

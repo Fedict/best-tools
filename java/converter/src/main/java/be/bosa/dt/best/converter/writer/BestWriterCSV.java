@@ -60,7 +60,7 @@ import org.opengis.referencing.operation.TransformException;
  * @author Bart Hanssens
  */
 public class BestWriterCSV implements BestWriter {
-	private static MathTransform TRANS;
+	protected static MathTransform TRANS;
 	private final static Logger LOG = Logger.getLogger(BestWriterCSV.class.getName());
 
 	/**
