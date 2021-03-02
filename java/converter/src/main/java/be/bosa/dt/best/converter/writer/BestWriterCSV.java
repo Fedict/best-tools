@@ -83,11 +83,11 @@ public class BestWriterCSV implements BestWriter {
 	 * @param lines stream of lines
 	 * @param func function to create a row in the CSV
 	 */
-	private <T> void write(Path file, String[] header, Stream<T> lines,	Function<T, String[]> func) {
+	protected <T> void write(Path file, String[] header, Stream<T> lines, Function<T, String[]> func, boolean quotes) {
 		LOG.log(Level.INFO, "Writing {0}", file);
 		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(file))) {
-			w.writeNext(header);
-			lines.forEach(s -> w.writeNext(func.apply(s)));
+			w.writeNext(header, quotes);
+			lines.forEach(s -> w.writeNext(func.apply(s), quotes));
 		} catch (IOException ioe) {
 			LOG.log(Level.SEVERE, "Error writing to file", ioe);
 		}
@@ -109,7 +109,7 @@ public class BestWriterCSV implements BestWriter {
 			return new String[]{s.getIDVersion(), s.getName("nl"), s.getName("fr"), s.getName("de")};
 		};
 
-		write(file, header, cities, func);
+		write(file, header, cities, func, true);
 
 		return cache;
 	}
@@ -138,7 +138,7 @@ public class BestWriterCSV implements BestWriter {
 			return new String[]{s.getId(), s.getName("nl"), s.getName("fr"), s.getName("de")};
 		};
 
-		write(file, header, postals, func);
+		write(file, header, postals, func, true);
 
 		return cache;
 	}
@@ -163,7 +163,7 @@ public class BestWriterCSV implements BestWriter {
 				s.getVersion(), s.getStatus(), s.getFromDate()};
 		};
 
-		write(file, header, streets, func);
+		write(file, header, streets, func, true);
 
 		return cache;
 	}
@@ -227,7 +227,7 @@ public class BestWriterCSV implements BestWriter {
 			};
 		};
 
-		write(file, header, addresses, func);
+		write(file, header, addresses, func, true);
 
 		return cache;
 	}
@@ -248,6 +248,6 @@ public class BestWriterCSV implements BestWriter {
 
 		Stream<String[]> stream = cache.values().stream().flatMap(k -> k.values().stream());
 
-		write(file, header, stream, Function.identity());
+		write(file, header, stream, Function.identity(), true);
 	}
 }

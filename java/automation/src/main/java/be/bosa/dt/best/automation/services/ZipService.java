@@ -31,6 +31,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Predicate;
 
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -131,9 +132,10 @@ public class ZipService {
 	 * 
 	 * @param indir input directory containing files to be zipped
 	 * @param outfile output zip file
+	 * @param filter only include specific files
 	 * @return false on error
 	 */
-	public boolean zip(String indir, String outfile) {
+	public boolean zip(String indir, String outfile, Predicate<? super Path> filter) {
 		Path pin = Paths.get(indir);
 		if (! (Files.exists(pin) && Files.isDirectory(pin))) {
 			LOG.errorf("Could not find input directory %s", pin);
@@ -145,7 +147,7 @@ public class ZipService {
 		try (OutputStream os = Files.newOutputStream(pout);
 			ZipOutputStream zos = new ZipOutputStream(os)) {
 	
-			Path[] files = Files.walk(pin).filter(f -> f.toFile().isFile()).toArray(Path[]::new);
+			Path[] files = Files.walk(pin).filter(f -> f.toFile().isFile()).filter(filter).toArray(Path[]::new);
 			for (Path f: files) {
 				zip(f, zos);
 			}
@@ -155,5 +157,16 @@ public class ZipService {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Move files to a zip file
+	 * 
+	 * @param indir input directory containing files to be zipped
+	 * @param outfile output zip file
+	 * @return false on error
+	 */
+	public boolean zip(String indir, String outfile) {
+		return zip(indir, outfile, f -> true);
 	}
 }

@@ -121,7 +121,7 @@ public class ConverterBean extends StatusBean {
 			for(BestRegion region: BestRegion.values()) {
 				brw.writeRegion(new BestWriterCSV(), region, xmlPath, csvPath);
 			}
-			zip.zip(csvPath.toString(), zipfile);
+			zip.zip(csvPath.toString(), zipfile, f -> f.toString().contains("postal"));
 		} finally {
 			Utils.recursiveDelete(xmlPath);
 			Utils.recursiveDelete(csvPath);

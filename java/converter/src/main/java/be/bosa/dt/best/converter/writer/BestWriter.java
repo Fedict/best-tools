@@ -71,7 +71,7 @@ public interface BestWriter {
 	}
 
 	/**
-	 * Write a stream of BeSt municipalities objects to a file
+	 * Write a stream of BeSt municipalities objects to a file and return a cache
 	 *
 	 * @param region
 	 * @param outdir output directory
@@ -81,7 +81,7 @@ public interface BestWriter {
 	public Map<String, String[]> writeMunicipalities(BestRegion region, Path outdir, Stream<Municipality> cities);
 
 	/**
-	 * Write a stream of BeSt municipality part objects to a file
+	 * Write a stream of BeSt municipality part objects to a file and return a cache
 	 *
 	 * @param region
 	 * @param outdir output directory
@@ -91,7 +91,7 @@ public interface BestWriter {
 	public Map<String, String[]> writeMunicipalityParts(BestRegion region, Path outdir, Stream<Municipality> cityParts);
 
 	/**
-	 * Write a stream of stream of BeSt postcode objects to a file
+	 * Write a stream of stream of BeSt postcode objects to a file and return a cache
 	 *
 	 * @param region
 	 * @param outdir output directory
@@ -101,7 +101,7 @@ public interface BestWriter {
 	public Map<String, String[]> writePostals(BestRegion region, Path outdir, Stream<Postal> postals);
 
 	/**
-	 * Write a stream of BeSt streetname objects to a file
+	 * Write a stream of BeSt streetname objects to a file and return a cache
 	 *
 	 * @param region
 	 * @param outdir output directory
@@ -113,7 +113,7 @@ public interface BestWriter {
 		Map<String, String[]> cities);
 
 	/**
-	 * Write a stream of BeSt addresses to a file
+	 * Write a stream of BeSt addresses to a file and return a cache
 	 *
 	 * @param region
 	 * @param outdir output directory
@@ -134,7 +134,7 @@ public interface BestWriter {
 	 * 
 	 * @param region
 	 * @param outdir output directory
-	 * @param cache
+	 * @param postalStreetCache
 	 */
-	public void writePostalStreets(BestRegion region, Path outdir, Map<String, Map<String, String[]>> cache);
+	public void writePostalStreets(BestRegion region, Path outdir, Map<String, Map<String, String[]>> postalStreetCache);
 }

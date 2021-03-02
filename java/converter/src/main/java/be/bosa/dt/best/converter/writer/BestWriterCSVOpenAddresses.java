@@ -31,17 +31,13 @@ import be.bosa.dt.best.dao.Municipality;
 import be.bosa.dt.best.dao.Postal;
 import be.bosa.dt.best.dao.Street;
 
-import com.opencsv.CSVWriter;
-
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,39 +49,16 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opengis.referencing.operation.TransformException;
 
 /**
- * Write addresses to a legacy format (same output as OSOC19 python tools), typically used by OpenAddresses.io
+ * Write addresses to a legacy format (same output as OSOC19 python tools) served to OpenAddresses.io.
+ * Only the CSV with addresses gets written, streets etc are not used by OpenAddresses.io
  *
  * @author Bart Hanssens
  */
 public class BestWriterCSVOpenAddresses extends BestWriterCSV {
 	private final static Logger LOG = Logger.getLogger(BestWriterCSVOpenAddresses.class.getName());
 
-	/**
-	 * Write a series of Best object to a file
-	 *
-	 * @param <T>
-	 * @param file CSV file to write to
-	 * @param header header as array of strings
-	 * @param lines stream of lines
-	 * @param func function to create a row in the CSV
-	 */
-	private <T> void write(Path file, String[] header, Stream<T> lines,	Function<T, String[]> func) {
-		LOG.log(Level.INFO, "Writing {0}", file);
-		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(file))) {
-			w.writeNext(header, false);
-			lines.forEach(s -> w.writeNext(func.apply(s), false));
-		} catch (IOException ioe) {
-			LOG.log(Level.SEVERE, "Error writing to file", ioe);
-		}
-	}
-
-	/**
-	 * get a cache of (or parts of municipalities) to a file
-	 *
-	 * @param cities municipalities or parts of municipalities
-	 * @return cache
-	 */
-	private Map<String, String[]> cacheMunicipalityOrParts(Stream<Municipality> cities) {
+	@Override
+	public Map<String, String[]> writeMunicipalities(BestRegion region, Path outdir, Stream<Municipality> cities) {
 		return cities.collect(Collectors.toMap(
 			s -> s.getId(), 
 			s -> new String[]{s.getName("nl"), s.getName("fr"), s.getName("de"), s.getIDVersion()},
@@ -93,13 +66,8 @@ public class BestWriterCSVOpenAddresses extends BestWriterCSV {
 	}
 
 	@Override
-	public Map<String, String[]> writeMunicipalities(BestRegion region, Path outdir, Stream<Municipality> cities) {
-		return cacheMunicipalityOrParts(cities);
-	}
-
-	@Override
 	public Map<String, String[]> writeMunicipalityParts(BestRegion region, Path outdir, Stream<Municipality> cityParts) {
-		return cacheMunicipalityOrParts(cityParts);
+		return Collections.EMPTY_MAP;
 	}
 
 	@Override
@@ -162,7 +130,7 @@ public class BestWriterCSVOpenAddresses extends BestWriterCSV {
 			};
 		};
 
-		write(file, header, addresses, func);
+		write(file, header, addresses, func, false);
 		
 		return cache;
 	}
