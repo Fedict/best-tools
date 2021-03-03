@@ -103,8 +103,8 @@ public class ConverterBean extends StatusBean {
 
 	@ConfigProperty(name = "openaddresses.vlg.data.file")
 	String dataFileOAVLG;
-	@ConfigProperty(name = "openaddresses.bxl.data.file")
-	String dataFileOABXL;
+	@ConfigProperty(name = "openaddresses.bru.data.file")
+	String dataFileOABRU;
 	@ConfigProperty(name = "openaddresses.wal.data.file")
 	String dataFileOAWAL;
 
@@ -141,7 +141,7 @@ public class ConverterBean extends StatusBean {
 	 * 
 	 * @param file 
 	 */
-	private void convertOA(String file, String zipFileVL, String zipFileBXL, String zipFileWAL) throws IOException {
+	private void convertOA(String file, String zipFileVL, String zipFileBRU, String zipFileWAL) throws IOException {
 		Path xmlPath = null;
 		Path csvPath = null;
 		try {
@@ -154,7 +154,7 @@ public class ConverterBean extends StatusBean {
 				brw.writeRegion(new BestWriterCSVOpenAddresses(), region, xmlPath, csvPath);
 			}
 			zip.zip(csvPath.toString(), zipFileVL, f -> f.toString().contains("bevlg"));
-			zip.zip(csvPath.toString(), zipFileBXL, f -> f.toString().contains("bebxl"));
+			zip.zip(csvPath.toString(), zipFileBRU, f -> f.toString().contains("bebru"));
 			zip.zip(csvPath.toString(), zipFileWAL, f -> f.toString().contains("bewal"));
 		} finally {
 			Utils.recursiveDelete(xmlPath);
@@ -193,7 +193,7 @@ public class ConverterBean extends StatusBean {
 
 		Path tempFile = null;
 		Path zipFileOAVLG = null;
-		Path zipFileOABXL = null;
+		Path zipFileOABRU = null;
 		Path zipFileOAWAL = null;
 		Path zipFilePs = null;
 		Path zipFileEs = null;
@@ -207,10 +207,10 @@ public class ConverterBean extends StatusBean {
 			sftp.download(mftServer, mftPort, mftUser, mftPass, fileName, localFile);
 
 			zipFileOAVLG = Files.createTempFile("best", "oavlg");			
-			zipFileOABXL = Files.createTempFile("best", "oabxl");
+			zipFileOABRU = Files.createTempFile("best", "oabru");
 			zipFileOAWAL = Files.createTempFile("best", "oawal");
 			setStatus("Converting open addresses");
-			convertOA(localFile, zipFileOAVLG.toString(), zipFileOABXL.toString(), zipFileOAWAL.toString());
+			convertOA(localFile, zipFileOAVLG.toString(), zipFileOABRU.toString(), zipFileOAWAL.toString());
 			
 			zipFilePs = Files.createTempFile("best", "postal");			
 			setStatus("Converting postal streets");
@@ -220,10 +220,10 @@ public class ConverterBean extends StatusBean {
 			setStatus("Converting empty streets");
 			convertEmptyStreets(localFile, zipFileEs.toString());
 
-			setStatus("Uploading open addresses VL");
+			setStatus("Uploading open addresses VLG");
 			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFileOAVLG, zipFileOAVLG.toString());
-			setStatus("Uploading open addresses BXL");
-			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFileOABXL, zipFileOABXL.toString());
+			setStatus("Uploading open addresses BRU");
+			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFileOABRU, zipFileOABRU.toString());
 			setStatus("Uploading open addresses WAL");
 			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFileOAWAL, zipFileOAWAL.toString());
 
@@ -239,7 +239,7 @@ public class ConverterBean extends StatusBean {
 			setStatus("Failed " + ioe.getMessage());
 			mail = Mail.withText(mailTo, "Conversion failed", ioe.getMessage());		
 		} finally {
-			for(Path p: new Path[]{ tempFile, zipFileOAVLG, zipFileOABXL, zipFileOAWAL, zipFilePs, zipFileEs}) {
+			for(Path p: new Path[]{ tempFile, zipFileOAVLG, zipFileOABRU, zipFileOAWAL, zipFilePs, zipFileEs}) {
 				if (p != null) {
 					p.toFile().delete();
 				}

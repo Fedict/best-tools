@@ -120,8 +120,8 @@ public class BestWriterCSVOpenAddresses extends BestWriterCSV {
 			}
 
 			return new String[]{
-				String.format(Locale.US, "%.4f", dest.x), String.format(Locale.US, "%.4f", dest.y),
 				String.valueOf(s.getPoint().getX()), String.valueOf(s.getPoint().getY()),
+				String.format(Locale.US, "%.4f", dest.x), String.format(Locale.US, "%.4f", dest.y),
 				s.getId(), s.getBox(), s.getNumber(),
 				s.getPostal().getId(), cPostal[1], cPostal[0],
 				s.getCity().getId(), cCities[2], cCities[1], cCities[1],						
