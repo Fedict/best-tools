@@ -49,8 +49,8 @@ import java.util.stream.Stream;
 public class BestRegionWriter {
 	
 	/**
-	 * Write files for a specific region using a dedicated writer
-	 * 
+	 * Read the various BeST XML files into memory,
+	 * and write the data for a specific region to another format.
 	 * 
 	 * @param writer writer
 	 * @param region region
@@ -62,7 +62,9 @@ public class BestRegionWriter {
 			Stream<Postal> postals = new PostalReader().read(region, inPath);
 			Stream<Street> streets = new StreetnameReader().read(region, inPath);
 			Stream<Address> addresses = new AddressReader().read(region, inPath)) {
-				
+			
+			// instead of using an RDBMS, store the required info in various maps
+			// key: ID, value: fields as strings
 			Map<String, String[]> cacheCities = writer.writeMunicipalities(region, outPath, cities);
 
 			Map<String, String[]> cacheCityParts = Collections.EMPTY_MAP;

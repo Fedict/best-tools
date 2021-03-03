@@ -43,8 +43,7 @@ import java.util.stream.Stream;
 
 
 /**
- * Write addresses to a legacy format (same output as OSOC19 python tools) served to OpenAddresses.io.
- * Only the CSV with addresses gets written, streets etc are not used by OpenAddresses.io
+ * Write the list of streets without any address / housenumber (could be a parc, rural road...)
  *
  * @author Bart Hanssens
  */
@@ -121,12 +120,11 @@ public class BestWriterCSVEmptyStreets extends BestWriterCSV {
 			Map<String, String[]> cities) {
 		return streets
 			.filter(s -> s.getStatus().equals("current"))
-			.filter(s -> s.getTillDate() == null)		// also remove Flanders streets with end date
+			.filter(s -> s.getTillDate() == null)		// remove streets with end date, even if status is current 
 			.collect(Collectors.toMap(
 				s -> s.getId(), 
 				s -> new String[]{ s.getName("nl"), s.getName("fr"), s.getName("de"), 
-									s.getNamespace(), s.getId(), s.getVersion(),
-									s.getCity().getId()},
+									s.getNamespace(), s.getId(), s.getVersion(), s.getCity().getId()},
 				(s1,s2) -> { return s2; }));
 	}
 
@@ -139,33 +137,38 @@ public class BestWriterCSVEmptyStreets extends BestWriterCSV {
 		Map<String,String[]> FR = new HashMap<>();
 		Map<String,String[]> DE = new HashMap<>();
 		
+		Map<String, String[]> emptyStreets = new HashMap<>(streets);
+
+		Map<String, Map<String, String[]>> cache = new HashMap<>();
+
+		// remove streets that have at least one address
 		addresses.filter(a -> a.getStatus().equals("current"))
 					.peek(a -> fillPostals(a, cities, NL, FR, DE))
 					.map(a -> a.getStreet().getId())
-					.forEach(s -> streets.remove(s));
+					.forEach(s -> emptyStreets.remove(s));
 
-		streets.values().stream()
-			//.sorted(Comparator.comparing(s -> s[6]))
-			.collect(Collectors.toMap(
-				s -> s[6],
-				s ->  {
-					String[] c = cities.getOrDefault(s[6], new String[6]);
-					String[] p = NL.getOrDefault(c[0], 
-									FR.getOrDefault(c[1],
-									DE.getOrDefault(c[2], new String[4])));
-					return new String[] { 
-						p[0], p[1], p[2], p[3],
-						s[0], s[1], s[2], 
-						c[0], c[1], c[2],
-						"", "", "", "",
-						s[3], s[4], s[5],
-						c[3], c[4], c[5],
-						"", "", "", "",
-					};
-				})
-			);
-		
-		return null;
+		emptyStreets.forEach((k,s) -> {
+			String[] c = cities.getOrDefault(s[6], new String[6]);
+			// "guess" postal code based on NL/FR/DE name of the municipality
+			String[] p = NL.getOrDefault(c[0],
+						FR.getOrDefault(c[1],
+							DE.getOrDefault(c[2], new String[4])));
+			
+			// mimic structure of the other postalstreets file (streets with an address)
+			Map<String, String[]> postalStreet = cache.getOrDefault(p[0], new HashMap<>());
+			postalStreet.put(s[0], new String[]{ 
+				p[0], p[1], p[2], p[3],
+				s[0], s[1], s[2], 
+				c[0], c[1], c[2],
+				"", "", "", "",
+				s[3], s[4], s[5],
+				c[3], c[4], c[5],
+				"", "", "", "",
+			});
+			cache.put(p[0], postalStreet);
+		});
+	
+		return cache;
 	}
 	
 	@Override
