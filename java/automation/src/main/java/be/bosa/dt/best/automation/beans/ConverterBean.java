@@ -30,6 +30,7 @@ import be.bosa.dt.best.automation.services.TransferService;
 import be.bosa.dt.best.automation.services.ZipService;
 import be.bosa.dt.best.converter.writer.BestRegionWriter;
 import be.bosa.dt.best.converter.writer.BestWriterCSV;
+import be.bosa.dt.best.converter.writer.BestWriterCSVOpenAddresses;
 import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.emptystreets.EmptyStreetWriter;
 
@@ -100,6 +101,13 @@ public class ConverterBean extends StatusBean {
 	@ConfigProperty(name = "emptystreets.weburl")
 	String webUrlEs;
 
+	@ConfigProperty(name = "openaddresses.vlg.data.file")
+	String dataFileOAVLG;
+	@ConfigProperty(name = "openaddresses.bxl.data.file")
+	String dataFileOABXL;
+	@ConfigProperty(name = "openaddresses.wal.data.file")
+	String dataFileOAWAL;
+
 	@ConfigProperty(name = "copier.mailto")
 	String mailTo;
 
@@ -122,6 +130,32 @@ public class ConverterBean extends StatusBean {
 				brw.writeRegion(new BestWriterCSV(), region, xmlPath, csvPath);
 			}
 			zip.zip(csvPath.toString(), zipfile, f -> f.toString().contains("postal"));
+		} finally {
+			Utils.recursiveDelete(xmlPath);
+			Utils.recursiveDelete(csvPath);
+		}
+	}
+	/**
+	 * Convert BeST XML into CSV files per Region.
+	 * OpenAddresses.io files
+	 * 
+	 * @param file 
+	 */
+	private void convertOA(String file, String zipFileVL, String zipFileBXL, String zipFileWAL) throws IOException {
+		Path xmlPath = null;
+		Path csvPath = null;
+		try {
+			xmlPath = Files.createTempDirectory("oa-in");
+			csvPath = Files.createTempDirectory("oa-out");
+			zip.unzip(file, xmlPath.toString());
+
+			BestRegionWriter brw = new BestRegionWriter();
+			for(BestRegion region: BestRegion.values()) {
+				brw.writeRegion(new BestWriterCSVOpenAddresses(), region, xmlPath, csvPath);
+			}
+			zip.zip(csvPath.toString(), zipFileVL, f -> f.toString().contains("bevlg"));
+			zip.zip(csvPath.toString(), zipFileBXL, f -> f.toString().contains("bebxl"));
+			zip.zip(csvPath.toString(), zipFileWAL, f -> f.toString().contains("bewal"));
 		} finally {
 			Utils.recursiveDelete(xmlPath);
 			Utils.recursiveDelete(csvPath);
@@ -156,7 +190,11 @@ public class ConverterBean extends StatusBean {
 	@Scheduled(cron = "{converter.cron.expr}")
 	public void scheduledConverter() {
 		Mail mail;
+
 		Path tempFile = null;
+		Path zipFileOAVLG = null;
+		Path zipFileOABXL = null;
+		Path zipFileOAWAL = null;
 		Path zipFilePs = null;
 		Path zipFileEs = null;
 
@@ -168,14 +206,27 @@ public class ConverterBean extends StatusBean {
 			setStatus("Downloading " + fileName);
 			sftp.download(mftServer, mftPort, mftUser, mftPass, fileName, localFile);
 
+			zipFileOAVLG = Files.createTempFile("best", "oavlg");			
+			zipFileOABXL = Files.createTempFile("best", "oabxl");
+			zipFileOAWAL = Files.createTempFile("best", "oawal");
+			setStatus("Converting open addresses");
+			convertOA(localFile, zipFileOAVLG.toString(), zipFileOABXL.toString(), zipFileOAWAL.toString());
+			
 			zipFilePs = Files.createTempFile("best", "postal");			
 			setStatus("Converting postal streets");
 			convertRegion(localFile, zipFilePs.toString());
-			
+					
 			zipFileEs = Files.createTempFile("best", "empty");			
 			setStatus("Converting empty streets");
 			convertEmptyStreets(localFile, zipFileEs.toString());
-			
+
+			setStatus("Uploading open addresses VL");
+			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFileOAVLG, zipFileOAVLG.toString());
+			setStatus("Uploading open addresses BXL");
+			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFileOABXL, zipFileOABXL.toString());
+			setStatus("Uploading open addresses WAL");
+			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFileOAWAL, zipFileOAWAL.toString());
+
 			setStatus("Uploading postal streets");
 			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFilePs, zipFilePs.toString());
 	
@@ -188,14 +239,10 @@ public class ConverterBean extends StatusBean {
 			setStatus("Failed " + ioe.getMessage());
 			mail = Mail.withText(mailTo, "Conversion failed", ioe.getMessage());		
 		} finally {
-			if (tempFile != null) {
-				tempFile.toFile().delete();
-			}
-			if (zipFilePs != null) {
-				zipFilePs.toFile().delete();
-			}
-			if (zipFileEs != null) {
-				zipFileEs.toFile().delete();
+			for(Path p: new Path[]{ tempFile, zipFileOAVLG, zipFileOABXL, zipFileOAWAL, zipFilePs, zipFileEs}) {
+				if (p != null) {
+					p.toFile().delete();
+				}
 			}
 		}
 		mailer.sendMail(mail);
