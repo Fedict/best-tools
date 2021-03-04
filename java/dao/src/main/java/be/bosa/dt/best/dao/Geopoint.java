@@ -31,16 +31,16 @@ package be.bosa.dt.best.dao;
  * @author Bart Hanssens
  */
 public class Geopoint {
-	private float x;
-	private float y;
+	private double x;
+	private double y;
 	private String srs;
 
 	/**
 	 * Get X coordinate
 	 * 
-	 * @return float
+	 * @return x
 	 */
-	public float getX() {
+	public double getX() {
 		return x;
 	}
 
@@ -55,9 +55,9 @@ public class Geopoint {
 	/**
 	 * Get Y coordinate
 	 * 
-	 * @return float
+	 * @return y
 	 */
-	public float getY() {
+	public double getY() {
 		return y;
 	}
 
@@ -66,7 +66,7 @@ public class Geopoint {
 	 * 
 	 * @param y 
 	 */
-	public void setY(float y) {
+	public void setY(double y) {
 		this.y = y;
 	}
 
@@ -103,8 +103,8 @@ public class Geopoint {
 			throw new NumberFormatException("Not Lambert 72 projection");
 		}
 		String[] coords = xy.split(" ");
-		this.x = Float.valueOf(coords[0]);
-		this.y = Float.valueOf(coords[1]);
+		this.x = Double.valueOf(coords[0]);
+		this.y = Double.valueOf(coords[1]);
 		this.srs = "31370";
 	}		
 	
