@@ -78,9 +78,9 @@
             <version>24.2</version>
         </dependency>
         <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-epsg-wkt</artifactId>
-            <version>24.2</version>
+            <groupId>org.locationtech.proj4j</groupId>
+            <artifactId>proj4j</artifactId>
+            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

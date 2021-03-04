@@ -45,14 +45,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.CRS;
-
-import org.locationtech.jts.geom.Coordinate;
-
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
+import org.locationtech.proj4j.BasicCoordinateTransform;
+import org.locationtech.proj4j.CRSFactory;
+import org.locationtech.proj4j.ProjCoordinate;
 
 /**
  * Write BeST data to a series of CSV files.
@@ -60,18 +55,16 @@ import org.opengis.referencing.operation.TransformException;
  * @author Bart Hanssens
  */
 public class BestWriterCSV implements BestWriter {
-	protected static MathTransform TRANS;
+	protected static BasicCoordinateTransform TRANS;
 	private final static Logger LOG = Logger.getLogger(BestWriterCSV.class.getName());
 
 	/**
 	 * Constructor
 	 */
 	public BestWriterCSV() {
-		try {
-			TRANS = CRS.findMathTransform(CRS.decode("EPSG:31370"), CRS.decode("EPSG:4326"), false);
-		} catch (FactoryException fe) {
-			LOG.severe("No conversion found");
-		}
+		CRSFactory factory = new CRSFactory();
+		TRANS = new BasicCoordinateTransform(
+			factory.createFromName("EPSG:31370"), factory.createFromName("EPSG:4326"));
 	}
 
 	/**
@@ -193,14 +186,10 @@ public class BestWriterCSV implements BestWriter {
 			String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[3]);
 			String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[3]);
 
-			Coordinate src = new Coordinate(s.getPoint().getX(), s.getPoint().getY());
-			Coordinate dest = new Coordinate();
+			ProjCoordinate src = new ProjCoordinate(s.getPoint().getX(), s.getPoint().getY());
+			ProjCoordinate dest = new ProjCoordinate();
 
-			try {
-				JTS.transform(src, dest, TRANS);
-			} catch (TransformException ex) {
-				LOG.warning("Transformation to GPS failed");
-			}
+			TRANS.transform(src, dest);
 
 			// A street can have different postal codes, so create a cache of info per street per postal code
 			if (s.getStatus().equals("current")) {

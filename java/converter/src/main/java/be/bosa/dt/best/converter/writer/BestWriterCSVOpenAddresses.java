@@ -38,15 +38,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.geotools.geometry.jts.JTS;
-
-import org.locationtech.jts.geom.Coordinate;
-
-import org.opengis.referencing.operation.TransformException;
+import org.locationtech.proj4j.ProjCoordinate;
 
 /**
  * Write addresses to a legacy format (same output as OSOC19 python tools) served to OpenAddresses.io.
@@ -55,8 +49,6 @@ import org.opengis.referencing.operation.TransformException;
  * @author Bart Hanssens
  */
 public class BestWriterCSVOpenAddresses extends BestWriterCSV {
-	private final static Logger LOG = Logger.getLogger(BestWriterCSVOpenAddresses.class.getName());
-
 	@Override
 	public Map<String, String[]> writeMunicipalities(BestRegion region, Path outdir, Stream<Municipality> cities) {
 		return cities.collect(Collectors.toMap(
@@ -110,14 +102,10 @@ public class BestWriterCSVOpenAddresses extends BestWriterCSV {
 			String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[3]);
 			String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[3]);
 
-			Coordinate src = new Coordinate(s.getPoint().getX(), s.getPoint().getY());
-			Coordinate dest = new Coordinate();
+			ProjCoordinate src = new ProjCoordinate(s.getPoint().getX(), s.getPoint().getY());
+			ProjCoordinate dest = new ProjCoordinate();
 
-			try {
-				JTS.transform(src, dest, TRANS);
-			} catch (TransformException ex) {
-				LOG.warning("Transformation to GPS failed");
-			}
+			TRANS.transform(src, dest);
 
 			return new String[]{
 				String.valueOf(s.getPoint().getX()),
