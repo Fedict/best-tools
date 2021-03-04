@@ -82,6 +82,7 @@ public class BestWriterCSV implements BestWriter {
 	 * @param header header as array of strings
 	 * @param lines stream of lines
 	 * @param func function to create a row in the CSV
+	 * @param quotes
 	 */
 	protected <T> void write(Path file, String[] header, Stream<T> lines, Function<T, String[]> func, boolean quotes) {
 		LOG.log(Level.INFO, "Writing {0}", file);
