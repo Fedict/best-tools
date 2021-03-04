@@ -188,6 +188,6 @@ public class BestWriterCSVEmptyStreets extends BestWriterCSV {
 
 		Stream<String[]> stream = cache.values().stream().flatMap(k -> k.values().stream());
 
-		write(file, header, stream, Function.identity(), false);
+		write(file, header, stream, Function.identity(), true);
 	}
 }
