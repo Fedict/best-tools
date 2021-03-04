@@ -25,8 +25,11 @@
  */
 package be.bosa.dt.best.automation.beans;
 
+import be.bosa.dt.best.automation.util.Utils;
+import be.bosa.dt.best.automation.util.Status;
 import be.bosa.dt.best.automation.services.MailService;
 import be.bosa.dt.best.automation.services.TransferService;
+import be.bosa.dt.best.automation.util.StatusHistory;
 
 import io.quarkus.mailer.Mail;
 import io.quarkus.scheduler.Scheduled;
@@ -34,6 +37,7 @@ import io.quarkus.scheduler.Scheduled;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -46,7 +50,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
  * @author Bart Hanssens
  */
 @ApplicationScoped
-public class CopyBean extends StatusBean {
+public class CopyBean implements StatusHistory {
 	@Inject
 	TransferService sftp;
 
@@ -68,7 +72,7 @@ public class CopyBean extends StatusBean {
 	@ConfigProperty(name = "copier.mft.file")
 	String mftFile;
 
-	@ConfigProperty(name = "copier.mft.size")
+	@ConfigProperty(name = "copier.mft.minsize")
 	long minSize;
 
 	@ConfigProperty(name = "copier.data.server")
@@ -83,15 +87,16 @@ public class CopyBean extends StatusBean {
 	@ConfigProperty(name = "copier.data.pass")
 	String dataPass;
 
-	@ConfigProperty(name = "copier.data.file")
-	String dataFile;
+	@ConfigProperty(name = "copier.data.path")
+	String dataPath;
 
-	@ConfigProperty(name = "copier.weburl")
-	String webUrl;
+	@ConfigProperty(name = "bestfull.data.file")
+	String dataFile;
 
 	@ConfigProperty(name = "copier.mailto")
 	String mailTo;
 
+	private Status status = new Status();
 
 	/**
 	 * Copy ZIP file from MFT to public website via SFTP
@@ -101,21 +106,23 @@ public class CopyBean extends StatusBean {
 		Mail mail;
 		Path tmpFile = null;
 
+		status.clear();
+
 		try {
 			tmpFile = Files.createTempFile("best", "local");
 			String localFile = tmpFile.toAbsolutePath().toString();
 			String fileName = Utils.getFileName(mftFile);
 	
-			setStatus("Downloading " + fileName);
+			status.set("Downloading " + fileName);
 			sftp.download(mftServer, mftPort, mftUser, mftPass, fileName, localFile);
 
-			setStatus("Uploading");
-			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFile, localFile);
+			status.set("Uploading");
+			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataPath + dataFile, localFile);
 
-			setStatus("Done (OK) " + fileName);
+			status.set("Done (OK) " + fileName);
 			mail = Mail.withText(mailTo, "Copy ok", "File copied: " + fileName);
 		} catch (IOException ioe) {
-			setStatus("Failed " + ioe.getMessage());
+			status.set("Failed " + ioe.getMessage());
 			mail = Mail.withText(mailTo, "Copy failed", ioe.getMessage());		
 		} finally {
 			if (tmpFile != null) {
@@ -124,5 +131,10 @@ public class CopyBean extends StatusBean {
 		}
 
 		mailer.sendMail(mail);
+	}
+	
+	@Override
+	public List<String> getStatusHistory() {
+		return status.getHistory();
 	}
 }

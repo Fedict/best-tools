@@ -26,11 +26,16 @@
 package be.bosa.dt.best.automation.resources;
 
 import be.bosa.dt.best.automation.beans.ConverterBean;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**
  * Convert XML files into CSV and sftp to public open data server
@@ -42,17 +47,24 @@ import javax.ws.rs.core.MediaType;
 public class ConverterResource {
 	@Inject
 	ConverterBean converter;
-		
+
+	@ConfigProperty(name = "webui.key")
+	String uiKey;
+	
 	@GET
 	@Path("/status")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getStatus() {
-		return converter.getStatus();
+		return converter.getStatusHistory().stream().collect(Collectors.joining("\n"));
 	}
-	
+
 	@GET
 	@Path("/execute")
-	public void execute() {
+	public Response execute(@QueryParam("key") String key) {
+		if (key == null || !key.equals(uiKey)) {
+			return Response.status(Status.FORBIDDEN).build();
+		}
 		converter.scheduledConverter();
+		return Response.ok().build();
 	}
 }

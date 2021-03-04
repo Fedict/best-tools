@@ -23,46 +23,57 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.automation.resources;
+package be.bosa.dt.best.automation.util;
 
-import be.bosa.dt.best.automation.beans.CopyBean;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
+
+import org.jboss.logging.Logger;
 
 /**
- * Copy XML files from MFT to public open data server
+ * Copies zipfile from BeST MFT to public web server via SFTP
  * 
  * @author Bart Hanssens
  */
-@Path("/copy")
-public class CopyResource {
-	@Inject
-	CopyBean copier;
+public class Utils {
+	private static final Logger LOG = Logger.getLogger(Utils.class);
 
-	@ConfigProperty(name = "webui.key")
-	String uiKey;
-
-	@GET
-	@Path("/status")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String getStatus() {
-		return copier.getStatusHistory().stream().collect(Collectors.joining("\n"));
+	/**
+	 * Construct file name based on previous data
+	 * 
+	 * @param str file pattern
+	 * @return %Y%m%d replaced by date of yesterday
+	 */
+	public static String getFileName(String str) {
+		LocalDate yesterday = LocalDate.now().minus(1, ChronoUnit.DAYS);
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd");
+		return str.replace("%Y%m%d", fmt.format(yesterday));
 	}
 
-	@GET
-	@Path("/execute")
-	public Response execute(@QueryParam("key") String key) {
-		if (key == null || !key.equals(uiKey)) {
-			return Response.status(Response.Status.FORBIDDEN).build();
+	/**
+	 * Recursively delete a directory and files / subdirectories
+	 * 
+	 * @param p root path
+	 * @return false on error
+	 */
+	public static boolean recursiveDelete(Path p) {
+		if (p == null) {
+			return true;
 		}
-		copier.scheduledCopy();
-		return Response.ok().build();
+
+		LOG.infof("Delete directory %s", p);
+
+		try {
+			Files.walk(p).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+		} catch(IOException ioe) {
+			return false;
+		}
+		return true;
 	}
 }

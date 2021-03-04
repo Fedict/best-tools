@@ -23,56 +23,59 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.automation.beans;
+package be.bosa.dt.best.automation.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import org.jboss.logging.Logger;
 
+
 /**
- * Copies zipfile from BeST MFT to public web server via SFTP
+ * Keeps track of status
  * 
  * @author Bart Hanssens
  */
-public class Utils {
-	private static final Logger LOG = Logger.getLogger(Utils.class);
+
+public class Status {
+	private static final Logger LOG = Logger.getLogger(Status.class);
+
+	private String status = "";
+	private final List<String> history = new ArrayList<>();
 
 	/**
-	 * Construct file name based on date
+	 * Get current status
 	 * 
-	 * @param str
-	 * @return 
+	 * @return string
 	 */
-	protected static String getFileName(String str) {
-		LocalDate yesterday = LocalDate.now().minus(1, ChronoUnit.DAYS);
-		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd");
-		return str.replace("%Y%m%d", fmt.format(yesterday));
+	public String get() {
+		return status;
 	}
 
 	/**
-	 * Recursively delete a directory
+	 * Get current status
 	 * 
-	 * @param p
-	 * @return 
+	 * @return string
 	 */
-	protected static boolean recursiveDelete(Path p) {
-		if (p == null) {
-			return true;
-		}
+	public List<String> getHistory() {
+		return history;
+	}
 
-		LOG.infof("Delete directory %s", p);
+	/**
+	 * Set status and add to history (with timestamp)
+	 * 
+	 * @param status 
+	 */
+	public void set(String status) {
+		LOG.info(status);
+		this.status = status;
+		history.add(Instant.now().toString() + " : " + status);
+	}
 
-		try {
-			Files.walk(p).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-		} catch(IOException ioe) {
-			return false;
-		}
-		return true;
+	/**
+	 * Clear history
+	 */
+	public void clear() {
+		history.clear();
 	}
 }

@@ -23,30 +23,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.automation.beans;
+package be.bosa.dt.best.automation.util;
 
-import org.jboss.logging.Logger;
+import java.util.List;
 
 
 /**
- * Keeps track of status
+ * Interface for retrieving status history
  * 
  * @author Bart Hanssens
  */
-
-public class StatusBean {
-	private static final Logger LOG = Logger.getLogger(StatusBean.class);
-
-	private String status = "";
-	
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		LOG.info(status);
-		this.status = status;
-	}
-	
-	
+public interface StatusHistory {
+	public List<String> getStatusHistory();
 }

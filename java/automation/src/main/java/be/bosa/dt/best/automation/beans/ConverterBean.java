@@ -25,9 +25,12 @@
  */
 package be.bosa.dt.best.automation.beans;
 
+import be.bosa.dt.best.automation.util.Utils;
+import be.bosa.dt.best.automation.util.Status;
 import be.bosa.dt.best.automation.services.MailService;
 import be.bosa.dt.best.automation.services.TransferService;
 import be.bosa.dt.best.automation.services.ZipService;
+import be.bosa.dt.best.automation.util.StatusHistory;
 import be.bosa.dt.best.converter.writer.BestRegionWriter;
 import be.bosa.dt.best.converter.writer.BestWriterCSV;
 import be.bosa.dt.best.converter.writer.BestWriterCSVOpenAddresses;
@@ -40,6 +43,7 @@ import io.quarkus.scheduler.Scheduled;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -52,7 +56,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
  * @author Bart Hanssens
  */
 @ApplicationScoped
-public class ConverterBean extends StatusBean {
+public class ConverterBean implements StatusHistory {
 	@Inject
 	TransferService sftp;
 	
@@ -89,17 +93,14 @@ public class ConverterBean extends StatusBean {
 	@ConfigProperty(name = "copier.data.pass")
 	String dataPass;
 
+	@ConfigProperty(name = "copier.data.path")
+	String dataPath;
+
 	@ConfigProperty(name = "postalstreets.data.file")
 	String dataFilePs;
 
-	@ConfigProperty(name = "postalstreets.weburl")
-	String webUrlPs;
-
 	@ConfigProperty(name = "emptystreets.data.file")
 	String dataFileEs;
-
-	@ConfigProperty(name = "emptystreets.weburl")
-	String webUrlEs;
 
 	@ConfigProperty(name = "openaddresses.vlg.data.file")
 	String dataFileOAVLG;
@@ -110,6 +111,8 @@ public class ConverterBean extends StatusBean {
 
 	@ConfigProperty(name = "copier.mailto")
 	String mailTo;
+
+	private Status status = new Status();
 
 	/**
 	 * Convert BeST XML into CSV files per Region.
@@ -198,45 +201,47 @@ public class ConverterBean extends StatusBean {
 		Path zipFilePs = null;
 		Path zipFileEs = null;
 
+		status.clear();
+
 		try {
 			tempFile = Files.createTempFile("best", "local");
 			String localFile = tempFile.toAbsolutePath().toString();
 			String fileName = Utils.getFileName(mftFile);
 
-			setStatus("Downloading " + fileName);
+			status.set("Downloading " + fileName);
 			sftp.download(mftServer, mftPort, mftUser, mftPass, fileName, localFile);
 
 			zipFileOAVLG = Files.createTempFile("best", "oavlg");			
 			zipFileOABRU = Files.createTempFile("best", "oabru");
 			zipFileOAWAL = Files.createTempFile("best", "oawal");
-			setStatus("Converting open addresses");
+			status.set("Converting open addresses");
 			convertOA(localFile, zipFileOAVLG.toString(), zipFileOABRU.toString(), zipFileOAWAL.toString());
 			
 			zipFilePs = Files.createTempFile("best", "postal");			
-			setStatus("Converting postal streets");
+			status.set("Converting postal streets");
 			convertRegion(localFile, zipFilePs.toString());
 					
 			zipFileEs = Files.createTempFile("best", "empty");			
-			setStatus("Converting empty streets");
+			status.set("Converting empty streets");
 			convertEmptyStreets(localFile, zipFileEs.toString());
 
-			setStatus("Uploading open addresses VLG");
-			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFileOAVLG, zipFileOAVLG.toString());
-			setStatus("Uploading open addresses BRU");
-			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFileOABRU, zipFileOABRU.toString());
-			setStatus("Uploading open addresses WAL");
-			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFileOAWAL, zipFileOAWAL.toString());
+			status.set("Uploading open addresses VLG");
+			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataPath + dataFileOAVLG, zipFileOAVLG.toString());
+			status.set("Uploading open addresses BRU");
+			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataPath + dataFileOABRU, zipFileOABRU.toString());
+			status.set("Uploading open addresses WAL");
+			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataPath + dataFileOAWAL, zipFileOAWAL.toString());
 
-			setStatus("Uploading postal streets");
-			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFilePs, zipFilePs.toString());
+			status.set("Uploading postal streets");
+			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataPath + dataFilePs, zipFilePs.toString());
 	
-			setStatus("Uploading empty streets");
-			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataFileEs, zipFileEs.toString());
+			status.set("Uploading empty streets");
+			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataPath + dataFileEs, zipFileEs.toString());
 
-			setStatus("Done (OK) " + fileName);
+			status.set("Done (OK) " + fileName);
 			mail = Mail.withText(mailTo, "Conversion ok", "File used: " + fileName);
 		} catch (IOException ioe) {
-			setStatus("Failed " + ioe.getMessage());
+			status.set("Failed " + ioe.getMessage());
 			mail = Mail.withText(mailTo, "Conversion failed", ioe.getMessage());		
 		} finally {
 			for(Path p: new Path[]{ tempFile, zipFileOAVLG, zipFileOABRU, zipFileOAWAL, zipFilePs, zipFileEs}) {
@@ -246,5 +251,10 @@ public class ConverterBean extends StatusBean {
 			}
 		}
 		mailer.sendMail(mail);
+	}
+
+	@Override
+	public List<String> getStatusHistory() {
+		return status.getHistory();
 	}
 }

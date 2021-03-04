@@ -45,7 +45,7 @@ public class MailService {
 
 	@Inject
 	Mailer mailer;
-	
+
 	/**
 	 * Send a mail
 	 * 
@@ -58,6 +58,5 @@ public class MailService {
 		} catch (Exception e) {
 			LOG.error("Sending mail failed", e);
 		}
-	}
-	
+	}	
 }

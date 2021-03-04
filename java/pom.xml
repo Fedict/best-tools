@@ -9,7 +9,6 @@
         <module>converter</module>
         <module>dao</module>
         <module>dbloader</module>
-        <module>emptystreets</module>
         <module>unzip</module>
         <module>webservice</module>
         <module>xmlreader</module>
