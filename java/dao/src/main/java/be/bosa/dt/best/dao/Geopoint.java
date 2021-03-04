@@ -48,7 +48,7 @@ public class Geopoint {
 	 * Set X coordinate
 	 * @param x 
 	 */
-	public void setX(float x) {
+	public void setX(double x) {
 		this.x = x;
 	}
 
