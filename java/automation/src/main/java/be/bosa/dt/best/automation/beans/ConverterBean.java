@@ -112,7 +112,7 @@ public class ConverterBean implements StatusHistory {
 	@ConfigProperty(name = "copier.mailto")
 	String mailTo;
 
-	private Status status = new Status();
+	private final Status status = new Status();
 
 	/**
 	 * Convert BeST XML into CSV files per Region.
@@ -132,7 +132,7 @@ public class ConverterBean implements StatusHistory {
 			for(BestRegion region: BestRegion.values()) {
 				brw.writeRegion(new BestWriterCSV(), region, xmlPath, csvPath);
 			}
-			zip.zip(csvPath.toString(), zipfile, f -> f.toString().contains("postal"));
+			zip.zip(csvPath.toString(), zipfile, f -> f.toString().contains("postalstreet"));
 		} finally {
 			Utils.recursiveDelete(xmlPath);
 			Utils.recursiveDelete(csvPath);

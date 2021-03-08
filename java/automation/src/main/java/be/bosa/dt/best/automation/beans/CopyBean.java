@@ -96,7 +96,7 @@ public class CopyBean implements StatusHistory {
 	@ConfigProperty(name = "copier.mailto")
 	String mailTo;
 
-	private Status status = new Status();
+	private final Status status = new Status();
 
 	/**
 	 * Copy ZIP file from MFT to public website via SFTP
