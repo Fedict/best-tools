@@ -132,7 +132,7 @@ public class ConverterBean implements StatusHistory {
 			for(BestRegion region: BestRegion.values()) {
 				brw.writeRegion(new BestWriterCSV(), region, xmlPath, csvPath);
 			}
-			zip.zip(csvPath.toString(), zipfile, f -> f.toString().contains("postalstreet"));
+			zip.zip(csvPath.toString(), zipfile, f -> f.toString().contains("postal_street"));
 		} finally {
 			Utils.recursiveDelete(xmlPath);
 			Utils.recursiveDelete(csvPath);
