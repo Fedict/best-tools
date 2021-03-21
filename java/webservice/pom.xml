@@ -54,7 +54,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-spatial</artifactId>
-			<version>5.4.27.Final</version>
+			<version>5.4.27.SP1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.n52.jackson</groupId>

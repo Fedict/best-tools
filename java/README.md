@@ -32,10 +32,10 @@ Usage:
 `java -jar emptystreets.jar -i <directory_unzipped_xml> -B -F -W`
 
 
-## Dao
+## DAO
 
 Helper module containing data objects to be used in other projects
 
 ## XmlReader
 
-Helper module containing readers to load XML files into Dao
+Helper module containing readers to load XML files into DAO
