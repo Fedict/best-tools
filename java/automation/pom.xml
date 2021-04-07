@@ -53,11 +53,6 @@
 			<version>${project.version}</version>
 		</dependency>	
 		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>emptystreets</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
             <groupId>com.hierynomus</groupId>
             <artifactId>sshj</artifactId>
             <version>0.31.0</version>
