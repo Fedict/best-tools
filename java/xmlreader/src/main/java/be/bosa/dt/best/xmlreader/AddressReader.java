@@ -143,7 +143,7 @@ public class AddressReader extends AbstractXMLReader<Address> {
 	}
 	
 	/**
-	 * Get a Java stream of streetnames
+	 * Get a Java stream of addresses
 	 * 
 	 * @param region region
 	 * @param indir input directory
