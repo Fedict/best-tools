@@ -29,6 +29,7 @@ import be.bosa.dt.best.automation.util.Utils;
 import be.bosa.dt.best.automation.util.Status;
 import be.bosa.dt.best.automation.services.MailService;
 import be.bosa.dt.best.automation.services.TransferService;
+import be.bosa.dt.best.automation.services.VerifyService;
 import be.bosa.dt.best.automation.util.StatusHistory;
 
 import io.quarkus.mailer.Mail;
@@ -57,6 +58,9 @@ public class CopyBean implements StatusHistory {
 	@Inject
 	MailService mailer;
 
+	@Inject
+	VerifyService verifier;
+
 	@ConfigProperty(name = "copier.mft.server")
 	String mftServer;
 
@@ -71,9 +75,6 @@ public class CopyBean implements StatusHistory {
 	
 	@ConfigProperty(name = "copier.mft.file")
 	String mftFile;
-
-	@ConfigProperty(name = "copier.mft.minsize")
-	long minSize;
 
 	@ConfigProperty(name = "copier.data.server")
 	String dataServer;
@@ -114,10 +115,12 @@ public class CopyBean implements StatusHistory {
 			String fileName = Utils.getFileName(mftFile);
 	
 			status.set("Downloading " + fileName);
-			sftp.download(mftServer, mftPort, mftUser, mftPass, fileName, localFile);
+			sftp.download(fileName, localFile);
+
+			verifier.verify(localFile);
 
 			status.set("Uploading");
-			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataPath + dataFile, localFile);
+			sftp.upload(dataPath + dataFile, localFile);
 
 			status.set("Done (OK) " + fileName);
 			mail = Mail.withText(mailTo, "Copy ok", "File copied: " + fileName);

@@ -29,6 +29,7 @@ import be.bosa.dt.best.automation.util.Utils;
 import be.bosa.dt.best.automation.util.Status;
 import be.bosa.dt.best.automation.services.MailService;
 import be.bosa.dt.best.automation.services.TransferService;
+import be.bosa.dt.best.automation.services.VerifyService;
 import be.bosa.dt.best.automation.services.ZipService;
 import be.bosa.dt.best.automation.util.StatusHistory;
 import be.bosa.dt.best.converter.writer.BestRegionWriter;
@@ -66,32 +67,11 @@ public class ConverterBean implements StatusHistory {
 	@Inject
 	MailService mailer;
 
-	@ConfigProperty(name = "copier.mft.server")
-	String mftServer;
-
-	@ConfigProperty(name = "copier.mft.port", defaultValue = "22")
-	int mftPort;
-
-	@ConfigProperty(name = "copier.mft.user")
-	String mftUser;
-	
-	@ConfigProperty(name = "copier.mft.pass")
-	String mftPass;
+	@Inject
+	VerifyService verifier;
 	
 	@ConfigProperty(name = "copier.mft.file")
 	String mftFile;
-
-	@ConfigProperty(name = "copier.data.server")
-	String dataServer;
-
-	@ConfigProperty(name = "copier.data.port", defaultValue = "22")
-	int dataPort;
-	
-	@ConfigProperty(name = "copier.data.user")
-	String dataUser;
-	
-	@ConfigProperty(name = "copier.data.pass")
-	String dataPass;
 
 	@ConfigProperty(name = "copier.data.path")
 	String dataPath;
@@ -209,7 +189,9 @@ public class ConverterBean implements StatusHistory {
 			String fileName = Utils.getFileName(mftFile);
 
 			status.set("Downloading " + fileName);
-			sftp.download(mftServer, mftPort, mftUser, mftPass, fileName, localFile);
+			sftp.download(fileName, localFile);
+			
+			verifier.verify(localFile);
 
 			zipFileOAVLG = Files.createTempFile("best", "oavlg");			
 			zipFileOABRU = Files.createTempFile("best", "oabru");
@@ -226,17 +208,17 @@ public class ConverterBean implements StatusHistory {
 			convertEmptyStreets(localFile, zipFileEs.toString());
 
 			status.set("Uploading open addresses VLG");
-			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataPath + dataFileOAVLG, zipFileOAVLG.toString());
+			sftp.upload(dataPath + dataFileOAVLG, zipFileOAVLG.toString());
 			status.set("Uploading open addresses BRU");
-			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataPath + dataFileOABRU, zipFileOABRU.toString());
+			sftp.upload(dataPath + dataFileOABRU, zipFileOABRU.toString());
 			status.set("Uploading open addresses WAL");
-			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataPath + dataFileOAWAL, zipFileOAWAL.toString());
+			sftp.upload(dataPath + dataFileOAWAL, zipFileOAWAL.toString());
 
 			status.set("Uploading postal streets");
-			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataPath + dataFilePs, zipFilePs.toString());
+			sftp.upload(dataPath + dataFilePs, zipFilePs.toString());
 	
 			status.set("Uploading empty streets");
-			sftp.upload(dataServer, dataPort, dataUser, dataPass, dataPath + dataFileEs, zipFileEs.toString());
+			sftp.upload(dataPath + dataFileEs, zipFileEs.toString());
 
 			status.set("Done (OK) " + fileName);
 			mail = Mail.withText(mailTo, "Conversion ok", "File used: " + fileName);

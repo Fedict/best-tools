@@ -33,6 +33,7 @@ import javax.enterprise.context.ApplicationScoped;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import org.eclipse.microprofile.faulttolerance.Retry;
 
@@ -43,23 +44,45 @@ import org.eclipse.microprofile.faulttolerance.Retry;
  */
 @ApplicationScoped
 public class TransferService {
+	// from
+	@ConfigProperty(name = "copier.mft.server")
+	String mftServer;
+
+	@ConfigProperty(name = "copier.mft.port", defaultValue = "22")
+	int mftPort;
+
+	@ConfigProperty(name = "copier.mft.user")
+	String mftUser;
+	
+	@ConfigProperty(name = "copier.mft.pass")
+	String mftPass;
+
+	// to
+	@ConfigProperty(name = "copier.data.server")
+	String dataServer;
+
+	@ConfigProperty(name = "copier.data.port", defaultValue = "22")
+	int dataPort;
+	
+	@ConfigProperty(name = "copier.data.user")
+	String dataUser;
+	
+	@ConfigProperty(name = "copier.data.pass")
+	String dataPass;
+
 	/**
 	 * Download data file via SFTP (typically from BOSA "Managed File Transfer" service) and save it to a local file.
-	 * 
-	 * @param server remote host
-	 * @param port port
-	 * @param user user name
-	 * @param pass password
+	 *
 	 * @param remote remote location of the file
 	 * @param local local name of zip file
 	 * @throws IOException 
 	 */
 	@Retry(retryOn = Exception.class, maxRetries = 3, delay = 2000)
-	public void download(String server, int port, String user, String pass, String remote, String local) throws IOException {
+	public void download(String remote, String local) throws IOException {
 		SSHClient client = new SSHClient();
 		client.addHostKeyVerifier(new PromiscuousVerifier());
-		client.connect(server, port);
-		client.authPassword(user, pass);
+		client.connect(mftServer, mftPort);
+		client.authPassword(mftUser, mftPass);
 
 		try (SFTPClient sftp = client.newSFTPClient()) {
 			sftp.get(remote, local);
@@ -71,20 +94,16 @@ public class TransferService {
 	/**
 	 * Upload file to a server via SFTP
 	 * 
-	 * @param server remote host
-	 * @param port remote port
-	 * @param user user name
-	 * @param pass password
 	 * @param remote remote location of the file
 	 * @param local local zip file
 	 * @throws IOException 
 	 */
 	@Retry(retryOn = Exception.class, maxRetries = 5, delay = 3000)
-	public void upload(String server, int port, String user, String pass, String remote, String local) throws IOException {
+	public void upload(String remote, String local) throws IOException {
 		SSHClient client = new SSHClient();
 		client.addHostKeyVerifier(new PromiscuousVerifier());
-		client.connect(server, port);
-		client.authPassword(user, pass);
+		client.connect(dataServer, dataPort);
+		client.authPassword(dataUser, dataPass);
 
 		try (SFTPClient sftp = client.newSFTPClient()) {
 			sftp.put(local, remote);
