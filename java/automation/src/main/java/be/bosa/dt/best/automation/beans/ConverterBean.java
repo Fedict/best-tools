@@ -33,9 +33,9 @@ import be.bosa.dt.best.automation.services.ZipService;
 import be.bosa.dt.best.automation.util.StatusHistory;
 import be.bosa.dt.best.converter.writer.BestRegionWriter;
 import be.bosa.dt.best.converter.writer.BestWriterCSV;
+import be.bosa.dt.best.converter.writer.BestWriterCSVEmptyStreets;
 import be.bosa.dt.best.converter.writer.BestWriterCSVOpenAddresses;
 import be.bosa.dt.best.dao.BestRegion;
-import be.bosa.dt.best.emptystreets.EmptyStreetWriter;
 
 import io.quarkus.mailer.Mail;
 import io.quarkus.scheduler.Scheduled;
@@ -179,9 +179,9 @@ public class ConverterBean implements StatusHistory {
 			csvPath = Files.createTempDirectory("emptystreets-out");
 			zip.unzip(file, xmlPath.toString());
 
-			EmptyStreetWriter esw = new EmptyStreetWriter();
+			BestRegionWriter brw = new BestRegionWriter();
 			for(BestRegion region: BestRegion.values()) {
-				esw.writeRegion(region, xmlPath, csvPath);
+				brw.writeRegion(new BestWriterCSVEmptyStreets(), region, xmlPath, csvPath);
 			}
 			zip.zip(csvPath.toString(), zipfile);	
 		} finally {

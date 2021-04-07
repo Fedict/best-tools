@@ -141,6 +141,9 @@ public class BestWriterCSVEmptyStreets extends BestWriterCSV {
 
 		Map<String, Map<String, String[]>> cache = new HashMap<>();
 
+		LOG.log(Level.INFO, "Streets {0}, cities {1}, postals {2}", 
+			new Object[] { streets.size(), cities.size(), postals.size() });
+	
 		// remove streets that have at least one address
 		addresses.filter(a -> a.getStatus().equals("current"))
 					.peek(a -> fillPostals(a, cities, NL, FR, DE))

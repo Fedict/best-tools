@@ -4,7 +4,7 @@
     <parent>
         <groupId>be.bosa.dt</groupId>
         <artifactId>best</artifactId>
-        <version>1.2.0</version>
+        <version>1.2.1</version>
     </parent>
     <groupId>be.bosa.dt.best</groupId>
     <artifactId>dbloader</artifactId>
@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.2.18</version>
+			<version>42.2.19</version>
 		</dependency>
     </dependencies>
 	<build>
