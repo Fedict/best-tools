@@ -92,7 +92,13 @@ public abstract class AbstractXMLReader<T> implements BestReader {
 	}
 
 	protected abstract QName getRoot();
-	
+
+	/**
+	 * Just read the root element
+	 * 
+	 * @param reader
+	 * @throws XMLStreamException 
+	 */
 	protected void start(XMLEventReader reader) throws XMLStreamException {
 		while(reader.hasNext()) {
 			XMLEvent peek = reader.peek();

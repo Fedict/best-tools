@@ -61,31 +61,11 @@ public class CopyBean implements StatusHistory {
 	@Inject
 	VerifyService verifier;
 
-	@ConfigProperty(name = "copier.mft.server")
-	String mftServer;
-
-	@ConfigProperty(name = "copier.mft.port", defaultValue = "22")
-	int mftPort;
-
-	@ConfigProperty(name = "copier.mft.user")
-	String mftUser;
-	
-	@ConfigProperty(name = "copier.mft.pass")
 	String mftPass;
 	
 	@ConfigProperty(name = "copier.mft.file")
 	String mftFile;
 
-	@ConfigProperty(name = "copier.data.server")
-	String dataServer;
-
-	@ConfigProperty(name = "copier.data.port", defaultValue = "22")
-	int dataPort;
-	
-	@ConfigProperty(name = "copier.data.user")
-	String dataUser;
-	
-	@ConfigProperty(name = "copier.data.pass")
 	String dataPass;
 
 	@ConfigProperty(name = "copier.data.path")

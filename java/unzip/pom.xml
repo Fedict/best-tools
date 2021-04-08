@@ -4,7 +4,7 @@
     <parent>
         <groupId>be.bosa.dt</groupId>
         <artifactId>best</artifactId>
-        <version>1.2.1</version>
+        <version>1.2.2</version>
     </parent>
     <groupId>be.bosa.dt.best</groupId>
     <artifactId>unzip</artifactId>

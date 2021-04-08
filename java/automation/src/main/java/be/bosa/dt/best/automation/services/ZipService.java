@@ -31,7 +31,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -52,7 +54,20 @@ public class ZipService {
 	private static final Logger LOG = Logger.getLogger(ZipService.class);
 
 	/**
-	 * Unzip a zip file into a directory
+	 * Get (non-recursive) list of files in a zip
+	 * 
+	 * @param pin input file
+	 * @return list of file names
+	 * @throws IOException 
+	 */
+	public List<String> listFiles(Path pin) throws IOException {
+		try (ZipFile zip = new ZipFile(pin.toFile())) {
+			return zip.stream().map(ZipEntry::getName).collect(Collectors.toList());
+		}
+	}
+
+	/**
+	 * (Recursively) unzip a zip file into a directory
 	 * 
 	 * @param pin input file
 	 * @param pout output directory

@@ -27,8 +27,11 @@ package be.bosa.dt.best.automation.services;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 
@@ -43,6 +46,12 @@ public class VerifyService {
 	@ConfigProperty(name = "copier.mft.minsize")
 	long minSize;
 
+	@ConfigProperty(name = "copier.mft.files")
+	List<String> expected;
+
+	@Inject
+	ZipService zip;
+
 	/**
 	 * Check BeST ZIP file
 	 * 
@@ -52,7 +61,21 @@ public class VerifyService {
 	public void verify(String file) throws IOException {
 		long fileSize = new File(file).length();
 		if (fileSize < minSize) {
-			throw new IOException("ZIP file too small: " + fileSize);
+			throw new IOException("File too small: " + fileSize);
+		}
+		
+		List<String> files = zip.listFiles(Paths.get(file));
+		if (files.size() != expected.size()) {
+			throw new IOException("Numer of files is different: " + files.size());
+		}
+		for(String e: expected) {
+			long count = files.stream().filter(f -> f.startsWith(e)).count();
+			if (count == 0) {
+				throw new IOException("Expected not found: " + e);
+			}
+			if (count > 1) {
+				throw new IOException("Expected found multiple times: " + e);
+			}
 		}
 	}
 }
