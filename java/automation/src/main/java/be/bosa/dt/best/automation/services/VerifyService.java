@@ -33,6 +33,7 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
 
 
 
@@ -43,6 +44,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
  */
 @ApplicationScoped
 public class VerifyService {
+	private static final Logger LOG = Logger.getLogger(ZipService.class);
+
 	@ConfigProperty(name = "copier.mft.minsize")
 	long minSize;
 
@@ -63,10 +66,11 @@ public class VerifyService {
 		if (fileSize < minSize) {
 			throw new IOException("File too small: " + fileSize);
 		}
-		
+		LOG.infof("File size %s OK", fileSize);
+
 		List<String> files = zip.listFiles(Paths.get(file));
 		if (files.size() != expected.size()) {
-			throw new IOException("Numer of files is different: " + files.size());
+			throw new IOException("Number of files is different: " + files.size());
 		}
 		for(String e: expected) {
 			long count = files.stream().filter(f -> f.startsWith(e)).count();
@@ -76,6 +80,7 @@ public class VerifyService {
 			if (count > 1) {
 				throw new IOException("Expected found multiple times: " + e);
 			}
+			LOG.infof("Expected %s OK", e);			
 		}
 	}
 }
