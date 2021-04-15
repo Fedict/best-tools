@@ -76,6 +76,9 @@ public class ConverterBean implements StatusHistory {
 	@ConfigProperty(name = "copier.data.path")
 	String dataPath;
 
+	@ConfigProperty(name = "bestfull.data.file")
+	String dataFile;
+
 	@ConfigProperty(name = "postalstreets.data.file")
 	String dataFilePs;
 
@@ -219,7 +222,10 @@ public class ConverterBean implements StatusHistory {
 	
 			status.set("Uploading empty streets");
 			sftp.upload(dataPath + dataFileEs, zipFileEs.toString());
-
+			
+			status.set("Uploading BeST Full");
+			sftp.upload(dataPath + dataFile, localFile);
+			
 			status.set("Done (OK) " + fileName);
 			mail = Mail.withText(mailTo, "Conversion ok", "File used: " + fileName);
 		} catch (IOException ioe) {
