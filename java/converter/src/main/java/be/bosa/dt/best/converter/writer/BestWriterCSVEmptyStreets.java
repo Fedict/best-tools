@@ -118,6 +118,7 @@ public class BestWriterCSVEmptyStreets extends BestWriterCSV {
 	@Override
 	public Map<String, String[]> writeStreets(BestRegion region, Path outdir, Stream<Street> streets,
 			Map<String, String[]> cities) {
+	
 		return streets
 			.filter(s -> s.getStatus().equals("current"))
 			.filter(s -> s.getTillDate() == null)		// remove streets with end date, even if status is current 
@@ -136,9 +137,8 @@ public class BestWriterCSVEmptyStreets extends BestWriterCSV {
 		Map<String,String[]> NL = new HashMap<>();
 		Map<String,String[]> FR = new HashMap<>();
 		Map<String,String[]> DE = new HashMap<>();
-		
-		Map<String, String[]> emptyStreets = new HashMap<>(streets);
 
+		Map<String, String[]> emptyStreets = new HashMap<>(streets);
 		Map<String, Map<String, String[]>> cache = new HashMap<>();
 
 		LOG.log(Level.INFO, "Streets {0}, cities {1}, postals {2}", 
@@ -156,10 +156,10 @@ public class BestWriterCSVEmptyStreets extends BestWriterCSV {
 			String[] p = NL.getOrDefault(c[0],
 						FR.getOrDefault(c[1],
 							DE.getOrDefault(c[2], new String[4])));
-			
+
 			// mimic structure of the other postalstreets file (streets with an address)
 			Map<String, String[]> postalStreet = cache.getOrDefault(p[0], new HashMap<>());
-			postalStreet.put(s[0], new String[]{ 
+			postalStreet.put(s[4], new String[]{ 
 				p[0], p[1], p[2], p[3],
 				s[0], s[1], s[2], 
 				c[0], c[1], c[2],
