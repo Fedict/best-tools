@@ -42,7 +42,7 @@ Helper module containing readers to load XML files into DAO
 
 ## DbLoader
 
-Loads (unzipped) XML files into a PostGIS RDBMS
+Loads (unzipped) XML files into a PostGIS RDBMS, requires role with admin role to create PostGIS extension
 
 Usage:
-`java -jar dbloader.jar -x <directory_unzipped_xml> -d jdbc:postgresql:localhost/best?user=foo&password=bar`
+`java -jar dbloader.jar -x <directory_unzipped_xml> -d jdbc:postgresql://localhost/best?user=foo&password=bar`
