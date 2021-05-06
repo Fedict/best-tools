@@ -110,7 +110,7 @@ public class SpatiaLiteLoader extends DbLoader {
 							"status VARCHAR(10))");
 
 			LOG.info("Adding geo column");
-			stmt.execute("SELECT AddGeometryColumn('addresses', 'geom', 4326, 'POINT', 'XY')");
+			stmt.execute("SELECT AddGeometryColumn('addresses', 'geom', 31370, 'POINT', 'XY')");
 		}
 	}
 
@@ -122,16 +122,16 @@ public class SpatiaLiteLoader extends DbLoader {
 
 			LOG.info("Constraints and indices");
 			// unfortunately not guaranteed to be unique in files / constraints issues
-			stmt.execute("CREATE INDEX ON streets(city_id)");
-			stmt.execute("CREATE INDEX ON addresses(postal_id)");
-			stmt.execute("CREATE INDEX ON addresses(city_id)");
-			stmt.execute("CREATE INDEX ON addresses(part_id)");
+			stmt.execute("CREATE INDEX idx_str_city ON streets(city_id)");
+			stmt.execute("CREATE INDEX idx_add_postal ON addresses(postal_id)");
+			stmt.execute("CREATE INDEX idx_add_city ON addresses(city_id)");
+			stmt.execute("CREATE INDEX idx_add_part ON addresses(part_id)");
 			
 			LOG.info("Set primary keys");
-			stmt.execute("ALTER TABLE municipalities ADD PRIMARY KEY(id)");
-			stmt.execute("ALTER TABLE municipalityparts ADD PRIMARY KEY(id)");
-			stmt.execute("ALTER TABLE streets ADD PRIMARY KEY(id)");
-			stmt.execute("ALTER TABLE addresses ADD PRIMARY KEY(id)");
+			stmt.execute("CREATE UNIQUE INDEX idx_mun_id ON municipalities(id)");
+			stmt.execute("CREATE UNIQUE INDEX idx_mpt_id ON municipalityparts(id)");
+			stmt.execute("CREATE UNIQUE INDEX idx_str_id ON streets(id)");
+			stmt.execute("CREATE UNIQUE INDEX idx_addr_id ON addresses(id)");
 
 			LOG.info("Set spatial index");			
 			stmt.execute("SELECT CreateSpatialIndex('addresses', 'geom')");
