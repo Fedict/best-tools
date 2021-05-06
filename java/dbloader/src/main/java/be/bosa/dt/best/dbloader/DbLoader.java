@@ -75,9 +75,10 @@ public abstract class DbLoader {
 	/**
 	 * Initialize database and create tables
 	 * 
+	 * @param gps use gps coordinates instead of Lambert72
 	 * @throws SQLException 
 	 */
-	public abstract void initDb() throws SQLException;
+	public abstract void initDb(boolean gps) throws SQLException;
 
 	/**
 	 * Add additional constraints and indices
@@ -276,10 +277,11 @@ public abstract class DbLoader {
 	 * Load XML BeST data files in a database file.
 	 * 
 	 * @param xmlPath path to XML BeST files
+	 * @param gps store coordinates as GPS coordinates
 	 * @throws ClassNotFoundException
 	 * @throws SQLException 
 	 */
-	public void loadData(Path xmlPath) throws ClassNotFoundException, SQLException {
+	public void loadData(Path xmlPath, boolean gps) throws ClassNotFoundException, SQLException {
 		try(Connection conn = getConnection()) {
 			
 			PreparedStatement prep = conn.prepareStatement("INSERT INTO postals VALUES (?, ?, ?, ?, ?)");
@@ -294,7 +296,10 @@ public abstract class DbLoader {
 			prep = conn.prepareStatement("INSERT INTO streets VALUES (?, ?, ?, ?, ?, ?)");
 			loadStreets(prep, xmlPath);
 
-			prep = conn.prepareStatement("INSERT INTO addresses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ST_GeomFromText(?, 31370))");
+			prep = conn.prepareStatement(gps
+				? "INSERT INTO addresses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ST_Transform(ST_GeomFromText(?, 31370), 4326))"
+				: "INSERT INTO addresses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ST_GeomFromText(?, 31370))"
+			);
 			loadAddresses(prep, xmlPath);
 		}
 

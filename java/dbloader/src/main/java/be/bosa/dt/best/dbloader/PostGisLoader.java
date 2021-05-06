@@ -41,7 +41,7 @@ public class PostGisLoader extends DbLoader {
 	private static final Logger LOG = Logger.getLogger(PostGisLoader.class.getName());
 
 	@Override
-	public void initDb() throws SQLException {
+	public void initDb(boolean gps) throws SQLException {
 		LOG.info("Initalizing DB");
 		// Spatial features
 		try(Connection conn = getConnection()) {

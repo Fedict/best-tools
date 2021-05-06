@@ -29,6 +29,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.sqlite.SQLiteConfig;
 import org.sqlite.SQLiteOpenMode;
@@ -62,11 +63,10 @@ public class SpatiaLiteLoader extends DbLoader {
 	}
 	
 	@Override
-	public void initDb() throws SQLException {
+	public void initDb(boolean gps) throws SQLException {
 		LOG.info("Initalizing DB");
 
-
-		LOG.info("Creating table");
+		LOG.info("Creating tables");
 		// We could use an ORM tool like MyBatis or Hibernate, but let's use plain JDBC
 		try(Connection conn = getConnection()) {
 			Statement stmt = conn.createStatement();
@@ -108,9 +108,12 @@ public class SpatiaLiteLoader extends DbLoader {
 							"houseno VARCHAR(12), " +
 							"boxno VARCHAR(40), " +
 							"status VARCHAR(10))");
+			
+			String crs = gps ? "4326" : "31370";
+			
+			LOG.log(Level.INFO, "Adding geo column using CRS {0}", crs);
 
-			LOG.info("Adding geo column");
-			stmt.execute("SELECT AddGeometryColumn('addresses', 'geom', 31370, 'POINT', 'XY')");
+			stmt.execute("SELECT AddGeometryColumn('addresses', 'geom', " + crs + ", 'POINT', 'XY')");
 		}
 	}
 

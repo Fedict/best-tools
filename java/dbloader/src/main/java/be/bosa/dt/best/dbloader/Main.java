@@ -49,7 +49,8 @@ public class Main {
 
 	private final static Options OPTS = new Options()
 		.addRequiredOption("x", "xmldir", true, "directory with unzipped BeST XML files")
-		.addRequiredOption("d", "db", true, "jdbc connection string");
+		.addRequiredOption("d", "db", true, "jdbc connection string")
+		.addOption("g", "gps", false, "store coordinates as WGS84/GPS instead of Lambert72");
 
 	/**
 	 * Print help info
@@ -88,6 +89,7 @@ public class Main {
 
 		String xmldir = cli.getOptionValue("x");
 		String dbstr = cli.getOptionValue("d");
+		boolean gps = cli.hasOption("g");
 		
 		Path xmlPath = Paths.get(xmldir);
 		if (!xmlPath.toFile().exists()) {
@@ -106,8 +108,8 @@ public class Main {
 		}
 
 		try {
-			loader.initDb();
-			loader.loadData(xmlPath);
+			loader.initDb(gps);
+			loader.loadData(xmlPath, gps);
 		} catch (Exception e) {
 			LOG.log(Level.SEVERE, "Failed", e);
 			System.exit(-4);
