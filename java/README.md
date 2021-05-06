@@ -42,7 +42,15 @@ Helper module containing readers to load XML files into DAO
 
 ## DbLoader
 
-Loads (unzipped) XML files into a PostGIS RDBMS, requires role with admin role to create PostGIS extension
+Loads (unzipped) BeST XML files into a [PostGIS](https://postgis.net) or [SpatiaLite](https://www.gaia-gis.it/fossil/libspatialite/home) RDBMS, optionally converting Lambert72 coordinates to WGS84/GPS
+
+For PostGIS, the user has to have admin rights to create the PostGIS extensions
 
 Usage:
 `java -jar dbloader.jar -x <directory_unzipped_xml> -d jdbc:postgresql://localhost/best?user=foo&password=bar`
+
+For spatialite, the `mod_spatialite` .dll or .so must be in the `PATH` environment variable.
+In addition, when converting Lambert coordinates to GPS coordinates, `PROJ_LIB` environment variable needs to be set to the directory containing proj.db database file, which is part of the precompiled [Windows executables](http://www.gaia-gis.it/gaia-sins/).
+
+Usage:
+`java -jar dbloader.jar -x <directory_unzipped_xml> -d jdbc:sqlite:C:/data/best.db -g`
