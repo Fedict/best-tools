@@ -24,15 +24,6 @@ It is possible to select one or more regions: B(russels), F(landers) or W(alloon
 Usage:
 `java -jar converter.jar -i <directory_unzipped_xml> -B -F -W`
 
-## Empty streets tool
-
-After unzipping the BeST-file, this tool can be used to get the list of streets without buildings (parcs, rural roads ...) as CSV.
-It is possible to select one or more regions: B(russels), F(landers) or W(alloon).
-
-Usage:
-`java -jar emptystreets.jar -i <directory_unzipped_xml> -B -F -W`
-
-
 ## DbLoader
 
 Loads (unzipped) BeST XML files into a [PostGIS](https://postgis.net) or [SpatiaLite](https://www.gaia-gis.it/fossil/libspatialite/home) RDBMS, optionally converting Lambert72 coordinates to WGS84/GPS
