@@ -23,6 +23,7 @@
             </goals>
             <configuration>
               <transformers>
+                <transformer />
                 <transformer>
                   <mainClass>be.bosa.dt.best.dbloader.Main</mainClass>
                 </transformer>

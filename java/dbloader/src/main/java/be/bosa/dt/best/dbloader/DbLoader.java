@@ -43,6 +43,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.Properties;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -57,22 +58,33 @@ import java.util.stream.Stream;
  */
 public abstract class DbLoader {
 	private static final Logger LOG = Logger.getLogger(DbLoader.class.getName());
+	private final String dbStr;
+	private final Properties dbProp;
 
+	public String getDbStr() {
+		return dbStr;
+	}
+
+	public Properties getDbProp() {
+		return dbProp;
+	}
+
+	public Connection getConnection() throws SQLException {
+		return DriverManager.getConnection(getDbStr(), getDbProp());
+	}
 	/**
 	 * Initialize database and create tables
 	 * 
-	 * @param jdbc
 	 * @throws SQLException 
 	 */
-	public abstract void initDb(String jdbc) throws SQLException;
+	public abstract void initDb() throws SQLException;
 
 	/**
 	 * Add additional constraints and indices
 	 * 
-	 * @param jdbc database string
 	 * @throws SQLException
 	 */
-	public abstract void addConstraints(String jdbc) throws SQLException;
+	public abstract void addConstraints() throws SQLException;
 
 	/**
 	 * Load postal code info
@@ -263,16 +275,13 @@ public abstract class DbLoader {
 	/**
 	 * Load XML BeST data files in a database file.
 	 * 
-	 * @param dbstr JDBC connection string to database
 	 * @param xmlPath path to XML BeST files
 	 * @throws ClassNotFoundException
 	 * @throws SQLException 
 	 */
-	public void loadData(String dbstr, Path xmlPath) throws ClassNotFoundException, SQLException {
-		// init db
-		initDb(dbstr);
-
-		try(Connection conn = DriverManager.getConnection(dbstr)) {
+	public void loadData(Path xmlPath) throws ClassNotFoundException, SQLException {
+		try(Connection conn = getConnection()) {
+			
 			PreparedStatement prep = conn.prepareStatement("INSERT INTO postals VALUES (?, ?, ?, ?, ?)");
 			loadPostals(prep, xmlPath);
 
@@ -289,6 +298,17 @@ public abstract class DbLoader {
 			loadAddresses(prep, xmlPath);
 		}
 
-		addConstraints(dbstr);
+		addConstraints();
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param dbstr 
+	 * @param prop 
+	 */
+	public DbLoader(String dbstr, Properties prop) {
+		this.dbStr = dbstr;
+		this.dbProp = prop;
 	}
 }

@@ -26,9 +26,9 @@
 package be.bosa.dt.best.dbloader;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
@@ -41,15 +41,17 @@ public class PostGisLoader extends DbLoader {
 	private static final Logger LOG = Logger.getLogger(PostGisLoader.class.getName());
 
 	@Override
-	public void initDb(String jdbc) throws SQLException {
+	public void initDb() throws SQLException {
+		LOG.info("Initalizing DB");
 		// Spatial features
-		try(Connection conn = DriverManager.getConnection(jdbc)) {
+		try(Connection conn = getConnection()) {
 			Statement stmt = conn.createStatement();
 			stmt.execute("CREATE EXTENSION IF NOT EXISTS postgis");
 		}
 
+		LOG.info("Creating tables");
 		// We could use an ORM tool like MyBatis or Hibernate, but let's use plain JDBC
-		try(Connection conn = DriverManager.getConnection(jdbc)) {
+		try(Connection conn = getConnection()) {
 			Statement stmt = conn.createStatement();
 
 			stmt.execute("CREATE TABLE postals(" +
@@ -93,9 +95,9 @@ public class PostGisLoader extends DbLoader {
 	}
 
 	@Override
-	public void addConstraints(String jdbc) throws SQLException {
+	public void addConstraints() throws SQLException {
 		// add primary keys, indices and constraints after loading data, for performance
-		try(Connection conn = DriverManager.getConnection(jdbc)) {
+		try(Connection conn = getConnection()) {
 			Statement stmt = conn.createStatement();
 
 			LOG.info("Constraints and indices");
@@ -117,5 +119,9 @@ public class PostGisLoader extends DbLoader {
 			LOG.info("Update statistics");
 			stmt.execute("VACUUM FULL ANALYZE");
 		}
+	}
+	
+	public PostGisLoader(String dbStr) {
+		super(dbStr, new Properties());
 	}
 }

@@ -97,16 +97,17 @@ public class Main {
 
 		DbLoader loader = null;
 		if (dbstr.contains("postg") || dbstr.contains("pgsql")) {
-			loader = new PostGisLoader();
+			loader = new PostGisLoader(dbstr);
 		} else if (dbstr.contains("spatialite") || dbstr.contains("sqlite")) {
-			loader = new SpatiaLiteLoader();
+			loader = new SpatiaLiteLoader(dbstr);
 		} else {
 			LOG.severe("Database type not supported");
 			System.exit(-3);
 		}
 
 		try {
-			loader.loadData(dbstr, xmlPath);
+			loader.initDb();
+			loader.loadData(xmlPath);
 		} catch (Exception e) {
 			LOG.log(Level.SEVERE, "Failed", e);
 			System.exit(-4);

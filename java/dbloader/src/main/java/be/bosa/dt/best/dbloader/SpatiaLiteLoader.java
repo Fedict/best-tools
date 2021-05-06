@@ -30,6 +30,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Logger;
+import org.sqlite.SQLiteConfig;
+import org.sqlite.SQLiteOpenMode;
 
 /**
  * Loads XML BeST data into an RDBMS, in this case SpatiaLite (SQLite extension)
@@ -38,20 +40,38 @@ import java.util.logging.Logger;
  * @author Bart Hanssens
  */
 public class SpatiaLiteLoader extends DbLoader {
-	private static final Logger LOG = Logger.getLogger(SpatiaLiteLoader.class.getName());
+	private final static Logger LOG = Logger.getLogger(SpatiaLiteLoader.class.getName());
+
+	// increase performance
+	private final static SQLiteConfig config = new SQLiteConfig();
+	static {
+		config.enableLoadExtension(true);
+		config.setOpenMode(SQLiteOpenMode.NOMUTEX);
+		config.setCacheSize(1024);
+		config.setPageSize(8192);
+		config.setSynchronous(SQLiteConfig.SynchronousMode.OFF);
+		config.setJournalMode(SQLiteConfig.JournalMode.OFF);
+	}
 
 	@Override
-	public void initDb(String jdbc) throws SQLException {
-		// Spatial features
-		try(Connection conn = DriverManager.getConnection(jdbc)) {
-			Statement stmt = conn.createStatement();
-			stmt.execute("SELECT load_extension('mod_spatialite')");
-		}
+	public Connection getConnection() throws SQLException {
+		Connection conn = DriverManager.getConnection(getDbStr(), getDbProp());
+		Statement stmt = conn.createStatement();
+		stmt.execute("SELECT load_extension('mod_spatialite')");
+		return conn;
+	}
+	
+	@Override
+	public void initDb() throws SQLException {
+		LOG.info("Initalizing DB");
 
+
+		LOG.info("Creating table");
 		// We could use an ORM tool like MyBatis or Hibernate, but let's use plain JDBC
-		try(Connection conn = DriverManager.getConnection(jdbc)) {
+		try(Connection conn = getConnection()) {
 			Statement stmt = conn.createStatement();
-
+			stmt.execute("SELECT InitSpatialMetaData()");
+			
 			stmt.execute("CREATE TABLE postals(" +
 							"id VARCHAR(88) NOT NULL, " +
 							"zipcode VARCHAR(4), " +
@@ -88,14 +108,16 @@ public class SpatiaLiteLoader extends DbLoader {
 							"houseno VARCHAR(12), " +
 							"boxno VARCHAR(40), " +
 							"status VARCHAR(10))");
+
+			LOG.info("Adding geo column");
 			stmt.execute("SELECT AddGeometryColumn('addresses', 'geom', 4326, 'POINT', 'XY')");
 		}
 	}
 
 	@Override
-	public void addConstraints(String jdbc) throws SQLException {
+	public void addConstraints() throws SQLException {
 		// add primary keys, indices and constraints after loading data, for performance
-		try(Connection conn = DriverManager.getConnection(jdbc)) {
+		try(Connection conn = getConnection()) {
 			Statement stmt = conn.createStatement();
 
 			LOG.info("Constraints and indices");
@@ -114,5 +136,9 @@ public class SpatiaLiteLoader extends DbLoader {
 			LOG.info("Set spatial index");			
 			stmt.execute("SELECT CreateSpatialIndex('addresses', 'geom')");
 		}
+	}
+	
+	public SpatiaLiteLoader(String dbStr) {
+		super(dbStr, config.toProperties());
 	}
 }
