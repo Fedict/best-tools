@@ -35,7 +35,6 @@ import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
-
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.IOUtils;
@@ -61,7 +60,7 @@ public class Unzipper {
 			for (ZipEntry f: zip.stream().toArray(ZipEntry[]::new)) {
 				String name = f.getName();
 				Path p = Paths.get(pout.toString(), name);
-				LOG.log(Level.INFO, "Unzipping {}", p);
+				LOG.log(Level.INFO, "Unzipping {0}", p);
 				
 				try (InputStream is = zip.getInputStream(f);
 					OutputStream os = Files.newOutputStream(p)) {
@@ -72,12 +71,12 @@ public class Unzipper {
 					}
 				} catch (IOException e) {
 					ok = false;
-					LOG.log(Level.SEVERE, "Error extracting {}", p);
+					LOG.log(Level.SEVERE, "Error extracting {0}", p);
 				}
 			}
 		} catch (IOException ioe) {
 			ok = false;
-			LOG.log(Level.SEVERE, "Error extracting {}", pin.toFile());
+			LOG.log(Level.SEVERE, "Error extracting {0}", pin);
 		}
 		return ok;
 	}
@@ -101,9 +100,14 @@ public class Unzipper {
 		}
 		
 		Path pout = Paths.get(outdir);
-		if (! (Files.exists(pout) && Files.isDirectory(pout))) {
-			LOG.severe("Could not find output directory");
-			return false;
+		if (! (Files.exists(pout))) {
+			try {
+				LOG.log(Level.INFO, "Creating output directory {0}", pout);
+				Files.createDirectories(pout);
+			} catch (IOException ex) {
+				LOG.log(Level.SEVERE, "Could not create output directory {0}", pout);
+				return false;
+			}
 		}
 		
 		try {
