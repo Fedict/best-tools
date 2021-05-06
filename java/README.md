@@ -24,7 +24,7 @@ It is possible to select one or more regions: B(russels), F(landers) or W(alloon
 Usage:
 `java -jar converter.jar -i <directory_unzipped_xml> -B -F -W`
 
-## DbLoader
+## DbLoader tool
 
 Loads (unzipped) BeST XML files into a [PostGIS](https://postgis.net) or [SpatiaLite](https://www.gaia-gis.it/fossil/libspatialite/home) RDBMS, optionally converting Lambert72 coordinates to WGS84/GPS
 
@@ -39,6 +39,7 @@ In addition, when converting Lambert coordinates to GPS coordinates, the `PROJ_L
 Usage:
 `java -jar dbloader.jar -x <directory_unzipped_xml> -d jdbc:sqlite:C:/data/best.db -g`
 
+### Helper modules
 
 ## DAO
 
