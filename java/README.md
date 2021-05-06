@@ -9,7 +9,8 @@ Note that unzipping the file and converting the XMLs to CSV/SHP may take a few m
 
 ## Unzip tool
 
-Recursively unzip the BeST-zip file: the big ZIP file contains another set of ZIP files. The output directory must already exist.
+Recursively unzip the BeST-zip file.
+The BeST ZIP [full download file](https://opendata.bosa.be/) (+/- 340 MB) contains another set of ZIP files, unzipping all of them requires +/- 13 GB disk space. The output directory will be created if it does not exist.
 
 
 Usage:
@@ -32,14 +33,6 @@ Usage:
 `java -jar emptystreets.jar -i <directory_unzipped_xml> -B -F -W`
 
 
-## DAO
-
-Helper module containing data objects to be used in other projects
-
-## XmlReader
-
-Helper module containing readers to load XML files into DAO
-
 ## DbLoader
 
 Loads (unzipped) BeST XML files into a [PostGIS](https://postgis.net) or [SpatiaLite](https://www.gaia-gis.it/fossil/libspatialite/home) RDBMS, optionally converting Lambert72 coordinates to WGS84/GPS
@@ -54,3 +47,12 @@ In addition, when converting Lambert coordinates to GPS coordinates, the `PROJ_L
 
 Usage:
 `java -jar dbloader.jar -x <directory_unzipped_xml> -d jdbc:sqlite:C:/data/best.db -g`
+
+
+## DAO
+
+Helper module containing data objects to be used in other projects
+
+## XmlReader
+
+Helper module containing readers to load XML files into DAO
