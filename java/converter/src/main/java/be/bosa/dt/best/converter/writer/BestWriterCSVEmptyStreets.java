@@ -163,10 +163,10 @@ public class BestWriterCSVEmptyStreets extends BestWriterCSV {
 				p[0], p[1], p[2], p[3],
 				s[0], s[1], s[2], 
 				c[0], c[1], c[2],
-				"", "", "", "",
+				"", "", "",
 				s[3], s[4], s[5],
 				c[3], c[4], c[5],
-				"", "", "", "",
+				"", "", "",
 			});
 			cache.put(p[0], postalStreet);
 		});
