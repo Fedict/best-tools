@@ -42,6 +42,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -72,13 +73,77 @@ public abstract class DbLoader {
 	public Connection getConnection() throws SQLException {
 		return DriverManager.getConnection(getDbStr(), getDbProp());
 	}
+
 	/**
-	 * Initialize database and create tables
+	 * Create address table with geometry column
 	 * 
 	 * @param gps use gps coordinates instead of Lambert72
 	 * @throws SQLException 
 	 */
-	public abstract void initDb(boolean gps) throws SQLException;
+	public abstract void createSpatialTable(boolean gps) throws SQLException;
+
+	/**
+	 * Create the rest of the "normal" tables
+	 * 
+	 * @throws SQLException 
+	 */
+	public void createNonSpatialTables() throws SQLException {
+		LOG.info("Create tables");
+
+		try(Connection conn = getConnection()) {
+			Statement stmt = conn.createStatement();
+
+			stmt.execute("CREATE TABLE postals(" +
+							"id VARCHAR(88) NOT NULL, " +
+							"zipcode VARCHAR(4) NOT NULL, " +
+							"name_nl VARCHAR(240), " +
+							"name_fr VARCHAR(240), " +
+							"name_de VARCHAR(240))");
+
+			stmt.execute("CREATE TABLE municipalities(" +
+							"id VARCHAR(88) NOT NULL, " +
+							"nis VARCHAR(5) NOT NULL, " +
+							"name_nl VARCHAR(80), " +
+							"name_fr VARCHAR(80), " +
+							"name_de VARCHAR(80))");
+
+			stmt.execute("CREATE TABLE municipalityparts(" +
+							"id VARCHAR(88) NOT NULL, " +
+							"name_nl VARCHAR(80), " +
+							"name_fr VARCHAR(80), " +
+							"name_de VARCHAR(80))");
+
+			stmt.execute("CREATE TABLE streets(" +
+							"id VARCHAR(88) NOT NULL, " +
+							"city_id VARCHAR(88) NOT NULL, " +
+							"name_nl VARCHAR(80), " +
+							"name_fr VARCHAR(80), " +
+							"name_de VARCHAR(80), " +
+							"status VARCHAR(10))");
+		}
+	}
+
+	/**
+	 * Add auxiliary tables to speed up searches on postal codes
+	 * 
+	 * @throws SQLException
+	 */
+	public void addPostalTables() throws SQLException {
+		try(Connection conn = getConnection()) {
+			Statement stmt = conn.createStatement();
+
+			LOG.info("Postal tables");
+			stmt.execute("CREATE TABLE postal_municipalities AS " +
+				"SELECT DISTINCT city_id, zipcode " +
+				"FROM addresses a, postals p " +
+				"WHERE a.postal_id = p.id");
+
+			stmt.execute("CREATE TABLE postal_streets AS " +
+				"SELECT DISTINCT street_id, zipcode " +
+				"FROM addresses a, postals p " +
+				"WHERE a.postal_id = p.id");
+		}
+	}
 
 	/**
 	 * Add additional constraints and indices
@@ -86,7 +151,7 @@ public abstract class DbLoader {
 	 * @throws SQLException
 	 */
 	public abstract void addConstraints() throws SQLException;
-
+	
 	/**
 	 * Load postal code info
 	 * 
@@ -285,6 +350,9 @@ public abstract class DbLoader {
 	 * @throws SQLException 
 	 */
 	public void loadData(Path xmlPath, boolean gps) throws ClassNotFoundException, SQLException {
+		createSpatialTable(gps);
+		createNonSpatialTables();
+
 		try(Connection conn = getConnection()) {
 			
 			PreparedStatement prep = conn.prepareStatement("INSERT INTO postals VALUES (?, ?, ?, ?, ?)");
@@ -305,7 +373,7 @@ public abstract class DbLoader {
 			);
 			loadAddresses(prep, xmlPath);
 		}
-
+		addPostalTables();
 		addConstraints();
 	}
 

@@ -63,43 +63,14 @@ public class SpatiaLiteLoader extends DbLoader {
 	}
 	
 	@Override
-	public void initDb(boolean gps) throws SQLException {
-		LOG.info("Initalizing DB");
+	public void createSpatialTable(boolean gps) throws SQLException {
+		LOG.info("Address table");
 
-		LOG.info("Creating tables");
-		// We could use an ORM tool like MyBatis or Hibernate, but let's use plain JDBC
 		try(Connection conn = getConnection()) {
 			Statement stmt = conn.createStatement();
+
 			stmt.execute("SELECT InitSpatialMetaData()");
-			
-			stmt.execute("CREATE TABLE postals(" +
-							"id VARCHAR(88) NOT NULL, " +
-							"zipcode VARCHAR(4) NOT NULL, " +
-							"name_nl VARCHAR(240), " +
-							"name_fr VARCHAR(240), " +
-							"name_de VARCHAR(240))");
-
-			stmt.execute("CREATE TABLE municipalities(" +
-							"id VARCHAR(88) NOT NULL, " +
-							"nis VARCHAR(5) NOT NULL, " +
-							"name_nl VARCHAR(80), " +
-							"name_fr VARCHAR(80), " +
-							"name_de VARCHAR(80))");
-
-			stmt.execute("CREATE TABLE municipalityparts(" +
-							"id VARCHAR(88) NOT NULL, " +
-							"name_nl VARCHAR(80), " +
-							"name_fr VARCHAR(80), " +
-							"name_de VARCHAR(80))");
-
-			stmt.execute("CREATE TABLE streets(" +
-							"id VARCHAR(88) NOT NULL, " +
-							"city_id VARCHAR(88) NOT NULL, " +
-							"name_nl VARCHAR(80), " +
-							"name_fr VARCHAR(80), " +
-							"name_de VARCHAR(80), " +
-							"status VARCHAR(10))");
-
+	
 			stmt.execute("CREATE TABLE addresses(" +
 							"id VARCHAR(88) NOT NULL, " +
 							"city_id VARCHAR(88) NOT NULL, " +
@@ -125,12 +96,6 @@ public class SpatiaLiteLoader extends DbLoader {
 		// add primary keys, indices and constraints after loading data, for performance
 		try(Connection conn = getConnection()) {
 			Statement stmt = conn.createStatement();
-
-			LOG.info("Postal table");
-			stmt.execute("CREATE TABLE postal_municipalities AS " +
-				"SELECT DISTINCT city_id, zipcode " +
-				"FROM addresses a, postals p " +
-				"WHERE a.postal_id = p.id");
 
 			LOG.info("Constraints and indices");
 			// unfortunately not guaranteed to be unique in files / constraints issues

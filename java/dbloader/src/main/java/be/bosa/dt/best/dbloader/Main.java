@@ -108,7 +108,6 @@ public class Main {
 		}
 
 		try {
-			loader.initDb(gps);
 			loader.loadData(xmlPath, gps);
 		} catch (Exception e) {
 			LOG.log(Level.SEVERE, "Failed", e);
