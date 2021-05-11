@@ -64,6 +64,9 @@ public class Address extends PanacheEntityBase {
 	public String houseno;
 	public String boxno;
 
+	public double l72x;
+	public double l72y;
+
 	@Column(columnDefinition = "geometry")
 	public Point geom;
 }

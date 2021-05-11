@@ -34,6 +34,7 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 
@@ -41,7 +42,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
  *
  * @author Bart Hanssens
  */
-@Path("/best")
+@Path("/best/api/v2")
 public class LookupResource {
 	@GET
 	@Path("/nearest/gps/{x}/{y}")

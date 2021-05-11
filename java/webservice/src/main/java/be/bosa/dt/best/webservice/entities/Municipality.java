@@ -31,12 +31,16 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 /**
- *
+ * Municipality.
+ * Note that each municipality has a unique REFNIS code, which is NOT a postal code.
+ * Municipalities may have multiple postal codes and postal codes can be shared by different municipalities 
+ * 
  * @author Bart Hanssens
  */
 @Entity(name = "Municipalities")
 public class Municipality extends PanacheEntityBase {
 	@Id public String id;
+	public String niscode;
 	public String name_nl;
 	public String name_fr;
 	public String name_de;

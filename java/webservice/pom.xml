@@ -20,7 +20,7 @@
 			<dependency>
 				<groupId>io.quarkus</groupId>
 				<artifactId>quarkus-bom</artifactId>
-				<version>1.13.0.Final</version>
+				<version>1.13.3.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -30,10 +30,6 @@
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-hibernate-orm-panache</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.quarkus</groupId>
-			<artifactId>quarkus-jdbc-postgresql</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.quarkus</groupId>
@@ -61,13 +57,18 @@
 			<artifactId>jackson-datatype-jts</artifactId>
 			<version>1.2.8</version>
 		</dependency>
+		<dependency>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+			<version>3.34.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>io.quarkus</groupId>
 				<artifactId>quarkus-maven-plugin</artifactId>
-				<version>1.13.0.Final</version>
+				<version>1.13.3.Final</version>
 				<executions>
 					<execution>
 						<goals>

@@ -31,7 +31,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 /**
- *
+ * Postal codes (bPost.be).
+ * 
  * @author Bart Hanssens
  */
 @Entity(name = "Postals")

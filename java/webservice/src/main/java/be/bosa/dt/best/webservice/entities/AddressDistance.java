@@ -32,7 +32,8 @@ import javax.persistence.Entity;
 import javax.persistence.Transient;
 
 /**
- *
+ * Address with distance (in meters)
+ * 
  * @author Bart Hanssens
  */
 @Entity
@@ -51,7 +52,7 @@ public class AddressDistance extends PanacheEntity {
 	}
 
 	/**
-	 * Find nearest address base on GPS coordinates
+	 * Find nearest address based on GPS/WGS84 coordinates
 	 * 
 	 * @param posx
 	 * @param posy
@@ -60,7 +61,7 @@ public class AddressDistance extends PanacheEntity {
 	public static List<AddressDistance> findNearestByGPS(double posx, double posy) {
 		// make sure to use a '.' as decimal separator
 		String point = String.format(Locale.US, 
-									"TRANSFORM(ST_GeomFromText('POINT(%f %f)', 4326), 31370)", 
+									"ST_GeomFromText('POINT(%f %f)', 4326)", 
 									posx, posy);
 
 		String qry = String.format("SELECT NEW AddressDistance(a, " +
