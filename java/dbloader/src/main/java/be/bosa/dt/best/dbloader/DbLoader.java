@@ -142,9 +142,10 @@ public abstract class DbLoader {
 			while (iter.hasNext()) {
 				Municipality a = iter.next();
 				prep.setString(1, a.getIDVersion());
-				prep.setString(2, a.getName("nl"));
-				prep.setString(3, a.getName("fr"));
-				prep.setString(4, a.getName("de"));
+				prep.setString(2, a.getId());
+				prep.setString(3, a.getName("nl"));
+				prep.setString(4, a.getName("fr"));
+				prep.setString(5, a.getName("de"));
 
 				prep.addBatch();
 				// insert per 10000 records
@@ -259,7 +260,9 @@ public abstract class DbLoader {
 				prep.setString(6, a.getNumber());
 				prep.setString(7, a.getBox());
 				prep.setString(8, a.getStatus());
-				prep.setString(9, geom);
+				prep.setDouble(9, p.getX());
+				prep.setDouble(10, p.getY());
+				prep.setString(11, geom);
 
 				prep.addBatch();
 				// insert per 10000 records
@@ -287,7 +290,7 @@ public abstract class DbLoader {
 			PreparedStatement prep = conn.prepareStatement("INSERT INTO postals VALUES (?, ?, ?, ?, ?)");
 			loadPostals(prep, xmlPath);
 
-			prep = conn.prepareStatement("INSERT INTO municipalities VALUES (?, ?, ?, ?)");
+			prep = conn.prepareStatement("INSERT INTO municipalities VALUES (?, ?, ?, ?, ?)");
 			loadMunicipalities(prep, xmlPath);
 
 			prep = conn.prepareStatement("INSERT INTO municipalityparts VALUES (?, ?, ?, ?)");
@@ -297,8 +300,8 @@ public abstract class DbLoader {
 			loadStreets(prep, xmlPath);
 
 			prep = conn.prepareStatement(gps
-				? "INSERT INTO addresses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ST_Transform(ST_GeomFromText(?, 31370), 4326))"
-				: "INSERT INTO addresses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ST_GeomFromText(?, 31370))"
+				? "INSERT INTO addresses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ST_Transform(ST_GeomFromText(?, 31370), 4326))"
+				: "INSERT INTO addresses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ST_GeomFromText(?, 31370))"
 			);
 			loadAddresses(prep, xmlPath);
 		}

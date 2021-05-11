@@ -74,13 +74,14 @@ public class SpatiaLiteLoader extends DbLoader {
 			
 			stmt.execute("CREATE TABLE postals(" +
 							"id VARCHAR(88) NOT NULL, " +
-							"zipcode VARCHAR(4), " +
+							"zipcode VARCHAR(4) NOT NULL, " +
 							"name_nl VARCHAR(240), " +
 							"name_fr VARCHAR(240), " +
 							"name_de VARCHAR(240))");
 
 			stmt.execute("CREATE TABLE municipalities(" +
 							"id VARCHAR(88) NOT NULL, " +
+							"nis VARCHAR(5) NOT NULL, " +
 							"name_nl VARCHAR(80), " +
 							"name_fr VARCHAR(80), " +
 							"name_de VARCHAR(80))");
@@ -107,7 +108,9 @@ public class SpatiaLiteLoader extends DbLoader {
 							"postal_id VARCHAR(88) NOT NULL, " +
 							"houseno VARCHAR(12), " +
 							"boxno VARCHAR(40), " +
-							"status VARCHAR(10))");
+							"status VARCHAR(10), " +
+							"l72x DOUBLE NOT NULL, " +
+							"l72y DOUBLE NOT NULL)");
 			
 			String crs = gps ? "4326" : "31370";
 			
@@ -122,6 +125,12 @@ public class SpatiaLiteLoader extends DbLoader {
 		// add primary keys, indices and constraints after loading data, for performance
 		try(Connection conn = getConnection()) {
 			Statement stmt = conn.createStatement();
+
+			LOG.info("Postal table");
+			stmt.execute("CREATE TABLE postal_municipalities AS " +
+				"SELECT DISTINCT city_id, zipcode " +
+				"FROM addresses a, postals p " +
+				"WHERE a.postal_id = p.id");
 
 			LOG.info("Constraints and indices");
 			// unfortunately not guaranteed to be unique in files / constraints issues
