@@ -23,30 +23,44 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.webservice.entities;
+package be.bosa.dt.hibernate;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import java.sql.SQLException;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import org.geolatte.geom.ByteBuffer;
+import org.geolatte.geom.ByteOrder;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Point;
+import org.geolatte.geom.builder.DSL;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 
 /**
- *
+ * Very minimalistic Spatialite dialect for Hibernate
+ * 
  * @author Bart Hanssens
  */
-@Entity(name = "Streets")
-public class Street extends PanacheEntityBase {
-	@Id public String id;
-	public String city_id;
-	public String name_nl;
-	public String name_fr;
-	public String name_de;
-	
-	public static PanacheQuery<Street> findByZipcode(String postal) {
-		return find("SELECT s " + 
-				"FROM PostalStreets AS ps " + 
-				"INNER JOIN ps.street as s " +
-				"WHERE ps.zipcode = ?1", postal);
+public class SpatialiteGeometryDecoder {
+	public Geometry from(byte[] blob) throws SQLException {
+		if (blob == null || blob.length < 60) {
+			throw new SQLException("Only simple points are supported");
+		}
+		ByteBuffer buf = ByteBuffer.from(blob);
+		buf.setByteOrder(blob[1] == 0x01 ? ByteOrder.NDR : ByteOrder.XDR);
+
+		byte start = buf.get();
+		byte bom = buf.get();
+		int srid = buf.getInt();
+		double minX = buf.getDouble();
+		double minY = buf.getDouble();
+		double maxX = buf.getDouble();
+		double maxY = buf.getDouble();
+		byte end = buf.get();
+		int ctype = buf.getInt();
+		
+		double x = buf.getDouble();
+		double y = buf.getDouble();
+
+		Point p = DSL.point(CoordinateReferenceSystems.WGS84, DSL.g(x, y));
+		return p;
 	}
 }

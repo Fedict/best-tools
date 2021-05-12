@@ -26,9 +26,15 @@
 package be.bosa.dt.hibernate;
 
 import java.sql.Types;
+import org.hibernate.boot.model.TypeContributions;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.function.StandardSQLFunction;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.spatial.GeolatteGeometryJavaTypeDescriptor;
+import org.hibernate.spatial.GeolatteGeometryType;
+import org.hibernate.spatial.JTSGeometryJavaTypeDescriptor;
+import org.hibernate.spatial.JTSGeometryType;
 import org.hibernate.spatial.SpatialDialect;
 import org.hibernate.spatial.SpatialFunction;
 import org.hibernate.spatial.SpatialRelation;
@@ -94,11 +100,21 @@ public class SpatialiteDialect extends Dialect implements SpatialDialect {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
+	@Override
+	public void contributeTypes(TypeContributions typeContributions, ServiceRegistry serviceRegistry) {
+		typeContributions.contributeType( new GeolatteGeometryType( SpatialiteGeometryTypeDescriptor.INSTANCE ) );
+		typeContributions.contributeType( new JTSGeometryType( SpatialiteGeometryTypeDescriptor.INSTANCE ) );
+
+		typeContributions.contributeJavaTypeDescriptor( GeolatteGeometryJavaTypeDescriptor.INSTANCE );
+		typeContributions.contributeJavaTypeDescriptor( JTSGeometryJavaTypeDescriptor.INSTANCE );
+	}
+	
 	public SpatialiteDialect() {
 		super();
 		// Register Geometry column type
-//		registerColumnType( SpatialiteGeometryTypeDescriptor.INSTANCE.getSqlType(), "GEOMETRY" );
 
+		registerColumnType( SpatialiteGeometryTypeDescriptor.INSTANCE.getSqlType(), "GEOMETRY" );
+	
 		registerColumnType(Types.BLOB, "blob");
 		registerColumnType(Types.DOUBLE, "double");
 		registerColumnType(Types.DATE, "date");

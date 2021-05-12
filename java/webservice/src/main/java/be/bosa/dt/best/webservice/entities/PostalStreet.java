@@ -26,27 +26,26 @@
 package be.bosa.dt.best.webservice.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
 
 /**
- *
+ * Postal codes (bPost.be).
+ * 
  * @author Bart Hanssens
  */
-@Entity(name = "Streets")
-public class Street extends PanacheEntityBase {
-	@Id public String id;
-	public String city_id;
-	public String name_nl;
-	public String name_fr;
-	public String name_de;
-	
-	public static PanacheQuery<Street> findByZipcode(String postal) {
-		return find("SELECT s " + 
-				"FROM PostalStreets AS ps " + 
-				"INNER JOIN ps.street as s " +
-				"WHERE ps.zipcode = ?1", postal);
-	}
+@Entity(name = "PostalStreets")
+@Table(name = "postal_streets")
+public class PostalStreet extends PanacheEntityBase {
+	@Id public Long id;
+
+	@OneToOne
+	@JoinColumn(name = "street_id", referencedColumnName = "id")
+	public Street street;
+	public String zipcode;
 }

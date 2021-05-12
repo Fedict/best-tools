@@ -23,30 +23,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.webservice.entities;
+package be.bosa.dt.best.webservice;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.quarkus.jackson.ObjectMapperCustomizer;
+import javax.inject.Singleton;
+import org.geolatte.geom.json.GeolatteGeomModule;
 
 /**
- *
+ * Mapper for geometry / geography types to JSON
+ * 
  * @author Bart Hanssens
  */
-@Entity(name = "Streets")
-public class Street extends PanacheEntityBase {
-	@Id public String id;
-	public String city_id;
-	public String name_nl;
-	public String name_fr;
-	public String name_de;
-	
-	public static PanacheQuery<Street> findByZipcode(String postal) {
-		return find("SELECT s " + 
-				"FROM PostalStreets AS ps " + 
-				"INNER JOIN ps.street as s " +
-				"WHERE ps.zipcode = ?1", postal);
-	}
+@Singleton
+public class GeomObjectMapperCustomizer implements ObjectMapperCustomizer {
+	@Override
+	public void customize(ObjectMapper mapper) {
+		mapper.registerModule(new GeolatteGeomModule());
+    }
 }

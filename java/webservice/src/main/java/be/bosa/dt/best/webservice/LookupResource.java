@@ -25,6 +25,7 @@
  */
 package be.bosa.dt.best.webservice;
 
+import be.bosa.dt.best.webservice.entities.Address;
 import be.bosa.dt.best.webservice.entities.AddressDistance;
 import be.bosa.dt.best.webservice.entities.Municipality;
 import be.bosa.dt.best.webservice.entities.Street;
@@ -34,6 +35,7 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
@@ -56,6 +58,24 @@ public class LookupResource {
 	}
 
 	@GET
+	@Path("/address")
+	@Operation(summary = "Get an address by id")
+	public Address getAddressById(
+			@Parameter(description = "Address BeST ID", required = true, example = "BE.BRUSSELS.BRIC.ADM.ADDR/1299/2")
+			@QueryParam("id") String id) {
+		return Address.findById(id);
+	}
+
+	@GET
+	@Path("/municipality")
+	@Operation(summary = "Get a municipality by id")
+	public Municipality getMunicipalityById(
+			@Parameter(description = "Municipality BeST ID", required = true, example = "https://data.vlaanderen.be/id/gemeente/23027/2002-08-13T17:32:32")
+			@QueryParam("id") String id) {
+		return Municipality.findById(id);
+	}
+
+	@GET
 	@Path("/municipalities")
 	@Operation(summary = "Get all municipalities")
 	public List<Municipality> allMunicipalities() {
@@ -68,7 +88,7 @@ public class LookupResource {
 	public List<Street> streetsByPostal(
 			@Parameter(description = "postal code", required = true, example = "1500")	
 			@PathParam("code") String code) {
-		return Street.findByPostal(code);
+		return Street.findByZipcode(code).list();
 	}
 
 /*	@GET

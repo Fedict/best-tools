@@ -23,30 +23,44 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.webservice.entities;
+package be.bosa.dt.hibernate;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import java.nio.ByteOrder;
+import org.geolatte.geom.ByteBuffer;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Point;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
 /**
- *
+ * Very minimalistic Spatialite dialect for Hibernate
+ * 
  * @author Bart Hanssens
  */
-@Entity(name = "Streets")
-public class Street extends PanacheEntityBase {
-	@Id public String id;
-	public String city_id;
-	public String name_nl;
-	public String name_fr;
-	public String name_de;
-	
-	public static PanacheQuery<Street> findByZipcode(String postal) {
-		return find("SELECT s " + 
-				"FROM PostalStreets AS ps " + 
-				"INNER JOIN ps.street as s " +
-				"WHERE ps.zipcode = ?1", postal);
+public class SpatialiteGeometryEncoder {
+	public byte[] to(Geometry geometry) {
+		System.err.println("QQQ encode to");
+		ByteOrder nativeOrder = ByteOrder.nativeOrder();
+		Envelope envelope = geometry.getEnvelope();
+		
+		Point p = (Point) geometry;
+		p.getPosition().getCoordinate(0);
+		p.getPosition().getCoordinate(0);
+		
+		ByteBuffer buf = ByteBuffer.allocate(84);
+		buf.put((byte) 0x00);
+		buf.put(nativeOrder.equals(ByteOrder.BIG_ENDIAN) ? (byte) 0x00 : (byte) 0x01);
+		buf.putInt(geometry.getSRID());
+		buf.putDouble(envelope.lowerLeft().getCoordinate(0));
+		buf.putDouble(envelope.lowerLeft().getCoordinate(1));
+		buf.putDouble(envelope.upperRight().getCoordinate(0));
+		buf.putDouble(envelope.upperRight().getCoordinate(1));
+		buf.put((byte) 0x7C);
+		buf.putInt(0x01);
+		buf.putDouble(p.getPosition().getCoordinate(0));
+		buf.putDouble(p.getPosition().getCoordinate(1));
+		buf.put((byte) 0xFE);
+		
+		return buf.toByteArray();
 	}
 }

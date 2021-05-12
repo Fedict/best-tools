@@ -26,16 +26,15 @@
 package be.bosa.dt.best.webservice.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import javax.persistence.Column;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import org.geolatte.geom.Geometry;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
-import org.locationtech.jts.geom.Point;
 
 /**
  *
@@ -67,6 +66,5 @@ public class Address extends PanacheEntityBase {
 	public double l72x;
 	public double l72y;
 
-	@Column(columnDefinition = "geometry")
-	public Point geom;
+	public Geometry geom;
 }
