@@ -13,7 +13,6 @@
         <module>webservice</module>
         <module>xmlreader</module>
         <module>automation</module>
-        <module>frontend</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

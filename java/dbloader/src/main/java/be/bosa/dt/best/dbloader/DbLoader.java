@@ -102,7 +102,7 @@ public abstract class DbLoader {
 
 			stmt.execute("CREATE TABLE municipalities(" +
 							"id VARCHAR(88) NOT NULL, " +
-							"nis VARCHAR(5) NOT NULL, " +
+							"niscode VARCHAR(5) NOT NULL, " +
 							"name_nl VARCHAR(80), " +
 							"name_fr VARCHAR(80), " +
 							"name_de VARCHAR(80))");

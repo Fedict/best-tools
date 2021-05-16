@@ -37,6 +37,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystems;
 /**
  * Very minimalistic Spatialite dialect for Hibernate
  * 
+ * @see https://www.gaia-gis.it/gaia-sins/BLOB-Geometry.html
  * @author Bart Hanssens
  */
 public class SpatialiteGeometryDecoder {
@@ -44,9 +45,11 @@ public class SpatialiteGeometryDecoder {
 		if (blob == null || blob.length < 60) {
 			throw new SQLException("Only simple points are supported");
 		}
+
 		ByteBuffer buf = ByteBuffer.from(blob);
 		buf.setByteOrder(blob[1] == 0x01 ? ByteOrder.NDR : ByteOrder.XDR);
 
+		// various metadata that's not used/ignored in this simple implementation
 		byte start = buf.get();
 		byte bom = buf.get();
 		int srid = buf.getInt();
