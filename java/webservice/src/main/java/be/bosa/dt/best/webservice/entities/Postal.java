@@ -29,6 +29,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Postal codes (bPost.be).
@@ -36,6 +37,7 @@ import javax.persistence.Id;
  * @author Bart Hanssens
  */
 @Entity(name = "Postals")
+@XmlRootElement
 public class Postal extends PanacheEntityBase {
 	@Id public String id;
 	public String zipcode;

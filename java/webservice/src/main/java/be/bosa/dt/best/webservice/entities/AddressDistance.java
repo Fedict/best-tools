@@ -26,10 +26,13 @@
 package be.bosa.dt.best.webservice.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import java.util.List;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import java.util.Locale;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Address with distance (in meters)
@@ -37,6 +40,8 @@ import javax.persistence.Transient;
  * @author Bart Hanssens
  */
 @Entity
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 public class AddressDistance extends PanacheEntity {
 	@Transient
 	public Address address;
@@ -44,32 +49,30 @@ public class AddressDistance extends PanacheEntity {
 	public double distance;
 
 	public AddressDistance() {
-		
 	}
+	
 	public AddressDistance(Address address, double distance) {
 		this.address = address;
 		this.distance = distance;
 	}
 
 	/**
-	 * Find nearest address based on GPS/WGS84 coordinates
+	 * Find 10 nearests addresses based on GPS/WGS84 coordinates
 	 * 
 	 * @param posx
 	 * @param posy
 	 * @return 
 	 */
-	public static List<AddressDistance> findNearestByGPS(double posx, double posy) {
+	public static PanacheQuery<AddressDistance> findNearestByGPS(double posx, double posy) {
+
 		// make sure to use a '.' as decimal separator
-		String point = String.format(Locale.US, 
-									"ST_GeomFromText('POINT(%f %f)', 4326)", 
-									posx, posy);
+		String point = String.format(Locale.US, " MakePoint(%f, %f, 4326) ", posx, posy);
 
 		String qry = String.format("SELECT NEW AddressDistance(a, " +
-				"DISTANCE(a.geom, %s) as distance) " +
+				"DISTANCE(a.geom, %s, 1) as distance) " +
 				"FROM Addresses a " +
-				"WHERE DWITHIN(a.geom, %s, 100) = TRUE " +
-				"ORDER BY distance", point, point);
+				"WHERE PtDistWithin(a.geom, %s, 100, 1) = TRUE", point, point);
 
-		return find(qry).list();
+		return find(qry);
 	}
 }

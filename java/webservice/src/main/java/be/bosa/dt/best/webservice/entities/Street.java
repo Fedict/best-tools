@@ -27,15 +27,22 @@ package be.bosa.dt.best.webservice.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import java.util.Optional;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author Bart Hanssens
  */
 @Entity(name = "Streets")
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 public class Street extends PanacheEntityBase {
 	@Id public String id;
 	public String city_id;
@@ -43,10 +50,42 @@ public class Street extends PanacheEntityBase {
 	public String name_fr;
 	public String name_de;
 	
-	public static PanacheQuery<Street> findByZipcode(String postal) {
-		return find("SELECT s " + 
+	/**
+	 * Find by postal code, using auxiliary table
+	 * 
+	 * @param postal zip code
+	 * @param name (part of)
+	 * @return street query
+	 */
+	public static PanacheQuery<Street> findByZipcode(String postal, Optional<String> name) {
+		if (!name.isPresent()) {
+			return find("SELECT s " + 
 				"FROM PostalStreets AS ps " + 
 				"INNER JOIN ps.street as s " +
 				"WHERE ps.zipcode = ?1", postal);
+		}
+
+		String str = '%' + name.get() + '%';
+		return find("SELECT s " + 
+				"FROM PostalStreets AS ps " + 
+				"INNER JOIN ps.street as s " +
+				"WHERE ps.zipcode = ?1 " +
+				"AND (name_nl LIKE ?2 OR name_fr LIKE ?2 OR name_de LIKE ?2)", postal, str);
+	}
+
+	/**
+	 * Find by REFNIS code
+	 * 
+	 * @param niscode REFNIS code
+	 * @param name (part of) name
+	 * @return street query
+	 */
+	public static PanacheQuery<Street> findByNiscode(String niscode, Optional<String> name) {
+		if (!name.isPresent()) {
+			return find("nis", niscode);
+		}
+		String str = '%' + name.get() + '%';
+		return find("FROM Streets WHERE nis = ?1 "
+					+ "WHERE (name_nl LIKE ?2 OR name_fr LIKE ?2 OR name_de LIKE ?2)", niscode, str);
 	}
 }

@@ -31,6 +31,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.geolatte.geom.Geometry;
 
 import org.hibernate.annotations.NotFound;
@@ -41,6 +42,7 @@ import org.hibernate.annotations.NotFoundAction;
  * @author Bart Hanssens
  */
 @Entity(name = "Addresses")
+@XmlRootElement
 public class Address extends PanacheEntityBase {
 	@Id public String id;
 	

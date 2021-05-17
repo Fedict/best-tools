@@ -42,7 +42,7 @@ import javax.persistence.Table;
 @Entity(name = "PostalStreets")
 @Table(name = "postal_streets")
 public class PostalStreet extends PanacheEntityBase {
-	@Id public Long id;
+	@Id Long id;
 
 	@OneToOne
 	@JoinColumn(name = "street_id", referencedColumnName = "id")

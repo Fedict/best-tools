@@ -20,7 +20,7 @@
 			<dependency>
 				<groupId>io.quarkus</groupId>
 				<artifactId>quarkus-bom</artifactId>
-				<version>1.13.3.Final</version>
+				<version>1.13.4.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -38,6 +38,10 @@
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-resteasy-jackson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-resteasy-jaxb</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.quarkus</groupId>

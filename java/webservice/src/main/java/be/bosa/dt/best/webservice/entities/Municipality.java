@@ -26,9 +26,13 @@
 package be.bosa.dt.best.webservice.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Municipality.
@@ -38,10 +42,24 @@ import javax.persistence.Id;
  * @author Bart Hanssens
  */
 @Entity(name = "Municipalities")
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 public class Municipality extends PanacheEntityBase {
 	@Id public String id;
 	public String niscode;
 	public String name_nl;
 	public String name_fr;
 	public String name_de;
+
+	/**
+	 * Find municipality by (part of) name
+	 * 
+	 * @param name
+	 * @return 
+	 */
+	public static PanacheQuery<Municipality> findByName(String name) {
+		String str = '%' + name + '%';
+		return find("FROM Municipalities "
+					+ "WHERE (name_nl LIKE ?1 OR name_fr LIKE ?1 OR name_de LIKE ?1)", str);
+	}
 }

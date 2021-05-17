@@ -39,7 +39,6 @@ import org.geolatte.geom.Point;
  */
 public class SpatialiteGeometryEncoder {
 	public byte[] to(Geometry geometry) {
-		System.err.println("QQQ encode to");
 		ByteOrder nativeOrder = ByteOrder.nativeOrder();
 		Envelope envelope = geometry.getEnvelope();
 		

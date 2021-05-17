@@ -29,13 +29,16 @@ import be.bosa.dt.best.webservice.entities.Address;
 import be.bosa.dt.best.webservice.entities.AddressDistance;
 import be.bosa.dt.best.webservice.entities.Municipality;
 import be.bosa.dt.best.webservice.entities.Street;
+import java.util.Collections;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
@@ -47,17 +50,19 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 @Path("/best/api/v2")
 public class LookupResource {
 	@GET
-	@Path("/nearest/gps/{x}/{y}")
+	@Produces({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
+	@Path("/near")
 	@Operation(summary = "Get nearest addresses by coordinates")
 	public List<AddressDistance> nearestAddress(
 			@Parameter(description = "X coordinate (longitude)", required = true, example = "4.23")
-			@PathParam("x") double x, 
+			@QueryParam("x") double x, 
 			@Parameter(description = "Y coordinate (latitude)", required = true, example = "50.73")	
-			@PathParam("y") double y) {
-		return AddressDistance.findNearestByGPS(x, y);
+			@QueryParam("y") double y) {
+		return AddressDistance.findNearestByGPS(x, y).list();
 	}
 
 	@GET
+	@Produces({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
 	@Path("/address")
 	@Operation(summary = "Get an address by id")
 	public Address getAddressById(
@@ -67,6 +72,17 @@ public class LookupResource {
 	}
 
 	@GET
+	@Produces({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
+	@Path("/street")
+	@Operation(summary = "Get a street by id")
+	public Municipality getStreetById(
+			@Parameter(description = "Street BeST ID", required = true, example = "https://data.vlaanderen.be/doc/straatnaam/178908")
+			@QueryParam("id") String id) {
+		return Street.findById(id);
+	}
+
+	@GET
+	@Produces({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
 	@Path("/municipality")
 	@Operation(summary = "Get a municipality by id")
 	public Municipality getMunicipalityById(
@@ -76,28 +92,37 @@ public class LookupResource {
 	}
 
 	@GET
+	@Produces({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
 	@Path("/municipalities")
-	@Operation(summary = "Get all municipalities")
-	public List<Municipality> allMunicipalities() {
+	@Operation(summary = "Get a list of all municipalities or search by (part of) name")
+	public List<Municipality> allMunicipalities(
+			@Parameter(description = "Part of the name (at least 2 characters)", example = "Halle")
+			@QueryParam("name") Optional<String> name) {
+		if (name.isPresent()) {
+			return Municipality.findByName(name.get()).list();
+		}
 		return Municipality.findAll().list();
 	}
 
 	@GET
-	@Path("/streets/by-postal/{code}")
-	@Operation(summary = "Get all streets by postal code")
-	public List<Street> streetsByPostal(
-			@Parameter(description = "postal code", required = true, example = "1500")	
-			@PathParam("code") String code) {
-		return Street.findByZipcode(code).list();
+	@Produces({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
+	@Path("/streets")
+	@Operation(summary = "Search for streets by postal or nis code, optionally by (part of) name ")
+	public List<Street> streetsByCode(
+			@Parameter(description = "postal code", example = "1500")	
+			@QueryParam("zipcode") Optional<String> zipcode,
+			@Parameter(description = "REFNIS code", example = "23027")	
+			@QueryParam("niscode") Optional<String> niscode,
+			@Parameter(description = "Part of the name (at least 2 characters)", example = "Markt")
+			@QueryParam("name") Optional<String> name) {
+		if (zipcode.isPresent()) {
+			return Street.findByZipcode(zipcode.get(), name).list();
+		}
+
+		if (niscode.isPresent()) {
+			return Street.findByNiscode(niscode.get(), name).list();
+		}
+		return Collections.EMPTY_LIST;
 	}
 
-/*	@GET
-	@Path("/municipality")
-	public List<Municipality> find(@QueryParam("id") String id, @QueryParam("postal") String postal) {
-		
-	}
-
-	@GET
-	@Path("/street")
-*/	
 }
