@@ -27,22 +27,42 @@ package be.bosa.dt.best.webservice.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
-import java.util.Locale;
+import java.util.Map;
 import javax.persistence.Entity;
+import javax.persistence.NamedQuery;
 import javax.persistence.Transient;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
+import org.eclipse.microprofile.config.ConfigProvider;
 
 /**
- * Address with distance (in meters)
+ * Address with distance (in meters).
+ * 
+ * Spatialite requires some special querying,
+ * to increase performance a "search frame" buffer with a 0.075 degree radius is created
+ * (meters are not directly supported in buffer)
  * 
  * @author Bart Hanssens
  */
 @Entity
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@NamedQuery(name = "spatialite", 
+			query = "SELECT NEW AddressDistance(a, " +
+				"DISTANCE(a.geom, MakePoint(:posx, :posy, 4326), 1) as distance) " +
+				"FROM Addresses AS a " +
+				"WHERE PtDistWithin(a.geom, MakePoint(:posx, :posy, 4326), :maxdist, 1) = TRUE " + 
+				"AND a.rowid IN ( " +
+					"SELECT s.rowid " +
+					"FROM SpatialIndex AS s " +
+					"WHERE f_table_name = 'addresses' " + 
+					"AND search_frame = Buffer(MakePoint(:posx, :posy, 4326), 0.075) )" +
+				"ORDER by distance")
+@NamedQuery(name = "postgis", 
+			query = "SELECT NEW AddressDistance(a, " +
+				"DISTANCE(a.geom, ST_SetSRID(ST_MakePoint(:posx, :posy), 4326)) as distance) " +
+				"FROM Addresses a " +
+				"WHERE DWITHIN(a.geom, ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), :maxdist) = TRUE " +
+				"ORDER by distance")
 public class AddressDistance extends PanacheEntity {
+	private final static String db = ConfigProvider.getConfig().getValue("quarkus.datasource.db-kind", String.class);
+
 	@Transient
 	public Address address;
 	@Transient
@@ -57,22 +77,15 @@ public class AddressDistance extends PanacheEntity {
 	}
 
 	/**
-	 * Find 10 nearests addresses based on GPS/WGS84 coordinates
+	 * Find all addresses within a range of X meters, based on GPS/WGS84 coordinates
 	 * 
 	 * @param posx
 	 * @param posy
+	 * @param maxdist maximum distance (in meters)
 	 * @return 
 	 */
-	public static PanacheQuery<AddressDistance> findNearestByGPS(double posx, double posy) {
-
-		// make sure to use a '.' as decimal separator
-		String point = String.format(Locale.US, " MakePoint(%f, %f, 4326) ", posx, posy);
-
-		String qry = String.format("SELECT NEW AddressDistance(a, " +
-				"DISTANCE(a.geom, %s, 1) as distance) " +
-				"FROM Addresses a " +
-				"WHERE PtDistWithin(a.geom, %s, 100, 1) = TRUE", point, point);
-
-		return find(qry);
+	public static PanacheQuery<AddressDistance> findNearestByGPS(double posx, double posy, int maxdist) {
+		String qry = db.equals("other") ? "#spatialite" : "#postgis";
+		return find(qry, Map.of("posx", posx, "posy", posy, "maxdist", maxdist));
 	}
 }

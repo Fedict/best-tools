@@ -33,6 +33,7 @@ import java.util.Collections;
 
 import java.util.List;
 import java.util.Optional;
+import javax.ws.rs.DefaultValue;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -50,19 +51,21 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 @Path("/best/api/v2")
 public class LookupResource {
 	@GET
-	@Produces({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
+	@Produces({MediaType.APPLICATION_JSON})
 	@Path("/near")
-	@Operation(summary = "Get nearest addresses by coordinates")
+	@Operation(summary = "Get addresses within (maximal) 100 meters")
 	public List<AddressDistance> nearestAddress(
 			@Parameter(description = "X coordinate (longitude)", required = true, example = "4.23")
 			@QueryParam("x") double x, 
 			@Parameter(description = "Y coordinate (latitude)", required = true, example = "50.73")	
-			@QueryParam("y") double y) {
-		return AddressDistance.findNearestByGPS(x, y).list();
+			@QueryParam("y") double y,
+			@Parameter(description = "maximum distance (meters)", required = false, example = "100")	
+			@DefaultValue("100") @QueryParam("dist") int maxdist) {
+		return AddressDistance.findNearestByGPS(x, y, maxdist).list();
 	}
 
 	@GET
-	@Produces({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
+	@Produces({MediaType.APPLICATION_JSON})
 	@Path("/address")
 	@Operation(summary = "Get an address by id")
 	public Address getAddressById(
@@ -72,7 +75,7 @@ public class LookupResource {
 	}
 
 	@GET
-	@Produces({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
+	@Produces({MediaType.APPLICATION_JSON})
 	@Path("/street")
 	@Operation(summary = "Get a street by id")
 	public Municipality getStreetById(
@@ -82,7 +85,7 @@ public class LookupResource {
 	}
 
 	@GET
-	@Produces({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
+	@Produces({MediaType.APPLICATION_JSON})
 	@Path("/municipality")
 	@Operation(summary = "Get a municipality by id")
 	public Municipality getMunicipalityById(
@@ -92,7 +95,7 @@ public class LookupResource {
 	}
 
 	@GET
-	@Produces({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
+	@Produces({MediaType.APPLICATION_JSON})
 	@Path("/municipalities")
 	@Operation(summary = "Get a list of all municipalities or search by (part of) name")
 	public List<Municipality> allMunicipalities(
@@ -105,7 +108,7 @@ public class LookupResource {
 	}
 
 	@GET
-	@Produces({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
+	@Produces({MediaType.APPLICATION_JSON})
 	@Path("/streets")
 	@Operation(summary = "Search for streets by postal or nis code, optionally by (part of) name ")
 	public List<Street> streetsByCode(
@@ -116,11 +119,11 @@ public class LookupResource {
 			@Parameter(description = "Part of the name (at least 2 characters)", example = "Markt")
 			@QueryParam("name") Optional<String> name) {
 		if (zipcode.isPresent()) {
-			return Street.findByZipcode(zipcode.get(), name).list();
+			return Street.findByZipcodeAndName(zipcode.get(), name).list();
 		}
 
 		if (niscode.isPresent()) {
-			return Street.findByNiscode(niscode.get(), name).list();
+			return Street.findByNiscodeAndName(niscode.get(), name).list();
 		}
 		return Collections.EMPTY_LIST;
 	}

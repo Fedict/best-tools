@@ -31,35 +31,31 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.xml.bind.annotation.XmlRootElement;
+
 import org.geolatte.geom.Geometry;
 
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 
 /**
- *
+ * Full address entity
+ * 
  * @author Bart Hanssens
  */
 @Entity(name = "Addresses")
-@XmlRootElement
 public class Address extends PanacheEntityBase {
+	public long rowid;
 	@Id public String id;
 	
-	@OneToOne(optional = true)
+	@OneToOne
 	@JoinColumn(name = "city_id", referencedColumnName = "id")
-	@NotFound(action = NotFoundAction.IGNORE)
 	public Municipality municipality;
 	public String part_id;
 	
-	@OneToOne(optional = true)
+	@OneToOne
 	@JoinColumn(name = "street_id", referencedColumnName = "id")
-	@NotFound(action = NotFoundAction.IGNORE)
 	public Street street;
 
-	@OneToOne(optional = true)
+	@OneToOne
 	@JoinColumn(name = "postal_id", referencedColumnName = "id")
-	@NotFound(action = NotFoundAction.IGNORE)
 	public Postal postal;
 
 	public String houseno;

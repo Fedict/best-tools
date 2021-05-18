@@ -120,7 +120,6 @@ public class SpatialiteDialect extends Dialect implements SpatialDialect {
 		registerColumnType(Types.DATE, "date");
 		registerColumnType(Types.VARCHAR, "varchar");
 
-	/*	registerFunction( "within", new StandardSQLFunction( "ST_Within", StandardBasicTypes.BOOLEAN ) ); */
 		registerFunction( "dwithin", new StandardSQLFunction( "PtDistWithin", StandardBasicTypes.BOOLEAN ) );
 		registerFunction( "distance", new StandardSQLFunction( "ST_Distance", StandardBasicTypes.DOUBLE ) );
 	}

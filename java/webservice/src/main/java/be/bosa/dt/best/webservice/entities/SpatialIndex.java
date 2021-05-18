@@ -28,21 +28,16 @@ package be.bosa.dt.best.webservice.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
+import org.geolatte.geom.Geometry;
 
 /**
- * Postal codes (bPost.be).
+ * Virtual table in spatialite.
  * 
  * @author Bart Hanssens
  */
-@Entity(name = "PostalStreets")
-@Table(name = "postal_streets")
-public class PostalStreet extends PanacheEntity {
-	@OneToOne
-	@JoinColumn(name = "street_id", referencedColumnName = "id")
-	public Street street;
-	public String zipcode;
+@Entity(name = "SpatialIndex")
+public class SpatialIndex extends PanacheEntity {
+	public long rowid;
+	public String f_table_name;
+	public Geometry search_frame;
 }

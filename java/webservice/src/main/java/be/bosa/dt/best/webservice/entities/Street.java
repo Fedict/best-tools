@@ -31,18 +31,13 @@ import java.util.Optional;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
+ * Street entity
+ * 
  * @author Bart Hanssens
  */
 @Entity(name = "Streets")
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 public class Street extends PanacheEntityBase {
 	@Id public String id;
 	public String city_id;
@@ -51,13 +46,16 @@ public class Street extends PanacheEntityBase {
 	public String name_de;
 	
 	/**
-	 * Find by postal code, using auxiliary table
+	 * Find street by postal code of the municipality and filter optionally by (part of) street name.
+	 * Note that, since postal codes are not directly related to municipalities and streets,
+	 * this will only return streets with at least one address.
+	 * "Empty" streets like hiking trails, parcs... will not be returned
 	 * 
-	 * @param postal zip code
-	 * @param name (part of)
+	 * @param postal zip code of municipality
+	 * @param name (part of) street name
 	 * @return street query
 	 */
-	public static PanacheQuery<Street> findByZipcode(String postal, Optional<String> name) {
+	public static PanacheQuery<Street> findByZipcodeAndName(String postal, Optional<String> name) {
 		if (!name.isPresent()) {
 			return find("SELECT s " + 
 				"FROM PostalStreets AS ps " + 
@@ -74,13 +72,13 @@ public class Street extends PanacheEntityBase {
 	}
 
 	/**
-	 * Find by REFNIS code
+	 * Find streets by the REFNIS code of the municipality and optionally filter on (part of) the street name
 	 * 
-	 * @param niscode REFNIS code
+	 * @param niscode REFNIS code of the municipality
 	 * @param name (part of) name
 	 * @return street query
 	 */
-	public static PanacheQuery<Street> findByNiscode(String niscode, Optional<String> name) {
+	public static PanacheQuery<Street> findByNiscodeAndName(String niscode, Optional<String> name) {
 		if (!name.isPresent()) {
 			return find("nis", niscode);
 		}

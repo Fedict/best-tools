@@ -30,20 +30,15 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Municipality.
+ * Municipality entity.
  * Note that each municipality has a unique REFNIS code, which is NOT a postal code.
  * Municipalities may have multiple postal codes and postal codes can be shared by different municipalities 
  * 
  * @author Bart Hanssens
  */
 @Entity(name = "Municipalities")
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 public class Municipality extends PanacheEntityBase {
 	@Id public String id;
 	public String niscode;
