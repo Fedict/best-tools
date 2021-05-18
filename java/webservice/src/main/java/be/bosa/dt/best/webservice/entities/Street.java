@@ -84,6 +84,6 @@ public class Street extends PanacheEntityBase {
 		}
 		String str = '%' + name.get() + '%';
 		return find("FROM Streets WHERE nis = ?1 "
-					+ "WHERE (name_nl LIKE ?2 OR name_fr LIKE ?2 OR name_de LIKE ?2)", niscode, str);
+					+ "AND (name_nl LIKE ?2 OR name_fr LIKE ?2 OR name_de LIKE ?2)", niscode, str);
 	}
 }
