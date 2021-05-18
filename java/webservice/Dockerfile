@@ -1,0 +1,14 @@
+FROM openjdk:11.0.11-9-jre-slim-buster
+MAINTAINER bart.hanssens@bosa.fgov.be
+RUN useradd -m best && \
+  echo "deb https://httpredir.debian.org/debian sid main" >> /etc/apt/sources.list && \
+  apt-get update && \
+  apt-get -t sid install -y --no-install-recommends libsqlite3-mod-spatialite && \
+  apt-get clean
+COPY target/webservice-1.2.4-runner.jar /home/best/runner.jar
+COPY best.db /home/best/best.db
+ENV PATH=/usr/lib/x86_64-linux-gnu:$PATH
+WORKDIR /home/best
+USER best
+EXPOSE 8080
+CMD ["java", "-jar", "runner.jar" ] 
