@@ -10,12 +10,36 @@
     <artifactId>dbloader</artifactId>
     <packaging>jar</packaging>
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-    </properties>
-    <description>Database loader</description>
-    <name>BeSt DB loader</name>
-    <dependencies>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+	</properties>
+	<description>Database loader</description>
+	<name>BeSt DB loader</name>
+	<repositories>
+		<repository>
+			<id>osgeo</id>
+			<name>OSGeo Release Repository</name>
+			<url>https://repo.osgeo.org/repository/release/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>osgeo-snapshot</id>
+			<name>OSGeo Snapshot Repository</name>
+			<url>https://repo.osgeo.org/repository/snapshot/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+	</repositories>
+	<dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>xmlreader</artifactId>
@@ -45,7 +69,17 @@
             <groupId>de.siegmar</groupId>
             <artifactId>fastcsv</artifactId>
             <version>2.0.0</version>
-        </dependency>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-main</artifactId>
+			<version>25.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-epsg-wkt</artifactId>
+			<version>25.0</version>
+		</dependency>
     </dependencies>
 	<build>
 		<plugins>

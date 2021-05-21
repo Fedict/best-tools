@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath be.bosa.dt.best.dbloader.Main -x c:\data\best\xml -c c:/data/best/csv</exec.args>
+                <exec.args>-classpath %classpath be.bosa.dt.best.dbloader.Main -x c:\data\best\xml -c c:/data/best/csv -g</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir></exec.workingdir>
             </properties>
@@ -25,7 +25,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath be.bosa.dt.best.dbloader.Main -x c:\data\best\xml -c c:/data/best/csv</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath be.bosa.dt.best.dbloader.Main -x c:\data\best\xml -c c:/data/best/csv -g</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
                 <exec.workingdir></exec.workingdir>
@@ -41,7 +41,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath be.bosa.dt.best.dbloader.Main -x c:\data\best\xml -c c:/data/best/csv</exec.args>
+                <exec.args>-classpath %classpath be.bosa.dt.best.dbloader.Main -x c:\data\best\xml -c c:/data/best/csv -g</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir></exec.workingdir>
             </properties>

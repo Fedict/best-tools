@@ -44,13 +44,24 @@ import de.siegmar.fastcsv.writer.QuoteStrategy;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
 import java.nio.file.Path;
 import java.util.Iterator;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.stream.Stream;
+
+import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.geotools.referencing.CRS;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.io.WKBWriter;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -60,7 +71,37 @@ import java.util.stream.Stream;
  */
 public class CsvPreparer {
 	private static final Logger LOG = Logger.getLogger(CsvPreparer.class.getName());
+	
 	private final CsvWriterBuilder builder;
+
+	// geo transformations
+	private final static GeometryFactory fac = JTSFactoryFinder.getGeometryFactory();
+	private final static WKBWriter wkb = new WKBWriter();
+	private CoordinateReferenceSystem l72;
+	private CoordinateReferenceSystem wgs84;
+	private MathTransform trans;
+
+	
+	/**
+	 * Convert geo coordinates to a hex representation of "well-known binary" format
+	 * 
+	 * @param x x coordinate
+	 * @param y y coordinate
+	 * @param gps convert to gps or not
+	 * @return hex string
+	 */
+	private String toWkb(double x, double y, boolean gps) throws IOException {
+		Coordinate coords = new Coordinate(x, y);
+		if (gps) {
+			try {
+				coords = JTS.transform(coords, null, trans);
+			} catch (TransformException ex) {
+				throw new IOException("Could not convert coordinates");
+			}
+		}
+		Point point = fac.createPoint(coords);
+		return WKBWriter.toHex(wkb.write(point));
+	}
 
 	/**
 	 * Write postal code info
@@ -202,11 +243,13 @@ public class CsvPreparer {
 					Address a = iter.next();
 
 					Geopoint p = a.getPoint();
+					String s = toWkb(p.getX(), p.getY(), gps);
+
 					// calculate geom afterwards, using separate UPDATE statement
 					w.writeRow(a.getIDVersion(), a.getCity().getIDVersion(), a.getCityPart().getIDVersion(),
 							a.getStreet().getIDVersion(), a.getPostal().getIDVersion(), a.getNumber(),
 							a.getBox(), a.getStatus(), 
-							String.valueOf(p.getX()), String.valueOf(p.getY()), null);
+							String.valueOf(p.getX()), String.valueOf(p.getY()), s);
 
 					if (++cnt % 10_000 == 0) {
 						LOG.log(Level.INFO, "Wrote {0}", cnt);
@@ -241,5 +284,12 @@ public class CsvPreparer {
 		builder = CsvWriter.builder()
 						.fieldSeparator(';').quoteCharacter('"').quoteStrategy(QuoteStrategy.REQUIRED)
 						.lineDelimiter(LineDelimiter.LF);
+		try {
+			l72 = CRS.decode("EPSG:31370");
+			wgs84 = CRS.decode("EPSG:4326");
+			trans = CRS.findMathTransform(l72, wgs84);
+		} catch (FactoryException e) {
+			LOG.log(Level.SEVERE, "Could not initialize geo{0}", e.getMessage());
+		}
 	}
 }
