@@ -36,6 +36,11 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.34.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.orbisgis</groupId>
+            <artifactId>h2gis</artifactId>
+            <version>1.5.0</version>
+        </dependency>
     </dependencies>
 	<build>
 		<plugins>

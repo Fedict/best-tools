@@ -373,8 +373,8 @@ public abstract class DbLoader {
 			);
 			loadAddresses(prep, xmlPath);
 		}
-		addPostalTables();
 		addConstraints();
+		addPostalTables();
 	}
 
 	/**

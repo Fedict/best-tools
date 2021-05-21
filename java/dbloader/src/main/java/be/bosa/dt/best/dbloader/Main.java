@@ -89,6 +89,7 @@ public class Main {
 
 		String xmldir = cli.getOptionValue("x");
 		String dbstr = cli.getOptionValue("d");
+		String csvstr = cli.getOptionValue("c");
 		boolean gps = cli.hasOption("g");
 		
 		Path xmlPath = Paths.get(xmldir);
@@ -102,6 +103,8 @@ public class Main {
 			loader = new PostGisLoader(dbstr);
 		} else if (dbstr.contains("spatialite") || dbstr.contains("sqlite")) {
 			loader = new SpatiaLiteLoader(dbstr);
+		} else if (dbstr.contains("h2")) {
+			loader = new H2GisLoader(dbstr);
 		} else {
 			LOG.severe("Database type not supported");
 			System.exit(-3);
