@@ -49,7 +49,8 @@ public class Main {
 
 	private final static Options OPTS = new Options()
 		.addRequiredOption("x", "xmldir", true, "directory with unzipped BeST XML files")
-		.addRequiredOption("d", "db", true, "jdbc connection string")
+		.addOption("c", "csv", true, "CSV output directory")
+		.addOption("d", "db", true, "JDBC connection string (postgis, h2gis, spatialite)")
 		.addOption("g", "gps", false, "store coordinates as WGS84/GPS instead of Lambert72");
 
 	/**
@@ -97,25 +98,44 @@ public class Main {
 			LOG.severe("BEST directory does not exist");
 			System.exit(-2);
 		}
+		
+		// load to database using JDBC _or_ write to CSV (so tables can be read later)
+		if (dbstr != null) {
+			DbLoader loader = null;
+			if (dbstr.contains("postg") || dbstr.contains("pgsql")) {
+				loader = new PostGisLoader(dbstr);
+			} else if (dbstr.contains("spatialite") || dbstr.contains("sqlite")) {
+				loader = new SpatiaLiteLoader(dbstr);
+			} else if (dbstr.contains("h2")) {
+				loader = new H2GisLoader(dbstr);
+			} else {
+				LOG.severe("Database type not supported");
+				System.exit(-3);
+			}
+		
+			try {
+				loader.loadData(xmlPath, gps);
+			} catch (Exception e) {
+				LOG.log(Level.SEVERE, "Failed", e);
+				System.exit(-4);
+			}
+		} else if (csvstr != null) {
+			CsvPreparer w = new CsvPreparer();
+	
+			Path p = Paths.get(csvstr);
+			if (!p.toFile().exists() && !p.toFile().mkdirs()) {
+				LOG.severe("Output directory does not exist and could not be created");
+				System.exit(-2);
+			}
 
-		DbLoader loader = null;
-		if (dbstr.contains("postg") || dbstr.contains("pgsql")) {
-			loader = new PostGisLoader(dbstr);
-		} else if (dbstr.contains("spatialite") || dbstr.contains("sqlite")) {
-			loader = new SpatiaLiteLoader(dbstr);
-		} else if (dbstr.contains("h2")) {
-			loader = new H2GisLoader(dbstr);
-		} else {
-			LOG.severe("Database type not supported");
-			System.exit(-3);
+			try {
+				w.write(xmlPath, p, gps);
+			} catch (Exception e) {
+				LOG.log(Level.SEVERE, "Failed", e);
+				System.exit(-4);
+			}
 		}
 
-		try {
-			loader.loadData(xmlPath, gps);
-		} catch (Exception e) {
-			LOG.log(Level.SEVERE, "Failed", e);
-			System.exit(-4);
-		}
 		LOG.info("Done");
 	}
 }

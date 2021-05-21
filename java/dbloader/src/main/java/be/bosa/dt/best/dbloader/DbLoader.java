@@ -161,7 +161,7 @@ public abstract class DbLoader {
 	 */
 	private void loadPostals(PreparedStatement prep, Path xmlPath) throws SQLException {
 		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
-			System.out.println("Starting postals " + reg.getName());
+			LOG.log(Level.INFO, "Starting postals {0}", reg.getName());
 			int cnt = 0;
 
 			PostalReader reader = new PostalReader();
