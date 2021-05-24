@@ -25,13 +25,16 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import java.util.Map;
+import java.util.Optional;
 import javax.persistence.Entity;
 import javax.persistence.NamedQuery;
 import javax.persistence.Transient;
 import org.eclipse.microprofile.config.ConfigProvider;
+import org.hibernate.annotations.Filter;
 
 /**
  * Address with distance (in meters).
@@ -43,6 +46,7 @@ import org.eclipse.microprofile.config.ConfigProvider;
  * @author Bart Hanssens
  */
 @Entity
+@JsonIgnoreProperties({"id"})
 @NamedQuery(name = "spatialite", 
 			query = "SELECT NEW AddressDistance(a, " +
 				"DISTANCE(a.geom, MakePoint(:posx, :posy, 4326), 1) as distance) " +
@@ -60,6 +64,7 @@ import org.eclipse.microprofile.config.ConfigProvider;
 				"FROM Addresses a " +
 				"WHERE DWITHIN(a.geom, ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), :maxdist) = TRUE " +
 				"ORDER by distance")
+@Filter(name="status", condition="status = :status") 
 public class AddressDistance extends PanacheEntity {
 	private final static String db = ConfigProvider.getConfig().getValue("quarkus.datasource.db-kind", String.class);
 
@@ -82,10 +87,13 @@ public class AddressDistance extends PanacheEntity {
 	 * @param posx
 	 * @param posy
 	 * @param maxdist maximum distance (in meters)
+	 * @param status
 	 * @return 
 	 */
-	public static PanacheQuery<AddressDistance> findNearestByGPS(double posx, double posy, int maxdist) {
+	public static PanacheQuery<AddressDistance> findNearestByGPS(double posx, double posy, int maxdist, 
+			Optional<String> status) {
 		String qry = db.equals("other") ? "#spatialite" : "#postgis";
-		return find(qry, Map.of("posx", posx, "posy", posy, "maxdist", maxdist));
+		PanacheQuery<AddressDistance> res = find(qry, Map.of("posx", posx, "posy", posy, "maxdist", maxdist));
+		return status.isPresent() ? res.filter("#status", Map.of("status", status)) : res;
 	}
 }

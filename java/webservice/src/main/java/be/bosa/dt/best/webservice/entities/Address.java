@@ -25,7 +25,9 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import java.util.Optional;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -33,6 +35,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 import org.geolatte.geom.Geometry;
+import org.hibernate.annotations.Filter;
 
 
 /**
@@ -41,8 +44,10 @@ import org.geolatte.geom.Geometry;
  * @author Bart Hanssens
  */
 @Entity(name = "Addresses")
+@Filter(name="status", condition="status = :status") 
 public class Address extends PanacheEntityBase {
 	public long rowid;
+
 	@Id public String id;
 	
 	@OneToOne
@@ -58,11 +63,30 @@ public class Address extends PanacheEntityBase {
 	@JoinColumn(name = "postal_id", referencedColumnName = "id")
 	public Postal postal;
 
+	@JsonProperty("houseNumber")
 	public String houseno;
+	@JsonProperty("poBox")
 	public String boxno;
 
 	public double l72x;
 	public double l72y;
 
 	public Geometry geom;
+	
+	public String status;
+	
+	/**
+	 * Find an address by ID and optionally filter on status
+	 * 
+	 * @param id id
+	 * @param status
+	 * @return 
+	 */
+	public static Address findByIdAndStatus(String id, Optional<String> status) {
+		Address adr = findById(id);
+		if (status.isPresent() && adr != null) {
+			return adr.status.equals(status.get()) ? adr : null;
+		}
+		return adr;
+	}
 }

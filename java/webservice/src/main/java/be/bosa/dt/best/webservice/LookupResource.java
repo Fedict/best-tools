@@ -60,37 +60,43 @@ public class LookupResource {
 			@Parameter(description = "Y coordinate (latitude)", required = true, example = "50.73")	
 			@QueryParam("y") double y,
 			@Parameter(description = "maximum distance (meters)", required = false, example = "100")	
-			@DefaultValue("100") @QueryParam("dist") int maxdist) {
-		return AddressDistance.findNearestByGPS(x, y, maxdist).list();
+			@DefaultValue("100") @QueryParam("dist") int maxdist,
+			@Parameter(description = "Status", example = "current")
+			@QueryParam("status") Optional<String> status) {
+		return AddressDistance.findNearestByGPS(x, y, maxdist, status).list();
 	}
 
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
 	@Path("/address")
-	@Operation(summary = "Get an address by id")
+	@Operation(summary = "Get an address by full, optionally filter by status")
 	public Address getAddressById(
-			@Parameter(description = "Address BeST ID", required = true, example = "BE.BRUSSELS.BRIC.ADM.ADDR/1299/2")
-			@QueryParam("id") String id) {
-		return Address.findById(id);
+			@Parameter(description = "Address ID", required = true, example = "BE.BRUSSELS.BRIC.ADM.ADDR/1299/2")
+			@QueryParam("id") String id,
+			@Parameter(description = "Status", example = "current")
+			@QueryParam("status") Optional<String> status) {
+		return Address.findByIdAndStatus(id, status);
 	}
 
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
 	@Path("/street")
-	@Operation(summary = "Get a street by id")
-	public Municipality getStreetById(
-			@Parameter(description = "Street BeST ID", required = true, example = "https://data.vlaanderen.be/doc/straatnaam/178908")
-			@QueryParam("id") String id) {
+	@Operation(summary = "Get a street by full id, optionally filter by status")
+	public Street getStreetById(
+			@Parameter(description = "Street ID", required = true, example = "https://data.vlaanderen.be/doc/straatnaam/178908")
+			@QueryParam("id") String id,
+			@Parameter(description = "Status", example = "current")
+			@QueryParam("status") Optional<String> status) {
 		return Street.findById(id);
 	}
 
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
 	@Path("/municipality")
-	@Operation(summary = "Get a municipality by id")
+	@Operation(summary = "Get a municipality by full id")
 	public Municipality getMunicipalityById(
-			@Parameter(description = "Municipality BeST ID", required = true, example = "https://data.vlaanderen.be/id/gemeente/23027/2002-08-13T17:32:32")
-			@QueryParam("id") String id) {
+			@Parameter(description = "Municipality ID", required = true, example = "https://data.vlaanderen.be/id/gemeente/23027/2002-08-13T17:32:32")
+			@QueryParam("id") Optional<String> id) {
 		return Municipality.findById(id);
 	}
 
