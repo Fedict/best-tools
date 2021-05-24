@@ -2,22 +2,22 @@ CREATE EXTENSION postgis;
 CREATE EXTENSION postgis_topology;
 CREATE EXTENSION fuzzystrmatch;
 
-CREATE USER best_reader IDENTIFIED BY 'best_reader';
-GRANT CONNECT to best_reader;
+CREATE USER best_reader WITH PASSWORD 'best_reader';
+GRANT CONNECT ON DATABASE best to best_reader;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO best_reader;
 
 CREATE TABLE addresses(
 	id VARCHAR(88) NOT NULL,
 	city_id VARCHAR(88) NOT NULL,
-	part_id VARCHAR(88) NOT NULL,
+	part_id VARCHAR(88),
 	street_id VARCHAR(88) NOT NULL,
 	postal_id VARCHAR(88) NOT NULL,
 	houseno VARCHAR(12),
 	boxno VARCHAR(40),
 	status VARCHAR(10), 
-	l72x DOUBLE NOT NULL,
-	l72y DOUBLE NOT NULL,
-	geom GEOMETRY NOT NULL);
+	l72x DOUBLE PRECISION NOT NULL,
+	l72y DOUBLE PRECISION NOT NULL,
+	geom POINT NOT NULL);
 
 CREATE TABLE municipalities(
 	id VARCHAR(88) NOT NULL,
@@ -48,23 +48,23 @@ CREATE TABLE streets(
 	status VARCHAR(10));
 
 
-COPY addresses FROM 'addresses.csv' WITH DELIMITER ';' FORMAT CSV;
-COPY municipalities FROM 'municipalities.csv' WITH DELIMITER ';' FORMAT CSV;
-COPY municipalityparts FROM 'municipalityparts.csv' WITH DELIMITER ';' FORMAT CSV;
-COPY postals FROM 'postals.csv' WITH DELIMITER ';' FORMAT CSV;
-COPY streets FROM 'streets.csv' WITH DELIMITER ';' FORMAT CSV;
+\COPY addresses FROM 'addresses.csv' WITH DELIMITER ';' QUOTE '"' csv;
+\COPY municipalities FROM 'municipalities.csv' WITH DELIMITER ';' QUOTE '"' csv;
+\COPY municipalityparts FROM 'municipalityparts.csv' WITH DELIMITER ';' QUOTE '"' csv;
+\COPY postals FROM 'postals.csv' WITH DELIMITER ';' QUOTE '"' csv;
+\COPY streets FROM 'streets.csv' WITH DELIMITER ';' QUOTE '"' csv;
 
 CREATE INDEX ON streets(city_id);
 CREATE INDEX ON addresses(postal_id);
 CREATE INDEX ON addresses(city_id);
 CREATE INDEX ON addresses(part_id);
 
-CREATE TABLE postal_municipalities AS
+CREATE TABLE postal_municipalities AS (
 	SELECT DISTINCT city_id, zipcode
 	FROM addresses a, postals p
 	WHERE a.postal_id = p.id);
 
-CREATE TABLE postal_streets AS
+CREATE TABLE postal_streets AS (
 	SELECT DISTINCT street_id, zipcode
 	FROM addresses a, postals p
 	WHERE a.postal_id = p.id);
