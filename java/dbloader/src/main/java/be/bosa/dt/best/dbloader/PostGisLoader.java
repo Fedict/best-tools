@@ -51,7 +51,7 @@ public class PostGisLoader extends DbLoader {
 			stmt.execute("CREATE TABLE addresses(" +
 							"id VARCHAR(88) NOT NULL, " +
 							"city_id VARCHAR(88) NOT NULL, " +
-							"part_id VARCHAR(88) NOT NULL, " +
+							"part_id VARCHAR(88), " +
 							"street_id VARCHAR(88) NOT NULL, " +
 							"postal_id VARCHAR(88) NOT NULL, " +
 							"houseno VARCHAR(12), " +
