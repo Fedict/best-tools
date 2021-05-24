@@ -57,9 +57,9 @@ public class PostGisLoader extends DbLoader {
 							"houseno VARCHAR(12), " +
 							"boxno VARCHAR(40), " +
 							"status VARCHAR(10), " + 
-							"l72x DOUBLE NOT NULL, " +
-							"l72y DOUBLE NOT NULL, " +
-							"geom GEOMETRY NOT NULL)");
+							"l72x DOUBLE PRECISION NOT NULL, " +
+							"l72y DOUBLE PRECISION NOT NULL, " +
+							"geom POINT NOT NULL)");
 		}
 	}
 
