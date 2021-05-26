@@ -1,5 +1,49 @@
-2021-05-10 23:19:00,274 abo-podel190146 webservice-1.2.4-runner.jar[9728] INFO  [org.hib.spa.int.SpatialService] (main) HHH80000001: hibernate-spatial integration enabled : true
-2021-05-10 23:19:01,092 abo-podel190146 webservice-1.2.4-runner.jar[9728] WARN  [io.qua.agr.run.AgroalConnectionConfigurer] (main) Agroal does not support detecting if a connection is still usable after an exception for database kind: other
-2021-05-10 23:19:01,694 abo-podel190146 webservice-1.2.4-runner.jar[9728] INFO  [io.quarkus] (main) webservice 1.2.4 on JVM (powered by Quarkus 1.13.3.Final) started in 2.369s. Listening on: http://0.0.0.0:8080
-2021-05-10 23:19:01,694 abo-podel190146 webservice-1.2.4-runner.jar[9728] INFO  [io.quarkus] (main) Profile prod activated. 
-2021-05-10 23:19:01,694 abo-podel190146 webservice-1.2.4-runner.jar[9728] INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, mutiny, narayana-jta, resteasy, resteasy-jackson, smallrye-context-propagation, smallrye-health, smallrye-openapi, swagger-ui]
+2021-05-24 19:43:57,798 abo-podel190146 webservice-1.2.4-runner.jar[7508] INFO  [org.hib.spa.int.SpatialService] (main) HHH80000001: hibernate-spatial integration enabled : true
+2021-05-24 19:43:59,001 abo-podel190146 webservice-1.2.4-runner.jar[7508] WARN  [io.qua.agr.run.AgroalConnectionConfigurer] (main) Agroal does not support detecting if a connection is still usable after an exception for database kind: other
+2021-05-24 19:43:59,703 abo-podel190146 webservice-1.2.4-runner.jar[7508] INFO  [io.quarkus] (main) webservice 1.2.4 on JVM (powered by Quarkus 1.13.4.Final) started in 2.666s. Listening on: http://0.0.0.0:8080
+2021-05-24 19:43:59,703 abo-podel190146 webservice-1.2.4-runner.jar[7508] INFO  [io.quarkus] (main) Profile prod activated. 
+2021-05-24 19:43:59,703 abo-podel190146 webservice-1.2.4-runner.jar[7508] INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, jdbc-postgresql, mutiny, narayana-jta, resteasy, resteasy-jackson, smallrye-context-propagation, smallrye-health, smallrye-openapi, swagger-ui]
+2021-05-24 19:50:11,530 abo-podel190146 webservice-1.2.4-runner.jar[7508] ERROR [io.qua.ver.htt.run.QuarkusErrorHandler] (executor-thread-1) HTTP Request to /best/api/v2/address?id=BE.BRUSSELS.BRIC.ADM.ADDR%2F1299%2F4&status=reserved failed, error id: aceb9003-7c91-4745-860e-e581767da4ef-1: org.jboss.resteasy.spi.UnhandledException: java.lang.NullPointerException: Cannot invoke "be.bosa.dt.best.webservice.entities.Address.getStatus()" because "adr" is null
+	at org.jboss.resteasy.core.ExceptionHandler.handleApplicationException(ExceptionHandler.java:106)
+	at org.jboss.resteasy.core.ExceptionHandler.handleException(ExceptionHandler.java:372)
+	at org.jboss.resteasy.core.SynchronousDispatcher.writeException(SynchronousDispatcher.java:218)
+	at org.jboss.resteasy.core.SynchronousDispatcher.invoke(SynchronousDispatcher.java:519)
+	at org.jboss.resteasy.core.SynchronousDispatcher.lambda$invoke$4(SynchronousDispatcher.java:261)
+	at org.jboss.resteasy.core.SynchronousDispatcher$$Lambda$350/0x0000000095d62608.run(Unknown Source)
+	at org.jboss.resteasy.core.SynchronousDispatcher.lambda$preprocess$0(SynchronousDispatcher.java:161)
+	at org.jboss.resteasy.core.SynchronousDispatcher$$Lambda$351/0x0000000095d64610.get(Unknown Source)
+	at org.jboss.resteasy.core.interception.jaxrs.PreMatchContainerRequestContext.filter(PreMatchContainerRequestContext.java:364)
+	at org.jboss.resteasy.core.SynchronousDispatcher.preprocess(SynchronousDispatcher.java:164)
+	at org.jboss.resteasy.core.SynchronousDispatcher.invoke(SynchronousDispatcher.java:247)
+	at io.quarkus.resteasy.runtime.standalone.RequestDispatcher.service(RequestDispatcher.java:73)
+	at io.quarkus.resteasy.runtime.standalone.VertxRequestHandler.dispatch(VertxRequestHandler.java:138)
+	at io.quarkus.resteasy.runtime.standalone.VertxRequestHandler.access$000(VertxRequestHandler.java:41)
+	at io.quarkus.resteasy.runtime.standalone.VertxRequestHandler$1.run(VertxRequestHandler.java:93)
+	at org.jboss.threads.EnhancedQueueExecutor$Task.run(EnhancedQueueExecutor.java:2415)
+	at org.jboss.threads.EnhancedQueueExecutor$ThreadBody.run(EnhancedQueueExecutor.java:1452)
+	at org.jboss.threads.DelegatingRunnable.run(DelegatingRunnable.java:29)
+	at org.jboss.threads.ThreadLocalResettingRunnable.run(ThreadLocalResettingRunnable.java:29)
+	at java.base/java.lang.Thread.run(Thread.java:853)
+	at org.jboss.threads.JBossThread.run(JBossThread.java:501)
+Caused by: java.lang.NullPointerException: Cannot invoke "be.bosa.dt.best.webservice.entities.Address.getStatus()" because "adr" is null
+	at be.bosa.dt.best.webservice.entities.Address.findByIdAndStatus(Address.java:88)
+	at be.bosa.dt.best.webservice.LookupResource.getAddressById(LookupResource.java:78)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:78)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:567)
+	at org.jboss.resteasy.core.MethodInjectorImpl.invoke(MethodInjectorImpl.java:170)
+	at org.jboss.resteasy.core.MethodInjectorImpl.invoke(MethodInjectorImpl.java:130)
+	at org.jboss.resteasy.core.ResourceMethodInvoker.internalInvokeOnTarget(ResourceMethodInvoker.java:660)
+	at org.jboss.resteasy.core.ResourceMethodInvoker.invokeOnTargetAfterFilter(ResourceMethodInvoker.java:524)
+	at org.jboss.resteasy.core.ResourceMethodInvoker.lambda$invokeOnTarget$2(ResourceMethodInvoker.java:474)
+	at org.jboss.resteasy.core.ResourceMethodInvoker$$Lambda$352/0x0000000095d69820.get(Unknown Source)
+	at org.jboss.resteasy.core.interception.jaxrs.PreMatchContainerRequestContext.filter(PreMatchContainerRequestContext.java:364)
+	at org.jboss.resteasy.core.ResourceMethodInvoker.invokeOnTarget(ResourceMethodInvoker.java:476)
+	at org.jboss.resteasy.core.ResourceMethodInvoker.invoke(ResourceMethodInvoker.java:434)
+	at org.jboss.resteasy.core.ResourceMethodInvoker.invoke(ResourceMethodInvoker.java:408)
+	at org.jboss.resteasy.core.ResourceMethodInvoker.invoke(ResourceMethodInvoker.java:69)
+	at org.jboss.resteasy.core.SynchronousDispatcher.invoke(SynchronousDispatcher.java:492)
+	... 17 more
+
+2021-05-24 22:28:14,123 abo-podel190146 webservice-1.2.4-runner.jar[7508] INFO  [io.quarkus] (Shutdown thread) webservice stopped in 0.123s

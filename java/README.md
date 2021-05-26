@@ -39,6 +39,11 @@ In addition, when converting Lambert coordinates to GPS coordinates, the `PROJ_L
 Usage:
 `java -jar dbloader.jar -x <directory_unzipped_xml> -d jdbc:sqlite:C:/data/best.db -g`
 
+Alternatively, the data can be written to a few CSV table files that can be loaded e.g. by Postgres' psql COPY command
+
+Usage:
+`java -jar dbloader.jar -x <directory_unzipped_xml> -c <directory_output_csv>`
+
 ### Helper modules
 
 ## DAO

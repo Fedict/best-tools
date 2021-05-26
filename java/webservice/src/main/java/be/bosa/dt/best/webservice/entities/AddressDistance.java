@@ -43,15 +43,18 @@ import org.hibernate.annotations.Filter;
  * to increase performance a "search frame" buffer with a 0.075 degree radius is created
  * (meters are not directly supported in buffer)
  * 
+ * Also, don't use the spheroid for calculating distance. 
+ * It will be 1-2% less accurate, but given the accuracy of GPS coordinates this is not a issue
+ * 
  * @author Bart Hanssens
  */
 @Entity
 @JsonIgnoreProperties({"id"})
 @NamedQuery(name = "spatialite", 
 			query = "SELECT NEW AddressDistance(a, " +
-				"DISTANCE(a.geom, MakePoint(:posx, :posy, 4326), 1) as distance) " +
+				"DISTANCE(a.geom, MakePoint(:posx, :posy, 4326), 0) as distance) " +
 				"FROM Addresses AS a " +
-				"WHERE PtDistWithin(a.geom, MakePoint(:posx, :posy, 4326), :maxdist, 1) = TRUE " + 
+				"WHERE PtDistWithin(a.geom, MakePoint(:posx, :posy, 4326), :maxdist, 0) = TRUE " + 
 				"AND a.rowid IN ( " +
 					"SELECT s.rowid " +
 					"FROM SpatialIndex AS s " +
