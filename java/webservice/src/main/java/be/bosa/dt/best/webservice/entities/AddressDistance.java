@@ -25,16 +25,7 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
-import java.util.Map;
-import java.util.Optional;
-import javax.persistence.Entity;
-import javax.persistence.NamedQuery;
-import javax.persistence.Transient;
-import org.eclipse.microprofile.config.ConfigProvider;
-import org.hibernate.annotations.Filter;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 /**
  * Address with distance (in meters).
@@ -48,55 +39,12 @@ import org.hibernate.annotations.Filter;
  * 
  * @author Bart Hanssens
  */
-@Entity
-@JsonIgnoreProperties({"id"})
-@NamedQuery(name = "spatialite", 
-			query = "SELECT NEW AddressDistance(a, " +
-				"DISTANCE(a.geom, MakePoint(:posx, :posy, 4326), 0) as distance) " +
-				"FROM Addresses AS a " +
-				"WHERE PtDistWithin(a.geom, MakePoint(:posx, :posy, 4326), :maxdist, 0) = TRUE " + 
-				"AND a.rowid IN ( " +
-					"SELECT s.rowid " +
-					"FROM SpatialIndex AS s " +
-					"WHERE f_table_name = 'addresses' " + 
-					"AND search_frame = Buffer(MakePoint(:posx, :posy, 4326), 0.075) )" +
-				"ORDER by distance")
-@NamedQuery(name = "postgis", 
-			query = "SELECT NEW AddressDistance(a, " +
-				"DISTANCE(a.geom, ST_SetSRID(ST_MakePoint(:posx, :posy), 4326)) as distance) " +
-				"FROM Addresses a " +
-				"WHERE DWITHIN(a.geom, ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), :maxdist) = TRUE " +
-				"ORDER by distance")
-@Filter(name="status", condition="status = :status") 
-public class AddressDistance extends PanacheEntity {
-	private final static String db = ConfigProvider.getConfig().getValue("quarkus.datasource.db-kind", String.class);
-
-	@Transient
+public class AddressDistance extends PanacheEntityBase {
 	public Address address;
-	@Transient
 	public double distance;
-
-	public AddressDistance() {
-	}
 	
 	public AddressDistance(Address address, double distance) {
 		this.address = address;
 		this.distance = distance;
-	}
-
-	/**
-	 * Find all addresses within a range of X meters, based on GPS/WGS84 coordinates
-	 * 
-	 * @param posx
-	 * @param posy
-	 * @param maxdist maximum distance (in meters)
-	 * @param status
-	 * @return 
-	 */
-	public static PanacheQuery<AddressDistance> findNearestByGPS(double posx, double posy, int maxdist, 
-			Optional<String> status) {
-		String qry = db.equals("other") ? "#spatialite" : "#postgis";
-		PanacheQuery<AddressDistance> res = find(qry, Map.of("posx", posx, "posy", posy, "maxdist", maxdist));
-		return status.isPresent() ? res.filter("#status", Map.of("status", status)) : res;
 	}
 }

@@ -26,7 +26,6 @@
 package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.Address;
-import be.bosa.dt.best.webservice.entities.AddressDistance;
 import be.bosa.dt.best.webservice.entities.Municipality;
 import be.bosa.dt.best.webservice.entities.Street;
 import java.util.Collections;
@@ -54,16 +53,20 @@ public class LookupResource {
 	@Produces({MediaType.APPLICATION_JSON})
 	@Path("/near")
 	@Operation(summary = "Get addresses within (maximal) 100 meters")
-	public List<AddressDistance> nearestAddress(
+	public List nearestAddress(
 			@Parameter(description = "X coordinate (longitude)", required = true, example = "4.23")
 			@QueryParam("x") double x, 
 			@Parameter(description = "Y coordinate (latitude)", required = true, example = "50.73")	
 			@QueryParam("y") double y,
 			@Parameter(description = "maximum distance (meters)", required = false, example = "100")	
 			@DefaultValue("100") @QueryParam("dist") int maxdist,
-			@Parameter(description = "Status", example = "current")
-			@QueryParam("status") Optional<String> status) {
-		return AddressDistance.findNearestByGPS(x, y, maxdist, status).list();
+			@Parameter(description = "status", example = "current")
+			@QueryParam("status") Optional<String> status,
+			@Parameter(description = "calculate distance", example = "true")
+			@QueryParam("calc") Optional<Boolean> calc) {
+		boolean withdistance = calc.orElse(Boolean.TRUE);		
+		return withdistance ? Address.findNearestWithDistance(x, y, maxdist, status) 
+							: Address.findNearest(x, y, maxdist, status);
 	}
 
 	@GET

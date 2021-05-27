@@ -10,6 +10,7 @@
 	<artifactId>webservice</artifactId>
 	<packaging>jar</packaging>
 	<properties>
+		<maven.compiler.parameters>true</maven.compiler.parameters>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 	</properties>
@@ -52,10 +53,12 @@
 			<artifactId>hibernate-spatial</artifactId>
 			<version>5.4.30.Final</version>
 		</dependency>
+		<!--
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-jdbc-postgresql</artifactId>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>org.geolatte</groupId>
 			<artifactId>geolatte-geojson</artifactId>
@@ -76,6 +79,10 @@
 	</dependencies>
 	<build>
 		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+			</plugin>
 			<plugin>
 				<groupId>io.quarkus</groupId>
 				<artifactId>quarkus-maven-plugin</artifactId>
