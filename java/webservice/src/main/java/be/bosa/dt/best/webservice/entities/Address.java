@@ -153,7 +153,7 @@ public class Address extends PanacheEntityBase {
 	public static List<AddressDistance> findNearestWithDistance(double posx, double posy, int maxdist, 
 			Optional<String> status) {
 		PanacheQuery<PanacheEntityBase> res = find("#withdistance", 
-			Map.of("posx", posx, "posy", posy, "maxdist", maxdist, "degrees", (double) maxdist / 7000));
+			Map.of("posx", posx, "posy", posy, "maxdist", maxdist, "degrees", (double) maxdist / 70100));
 		return status.isPresent() ? res.filter("#status", Map.of("status", status)).list() : res.list();
 	}
 	
@@ -168,7 +168,7 @@ public class Address extends PanacheEntityBase {
 	 */
 	public static List<Address> findNearest(double posx, double posy, int maxdist, Optional<String> status) {
 		PanacheQuery<Address> res = find("#withoutdistance", 
-			Map.of("posx", posx, "posy", posy, "maxdist", maxdist, "degrees", (double) maxdist / 7000));
+			Map.of("posx", posx, "posy", posy, "maxdist", maxdist, "degrees", (double) maxdist / 70100));
 		return status.isPresent() ? res.filter("#status", Map.of("status", status)).list() : res.list();
 	}
 
