@@ -4,7 +4,6 @@ CREATE EXTENSION fuzzystrmatch;
 
 CREATE USER best_reader WITH PASSWORD 'best_reader';
 GRANT CONNECT ON DATABASE best to best_reader;
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO best_reader;
 
 CREATE TABLE addresses(
 	id VARCHAR(88) NOT NULL,
@@ -54,6 +53,8 @@ CREATE TABLE streets(
 \COPY postals FROM 'postals.csv' WITH DELIMITER ';' QUOTE '"' csv;
 \COPY streets FROM 'streets.csv' WITH DELIMITER ';' QUOTE '"' csv;
 
+SELECT UpdateGeometrySRID('addreses','geom',4326);
+
 CREATE INDEX ON streets(city_id);
 CREATE INDEX ON addresses(postal_id);
 CREATE INDEX ON addresses(city_id);
@@ -77,3 +78,5 @@ ALTER TABLE streets ADD PRIMARY KEY(id);
 CREATE INDEX ON addresses USING GIST(geom);
 			
 VACUUM FULL ANALYZE;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO best_reader;
