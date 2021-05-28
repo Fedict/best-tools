@@ -58,7 +58,7 @@ public class LookupResource {
 			@QueryParam("x") double x, 
 			@Parameter(description = "Y coordinate (latitude)", required = true, example = "50.73")	
 			@QueryParam("y") double y,
-			@Parameter(description = "maximum distance (meters)", required = false, example = "100")	
+			@Parameter(description = "Maximum distance (meters)", required = false, example = "100")	
 			@DefaultValue("100") @QueryParam("dist") int maxdist,
 			@Parameter(description = "status", example = "current")
 			@QueryParam("status") Optional<String> status,

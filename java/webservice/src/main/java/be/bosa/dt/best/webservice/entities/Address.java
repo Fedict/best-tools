@@ -49,8 +49,9 @@ import org.hibernate.annotations.Filter;
  * Full address entity
  *
  * Spatialite requires some special querying,
- * to increase performance a "search frame" buffer with a 0.055 degree radius is created
+ * to increase performance a "search frame" buffer with a degree radius is created 
  * (meters are not directly supported in buffer)
+ * At 51° _latitude_, 1 degree _latitude_ is about 111250 m and 1 degree _longitude_ is about 70200 meters
  * 
  * Also: don't use the spheroid for calculating distance. 
  * It will be slightly less accurate, but given the (in)accuracy of GPS coordinates this is not an issue.
@@ -75,7 +76,8 @@ import org.hibernate.annotations.Filter;
 					"SELECT s.rowid " +
 					"FROM SpatialIndex AS s " +
 					"WHERE f_table_name = 'addresses' " + 
-					"AND search_frame = Buffer(MakePoint(:posx, :posy, 4326), 0.055) )",
+					"AND search_frame = Buffer(MakePoint(:posx, :posy, 4326), :degrees) ) " +
+				"ORDER by distance",
 			hints = { 
 				@QueryHint(name = "org.hibernate.readOnly", value="true")
 			}),
@@ -87,7 +89,7 @@ import org.hibernate.annotations.Filter;
 					"SELECT s.rowid " +
 					"FROM SpatialIndex AS s " +
 					"WHERE f_table_name = 'addresses' " + 
-					"AND search_frame = Buffer(MakePoint(:posx, :posy, 4326), 0.055) )",
+					"AND search_frame = Buffer(MakePoint(:posx, :posy, 4326), :degrees))",
 			hints = { 
 				@QueryHint(name = "org.hibernate.readOnly", value="true")
 			}),
@@ -151,7 +153,7 @@ public class Address extends PanacheEntityBase {
 	public static List<AddressDistance> findNearestWithDistance(double posx, double posy, int maxdist, 
 			Optional<String> status) {
 		PanacheQuery<PanacheEntityBase> res = find("#withdistance", 
-			Map.of("posx", posx, "posy", posy, "maxdist", maxdist));
+			Map.of("posx", posx, "posy", posy, "maxdist", maxdist, "degrees", (double) maxdist / 7000));
 		return status.isPresent() ? res.filter("#status", Map.of("status", status)).list() : res.list();
 	}
 	
@@ -166,7 +168,7 @@ public class Address extends PanacheEntityBase {
 	 */
 	public static List<Address> findNearest(double posx, double posy, int maxdist, Optional<String> status) {
 		PanacheQuery<Address> res = find("#withoutdistance", 
-			Map.of("posx", posx, "posy", posy, "maxdist", maxdist));
+			Map.of("posx", posx, "posy", posy, "maxdist", maxdist, "degrees", (double) maxdist / 7000));
 		return status.isPresent() ? res.filter("#status", Map.of("status", status)).list() : res.list();
 	}
 
