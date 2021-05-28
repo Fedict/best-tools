@@ -44,7 +44,7 @@ public class Street extends PanacheEntityBase {
 	public String name_nl;
 	public String name_fr;
 	public String name_de;
-	
+
 	/**
 	 * Find street by postal code of the municipality and filter optionally by (part of) street name.
 	 * Note that, since postal codes are not directly related to municipalities and streets,
@@ -85,5 +85,24 @@ public class Street extends PanacheEntityBase {
 		String str = '%' + name.get() + '%';
 		return find("FROM Streets WHERE nis = ?1 "
 					+ "AND (name_nl LIKE ?2 OR name_fr LIKE ?2 OR name_de LIKE ?2)", niscode, str);
+	}
+
+	public Street() {
+	}
+
+	/**
+	* Constructor, only needed for N+1 select work-around
+	* 
+	* @param id
+	* @param city_id
+	* @param name_nl
+	* @param name_fr
+	* @param name_de 
+	*/
+	public Street(String id, String name_nl, String name_fr, String name_de) {
+		this.id = id;
+		this.name_nl = name_nl;
+		this.name_fr = name_fr;
+		this.name_de = name_de;
 	}
 }

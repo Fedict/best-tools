@@ -29,7 +29,6 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Postal codes (bPost.be).
@@ -37,11 +36,30 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Bart Hanssens
  */
 @Entity(name = "Postals")
-@XmlRootElement
 public class Postal extends PanacheEntityBase {
 	@Id public String id;
 	public String zipcode;
 	public String name_nl;
 	public String name_fr;
 	public String name_de;
+
+	public Postal() {
+	}
+
+	/**
+	 * Constructor, only needed for N+1 select work-around
+	 * 
+	 * @param id
+	 * @param zipcode
+	 * @param name_nl
+	 * @param name_fr
+	 * @param name_de 
+	 */
+	public Postal(String id, String zipcode, String name_nl, String name_fr, String name_de) {
+		this.id = id;
+		this.zipcode = zipcode;
+		this.name_nl = name_nl;
+		this.name_fr = name_fr;
+		this.name_de = name_de;
+	}
 }

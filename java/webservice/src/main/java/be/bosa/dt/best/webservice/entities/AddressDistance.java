@@ -26,16 +26,11 @@
 package be.bosa.dt.best.webservice.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import org.geolatte.geom.Geometry;
+
 
 /**
  * Address with distance (in meters).
- * 
- * Spatialite requires some special querying,
- * to increase performance a "search frame" buffer with a 0.075 degree radius is created
- * (meters are not directly supported in buffer)
- * 
- * Also, don't use the spheroid for calculating distance. 
- * It will be 1-2% less accurate, but given the accuracy of GPS coordinates this is not a issue
  * 
  * @author Bart Hanssens
  */
@@ -46,5 +41,46 @@ public class AddressDistance extends PanacheEntityBase {
 	public AddressDistance(Address address, double distance) {
 		this.address = address;
 		this.distance = distance;
+	}
+	
+	/**
+	 * Constructor, only needed for N+1 select work-around
+	 * 
+	 * @param rowid
+	 * @param id
+	 * @param part_id
+	 * @param houseno
+	 * @param boxno
+	 * @param l72x
+	 * @param l72y
+	 * @param geom
+	 * @param status 
+	 * @param s_id 
+	 * @param s_name_nl 
+	 * @param s_name_fr 
+	 * @param s_name_de 
+	 * @param m_id 
+	 * @param m_niscode 
+	 * @param m_name_nl 
+	 * @param m_name_fr 
+	 * @param m_name_de 
+	 * @param p_id 
+	 * @param p_zipcode 
+	 * @param p_name_fr 
+	 * @param p_name_nl 
+	 * @param p_name_de 
+	 * @param distance 
+	 */
+	public AddressDistance(long rowid, String id, String part_id, String houseno, String boxno, 
+					double l72x, double l72y, Geometry geom, String status,
+					String s_id, String s_name_nl, String s_name_fr, String s_name_de,
+					String m_id, String m_niscode, String m_name_nl, String m_name_fr, String m_name_de,
+					String p_id, String p_zipcode, String p_name_nl, String p_name_fr, String p_name_de,
+					double distance) {
+		this(new Address(rowid, id, part_id, houseno, boxno, l72x, l72y, geom, status,
+						s_id, s_name_nl, s_name_fr, s_name_de,
+						m_id, m_niscode, m_name_nl, m_name_fr, m_name_de,
+						p_id, p_zipcode, p_name_nl, p_name_fr, p_name_de), 
+			distance);
 	}
 }

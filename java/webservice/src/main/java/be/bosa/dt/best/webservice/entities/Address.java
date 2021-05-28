@@ -47,15 +47,29 @@ import org.hibernate.annotations.Filter;
 
 /**
  * Full address entity
+ *
+ * Spatialite requires some special querying,
+ * to increase performance a "search frame" buffer with a 0.055 degree radius is created
+ * (meters are not directly supported in buffer)
+ * 
+ * Also: don't use the spheroid for calculating distance. 
+ * It will be slightly less accurate, but given the (in)accuracy of GPS coordinates this is not an issue.
  * 
  * @author Bart Hanssens
  */
 @Entity(name = "Addresses")
 @NamedQueries({
 @NamedQuery(name = "withdistance", 
-			query = "SELECT NEW be.bosa.dt.best.webservice.entities.AddressDistance(a, " +
+			query = "SELECT NEW be.bosa.dt.best.webservice.entities.AddressDistance( " +
+					"a.rowid, a.id, a.part_id, a.houseno, a.boxno, a.l72x, a.l72y, a.geom, a.status, " +
+					"s.id, s.name_nl, s.name_fr, s.name_de, " +
+					"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
+					"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
 				"DISTANCE(a.geom, MakePoint(:posx, :posy, 4326), 0) as distance) " +
-				"FROM Addresses AS a " +
+				"FROM Addresses a " +
+				"INNER JOIN a.street s " +
+				"INNER JOIN a.municipality m " +
+				"INNER JOIN a.postal p " +
 				"WHERE PtDistWithin(a.geom, MakePoint(:posx, :posy, 4326), :maxdist, 0) = TRUE " + 
 				"AND a.rowid IN ( " +
 					"SELECT s.rowid " +
@@ -63,8 +77,7 @@ import org.hibernate.annotations.Filter;
 					"WHERE f_table_name = 'addresses' " + 
 					"AND search_frame = Buffer(MakePoint(:posx, :posy, 4326), 0.055) )",
 			hints = { 
-				@QueryHint(name = "org.hibernate.readOnly", value="true"),
-				@QueryHint(name = "org.hibernate.batchSize ", value="10")
+				@QueryHint(name = "org.hibernate.readOnly", value="true")
 			}),
 @NamedQuery(name = "withoutdistance", 
 			query = "SELECT a " +
@@ -155,5 +168,54 @@ public class Address extends PanacheEntityBase {
 		PanacheQuery<Address> res = find("#withoutdistance", 
 			Map.of("posx", posx, "posy", posy, "maxdist", maxdist));
 		return status.isPresent() ? res.filter("#status", Map.of("status", status)).list() : res.list();
+	}
+
+	public Address() {
+	}
+
+	/**
+	 * Constructor, only needed for N+1 select work-around
+	 * 
+	 * @param rowid
+	 * @param id
+	 * @param part_id
+	 * @param houseno
+	 * @param boxno
+	 * @param l72x
+	 * @param l72y
+	 * @param geom
+	 * @param status 
+	 * @param s_id 
+	 * @param s_name_nl 
+	 * @param s_name_fr 
+	 * @param s_name_de 
+	 * @param m_id 
+	 * @param m_niscode 
+	 * @param m_name_nl 
+	 * @param m_name_fr 
+	 * @param m_name_de 
+	 * @param p_id 
+	 * @param p_zipcode 
+	 * @param p_name_fr 
+	 * @param p_name_nl 
+	 * @param p_name_de 
+	 */
+	public Address(long rowid, String id, String part_id, String houseno, String boxno, 
+					double l72x, double l72y, Geometry geom, String status,
+					String s_id, String s_name_nl, String s_name_fr, String s_name_de,
+					String m_id, String m_niscode, String m_name_nl, String m_name_fr, String m_name_de,
+					String p_id, String p_zipcode, String p_name_nl, String p_name_fr, String p_name_de) {
+		this.rowid = rowid;
+		this.id = id;
+		this.part_id = part_id;
+		this.houseno = houseno;
+		this.boxno = boxno;
+		this.l72x = l72x;
+		this.l72y = l72y;
+		this.geom = geom;
+		this.status = status;
+		this.municipality = new Municipality(m_id, m_niscode, m_name_nl, m_name_fr, m_name_de);
+		this.street = new Street(s_id, s_name_nl, s_name_fr, s_name_de);
+		this.postal = new Postal(p_id, p_zipcode, p_name_nl, p_name_fr, p_name_de);
 	}
 }

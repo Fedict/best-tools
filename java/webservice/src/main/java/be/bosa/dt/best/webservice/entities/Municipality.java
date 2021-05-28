@@ -57,4 +57,24 @@ public class Municipality extends PanacheEntityBase {
 		return find("FROM Municipalities "
 					+ "WHERE (name_nl LIKE ?1 OR name_fr LIKE ?1 OR name_de LIKE ?1)", str);
 	}
+
+	public Municipality() {
+	}
+
+	/**
+	 * Constructor, only needed for N+1 select work-around
+	 * 
+	 * @param id
+	 * @param niscode
+	 * @param name_nl
+	 * @param name_fr
+	 * @param name_de 
+	 */
+	public Municipality(String id, String niscode, String name_nl, String name_fr, String name_de) {
+		this.id = id;
+		this.niscode = niscode;
+		this.name_nl = name_nl;
+		this.name_fr = name_fr;
+		this.name_de = name_de;
+	}
 }
