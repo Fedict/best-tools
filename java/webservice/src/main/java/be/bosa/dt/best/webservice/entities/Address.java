@@ -32,6 +32,7 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.persistence.Column;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -104,6 +105,7 @@ public class Address extends PanacheEntityBase {
 	public double x;
 	public double y;
 
+	@Column(columnDefinition = "geometry(Geometry,4326)")
 	public Geometry geom;
 	
 	public String status;

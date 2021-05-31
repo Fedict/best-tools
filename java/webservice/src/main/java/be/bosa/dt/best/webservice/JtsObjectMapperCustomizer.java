@@ -28,7 +28,8 @@ package be.bosa.dt.best.webservice;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.jackson.ObjectMapperCustomizer;
 import javax.inject.Singleton;
-import org.geolatte.geom.json.GeolatteGeomModule;
+
+import org.n52.jackson.datatype.jts.JtsModule;
 
 /**
  * Mapper for geometry / geography types to JSON
@@ -36,9 +37,9 @@ import org.geolatte.geom.json.GeolatteGeomModule;
  * @author Bart Hanssens
  */
 @Singleton
-public class GeomObjectMapperCustomizer implements ObjectMapperCustomizer {
+public class JtsObjectMapperCustomizer implements ObjectMapperCustomizer {
 	@Override
 	public void customize(ObjectMapper mapper) {
-		mapper.registerModule(new GeolatteGeomModule());
+		mapper.registerModule(new JtsModule());
     }
 }
