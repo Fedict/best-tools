@@ -26,7 +26,6 @@
 package be.bosa.dt.best.webservice.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import org.locationtech.jts.geom.Point;
 
 
 /**
@@ -71,12 +70,12 @@ public class AddressDistance extends PanacheEntityBase {
 	 * @param distance 
 	 */
 	public AddressDistance(String id, String part_id, String houseno, String boxno, 
-					double l72x, double l72y, Point geom, String status,
+					double l72x, double l72y, String status,
 					String s_id, String s_name_nl, String s_name_fr, String s_name_de,
 					String m_id, String m_niscode, String m_name_nl, String m_name_fr, String m_name_de,
 					String p_id, String p_zipcode, String p_name_nl, String p_name_fr, String p_name_de,
 					double distance) {
-		this(new Address(id, part_id, houseno, boxno, l72x, l72y, geom, status,
+		this(new Address(id, part_id, houseno, boxno, l72x, l72y, status,
 						s_id, s_name_nl, s_name_fr, s_name_de,
 						m_id, m_niscode, m_name_nl, m_name_fr, m_name_de,
 						p_id, p_zipcode, p_name_nl, p_name_fr, p_name_de), 
