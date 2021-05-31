@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -57,7 +56,7 @@ import org.locationtech.jts.geom.Point;
 @NamedQueries({
 @NamedQuery(name = "withdistance", 
 			query = "SELECT NEW be.bosa.dt.best.webservice.entities.AddressDistance( " +
-					"a.id, a.part_id, a.houseno, a.boxno, a.x, a.y, a.status, " +
+					"a.id, a.part_id, a.houseno, a.boxno, a.x, a.y, a.geom, a.status, " +
 					"s.id, s.name_nl, s.name_fr, s.name_de, " +
 					"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
 					"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
@@ -104,7 +103,6 @@ public class Address extends PanacheEntityBase {
 	public double x;
 	public double y;
 
-	@Column(columnDefinition = "geometry")
 	public Point geom;
 	
 	public String status;
@@ -186,7 +184,7 @@ public class Address extends PanacheEntityBase {
 	 * @param p_name_de 
 	 */
 	public Address(String id, String part_id, String houseno, String boxno, 
-					double x, double y, String status,
+					double x, double y, Point geom, String status,
 					String s_id, String s_name_nl, String s_name_fr, String s_name_de,
 					String m_id, String m_niscode, String m_name_nl, String m_name_fr, String m_name_de,
 					String p_id, String p_zipcode, String p_name_nl, String p_name_fr, String p_name_de) {
@@ -196,6 +194,7 @@ public class Address extends PanacheEntityBase {
 		this.boxno = boxno;
 		this.x = x;
 		this.y = y;
+		this.geom = geom;
 		this.status = status;
 		this.municipality = new Municipality(m_id, m_niscode, m_name_nl, m_name_fr, m_name_de);
 		this.street = new Street(s_id, s_name_nl, s_name_fr, s_name_de);
