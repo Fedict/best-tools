@@ -54,7 +54,7 @@ import org.hibernate.annotations.Filter;
 @NamedQueries({
 @NamedQuery(name = "withdistance", 
 			query = "SELECT NEW be.bosa.dt.best.webservice.entities.AddressDistance( " +
-					"a.rowid, a.id, a.part_id, a.houseno, a.boxno, a.x, a.y a.geom, a.status, " +
+					"a.rowid, a.id, a.part_id, a.houseno, a.boxno, a.x, a.y, a.geom, a.status, " +
 					"s.id, s.name_nl, s.name_fr, s.name_de, " +
 					"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
 					"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
