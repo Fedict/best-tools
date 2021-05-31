@@ -26,13 +26,15 @@
 package be.bosa.dt.best.webservice.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.persistence.Column;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -41,8 +43,9 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.QueryHint;
 
-import org.geolatte.geom.Geometry;
 import org.hibernate.annotations.Filter;
+
+import org.locationtech.jts.geom.Point;
 
 
 /**
@@ -102,7 +105,7 @@ public class Address extends PanacheEntityBase {
 	public double y;
 
 	@Column(columnDefinition = "geometry")
-	public Geometry geom;
+	public Point geom;
 	
 	public String status;
 	
@@ -183,7 +186,7 @@ public class Address extends PanacheEntityBase {
 	 * @param p_name_de 
 	 */
 	public Address(String id, String part_id, String houseno, String boxno, 
-					double x, double y, Geometry geom, String status,
+					double x, double y, Point geom, String status,
 					String s_id, String s_name_nl, String s_name_fr, String s_name_de,
 					String m_id, String m_niscode, String m_name_nl, String m_name_fr, String m_name_de,
 					String p_id, String p_zipcode, String p_name_nl, String p_name_fr, String p_name_de) {

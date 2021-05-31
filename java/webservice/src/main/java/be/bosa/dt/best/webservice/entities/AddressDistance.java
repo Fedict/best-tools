@@ -26,7 +26,7 @@
 package be.bosa.dt.best.webservice.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import org.geolatte.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 
 
 /**
@@ -46,7 +46,6 @@ public class AddressDistance extends PanacheEntityBase {
 	/**
 	 * Constructor, only needed for N+1 select work-around
 	 * 
-	 * @param rowid
 	 * @param id
 	 * @param part_id
 	 * @param houseno
@@ -72,7 +71,7 @@ public class AddressDistance extends PanacheEntityBase {
 	 * @param distance 
 	 */
 	public AddressDistance(String id, String part_id, String houseno, String boxno, 
-					double l72x, double l72y, Geometry geom, String status,
+					double l72x, double l72y, Point geom, String status,
 					String s_id, String s_name_nl, String s_name_fr, String s_name_de,
 					String m_id, String m_niscode, String m_name_nl, String m_name_fr, String m_name_de,
 					String p_id, String p_zipcode, String p_name_nl, String p_name_fr, String p_name_de,
