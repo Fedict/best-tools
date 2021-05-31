@@ -105,7 +105,7 @@ public class Address extends PanacheEntityBase {
 	public double x;
 	public double y;
 
-	@Column(columnDefinition = "geometry(Geometry,4326)")
+	@Column(columnDefinition = "geometry")
 	public Geometry geom;
 	
 	public String status;
