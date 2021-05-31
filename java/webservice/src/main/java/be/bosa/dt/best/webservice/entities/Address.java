@@ -56,16 +56,9 @@ import org.locationtech.jts.geom.Point;
 @Entity(name = "Addresses")
 @NamedQueries({
 @NamedQuery(name = "withdistance", 
-			query = "SELECT NEW be.bosa.dt.best.webservice.entities.AddressDistance( " +
-					"a.id, a.part_id, a.houseno, a.boxno, a.x, a.y, a.geom, a.status, " +
-					"s.id, s.name_nl, s.name_fr, s.name_de, " +
-					"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
-					"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
+			query = "SELECT NEW be.bosa.dt.best.webservice.entities.AddressDistance(a, " +
 				"ST_DISTANCE(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370)) as distance) " +
 				"FROM Addresses a " +
-				"INNER JOIN a.street s " +
-				"INNER JOIN a.municipality m " +
-				"INNER JOIN a.postal p " +
 				"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370), :maxdist) = TRUE " + 
 				"ORDER by distance",
 			hints = { 
