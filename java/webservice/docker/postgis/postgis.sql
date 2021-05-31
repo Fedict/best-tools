@@ -14,8 +14,8 @@ CREATE TABLE addresses(
 	houseno VARCHAR(12),
 	boxno VARCHAR(40),
 	status VARCHAR(10), 
-	l72x DOUBLE PRECISION NOT NULL,
-	l72y DOUBLE PRECISION NOT NULL,
+	x DOUBLE PRECISION NOT NULL,
+	y DOUBLE PRECISION NOT NULL,
 	geom GEOMETRY NOT NULL);
 
 CREATE TABLE municipalities(
@@ -46,14 +46,13 @@ CREATE TABLE streets(
 	name_de VARCHAR(80),
 	status VARCHAR(10));
 
-
 \COPY addresses FROM 'addresses.csv' WITH DELIMITER ';' QUOTE '"' csv;
 \COPY municipalities FROM 'municipalities.csv' WITH DELIMITER ';' QUOTE '"' csv;
 \COPY municipalityparts FROM 'municipalityparts.csv' WITH DELIMITER ';' QUOTE '"' csv;
 \COPY postals FROM 'postals.csv' WITH DELIMITER ';' QUOTE '"' csv;
 \COPY streets FROM 'streets.csv' WITH DELIMITER ';' QUOTE '"' csv;
 
-SELECT UpdateGeometrySRID('addreses','geom',4326);
+SELECT UpdateGeometrySRID('addreses','geom',31370);
 
 CREATE INDEX ON streets(city_id);
 CREATE INDEX ON addresses(postal_id);

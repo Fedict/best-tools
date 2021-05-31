@@ -48,35 +48,22 @@ import org.hibernate.annotations.Filter;
 /**
  * Full address entity
  *
- * Spatialite requires some special querying,
- * to increase performance a "search frame" buffer with a degree radius is created 
- * (meters are not directly supported in buffer)
- * At 51° _latitude_, 1 degree _latitude_ is about 111250 m and 1 degree _longitude_ is about 70200 meters
- * 
- * Also: don't use the spheroid for calculating distance. 
- * It will be slightly less accurate, but given the (in)accuracy of GPS coordinates this is not an issue.
- * 
  * @author Bart Hanssens
  */
 @Entity(name = "Addresses")
 @NamedQueries({
 @NamedQuery(name = "withdistance", 
 			query = "SELECT NEW be.bosa.dt.best.webservice.entities.AddressDistance( " +
-					"a.rowid, a.id, a.part_id, a.houseno, a.boxno, a.l72x, a.l72y, a.geom, a.status, " +
+					"a.rowid, a.id, a.part_id, a.houseno, a.boxno, a.x, a.y a.geom, a.status, " +
 					"s.id, s.name_nl, s.name_fr, s.name_de, " +
 					"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
 					"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
-				"DISTANCE(a.geom, MakePoint(:posx, :posy, 4326), 0) as distance) " +
+				"ST_DISTANCE(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370)) as distance) " +
 				"FROM Addresses a " +
 				"INNER JOIN a.street s " +
 				"INNER JOIN a.municipality m " +
 				"INNER JOIN a.postal p " +
-				"WHERE PtDistWithin(a.geom, MakePoint(:posx, :posy, 4326), :maxdist, 0) = TRUE " + 
-				"AND a.rowid IN ( " +
-					"SELECT s.rowid " +
-					"FROM SpatialIndex AS s " +
-					"WHERE f_table_name = 'addresses' " + 
-					"AND search_frame = Buffer(MakePoint(:posx, :posy, 4326), :degrees) ) " +
+				"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370), :maxdist) = TRUE " + 
 				"ORDER by distance",
 			hints = { 
 				@QueryHint(name = "org.hibernate.readOnly", value="true")
@@ -84,12 +71,7 @@ import org.hibernate.annotations.Filter;
 @NamedQuery(name = "withoutdistance", 
 			query = "SELECT a " +
 				"FROM Addresses AS a " +
-				"WHERE PtDistWithin(a.geom, MakePoint(:posx, :posy, 4326), :maxdist, 0) = TRUE " + 
-				"AND a.rowid IN ( " +
-					"SELECT s.rowid " +
-					"FROM SpatialIndex AS s " +
-					"WHERE f_table_name = 'addresses' " + 
-					"AND search_frame = Buffer(MakePoint(:posx, :posy, 4326), :degrees))",
+				"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370), :maxdist) = TRUE ",
 			hints = { 
 				@QueryHint(name = "org.hibernate.readOnly", value="true")
 			}),
@@ -119,8 +101,8 @@ public class Address extends PanacheEntityBase {
 	@JsonProperty("poBox")
 	public String boxno;
 
-	public double l72x;
-	public double l72y;
+	public double x;
+	public double y;
 
 	public Geometry geom;
 	
@@ -153,7 +135,7 @@ public class Address extends PanacheEntityBase {
 	public static List<AddressDistance> findNearestWithDistance(double posx, double posy, int maxdist, 
 			Optional<String> status) {
 		PanacheQuery<PanacheEntityBase> res = find("#withdistance", 
-			Map.of("posx", posx, "posy", posy, "maxdist", maxdist, "degrees", (double) maxdist / 70100));
+			Map.of("posx", posx, "posy", posy, "maxdist", maxdist));
 		return status.isPresent() ? res.filter("#status", Map.of("status", status)).list() : res.list();
 	}
 	
@@ -183,8 +165,8 @@ public class Address extends PanacheEntityBase {
 	 * @param part_id
 	 * @param houseno
 	 * @param boxno
-	 * @param l72x
-	 * @param l72y
+	 * @param x
+	 * @param y
 	 * @param geom
 	 * @param status 
 	 * @param s_id 
@@ -203,7 +185,7 @@ public class Address extends PanacheEntityBase {
 	 * @param p_name_de 
 	 */
 	public Address(long rowid, String id, String part_id, String houseno, String boxno, 
-					double l72x, double l72y, Geometry geom, String status,
+					double x, double y, Geometry geom, String status,
 					String s_id, String s_name_nl, String s_name_fr, String s_name_de,
 					String m_id, String m_niscode, String m_name_nl, String m_name_fr, String m_name_de,
 					String p_id, String p_zipcode, String p_name_nl, String p_name_fr, String p_name_de) {
@@ -212,8 +194,8 @@ public class Address extends PanacheEntityBase {
 		this.part_id = part_id;
 		this.houseno = houseno;
 		this.boxno = boxno;
-		this.l72x = l72x;
-		this.l72y = l72y;
+		this.x = x;
+		this.y = y;
 		this.geom = geom;
 		this.status = status;
 		this.municipality = new Municipality(m_id, m_niscode, m_name_nl, m_name_fr, m_name_de);

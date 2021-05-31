@@ -8,6 +8,7 @@
 	</parent>
 	<groupId>be.bosa.dt.best</groupId>
 	<artifactId>webservice</artifactId>
+	<version>1.2.6</version>
 	<packaging>jar</packaging>
 	<properties>
 		<maven.compiler.parameters>true</maven.compiler.parameters>
@@ -53,12 +54,10 @@
 			<artifactId>hibernate-spatial</artifactId>
 			<version>5.4.30.Final</version>
 		</dependency>
-		<!--
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-jdbc-postgresql</artifactId>
 		</dependency>
-		-->
 		<dependency>
 			<groupId>org.geolatte</groupId>
 			<artifactId>geolatte-geojson</artifactId>
@@ -70,12 +69,7 @@
 			<artifactId>jackson-datatype-jts</artifactId>
 			<version>1.2.8</version>
 		</dependency>
-		-->
-		<dependency>
-			<groupId>org.xerial</groupId>
-			<artifactId>sqlite-jdbc</artifactId>
-			<version>3.34.0</version>
-		</dependency>
+				-->
 	</dependencies>
 	<build>
 		<plugins>

@@ -56,7 +56,6 @@ import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.WKBWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -83,14 +82,14 @@ public class CsvPreparer {
 
 	
 	/**
-	 * Convert geo coordinates to a hex representation of "well-known binary" format
+	 * Convert x y to a set of coordinates, optionally convert lambert72 to GPS coordinates
 	 * 
 	 * @param x x coordinate
 	 * @param y y coordinate
 	 * @param gps convert to gps or not
 	 * @return hex string
 	 */
-	private String toWkb(double x, double y, boolean gps) throws IOException {
+	private Coordinate toCoords(double x, double y, boolean gps) throws IOException {
 		Coordinate coords = new Coordinate(x, y);
 		if (gps) {
 			try {
@@ -99,8 +98,17 @@ public class CsvPreparer {
 				throw new IOException("Could not convert coordinates");
 			}
 		}
-		Point point = fac.createPoint(coords);
-		return WKBWriter.toHex(wkb.write(point));
+		return coords;
+	}
+
+	/**
+	 * Convert geo coordinates to a hex representation of "well-known binary" format
+	 * 
+	 * @param coords coordinates
+	 * @return hex string
+	 */
+	private String toWkb(Coordinate coords) {
+		return WKBWriter.toHex(wkb.write(fac.createPoint(coords)));
 	}
 
 	/**
@@ -243,13 +251,19 @@ public class CsvPreparer {
 					Address a = iter.next();
 
 					Geopoint p = a.getPoint();
-					String s = toWkb(p.getX(), p.getY(), gps);
+					
+					// if GPS flag is set, write the WKB as GPS but x,y as Lambert72 (and vice versa)
+					Coordinate coordl72 = toCoords(p.getX(), p.getY(), false);
+					Coordinate coordgps = toCoords(p.getX(), p.getY(), true);
+					
+					String x = String.valueOf(gps ? coordl72.x : coordgps.x);
+					String y = String.valueOf(gps ? coordl72.y : coordgps.y);
+					String c = toWkb(gps ? coordgps : coordl72);
 
 					// calculate geom afterwards, using separate UPDATE statement
 					w.writeRow(a.getIDVersion(), a.getCity().getIDVersion(), a.getCityPart().getIDVersion(),
 							a.getStreet().getIDVersion(), a.getPostal().getIDVersion(), a.getNumber(),
-							a.getBox(), a.getStatus(), 
-							String.valueOf(p.getX()), String.valueOf(p.getY()), s);
+							a.getBox(), a.getStatus(), x, y, c);
 
 					if (++cnt % 10_000 == 0) {
 						LOG.log(Level.INFO, "Wrote {0}", cnt);
