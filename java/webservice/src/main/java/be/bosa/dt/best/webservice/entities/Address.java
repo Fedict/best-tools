@@ -57,7 +57,7 @@ import org.locationtech.jts.geom.Point;
 @NamedQueries({
 @NamedQuery(name = "withdistance", 
 			query = "SELECT NEW be.bosa.dt.best.webservice.entities.AddressDistance(a, " +
-				"ST_DISTANCE(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370)) as distance) " +
+				"DISTANCE(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370)) as distance) " +
 				"FROM Addresses a " +
 				"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370), :maxdist) = TRUE " + 
 				"ORDER by distance",
