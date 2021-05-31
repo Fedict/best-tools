@@ -26,7 +26,7 @@
 package be.bosa.dt.best.webservice.entities;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import org.locationtech.jts.geom.Point;
+import org.geolatte.geom.Point;
 
 
 /**

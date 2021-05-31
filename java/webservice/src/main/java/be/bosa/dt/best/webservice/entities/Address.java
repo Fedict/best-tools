@@ -41,10 +41,9 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.QueryHint;
+import org.geolatte.geom.Point;
 
 import org.hibernate.annotations.Filter;
-
-import org.locationtech.jts.geom.Point;
 
 
 /**
