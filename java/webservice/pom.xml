@@ -4,11 +4,10 @@
 	<parent>
 		<groupId>be.bosa.dt</groupId>
 		<artifactId>best</artifactId>
-		<version>1.2.5</version>
+		<version>1.2.6</version>
 	</parent>
 	<groupId>be.bosa.dt.best</groupId>
 	<artifactId>webservice</artifactId>
-	<version>1.2.6</version>
 	<packaging>jar</packaging>
 	<properties>
 		<maven.compiler.parameters>true</maven.compiler.parameters>
