@@ -25,7 +25,6 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
@@ -55,7 +54,7 @@ import org.hibernate.annotations.Filter;
 @NamedQueries({
 @NamedQuery(name = "withdistance", 
 			query = "SELECT NEW be.bosa.dt.best.webservice.entities.AddressDistance( " +
-					"a.rowid, a.id, a.part_id, a.houseno, a.boxno, a.x, a.y, a.geom, a.status, " +
+					"a.id, a.part_id, a.houseno, a.boxno, a.x, a.y, a.geom, a.status, " +
 					"s.id, s.name_nl, s.name_fr, s.name_de, " +
 					"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
 					"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
@@ -78,10 +77,7 @@ import org.hibernate.annotations.Filter;
 			}),
 })
 @Filter(name="status", condition="status = :status")
-@JsonIgnoreProperties("rowid")
 public class Address extends PanacheEntityBase {
-	public long rowid;
-
 	@Id public String id;
 	
 	@OneToOne
@@ -186,12 +182,11 @@ public class Address extends PanacheEntityBase {
 	 * @param p_name_nl 
 	 * @param p_name_de 
 	 */
-	public Address(long rowid, String id, String part_id, String houseno, String boxno, 
+	public Address(String id, String part_id, String houseno, String boxno, 
 					double x, double y, Geometry geom, String status,
 					String s_id, String s_name_nl, String s_name_fr, String s_name_de,
 					String m_id, String m_niscode, String m_name_nl, String m_name_fr, String m_name_de,
 					String p_id, String p_zipcode, String p_name_nl, String p_name_fr, String p_name_de) {
-		this.rowid = rowid;
 		this.id = id;
 		this.part_id = part_id;
 		this.houseno = houseno;
