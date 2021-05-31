@@ -52,7 +52,7 @@ CREATE TABLE streets(
 \COPY postals FROM 'postals.csv' WITH DELIMITER ';' QUOTE '"' csv;
 \COPY streets FROM 'streets.csv' WITH DELIMITER ';' QUOTE '"' csv;
 
-SELECT UpdateGeometrySRID('addreses','geom',31370);
+SELECT UpdateGeometrySRID('addresses','geom', 31370);
 
 CREATE INDEX ON streets(city_id);
 CREATE INDEX ON addresses(postal_id);
