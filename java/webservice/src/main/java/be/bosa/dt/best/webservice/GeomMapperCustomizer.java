@@ -36,7 +36,7 @@ import org.geolatte.geom.json.GeolatteGeomModule;
  * @author Bart Hanssens
  */
 @Singleton
-public class JtsObjectMapperCustomizer implements ObjectMapperCustomizer {
+public class GeomMapperCustomizer implements ObjectMapperCustomizer {
 	@Override
 	public void customize(ObjectMapper mapper) {
 		mapper.registerModule(new GeolatteGeomModule());
