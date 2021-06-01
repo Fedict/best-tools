@@ -25,19 +25,13 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
 /**
  * Postal codes (bPost.be).
  * 
  * @author Bart Hanssens
  */
-@Entity(name = "Postals")
-public class Postal extends PanacheEntityBase {
-	@Id public String id;
+public class Postal {
+	public String id;
 	public String zipcode;
 	public String name_nl;
 	public String name_fr;
@@ -47,7 +41,7 @@ public class Postal extends PanacheEntityBase {
 	}
 
 	/**
-	 * Constructor, only needed for N+1 select work-around
+	 * Constructor
 	 * 
 	 * @param id
 	 * @param zipcode

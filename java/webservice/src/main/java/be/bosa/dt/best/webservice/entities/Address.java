@@ -27,23 +27,8 @@ package be.bosa.dt.best.webservice.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import javax.inject.Inject;
-
-import javax.persistence.Entity;
-import javax.persistence.EntityManager;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
 import org.geolatte.geom.Point;
-import org.hibernate.annotations.QueryHints;
 
 
 
@@ -52,56 +37,12 @@ import org.hibernate.annotations.QueryHints;
  *
  * @author Bart Hanssens
  */
-@Entity(name = "Addresses")
-@NamedQueries({
-@NamedQuery(name = "withdistance", 
-			query = "SELECT NEW be.bosa.dt.best.webservice.entities.AddressDistance( " +
-					"a.id, a.part_id, a.houseno, a.boxno, a.x, a.y, a.geom, a.status, " +
-					"s.id, s.name_nl, s.name_fr, s.name_de, " +
-					"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
-					"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
-				"DISTANCE(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370)) as distance) " +
-				"FROM Addresses a " +
-				"INNER JOIN a.street s " +
-				"INNER JOIN a.municipality m " +
-				"INNER JOIN a.postal p " +
-				"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370), :maxdist) = TRUE " + 
-				"ORDER by distance"),
-@NamedQuery(name = "withoutdistance", 
-			query = "SELECT a " +
-				"FROM Addresses AS a " +
-				"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370), :maxdist) = TRUE ")
-})
-public class Address extends PanacheEntityBase {
-	@Inject
-	private static EntityManager em;
+public class Address {
+	public String id;
 
-	private final static String query = 
-		"SELECT NEW be.bosa.dt.best.webservice.entities.AddressDistance( " +
-					"a.id, a.part_id, a.houseno, a.boxno, a.x, a.y, a.geom, a.status, " +
-					"s.id, s.name_nl, s.name_fr, s.name_de, " +
-					"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
-					"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
-				"DISTANCE(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370)) as distance) " +
-				"FROM Addresses a " +
-				"INNER JOIN a.street s " +
-				"INNER JOIN a.municipality m " +
-				"INNER JOIN a.postal p " +
-				"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370), :maxdist) = TRUE " + 
-				"ORDER by distance";
-	@Id public String id;
-	
-	@OneToOne
-	@JoinColumn(name = "city_id", referencedColumnName = "id")
 	public Municipality municipality;
 	public String part_id;
-	
-	@OneToOne
-	@JoinColumn(name = "street_id", referencedColumnName = "id")
 	public Street street;
-
-	@OneToOne
-	@JoinColumn(name = "postal_id", referencedColumnName = "id")
 	public Postal postal;
 
 	@JsonProperty("houseNumber")
@@ -115,22 +56,7 @@ public class Address extends PanacheEntityBase {
 	public Point geom;
 	
 	public String status;
-	
-	/**
-	 * Find an address by ID and optionally filter on status
-	 * 
-	 * @param id id
-	 * @param status
-	 * @return 
-	 */
-	public static Address findByIdAndStatus(String id, Optional<String> status) {
-		Address adr = findById(id);
-		if (status.isPresent() && adr != null) {
-			return adr.status.equals(status.get()) ? adr : null;
-		}
-		return adr;
-	}
-	
+
 	/**
 	 * Find all addresses within a range of X meters, based on GPS/WGS84 coordinates + calculate distance
 	 * 
@@ -140,15 +66,11 @@ public class Address extends PanacheEntityBase {
 	 * @param status
 	 * @return 
 	 */
-	public static List<AddressDistance> findNearestWithDistance(double posx, double posy, int maxdist, 
+/*	public static List<AddressDistance> findNearestWithDistance(double posx, double posy, int maxdist, 
 			Optional<String> status) {
-		List<AddressDistance> res = em.createNamedQuery(query, AddressDistance.class)
-			.setParameter("posx", posx)
-			.setParameter("posy", posy)
-			.setParameter("maxdist", maxdist)
-			.setHint(QueryHints.READ_ONLY, true).getResultList();
-
-		return res;
+		PanacheQuery<AddressDistance> res = find("#withdistance", 
+			Map.of("posx", posx, "posy", posy, "maxdist", maxdist)).
+		return res.list();
 	}
 	
 	/**
@@ -160,12 +82,12 @@ public class Address extends PanacheEntityBase {
 	 * @param status
 	 * @return 
 	 */
-	public static List<Address> findNearest(double posx, double posy, int maxdist, Optional<String> status) {
-		PanacheQuery<Address> res = find(query, 
+	/*public static List<Address> findNearest(double posx, double posy, int maxdist, Optional<String> status) {
+		PanacheQuery<Address> res = find("#withoutdistance", 
 			Map.of("posx", posx, "posy", posy, "maxdist", maxdist, "degrees", (double) maxdist / 70100));
 		return status.isPresent() ? res.filter("#status", Map.of("status", status)).list() : res.list();
 	}
-
+*/
 	public Address() {
 	}
 

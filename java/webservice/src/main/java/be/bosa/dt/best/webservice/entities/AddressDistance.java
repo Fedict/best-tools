@@ -34,12 +34,12 @@ package be.bosa.dt.best.webservice.entities;
 public class AddressDistance {
 	public Address address;
 	public double distance;
-	/*
+	
 	public AddressDistance(Address address, double distance) {
 		this.address = address;
 		this.distance = distance;
 	}
-	*/
+
 	/**
 	 * Constructor, only needed for N+1 select work-around
 	 * 

@@ -26,23 +26,12 @@
 package be.bosa.dt.best.webservice.entities;
 
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
-
 /**
  * Postal codes (bPost.be).
  * 
  * @author Bart Hanssens
  */
-@Entity(name = "PostalStreets")
-@Table(name = "postal_streets")
-public class PostalStreet extends PanacheEntity {
-	@OneToOne
-	@JoinColumn(name = "street_id", referencedColumnName = "id")
+public class PostalStreet {
 	public Street street;
 	public String zipcode;
 }

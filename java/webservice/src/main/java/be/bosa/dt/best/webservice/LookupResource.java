@@ -25,13 +25,10 @@
  */
 package be.bosa.dt.best.webservice;
 
-import be.bosa.dt.best.webservice.entities.Address;
-import be.bosa.dt.best.webservice.entities.Municipality;
-import be.bosa.dt.best.webservice.entities.Street;
-import java.util.Collections;
 
 import java.util.List;
 import java.util.Optional;
+import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 
 import javax.ws.rs.GET;
@@ -49,6 +46,9 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
  */
 @Path("/best/api/v2")
 public class LookupResource {
+	@Inject
+	Repository repo;
+
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
 	@Path("/near")
@@ -63,12 +63,10 @@ public class LookupResource {
 			@Parameter(description = "status", example = "current")
 			@QueryParam("status") Optional<String> status,
 			@Parameter(description = "calculate distance", example = "true")
-			@QueryParam("calc") Optional<Boolean> calc) {
-		boolean withdistance = calc.orElse(Boolean.TRUE);		
-		return withdistance ? Address.findNearestWithDistance(x, y, maxdist, status) 
-							: Address.findNearest(x, y, maxdist, status);
+			@QueryParam("calc") Optional<Boolean> calc) {	
+		return repo.findAddressDistance(x, y, maxdist);
 	}
-
+/*
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
 	@Path("/address")
@@ -136,5 +134,5 @@ public class LookupResource {
 		}
 		return Collections.EMPTY_LIST;
 	}
-
+*/
 }
