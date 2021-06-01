@@ -31,9 +31,9 @@ public class Repository {
 				"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
 		"ST_DISTANCE(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(?, ?), 4326), 31370)) as distance " +
 		"FROM Addresses a " +
-		"INNER JOIN a.street s " +
-		"INNER JOIN a.municipality m " +
-		"INNER JOIN a.postal p " +
+		"INNER JOIN streets s ON a.street_id = s.id " +
+		"INNER JOIN municipalities m ON a.city_id = m.id " +
+		"INNER JOIN postals p ON a.postal_id = p.id " +
 		"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(?, ?), 4326), 31370), ?) = TRUE " + 
 		"ORDER by distance";
 	
