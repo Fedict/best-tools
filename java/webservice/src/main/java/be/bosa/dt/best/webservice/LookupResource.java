@@ -26,7 +26,9 @@
 package be.bosa.dt.best.webservice;
 
 
-import java.util.List;
+import be.bosa.dt.best.webservice.entities.AddressDistance;
+import io.smallrye.mutiny.Multi;
+import io.vertx.mutiny.pgclient.PgPool;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
@@ -47,13 +49,16 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 @Path("/best/api/v2")
 public class LookupResource {
 	@Inject
+	PgPool pg;
+	
+	@Inject
 	Repository repo;
 
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
 	@Path("/near")
 	@Operation(summary = "Get addresses within (maximal) 100 meters")
-	public List nearestAddress(
+	public Multi<AddressDistance> nearestAddress(
 			@Parameter(description = "X coordinate (longitude)", required = true, example = "4.23")
 			@QueryParam("x") double x, 
 			@Parameter(description = "Y coordinate (latitude)", required = true, example = "50.73")	
@@ -64,7 +69,7 @@ public class LookupResource {
 			@QueryParam("status") Optional<String> status,
 			@Parameter(description = "calculate distance", example = "true")
 			@QueryParam("calc") Optional<Boolean> calc) {	
-		return repo.findAddressDistance(x, y, maxdist);
+		return repo.findAddressDistance(pg, x, y, maxdist);
 	}
 /*
 	@GET

@@ -6,16 +6,12 @@
 package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.AddressDistance;
-import io.agroal.api.AgroalDataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import io.smallrye.mutiny.Multi;
+import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.sqlclient.Row;
+import io.vertx.mutiny.sqlclient.Tuple;
+
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.ws.rs.WebApplicationException;
 
 /**
  *
@@ -37,35 +33,20 @@ public class Repository {
 		"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(?, ?), 4326), 31370), ?) = TRUE " + 
 		"ORDER by distance";
 	
-	@Inject
-	AgroalDataSource ds;
-	
-	public List<AddressDistance> findAddressDistance(double x, double y, int maxdist) {
-		List<AddressDistance> list = new ArrayList<>();
+	public static Multi<AddressDistance> findAddressDistance(PgPool client, double x, double y, int maxdist) {
+		return client.preparedQuery(SQL_DISTANCE)
+					.execute(Tuple.of(x, y, x, y, maxdist))
+					.onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
+					.onItem().transform(Repository::toAddressDistance);
+	}
 
-		try(Connection conn = ds.getConnection();
-			PreparedStatement stmt = conn.prepareStatement(SQL_DISTANCE)) {
-				stmt.setDouble(1, x);
-				stmt.setDouble(2, y);
-				stmt.setDouble(3, x);
-				stmt.setDouble(4, y);
-				stmt.setInt(5, maxdist);
-		
-				try(ResultSet res = stmt.executeQuery()) {
-					while (res.next()) {
-						list.add(
-							new AddressDistance(
-						res.getString(1), res.getString(2), res.getString(3), res.getString(4), 
-						res.getDouble(5), res.getDouble(6), null, res.getString(8),
-						res.getString(9), res.getString(10), res.getString(11), res.getString(12),
-						res.getString(13), res.getString(14), res.getString(15), res.getString(16), res.getString(17),
-						res.getString(18), res.getString(19), res.getString(20), res.getString(21), res.getString(22),
-						res.getDouble(23)));
-				}
-			}
-		} catch (SQLException ex) {
-			throw new WebApplicationException(ex);
-		}
-		return list;
+	private static AddressDistance toAddressDistance(Row res) {
+		return new AddressDistance(
+			res.getString(1), res.getString(2), res.getString(3), res.getString(4), 
+			res.getDouble(5), res.getDouble(6), null, res.getString(8),
+			res.getString(9), res.getString(10), res.getString(11), res.getString(12),
+			res.getString(13), res.getString(14), res.getString(15), res.getString(16), res.getString(17),
+			res.getString(18), res.getString(19), res.getString(20), res.getString(21), res.getString(22),
+			res.getDouble(23));
 	}
 }
