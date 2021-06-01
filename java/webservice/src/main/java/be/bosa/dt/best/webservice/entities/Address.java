@@ -33,14 +33,17 @@ import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.inject.Inject;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import org.geolatte.geom.Point;
+import org.hibernate.annotations.QueryHints;
 
 
 
@@ -70,6 +73,9 @@ import org.geolatte.geom.Point;
 				"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370), :maxdist) = TRUE ")
 })
 public class Address extends PanacheEntityBase {
+	@Inject
+	private static EntityManager em;
+
 	private final static String query = 
 		"SELECT NEW be.bosa.dt.best.webservice.entities.AddressDistance( " +
 					"a.id, a.part_id, a.houseno, a.boxno, a.x, a.y, a.geom, a.status, " +
@@ -136,9 +142,13 @@ public class Address extends PanacheEntityBase {
 	 */
 	public static List<AddressDistance> findNearestWithDistance(double posx, double posy, int maxdist, 
 			Optional<String> status) {
-		PanacheQuery<AddressDistance> res = find("#withdistance", 
-			Map.of("posx", posx, "posy", posy, "maxdist", maxdist)).project(AddressDistance.class);
-		return res.list();
+		List<AddressDistance> res = em.createNamedQuery(query, AddressDistance.class)
+			.setParameter("posx", posx)
+			.setParameter("posy", posy)
+			.setParameter("maxdist", maxdist)
+			.setHint(QueryHints.READ_ONLY, true).getResultList();
+
+		return res;
 	}
 	
 	/**
