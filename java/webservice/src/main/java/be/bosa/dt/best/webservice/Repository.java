@@ -56,7 +56,7 @@ public class Repository {
 						list.add(
 							new AddressDistance(
 						res.getString(1), res.getString(2), res.getString(3), res.getString(4), 
-						res.getDouble(5), res.getDouble(6), res.getObject(7), res.getString(8),
+						res.getDouble(5), res.getDouble(6), null, res.getString(8),
 						res.getString(9), res.getString(10), res.getString(11), res.getString(12),
 						res.getString(13), res.getString(14), res.getString(15), res.getString(16), res.getString(17),
 						res.getString(18), res.getString(19), res.getString(20), res.getString(21), res.getString(22),
