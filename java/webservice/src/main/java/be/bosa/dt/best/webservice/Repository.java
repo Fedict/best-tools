@@ -28,12 +28,12 @@ public class Repository {
 				"s.id, s.name_nl, s.name_fr, s.name_de, " +
 				"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
 				"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
-		"ST_DISTANCE(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370)) as distance " +
+		"ST_DISTANCE(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(?, ?), 4326), 31370)) as distance " +
 		"FROM Addresses a " +
 		"INNER JOIN a.street s " +
 		"INNER JOIN a.municipality m " +
 		"INNER JOIN a.postal p " +
-		"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370), :maxdist) = TRUE " + 
+		"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(?, ?), 4326), 31370), ?) = TRUE " + 
 		"ORDER by distance";
 	
 	@Inject
