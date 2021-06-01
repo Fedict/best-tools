@@ -42,27 +42,25 @@ public class Repository {
 	
 	public List<AddressDistance> findAddressDistance(double x, double y, int maxdist) {
 		List<AddressDistance> list = new ArrayList<>();
-		String params[] = new String[] { String.valueOf(x), String.valueOf(y), 
-										String.valueOf(x), String.valueOf(y), String.valueOf(maxdist) };
-		
+
 		try(Connection conn = ds.getConnection();
 			PreparedStatement stmt = conn.prepareStatement(SQL_DISTANCE)) {
 				stmt.setDouble(1, x);
 				stmt.setDouble(2, y);
 				stmt.setDouble(3, x);
 				stmt.setDouble(4, y);
-				stmt.setDouble(5, maxdist);
+				stmt.setInt(5, maxdist);
 		
 				try(ResultSet res = stmt.executeQuery()) {
 					while (res.next()) {
 						list.add(
 							new AddressDistance(
 						res.getString(1), res.getString(2), res.getString(3), res.getString(4), 
-						res.getDouble(5), res.getDouble(5), res.getObject(6), res.getString(7),
-						res.getString(8), res.getString(9), res.getString(10), res.getString(11),
-						res.getString(12), res.getString(13), res.getString(14), res.getString(15), res.getString(16),
-						res.getString(17), res.getString(18), res.getString(19), res.getString(20), res.getString(21),
-						res.getDouble(22)));
+						res.getDouble(5), res.getDouble(6), res.getObject(7), res.getString(8),
+						res.getString(9), res.getString(10), res.getString(11), res.getString(12),
+						res.getString(13), res.getString(14), res.getString(15), res.getString(16), res.getString(17),
+						res.getString(18), res.getString(19), res.getString(20), res.getString(21), res.getString(22),
+						res.getDouble(23)));
 				}
 			}
 		} catch (SQLException ex) {
