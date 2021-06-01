@@ -25,23 +25,21 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-
 
 /**
  * Address with distance (in meters).
  * 
  * @author Bart Hanssens
  */
-public class AddressDistance extends PanacheEntityBase {
+public class AddressDistance {
 	public Address address;
 	public double distance;
-	
+	/*
 	public AddressDistance(Address address, double distance) {
 		this.address = address;
 		this.distance = distance;
 	}
-	
+	*/
 	/**
 	 * Constructor, only needed for N+1 select work-around
 	 * 
@@ -75,10 +73,10 @@ public class AddressDistance extends PanacheEntityBase {
 					String m_id, String m_niscode, String m_name_nl, String m_name_fr, String m_name_de,
 					String p_id, String p_zipcode, String p_name_nl, String p_name_fr, String p_name_de,
 					double distance) {
-		this(new Address(id, part_id, houseno, boxno, l72x, l72y, geom, status,
+		this.address = new Address(id, part_id, houseno, boxno, l72x, l72y, geom, status,
 						s_id, s_name_nl, s_name_fr, s_name_de,
 						m_id, m_niscode, m_name_nl, m_name_fr, m_name_de,
-						p_id, p_zipcode, p_name_nl, p_name_fr, p_name_de), 
-			distance);
+						p_id, p_zipcode, p_name_nl, p_name_fr, p_name_de);
+		this.distance = distance;
 	}
 }

@@ -40,10 +40,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
-import javax.persistence.QueryHint;
 import org.geolatte.geom.Point;
 
-import org.hibernate.annotations.Filter;
 
 
 /**
@@ -65,19 +63,12 @@ import org.hibernate.annotations.Filter;
 				"INNER JOIN a.municipality m " +
 				"INNER JOIN a.postal p " +
 				"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370), :maxdist) = TRUE " + 
-				"ORDER by distance",
-			hints = { 
-				@QueryHint(name = "org.hibernate.readOnly", value="true")
-			}),
+				"ORDER by distance"),
 @NamedQuery(name = "withoutdistance", 
 			query = "SELECT a " +
 				"FROM Addresses AS a " +
-				"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370), :maxdist) = TRUE ",
-			hints = { 
-				@QueryHint(name = "org.hibernate.readOnly", value="true")
-			}),
+				"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint(:posx, :posy), 4326), 31370), :maxdist) = TRUE ")
 })
-@Filter(name="status", condition="status = :status")
 public class Address extends PanacheEntityBase {
 	@Id public String id;
 	
@@ -132,9 +123,9 @@ public class Address extends PanacheEntityBase {
 	 */
 	public static List<AddressDistance> findNearestWithDistance(double posx, double posy, int maxdist, 
 			Optional<String> status) {
-		PanacheQuery<PanacheEntityBase> res = find("#withdistance", 
-			Map.of("posx", posx, "posy", posy, "maxdist", maxdist));
-		return status.isPresent() ? res.filter("#status", Map.of("status", status)).list() : res.list();
+		PanacheQuery<AddressDistance> res = find("#withdistance", 
+			Map.of("posx", posx, "posy", posy, "maxdist", maxdist)).project(AddressDistance.class);
+		return res.list();
 	}
 	
 	/**
@@ -158,7 +149,6 @@ public class Address extends PanacheEntityBase {
 	/**
 	 * Constructor, only needed for N+1 select work-around
 	 * 
-	 * @param rowid
 	 * @param id
 	 * @param part_id
 	 * @param houseno
