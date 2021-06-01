@@ -35,7 +35,7 @@ public class Repository {
 	
 	public static Multi<AddressDistance> findAddressDistance(PgPool client, double x, double y, int maxdist) {
 		return client.preparedQuery(SQL_DISTANCE)
-					.execute(Tuple.of(x, y, x, y, maxdist))
+					.execute(Tuple.tuple().addDouble(x).addDouble(y).addDouble(x).addDouble(y).addInteger(maxdist))
 					.onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
 					.onItem().transform(Repository::toAddressDistance);
 	}
