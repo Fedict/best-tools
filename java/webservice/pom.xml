@@ -45,6 +45,11 @@
 			<artifactId>quarkus-reactive-pg-client</artifactId>
 		</dependency>
 		<dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-epoll</artifactId>
+            <classifier>linux-x86_64</classifier>
+        </dependency>
+		<dependency>
 			<groupId>org.geolatte</groupId>
 			<artifactId>geolatte-geojson</artifactId>
 			<version>1.8.0</version>
