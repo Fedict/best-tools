@@ -32,9 +32,9 @@ import org.opengis.referencing.operation.TransformException;
 @ApplicationScoped
 public class Repository {
 	private final static GeometryFactory fac = JTSFactoryFinder.getGeometryFactory();
-	private CoordinateReferenceSystem l72;
-	private CoordinateReferenceSystem wgs84;
-	private MathTransform trans;
+	private final CoordinateReferenceSystem l72;
+	private final CoordinateReferenceSystem wgs84;
+	private final MathTransform trans;
 
 	private final static String SQL_DISTANCE = 
 		"SELECT a.id, a.part_id, a.houseno, a.boxno, " +
