@@ -29,6 +29,7 @@ package be.bosa.dt.best.webservice;
 import be.bosa.dt.best.webservice.entities.AddressDistance;
 
 import io.quarkus.vertx.web.Param;
+import io.quarkus.vertx.web.ReactiveRoutes;
 import io.quarkus.vertx.web.Route;
 import io.smallrye.mutiny.Multi;
 import io.vertx.core.http.HttpMethod;
@@ -71,7 +72,7 @@ public class LookupResource {
 			@Param("status") Optional<String> status,
 			@Parameter(description = "calculate distance", example = "true")
 			@Param("calc") Optional<Boolean> calc) {	
-		return repo.findAddressDistance(x, y, maxdist.orElse(100));
+		return ReactiveRoutes.asJsonArray(repo.findAddressDistance(x, y, maxdist.orElse(100)));
 	}
 /*
 	@GET
