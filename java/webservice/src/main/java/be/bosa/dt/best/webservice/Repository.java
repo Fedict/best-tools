@@ -40,12 +40,10 @@ public class Repository {
 		"ORDER by distance";
 	
 	public Multi<AddressDistance> findAddressDistance(double x, double y, int maxdist) {
-		Multi<AddressDistance> addr = pg.preparedQuery(SQL_DISTANCE)
+		return pg.preparedQuery(SQL_DISTANCE)
 			.execute(Tuple.tuple().addDouble(x).addDouble(y).addDouble(x).addDouble(y).addInteger(maxdist))
 			.onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
 			.onItem().transform(Repository::toAddressDistance);
-		pg.close();
-		return addr;
 	}
 
 	private static AddressDistance toAddressDistance(Row res) {

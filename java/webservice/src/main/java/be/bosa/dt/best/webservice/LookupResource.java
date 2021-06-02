@@ -31,6 +31,7 @@ import be.bosa.dt.best.webservice.entities.AddressDistance;
 import io.quarkus.vertx.web.Param;
 import io.quarkus.vertx.web.ReactiveRoutes;
 import io.quarkus.vertx.web.Route;
+import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Multi;
 import io.vertx.core.http.HttpMethod;
 
@@ -61,6 +62,7 @@ public class LookupResource {
 
 	@Route(path = "/best/api/v2/near", methods = HttpMethod.GET, produces = "application/json")
 	@Operation(summary = "Get addresses within (maximal) 100 meters")
+	@Blocking
 	public Multi<AddressDistance> nearestAddress(
 			@Parameter(description = "X coordinate (longitude)", required = true, example = "4.23")
 			@Param("x") Double x, 
