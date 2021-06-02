@@ -6,12 +6,15 @@
 package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.AddressDistance;
+
 import io.smallrye.mutiny.Multi;
+
 import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.Tuple;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 /**
  *
@@ -19,6 +22,9 @@ import javax.enterprise.context.ApplicationScoped;
  */
 @ApplicationScoped
 public class Repository {
+	@Inject
+	PgPool pg;
+
 	private final static String SQL_DISTANCE = 
 		"SELECT a.id, a.part_id, a.houseno, a.boxno, " +
 				"a.x, a.y, a.geom, a.status, " +
@@ -33,8 +39,8 @@ public class Repository {
 		"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint($3, $4), 4326), 31370), $5) = TRUE " + 
 		"ORDER by distance";
 	
-	public static Multi<AddressDistance> findAddressDistance(PgPool client, double x, double y, int maxdist) {
-		return client.preparedQuery(SQL_DISTANCE)
+	public Multi<AddressDistance> findAddressDistance(double x, double y, int maxdist) {
+		return pg.preparedQuery(SQL_DISTANCE)
 					.execute(Tuple.tuple().addDouble(x).addDouble(y).addDouble(x).addDouble(y).addInteger(maxdist))
 					.onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
 					.onItem().transform(Repository::toAddressDistance);

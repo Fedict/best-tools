@@ -27,49 +27,51 @@ package be.bosa.dt.best.webservice;
 
 
 import be.bosa.dt.best.webservice.entities.AddressDistance;
+
+import io.quarkus.vertx.web.Param;
+import io.quarkus.vertx.web.Route;
 import io.smallrye.mutiny.Multi;
-import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.core.http.HttpMethod;
+
 import java.util.Optional;
+
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.ws.rs.DefaultValue;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-
+import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.info.Info;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 
 /**
  *
  * @author Bart Hanssens
  */
-@Path("/best/api/v2")
+@OpenAPIDefinition(
+	 info = @Info(
+        title="Demo BeST API application",
+        version = "1.0.0")
+)
+@ApplicationScoped
 public class LookupResource {
-	@Inject
-	PgPool pg;
-	
+
 	@Inject
 	Repository repo;
 
-	@GET
-	@Produces({MediaType.APPLICATION_JSON})
-	@Path("/near")
+	@Route(path = "/best/api/v2/near", methods = HttpMethod.GET, produces = "application/json")
 	@Operation(summary = "Get addresses within (maximal) 100 meters")
 	public Multi<AddressDistance> nearestAddress(
 			@Parameter(description = "X coordinate (longitude)", required = true, example = "4.23")
-			@QueryParam("x") double x, 
+			@Param("x") Double x, 
 			@Parameter(description = "Y coordinate (latitude)", required = true, example = "50.73")	
-			@QueryParam("y") double y,
+			@Param("y") Double y,
 			@Parameter(description = "Maximum distance (meters)", required = false, example = "100")	
-			@DefaultValue("100") @QueryParam("dist") int maxdist,
+			@Param("dist") Optional<Integer> maxdist,
 			@Parameter(description = "status", example = "current")
-			@QueryParam("status") Optional<String> status,
+			@Param("status") Optional<String> status,
 			@Parameter(description = "calculate distance", example = "true")
-			@QueryParam("calc") Optional<Boolean> calc) {	
-		return repo.findAddressDistance(pg, x, y, maxdist);
+			@Param("calc") Optional<Boolean> calc) {	
+		return repo.findAddressDistance(x, y, maxdist.orElse(100));
 	}
 /*
 	@GET
