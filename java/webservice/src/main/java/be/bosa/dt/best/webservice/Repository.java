@@ -17,10 +17,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import org.geotools.geometry.jts.JTS;
-import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -31,7 +29,6 @@ import org.opengis.referencing.operation.TransformException;
  */
 @ApplicationScoped
 public class Repository {
-	private final static GeometryFactory fac = JTSFactoryFinder.getGeometryFactory();
 	private final CoordinateReferenceSystem l72;
 	private final CoordinateReferenceSystem wgs84;
 	private final MathTransform trans;
@@ -60,8 +57,8 @@ public class Repository {
 
 		try(Connection conn = ds.getConnection();
 			PreparedStatement stmt = conn.prepareStatement(SQL_DISTANCE)) {
-				stmt.setDouble(1, x);
-				stmt.setDouble(2, y);
+				stmt.setDouble(1, coordl72.x);
+				stmt.setDouble(2, coordl72.y);
 				stmt.setDouble(3, coordl72.x);
 				stmt.setDouble(4, coordl72.y);			
 				stmt.setInt(5, maxdist);
