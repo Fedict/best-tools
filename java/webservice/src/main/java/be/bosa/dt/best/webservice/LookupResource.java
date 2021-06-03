@@ -31,9 +31,9 @@ import be.bosa.dt.best.webservice.entities.AddressDistance;
 import io.quarkus.vertx.web.Param;
 import io.quarkus.vertx.web.ReactiveRoutes;
 import io.quarkus.vertx.web.Route;
+import io.quarkus.vertx.web.Route.HttpMethod;
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Multi;
-import io.vertx.core.http.HttpMethod;
 
 import java.util.Optional;
 
