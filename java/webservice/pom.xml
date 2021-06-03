@@ -52,7 +52,7 @@
 		</repository>
 	</repositories>
 	<dependencies>
-				<dependency>
+		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-main</artifactId>
 			<version>25.0</version>
@@ -77,6 +77,10 @@
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-smallrye-health</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-smallrye-metrics</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.quarkus</groupId>

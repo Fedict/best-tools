@@ -55,12 +55,12 @@ public class Repository {
 	
 	public List<AddressDistance> findAddressDistance(double x, double y, int maxdist) {
 		List<AddressDistance> list = new ArrayList<>();
+		Coordinate coordl72 = toCoords(x, y);
 
 		try(Connection conn = ds.getConnection();
 			PreparedStatement stmt = conn.prepareStatement(SQL_DISTANCE)) {
 				stmt.setDouble(1, x);
 				stmt.setDouble(2, y);
-				Coordinate coordl72 = toCoords(x, y);
 				stmt.setDouble(3, coordl72.x);
 				stmt.setDouble(4, coordl72.y);			
 				stmt.setInt(5, maxdist);
