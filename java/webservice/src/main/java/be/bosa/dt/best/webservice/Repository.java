@@ -6,7 +6,7 @@
 package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.AddressDistance;
-import io.agroal.api.AgroalDataSource;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.sql.DataSource;
 import javax.ws.rs.WebApplicationException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.JTSFactoryFinder;
@@ -55,7 +56,7 @@ public class Repository {
 		"LIMIT 250 ";
 	
 	@Inject
-	AgroalDataSource ds;
+	DataSource ds;
 	
 	public List<AddressDistance> findAddressDistance(double x, double y, int maxdist) {
 		List<AddressDistance> list = new ArrayList<>();
