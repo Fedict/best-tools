@@ -39,7 +39,7 @@ public class Repository {
 
 	private final static String SQL_DISTANCE = 
 		"SELECT a.id, a.part_id, a.houseno, a.boxno, " +
-				"a.x, a.y, a.geom, a.status, " +
+				"a.l72x, a.l72y, a.geom, a.status, " +
 				"s.id, s.name_nl, s.name_fr, s.name_de, " +
 				"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
 				"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
