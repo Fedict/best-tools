@@ -62,10 +62,14 @@
 			<artifactId>gt-epsg-wkt</artifactId>
 			<version>25.0</version>
 		</dependency>
-				<dependency>
+			<dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
 			<version>3.34.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-agroal</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.quarkus</groupId>
