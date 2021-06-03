@@ -41,7 +41,8 @@ public class Repository {
 		"INNER JOIN municipalities m ON a.city_id = m.id " +
 		"INNER JOIN postals p ON a.postal_id = p.id " +
 		"WHERE ST_DWithin(a.geom, ST_SetSRID(ST_MakePoint($3, $4), 31370), $5) = TRUE " + 
-		"ORDER by distance";
+		"ORDER by distance" + 
+		"LIMIT 200";
 	
 	public Multi<AddressDistance> findAddressDistance(double x, double y, int maxdist) {
 		Coordinate l72 = coordConverter.toCoords(x, y);
