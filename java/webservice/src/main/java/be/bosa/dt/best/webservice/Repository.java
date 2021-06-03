@@ -15,6 +15,7 @@ import io.vertx.mutiny.sqlclient.Tuple;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  *
@@ -22,6 +23,9 @@ import javax.inject.Inject;
  */
 @ApplicationScoped
 public class Repository {
+	@Inject
+	CoordConverter coordConverter;
+
 	@Inject
 	PgPool pg;
 
@@ -31,17 +35,20 @@ public class Repository {
 				"s.id, s.name_nl, s.name_fr, s.name_de, " +
 				"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
 				"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
-		"ST_DISTANCE(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint($1, $2), 4326), 31370)) as distance " +
+		"ST_DISTANCE(a.geom, ST_SetSRID(ST_MakePoint($1, $2), 31370)) as distance " +
 		"FROM Addresses a " +
 		"INNER JOIN streets s ON a.street_id = s.id " +
 		"INNER JOIN municipalities m ON a.city_id = m.id " +
 		"INNER JOIN postals p ON a.postal_id = p.id " +
-		"WHERE ST_DWithin(a.geom, ST_Transform(ST_SetSRID(ST_MakePoint($3, $4), 4326), 31370), $5) = TRUE " + 
+		"WHERE ST_DWithin(a.geom, ST_SetSRID(ST_MakePoint($3, $4), 31370), $5) = TRUE " + 
 		"ORDER by distance";
 	
 	public Multi<AddressDistance> findAddressDistance(double x, double y, int maxdist) {
+		Coordinate l72 = coordConverter.toCoords(x, y);
+	
 		return pg.preparedQuery(SQL_DISTANCE)
-			.execute(Tuple.tuple().addDouble(x).addDouble(y).addDouble(x).addDouble(y).addInteger(maxdist))
+			.execute(Tuple.tuple().addDouble(l72.x).addDouble(l72.y)
+									.addDouble(l72.x).addDouble(l72.y).addInteger(maxdist))
 			.onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
 			.onItem().transform(Repository::toAddressDistance);
 	}

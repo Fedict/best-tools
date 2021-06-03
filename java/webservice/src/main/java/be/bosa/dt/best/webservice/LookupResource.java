@@ -56,7 +56,6 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 )
 @ApplicationScoped
 public class LookupResource {
-
 	@Inject
 	Repository repo;
 
