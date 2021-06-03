@@ -68,7 +68,7 @@ public class Repository {
 				stmt.setDouble(2, y);
 				stmt.setDouble(3, x);
 				stmt.setDouble(4, y);			
-				stmt.setDouble(5, maxdist / 70100);
+				stmt.setDouble(5, (double) maxdist / 70100);
 		
 				try(ResultSet res = stmt.executeQuery()) {
 					while (res.next()) {
