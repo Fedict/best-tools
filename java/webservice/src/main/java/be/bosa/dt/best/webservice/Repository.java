@@ -42,12 +42,15 @@ public class Repository {
 				"s.id, s.name_nl, s.name_fr, s.name_de, " +
 				"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
 				"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
-		"ST_DISTANCE(a.geom, ST_SetSRID(ST_MakePoint(?, ?), 31370)) as distance " +
+		"DISTANCE(a.geom, MakePoint(?, ?, 4326)) as distance " +
 		"FROM Addresses a " +
 		"INNER JOIN streets s ON a.street_id = s.id " +
 		"INNER JOIN municipalities m ON a.city_id = m.id " +
 		"INNER JOIN postals p ON a.postal_id = p.id " +
-		"WHERE ST_DWithin(a.geom, ST_SetSRID(ST_MakePoint(?, ?), 31370), ?) = TRUE " + 
+		"WHERE a.rowid IN (  SELECT s.rowid  " +
+			"FROM SpatialIndex as s " +
+			"WHERE f_table_name = 'addresses' " +
+			"AND search_frame = Buffer(MakePoint(?, ?, 4326), ?))" +
 		"ORDER by distance " +
 		"LIMIT 250 ";
 	
@@ -56,15 +59,15 @@ public class Repository {
 	
 	public List<AddressDistance> findAddressDistance(double x, double y, int maxdist) {
 		List<AddressDistance> list = new ArrayList<>();
-		Coordinate coordl72 = toCoords(x, y);
+		//Coordinate coordl72 = toCoords(x, y);
 
 		try(Connection conn = ds.getConnection();
 			PreparedStatement stmt = conn.prepareStatement(SQL_DISTANCE)) {
 				stmt.setDouble(1, x);
 				stmt.setDouble(2, y);
-				stmt.setDouble(3, coordl72.x);
-				stmt.setDouble(4, coordl72.y);			
-				stmt.setInt(5, maxdist);
+				stmt.setDouble(3, x);
+				stmt.setDouble(4, y);			
+				stmt.setDouble(5, maxdist / 70100);
 		
 				try(ResultSet res = stmt.executeQuery()) {
 					while (res.next()) {
