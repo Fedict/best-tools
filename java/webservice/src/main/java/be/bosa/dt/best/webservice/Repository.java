@@ -48,7 +48,7 @@ public class Repository {
 				"s.id, s.name_nl, s.name_fr, s.name_de, " +
 				"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
 				"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
-		" a <-> ST_SetSRID(ST_MakePoint($1, $2), 31370) as distance " +
+		" a.geom <-> ST_SetSRID(ST_MakePoint($1, $2), 31370) as distance " +
 		"FROM Addresses a " +
 		"INNER JOIN streets s ON a.street_id = s.id " +
 		"INNER JOIN municipalities m ON a.city_id = m.id " +
