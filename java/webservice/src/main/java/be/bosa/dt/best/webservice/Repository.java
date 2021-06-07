@@ -38,6 +38,11 @@ public class Repository {
 
 	// queries
 	private final static String SQL_DISTANCE = 
+		"SELECT ST_DISTANCE(a.geom::geography, b.geom::geography, true) as distance " +
+		"FROM addresses a, addresses b " +
+		"WHERE a.id = $1 AND b.id = $2";
+
+	private final static String SQL_NEAR_DISTANCE = 
 		"SELECT a.id, a.part_id, a.houseno, a.boxno, " +
 				"a.x, a.y, a.geom, a.status, " +
 				"s.id, s.name_nl, s.name_fr, s.name_de, " +
@@ -154,11 +159,23 @@ public class Repository {
 	 */
 	public Multi<AddressDistance> findAddressDistance(double x, double y, int maxdist, int maxres) {
 		Coordinate l72 = CoordConverter.gpsToLambert(x, y);
-		return multi(
-			pg.preparedQuery(SQL_DISTANCE).execute(Tuple.of(l72.x, l72.y, l72.x, l72.y, maxdist, maxres))
+		return multi(pg.preparedQuery(SQL_NEAR_DISTANCE).execute(Tuple.of(l72.x, l72.y, l72.x, l72.y, maxdist, maxres))
 		).transform(AddressDistance::from);
 	}
 
+	/**
+	 * Find the distance between two addresses
+	 * 
+	 * @param a ID first address 
+	 * @param b ID second address
+	 * @return address
+	 */
+	public Uni<Double> findDistance(String a, String b) {
+		return uni(
+			pg.preparedQuery(SQL_DISTANCE).execute(Tuple.of(a, b))
+		).transform(row -> row.hasNext() ? row.next().getDouble(1) : null);
+	}
+	
 	/**
 	 * Find the address by ID
 	 * 

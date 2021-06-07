@@ -73,6 +73,17 @@ public class LookupResource {
 		response.setStatusCode(400).end(e.getMessage());
 	}
 
+	@Route(path = "distance", methods = HttpMethod.GET, produces = "application/json")
+	@Operation(summary = "Get distance between two addresses")
+	@Blocking
+	public Uni<Double> distance(
+			@Parameter(description = "ID of first address", required = true, example = "4.23")
+			@Param("a") String a, 
+			@Parameter(description = "ID of second address", required = true, example = "50.73")	
+			@Param("b") String b) {
+		return repo.findDistance(a, b);
+	}
+
 	@Route(path = "near", methods = HttpMethod.GET, produces = "application/json")
 	@Operation(summary = "Get (maximum) 200 addresses within (maximum) 100 meters + calculate distance")
 	@Blocking
@@ -122,6 +133,7 @@ public class LookupResource {
 
 	@Route(path = "municipalities", methods = HttpMethod.GET, produces = "application/json")
 	@Operation(summary = "Get a list of all municipalities, or search by (part of) name or zipcode")
+	@Blocking
 	public Multi<Municipality> allMunicipalities(
 			@Parameter(description = "Part of the name", example = "Halle")
 			@Param("name") Optional<String> name,
@@ -144,6 +156,7 @@ public class LookupResource {
 
 	@Route(path = "streets", methods = HttpMethod.GET, produces = "application/json")
 	@Operation(summary = "Search for streets by postal or nis code, optionally by (part of) name ")
+	@Blocking
 	public Multi<Street> streetsByCode(
 			@Parameter(description = "postal code", example = "1500")	
 			@Param("zipcode") Optional<String> zipcode,
