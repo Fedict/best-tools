@@ -173,7 +173,7 @@ public class Repository {
 	public Uni<Double> findDistance(String a, String b) {
 		return uni(
 			pg.preparedQuery(SQL_DISTANCE).execute(Tuple.of(a, b))
-		).transform(row -> row.hasNext() ? row.next().getDouble(1) : null);
+		).transform(row -> row.hasNext() ? row.next().getDouble(0): null);
 	}
 	
 	/**
