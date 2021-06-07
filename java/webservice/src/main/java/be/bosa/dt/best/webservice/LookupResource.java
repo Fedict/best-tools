@@ -82,9 +82,9 @@ public class LookupResource {
 			@Parameter(description = "Y coordinate (latitude)", required = true, example = "50.73")	
 			@Param("y") Double y,
 			@Parameter(description = "Maximum distance (meters)", required = false, example = "100")	
-			@Param("dist") Optional<Integer> maxdist,
+			@Param("maxdist") Optional<Integer> maxdist,
 			@Parameter(description = "Maximum number of results", example = "200")
-			@Param("status") Optional<Integer> limit,
+			@Param("limit") Optional<Integer> limit,
 			@Parameter(description = "Calculate distance", example = "true")
 			@Param("calc") Optional<Boolean> calc) {
 	

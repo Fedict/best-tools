@@ -153,7 +153,7 @@ public class Repository {
 	 * @return address with distance to location
 	 */
 	public Multi<AddressDistance> findAddressDistance(double x, double y, int maxdist, int maxres) {
-		Coordinate l72 = CoordConverter.lambertToGps(x, y);
+		Coordinate l72 = CoordConverter.gpsToLambert(x, y);
 		return multi(
 			pg.preparedQuery(SQL_DISTANCE).execute(Tuple.of(l72.x, l72.y, l72.x, l72.y, maxdist, maxres))
 		).transform(AddressDistance::from);
