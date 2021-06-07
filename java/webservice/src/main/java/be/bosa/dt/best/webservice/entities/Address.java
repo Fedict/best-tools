@@ -66,9 +66,9 @@ public class Address {
 		return new Address(
 			res.getString(0), res.getString(1), res.getString(2), res.getString(3), 
 			res.getDouble(4), res.getDouble(5), null, res.getString(7),
-			res.getString(8), res.getString(9), res.getString(10), res.getString(11),
-			res.getString(12), res.getString(13), res.getString(14), res.getString(15), res.getString(16),
-			res.getString(17), res.getString(18), res.getString(19), res.getString(20), res.getString(21));
+			res.getString(8), res.getString(9), res.getString(10), res.getString(11), res.getString(12), 
+			res.getString(13), res.getString(14), res.getString(15), res.getString(16), res.getString(17), 
+			res.getString(18), res.getString(19), res.getString(20), res.getString(21), res.getString(22));
 	}
 
 	/**
@@ -83,6 +83,7 @@ public class Address {
 	 * @param geom
 	 * @param status 
 	 * @param s_id 
+	 * @param s_city_id 
 	 * @param s_name_nl 
 	 * @param s_name_fr 
 	 * @param s_name_de 
@@ -99,7 +100,7 @@ public class Address {
 	 */
 	public Address(String id, String part_id, String houseno, String boxno, 
 					double x, double y, Object geom, String status,
-					String s_id, String s_name_nl, String s_name_fr, String s_name_de,
+					String s_id, String s_city_id, String s_name_nl, String s_name_fr, String s_name_de,
 					String m_id, String m_niscode, String m_name_nl, String m_name_fr, String m_name_de,
 					String p_id, String p_zipcode, String p_name_nl, String p_name_fr, String p_name_de) {
 		this.id = id;
@@ -111,7 +112,7 @@ public class Address {
 		this.geom = (Point) geom;
 		this.status = status;
 		this.municipality = new Municipality(m_id, m_niscode, m_name_nl, m_name_fr, m_name_de);
-		this.street = new Street(s_id, s_name_nl, s_name_fr, s_name_de);
+		this.street = new Street(s_id, s_city_id, s_name_nl, s_name_fr, s_name_de);
 		this.postal = new Postal(p_id, p_zipcode, p_name_nl, p_name_fr, p_name_de);
 	}
 }

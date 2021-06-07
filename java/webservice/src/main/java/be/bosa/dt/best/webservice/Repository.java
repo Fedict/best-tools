@@ -45,7 +45,7 @@ public class Repository {
 	private final static String SQL_NEAR_DISTANCE = 
 		"SELECT a.id, a.part_id, a.houseno, a.boxno, " +
 				"a.x, a.y, a.geom, a.status, " +
-				"s.id, s.name_nl, s.name_fr, s.name_de, " +
+				"s.id, s.city_id, s.name_nl, s.name_fr, s.name_de, " +
 				"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
 				"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
 		" a.geom <-> ST_SetSRID(ST_MakePoint($1, $2), 31370) as distance " +
@@ -100,27 +100,27 @@ public class Repository {
 		"WHERE s.id = $1";
 
 	private final static String SQL_STREET_ZIP = 
-		"SELECT s.id, s.name_nl, s.name_fr, s.name_de " +
+		"SELECT s.id, s.city_id, s.name_nl, s.name_fr, s.name_de " +
 		"FROM streets s " +
 		"INNER JOIN postal_municipalities p ON p.street_id = s.id " +
 		"WHERE s.id = $1 " +
 		"AND (s.name_nl LIKE '$1' or s.name_fr LIKE '$2' or s.name_de LIKE '$3')";
 
 	private final static String SQL_STREET_ZIP_NAME = 
-		"SELECT s.id, s.name_nl, s.name_fr, s.name_de " +
+		"SELECT s.id, s.city_id, s.name_nl, s.name_fr, s.name_de " +
 		"FROM streets s " +
 		"INNER JOIN postal_municipalities p ON p.street_id = s.id " +
 		"WHERE p.zipcode = $1 " +
 		"AND (s.name_nl LIKE '$1' or s.name_fr LIKE '$2' or s.name_de LIKE '$3')";
 
 	private final static String SQL_STREET_NIS = 
-		"SELECT s.id, s.name_nl, s.name_fr, s.name_de " +
+		"SELECT s.id, s.city_id, s.name_nl, s.name_fr, s.name_de " +
 		"FROM streets s " +
 		"INNER JOIN municipalities m ON s.city_id = m.id " +
 		"WHERE m.niscode = $1 ";
 
 	private final static String SQL_STREET_NIS_NAME = 
-		"SELECT s.id, s.name_nl, s.name_fr, s.name_de " +
+		"SELECT s.id, s.city_id, s.name_nl, s.name_fr, s.name_de " +
 		"FROM streets s " +
 		"INNER JOIN municipalities m ON s.city_id = m.id " +
 		"WHERE m.niscode = $1 " +

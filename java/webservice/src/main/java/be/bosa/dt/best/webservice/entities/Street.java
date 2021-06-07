@@ -46,7 +46,7 @@ public class Street {
 	 * @return data object
 	 */
 	public static Street from(Row res) {
-		return new Street(res.getString(0), res.getString(1), res.getString(2), res.getString(3));
+		return new Street(res.getString(0), res.getString(1), res.getString(2), res.getString(3), res.getString(4));
 	}
 	
 	/**
@@ -57,8 +57,9 @@ public class Street {
 	* @param name_fr
 	* @param name_de 
 	*/
-	public Street(String id, String name_nl, String name_fr, String name_de) {
+	public Street(String id, String city_id, String name_nl, String name_fr, String name_de) {
 		this.id = id;
+		this.city_id = city_id;
 		this.name_nl = name_nl;
 		this.name_fr = name_fr;
 		this.name_de = name_de;
