@@ -92,16 +92,6 @@
 			<artifactId>geolatte-geojson</artifactId>
 			<version>1.8.0</version>
 		</dependency>
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-main</artifactId>
-			<version>25.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-epsg-wkt</artifactId>
-			<version>25.0</version>
-		</dependency>
 	<!--
 		<dependency>
 			<groupId>org.n52.jackson</groupId>
