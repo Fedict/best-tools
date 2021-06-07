@@ -164,7 +164,7 @@ public class Repository {
 	}
 
 	/**
-	 * Find the distance between two addresses
+	 * Calculate the approximate distance between two addresses in meters
 	 * 
 	 * @param a ID first address 
 	 * @param b ID second address
