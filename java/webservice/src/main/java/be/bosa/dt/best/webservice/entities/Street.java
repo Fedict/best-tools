@@ -25,6 +25,8 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
+import io.vertx.mutiny.sqlclient.Row;
+
 /**
  * Street entity
  * 
@@ -38,55 +40,19 @@ public class Street {
 	public String name_de;
 
 	/**
-	 * Find street by postal code of the municipality and filter optionally by (part of) street name.
-	 * Note that, since postal codes are not directly related to municipalities and streets,
-	 * this will only return streets with at least one address.
-	 * "Empty" streets like hiking trails, parcs... will not be returned
+	 * Convert database result to object
 	 * 
-	 * @param postal zip code of municipality
-	 * @param name (part of) street name
-	 * @return street query
+	 * @param res database row
+	 * @return data object
 	 */
-/*	public static PanacheQuery<Street> findByZipcodeAndName(String postal, Optional<String> name) {
-		if (!name.isPresent()) {
-			return find("SELECT s " + 
-				"FROM PostalStreets AS ps " + 
-				"INNER JOIN ps.street as s " +
-				"WHERE ps.zipcode = ?1", postal);
-		}
-
-		String str = '%' + name.get() + '%';
-		return find("SELECT s " + 
-				"FROM PostalStreets AS ps " + 
-				"INNER JOIN ps.street as s " +
-				"WHERE ps.zipcode = ?1 " +
-				"AND (name_nl LIKE ?2 OR name_fr LIKE ?2 OR name_de LIKE ?2)", postal, str);
+	public static Street from(Row res) {
+		return new Street(res.getString(0), res.getString(1), res.getString(2), res.getString(3));
 	}
-*/
+	
 	/**
-	 * Find streets by the REFNIS code of the municipality and optionally filter on (part of) the street name
-	 * 
-	 * @param niscode REFNIS code of the municipality
-	 * @param name (part of) name
-	 * @return street query
-	 */
-/*	public static PanacheQuery<Street> findByNiscodeAndName(String niscode, Optional<String> name) {
-		if (!name.isPresent()) {
-			return find("nis", niscode);
-		}
-		String str = '%' + name.get() + '%';
-		return find("FROM Streets WHERE nis = ?1 "
-					+ "AND (name_nl LIKE ?2 OR name_fr LIKE ?2 OR name_de LIKE ?2)", niscode, str);
-	}
-*/
-	public Street() {
-	}
-
-	/**
-	* Constructor, only needed for N+1 select work-around
+	* Constructor
 	* 
 	* @param id
-	* @param city_id
 	* @param name_nl
 	* @param name_fr
 	* @param name_de 

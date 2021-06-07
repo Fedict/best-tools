@@ -25,6 +25,8 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
+import io.vertx.mutiny.sqlclient.Row;
+
 /**
  * Municipality entity.
  * Note that each municipality has a unique REFNIS code, which is NOT a postal code.
@@ -40,7 +42,17 @@ public class Municipality {
 	public String name_de;
 
 	/**
-	 * Constructor, only needed for N+1 select work-around
+	 * Convert database result to object
+	 * 
+	 * @param res database row
+	 * @return data object
+	 */
+	public static Municipality from(Row res) {
+		return new Municipality(res.getString(0), res.getString(1), res.getString(2), res.getString(3), res.getString(4));
+	}
+
+	/**
+	 * Constructor
 	 * 
 	 * @param id
 	 * @param niscode

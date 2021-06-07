@@ -26,11 +26,10 @@
 package be.bosa.dt.best.webservice.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.vertx.mutiny.sqlclient.Row;
 
 
 import org.geolatte.geom.Point;
-
-
 
 /**
  * Full address entity
@@ -58,41 +57,22 @@ public class Address {
 	public String status;
 
 	/**
-	 * Find all addresses within a range of X meters, based on GPS/WGS84 coordinates + calculate distance
+	 * Convert database result to object
 	 * 
-	 * @param posx
-	 * @param posy
-	 * @param maxdist maximum distance (in meters)
-	 * @param status
-	 * @return 
+	 * @param res database row
+	 * @return data object
 	 */
-/*	public static List<AddressDistance> findNearestWithDistance(double posx, double posy, int maxdist, 
-			Optional<String> status) {
-		PanacheQuery<AddressDistance> res = find("#withdistance", 
-			Map.of("posx", posx, "posy", posy, "maxdist", maxdist)).
-		return res.list();
-	}
-	
-	/**
-	 * Find all addresses within a range of X meters, based on GPS/WGS84 coordinates
-	 * 
-	 * @param posx
-	 * @param posy
-	 * @param maxdist maximum distance (in meters)
-	 * @param status
-	 * @return 
-	 */
-	/*public static List<Address> findNearest(double posx, double posy, int maxdist, Optional<String> status) {
-		PanacheQuery<Address> res = find("#withoutdistance", 
-			Map.of("posx", posx, "posy", posy, "maxdist", maxdist, "degrees", (double) maxdist / 70100));
-		return status.isPresent() ? res.filter("#status", Map.of("status", status)).list() : res.list();
-	}
-*/
-	public Address() {
+	public static Address from(Row res) {
+		return new Address(
+			res.getString(0), res.getString(1), res.getString(2), res.getString(3), 
+			res.getDouble(4), res.getDouble(5), null, res.getString(7),
+			res.getString(8), res.getString(9), res.getString(10), res.getString(11),
+			res.getString(12), res.getString(13), res.getString(14), res.getString(15), res.getString(16),
+			res.getString(17), res.getString(18), res.getString(19), res.getString(20), res.getString(21));
 	}
 
 	/**
-	 * Constructor, only needed for N+1 select work-around
+	 * Constructor
 	 * 
 	 * @param id
 	 * @param part_id
