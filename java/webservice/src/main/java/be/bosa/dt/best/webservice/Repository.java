@@ -75,13 +75,13 @@ public class Repository {
 
 	private final static String SQL_MUNICIPALITY_NIS = 
 		"SELECT m.id, m.niscode, m.name_nl, m.name_fr, m.name_de " +
-		"FROM postal_municipalities p " +
+		"FROM municipalities m " +
 		"WHERE m.niscode = $1";
 		
 	private final static String SQL_MUNICIPALITY_ZIP = 
 		"SELECT m.id, m.niscode, m.name_nl, m.name_fr, m.name_de " +
 		"FROM municipalities m " +
-		"INNER JOIN postal_municipalities ON p.city_id = m.id " +
+		"INNER JOIN postal_municipalities p ON p.city_id = m.id " +
 		"WHERE p.zipcode = $1";
 
 	private final static String SQL_MUNICIPALITY_NAME = 
