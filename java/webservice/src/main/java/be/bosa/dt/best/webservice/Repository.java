@@ -38,7 +38,7 @@ public class Repository {
 
 	// queries
 	private final static String SQL_DISTANCE = 
-		"SELECT ST_DISTANCE(a.geom::geography, b.geom::geography, true) as distance " +
+		"SELECT ST_DISTANCE(a.geom, b.geom) as distance " +
 		"FROM addresses a, addresses b " +
 		"WHERE a.id = $1 AND b.id = $2";
 
@@ -48,7 +48,7 @@ public class Repository {
 				"s.id, s.name_nl, s.name_fr, s.name_de, " +
 				"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
 				"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de, " +
-		"ST_DISTANCE(a.geom, ST_SetSRID(ST_MakePoint($1, $2), 31370)) as distance " +
+		" a <-> ST_SetSRID(ST_MakePoint($1, $2), 31370) as distance " +
 		"FROM Addresses a " +
 		"INNER JOIN streets s ON a.street_id = s.id " +
 		"INNER JOIN municipalities m ON a.city_id = m.id " +

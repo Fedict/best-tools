@@ -74,12 +74,12 @@ public class LookupResource {
 	}
 
 	@Route(path = "distance", methods = HttpMethod.GET, produces = "application/json")
-	@Operation(summary = "Get distance between two addresses")
+	@Operation(summary = "Get (approximate) distance between two addresses")
 	@Blocking
 	public Uni<Double> distance(
-			@Parameter(description = "ID of first address", required = true, example = "4.23")
+			@Parameter(description = "ID of first address", required = true, example = "BE.BRUSSELS.BRIC.ADM.ADDR/172821/2")
 			@Param("a") String a, 
-			@Parameter(description = "ID of second address", required = true, example = "50.73")	
+			@Parameter(description = "ID of second address", required = true, example = "https://data.vlaanderen.be/id/adres/1273627/2015-05-22T05:53:08.330")	
 			@Param("b") String b) {
 		return repo.findDistance(a, b);
 	}
