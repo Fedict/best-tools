@@ -25,6 +25,8 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
+import io.vertx.mutiny.sqlclient.Row;
+
 
 /**
  * Address with distance (in meters).
@@ -34,14 +36,36 @@ package be.bosa.dt.best.webservice.entities;
 public class AddressDistance {
 	public Address address;
 	public double distance;
-	
+
+	/**
+	 * Convert database result to object
+	 * 
+	 * @param res database row
+	 * @return data object
+	 */
+	public static AddressDistance from(Row res) {
+		return new AddressDistance(
+			res.getString(0), res.getString(1), res.getString(2), res.getString(3), 
+			res.getDouble(4), res.getDouble(5), null, res.getString(7),
+			res.getString(8), res.getString(9), res.getString(10), res.getString(11),
+			res.getString(12), res.getString(13), res.getString(14), res.getString(15), res.getString(16),
+			res.getString(17), res.getString(18), res.getString(19), res.getString(20), res.getString(21),
+			res.getDouble(22));
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param address
+	 * @param distance 
+	 */
 	public AddressDistance(Address address, double distance) {
 		this.address = address;
 		this.distance = distance;
 	}
 
 	/**
-	 * Constructor, only needed for N+1 select work-around
+	 * Constructor
 	 * 
 	 * @param id
 	 * @param part_id

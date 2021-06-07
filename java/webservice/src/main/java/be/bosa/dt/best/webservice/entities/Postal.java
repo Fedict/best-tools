@@ -37,8 +37,6 @@ public class Postal {
 	public String name_fr;
 	public String name_de;
 
-	public Postal() {
-	}
 
 	/**
 	 * Constructor

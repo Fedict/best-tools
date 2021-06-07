@@ -5,30 +5,38 @@
  */
 package be.bosa.dt.best.webservice;
 
+import be.bosa.dt.best.webservice.entities.Address;
 import be.bosa.dt.best.webservice.entities.AddressDistance;
+import be.bosa.dt.best.webservice.entities.Municipality;
+import be.bosa.dt.best.webservice.entities.Street;
 
 import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.groups.MultiOnItem;
+import io.smallrye.mutiny.groups.UniOnItem;
 
 import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Row;
+import io.vertx.mutiny.sqlclient.RowIterator;
+import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
 import org.locationtech.jts.geom.Coordinate;
 
 /**
- *
- * @author Bart.Hanssens
+ * Connect to database
+ * 
+ * @author Bart Hanssens
  */
 @ApplicationScoped
 public class Repository {
 	@Inject
-	CoordConverter coordConverter;
-
-	@Inject
 	PgPool pg;
 
+	// queries
 	private final static String SQL_DISTANCE = 
 		"SELECT a.id, a.part_id, a.houseno, a.boxno, " +
 				"a.x, a.y, a.geom, a.status, " +
@@ -42,25 +50,229 @@ public class Repository {
 		"INNER JOIN postals p ON a.postal_id = p.id " +
 		"WHERE ST_DWithin(a.geom, ST_SetSRID(ST_MakePoint($3, $4), 31370), $5) = TRUE " + 
 		"ORDER by distance " + 
-		"LIMIT 200";
+		"LIMIT $6";
+
+	private final static String SQL_ADDRESS_ID = 
+		"SELECT a.id, a.part_id, a.houseno, a.boxno, " +
+				"a.x, a.y, a.geom, a.status, " +
+				"s.id, s.name_nl, s.name_fr, s.name_de, " +
+				"m.id, m.niscode, m.name_nl, m.name_fr, m.name_de, " +
+				"p.id, p.zipcode, p.name_nl, p.name_fr, p.name_de " +
+		"FROM addresses a " +
+		"INNER JOIN streets s ON a.street_id = s.id " +
+		"INNER JOIN municipalities m ON a.city_id = m.id " +
+		"INNER JOIN postals p ON a.postal_id = p.id " +
+		"WHERE a.id = $1";
+
+	private final static String SQL_MUNICIPALITIES = 
+		"SELECT m.id, m.niscode, m.name_nl, m.name_fr, m.name_de " +
+		"FROM municipalities m";
+
+	private final static String SQL_MUNICIPALITY_ID = 
+		"SELECT m.id, m.niscode, m.name_nl, m.name_fr, m.name_de " +
+		"FROM municipalities m ON a.city_id = m.id " +
+		"WHERE m.id = $1";
+
+	private final static String SQL_MUNICIPALITY_ZIP = 
+		"SELECT m.id, m.niscode, m.name_nl, m.name_fr, m.name_de " +
+		"FROM postal_municipalities p ON a.city_id = m.id " +
+		"WHERE p.zipcode = $1";
+
+	private final static String SQL_MUNICIPALITY_NAME = 
+		"SELECT m.id, m.niscode, m.name_nl, m.name_fr, m.name_de " +
+		"FROM municipalities m ON a.city_id = m.id " +
+		"WHERE (m.name_nl LIKE '$1' or m.name_fr LIKE '$2' or m.name_de LIKE '$3')";
 	
-	public Multi<AddressDistance> findAddressDistance(double x, double y, int maxdist) {
-		Coordinate l72 = coordConverter.toCoords(x, y);
+	private final static String SQL_STREET_ID = 
+		"SELECT s.id, s.name_nl, s.name_fr, s.name_de " +
+		"FROM streets s " +
+		"WHERE s.id = $1";
+
+	private final static String SQL_STREET_ZIP = 
+		"SELECT s.id, s.name_nl, s.name_fr, s.name_de " +
+		"FROM streets s " +
+		"INNER JOIN postal_municipalities p ON p.street_id = s.id " +
+		"WHERE s.id = $1 " +
+		"AND (s.name_nl LIKE '$1' or s.name_fr LIKE '$2' or s.name_de LIKE '$3')";
+
+	private final static String SQL_STREET_ZIP_NAME = 
+		"SELECT s.id, s.name_nl, s.name_fr, s.name_de " +
+		"FROM streets s " +
+		"INNER JOIN postal_municipalities p ON p.street_id = s.id " +
+		"WHERE p.zipcode = $1 " +
+		"AND (s.name_nl LIKE '$1' or s.name_fr LIKE '$2' or s.name_de LIKE '$3')";
+
+	private final static String SQL_STREET_NIS = 
+		"SELECT s.id, s.name_nl, s.name_fr, s.name_de " +
+		"FROM streets s " +
+		"INNER JOIN municipalities m ON s.city_id = m.id " +
+		"WHERE m.niscode = $1 ";
+
+	private final static String SQL_STREET_NIS_NAME = 
+		"SELECT s.id, s.name_nl, s.name_fr, s.name_de " +
+		"FROM streets s " +
+		"INNER JOIN municipalities m ON s.city_id = m.id " +
+		"WHERE m.niscode = $1 " +
+		"AND (s.name_nl LIKE '$1' or s.name_fr LIKE '$2' or s.name_de LIKE '$3')";
+
+	/**
+	 * Convert rows to a multi result
+	 * 
+	 * @param res row set
+	 * @param mapper entity mapper
+	 * @return multi of data objects
+	 */
+	private MultiOnItem<Row> multi(Uni<RowSet<Row>> res) {
+		return res.onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows)).onItem();
+	}
 	
-		return pg.preparedQuery(SQL_DISTANCE)
-			.execute(Tuple.tuple().addDouble(l72.x).addDouble(l72.y)
-									.addDouble(l72.x).addDouble(l72.y).addInteger(maxdist))
-			.onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
-			.onItem().transform(Repository::toAddressDistance);
+	/**
+	 * Convert rows to a uni result
+	 * 
+	 * @param res row set
+	 * @param mapper entity mapper
+	 * @return multi of data objects
+	 */
+	private UniOnItem<RowIterator<Row>> uni(Uni<RowSet<Row>> res) {
+		return res.onItem().transform(RowSet::iterator).onItem();
 	}
 
-	private static AddressDistance toAddressDistance(Row res) {
-		return new AddressDistance(
-			res.getString(0), res.getString(1), res.getString(2), res.getString(3), 
-			res.getDouble(4), res.getDouble(5), null, res.getString(7),
-			res.getString(8), res.getString(9), res.getString(10), res.getString(11),
-			res.getString(12), res.getString(13), res.getString(14), res.getString(15), res.getString(16),
-			res.getString(17), res.getString(18), res.getString(19), res.getString(20), res.getString(21),
-			res.getDouble(22));
+	/**
+	 * Find the list of addresses within a range of 100m, and calculate distance to GPS location
+	 * 
+	 * @param x GPS x coordinate
+	 * @param y GPS y coordinat
+	 * @param maxdist maximum distance (in meters)
+	 * @param maxres maximum number of results
+	 * @return address with distance to location
+	 */
+	public Multi<AddressDistance> findAddressDistance(double x, double y, int maxdist, int maxres) {
+		Coordinate l72 = CoordConverter.lambertToGps(x, y);
+		return multi(
+			pg.preparedQuery(SQL_DISTANCE).execute(Tuple.of(l72.x, l72.y, l72.x, l72.y, maxdist, maxres))
+		).transform(AddressDistance::from);
+	}
+
+	/**
+	 * Find the address by ID
+	 * 
+	 * @param id full address id
+	 * @return address
+	 */
+	public Uni<Address> findAddressById(String id) {
+		return uni(
+			pg.preparedQuery(SQL_ADDRESS_ID).execute(Tuple.of(id))
+		).transform(row -> row.hasNext() ? Address.from(row.next()) : null);
+	}
+
+	/**
+	 * Find all municipalities
+	 * 
+	 * @return municipalities
+	 */
+	public Multi<Municipality> findMunicipalities() {
+		return multi(
+			pg.preparedQuery(SQL_MUNICIPALITIES).execute())
+		.transform(Municipality::from);
+	}
+	
+	/**
+	 * Find the municipality by ID
+	 * 
+	 * @param id municipality id
+	 * @return municipality
+	 */
+	public Uni<Municipality> findMunicipalityById(String id) {
+		return uni(
+			pg.preparedQuery(SQL_MUNICIPALITY_ID).execute(Tuple.of(id))
+		).transform(row -> row.hasNext() ? Municipality.from(row.next()) : null);
+	}
+
+	/**
+	 * Find municipalities by part of name
+	 * 
+	 * @param name part of name
+	 * @return municipalities
+	 */
+	public Multi<Municipality> findMunicipalitiesByName(String name) {
+		String str = name + '%';
+		return multi(
+			pg.preparedQuery(SQL_MUNICIPALITY_NAME).execute(Tuple.of(str, str, str)))
+		.transform(Municipality::from);
+	}
+	/**
+	 * Find municipalities by postal code
+	 * 
+	 * @param zipcode postal code
+	 * @return municipalities
+	 */
+	public Multi<Municipality> findMunicipalitiesByZipcode(String zipcode) {
+		return multi(
+			pg.preparedQuery(SQL_MUNICIPALITY_ZIP).execute(Tuple.of(zipcode)))
+		.transform(Municipality::from);
+	}
+
+	/**
+	 * Find the street by ID
+	 * 
+	 * @param id street id
+	 * @return street
+	 */
+	public Uni<Street> findStreetById(String id) {
+		return uni(
+			pg.preparedQuery(SQL_STREET_ID).execute(Tuple.of(id))
+		).transform(row -> row.hasNext() ? Street.from(row.next()) : null);
+	}
+
+	/**
+	 * Find the streets by postal code
+	 * 
+	 * @param niscode
+	 * @return streets
+	 */
+	public Multi<Street> findStreetsByNiscode(String niscode) {
+		return multi(
+			pg.preparedQuery(SQL_STREET_NIS).execute(Tuple.of(niscode))
+		).transform(Street::from);
+	}
+
+	/**
+	 * Find the streets by part of name
+	 * 
+	 * @param niscode
+	 * @param name part of name
+	 * @return streets
+	 */
+	public Multi<Street> findStreetsByNiscodeAndName(String niscode, String name) {
+		String str = name + '%';
+		return multi(
+			pg.preparedQuery(SQL_STREET_NIS_NAME).execute(Tuple.of(niscode, str, str, str))
+		).transform(Street::from);
+	}
+
+	/**
+	 * Find the streets by postal code
+	 * 
+	 * @param zipcode
+	 * @return streets
+	 */
+	public Multi<Street> findStreetsByZipcode(String zipcode) {
+		return multi(
+			pg.preparedQuery(SQL_STREET_ZIP).execute(Tuple.of(zipcode))
+		).transform(Street::from);
+	}
+
+	/**
+	 * Find the streets by part of name
+	 * 
+	 * @param zipcode
+	 * @param name part of name
+	 * @return streets
+	 */
+	public Multi<Street> findStreetsByZipcodeAndName(String zipcode, String name) {
+		String str = name + '%';
+		return multi(
+			pg.preparedQuery(SQL_STREET_ZIP_NAME).execute(Tuple.of(zipcode, str, str, str))
+		).transform(Street::from);
 	}
 }
