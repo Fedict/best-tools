@@ -70,17 +70,23 @@ public class Repository {
 
 	private final static String SQL_MUNICIPALITY_ID = 
 		"SELECT m.id, m.niscode, m.name_nl, m.name_fr, m.name_de " +
-		"FROM municipalities m ON a.city_id = m.id " +
+		"FROM municipalities m " +
 		"WHERE m.id = $1";
 
+	private final static String SQL_MUNICIPALITY_NIS = 
+		"SELECT m.id, m.niscode, m.name_nl, m.name_fr, m.name_de " +
+		"FROM postal_municipalities p " +
+		"WHERE m.niscode = $1";
+		
 	private final static String SQL_MUNICIPALITY_ZIP = 
 		"SELECT m.id, m.niscode, m.name_nl, m.name_fr, m.name_de " +
-		"FROM postal_municipalities p ON a.city_id = m.id " +
+		"FROM municipalities m " +
+		"INNER JOIN postal_municipalities ON p.city_id = m.id " +
 		"WHERE p.zipcode = $1";
 
 	private final static String SQL_MUNICIPALITY_NAME = 
 		"SELECT m.id, m.niscode, m.name_nl, m.name_fr, m.name_de " +
-		"FROM municipalities m ON a.city_id = m.id " +
+		"FROM municipalities m " +
 		"WHERE (m.name_nl LIKE '$1' or m.name_fr LIKE '$2' or m.name_de LIKE '$3')";
 	
 	private final static String SQL_STREET_ID = 
@@ -200,6 +206,19 @@ public class Repository {
 			pg.preparedQuery(SQL_MUNICIPALITY_NAME).execute(Tuple.of(str, str, str)))
 		.transform(Municipality::from);
 	}
+
+	/**
+	 * Find municipalities by REFNIS code
+	 * 
+	 * @param niscode nis code
+	 * @return municipalities
+	 */
+	public Multi<Municipality> findMunicipalitiesByNiscode(String niscode) {
+		return multi(
+			pg.preparedQuery(SQL_MUNICIPALITY_NIS).execute(Tuple.of(niscode)))
+		.transform(Municipality::from);
+	}
+
 	/**
 	 * Find municipalities by postal code
 	 * 

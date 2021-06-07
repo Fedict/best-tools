@@ -125,11 +125,15 @@ public class LookupResource {
 	public Multi<Municipality> allMunicipalities(
 			@Parameter(description = "Part of the name", example = "Halle")
 			@Param("name") Optional<String> name,
+			@Parameter(description = "NIS code", example = "23027")
+			@Param("niscode") Optional<String> niscode,
 			@Parameter(description = "Postal code", example = "1500")
-			@Param("name") Optional<String> zipcode) {
+			@Param("zipcode") Optional<String> zipcode) {
 		Multi<Municipality> res = null;
 		if (name.isPresent()) {
 			res = ReactiveRoutes.asJsonArray(repo.findMunicipalitiesByName(name.get()));
+		} else if (niscode.isPresent()) {
+			res = repo.findMunicipalitiesByNiscode(niscode.get());
 		} else if (zipcode.isPresent()) {
 			res = repo.findMunicipalitiesByZipcode(zipcode.get());
 		} else {
