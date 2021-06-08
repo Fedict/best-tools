@@ -279,7 +279,7 @@ public class Repository {
 	 * @return streets
 	 */
 	public Multi<Street> findStreetsByNiscodeAndName(String niscode, String name) {
-		String str = "'" + name + "%'";
+		String str = name + "%";
 		return multi(
 			pg.preparedQuery(SQL_STREET_NIS_NAME).execute(Tuple.of(niscode, str, str, str))
 		).transform(Street::from);
@@ -305,7 +305,7 @@ public class Repository {
 	 * @return streets
 	 */
 	public Multi<Street> findStreetsByZipcodeAndName(String zipcode, String name) {
-		String str = "'" + name + "%'";
+		String str = name + "%";
 		return multi(
 			pg.preparedQuery(SQL_STREET_ZIP_NAME).execute(Tuple.of(zipcode, str, str, str))
 		).transform(Street::from);
