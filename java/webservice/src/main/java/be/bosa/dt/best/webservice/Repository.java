@@ -102,14 +102,13 @@ public class Repository {
 	private final static String SQL_STREET_ZIP = 
 		"SELECT s.id, s.city_id, s.name_nl, s.name_fr, s.name_de " +
 		"FROM streets s " +
-		"INNER JOIN postal_municipalities p ON p.street_id = s.id " +
-		"WHERE s.id = $1 " +
-		"AND (s.name_nl LIKE '$1' or s.name_fr LIKE '$2' or s.name_de LIKE '$3')";
+		"INNER JOIN postal_municipalities p ON p.city_id = s.city_id " +
+		"WHERE p.zipcode = $1 ";
 
 	private final static String SQL_STREET_ZIP_NAME = 
 		"SELECT s.id, s.city_id, s.name_nl, s.name_fr, s.name_de " +
 		"FROM streets s " +
-		"INNER JOIN postal_municipalities p ON p.street_id = s.id " +
+		"INNER JOIN postal_municipalities p ON p.city_id = s.city_id " +
 		"WHERE p.zipcode = $1 " +
 		"AND (s.name_nl LIKE '$1' or s.name_fr LIKE '$2' or s.name_de LIKE '$3')";
 
