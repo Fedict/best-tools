@@ -110,7 +110,7 @@ public class Repository {
 		"FROM streets s " +
 		"INNER JOIN postal_municipalities p ON p.city_id = s.city_id " +
 		"WHERE p.zipcode = $1 " +
-		"AND (s.name_nl LIKE '$1' or s.name_fr LIKE '$2' or s.name_de LIKE '$3')";
+		"AND (s.name_nl LIKE $2 or s.name_fr LIKE $3 or s.name_de LIKE $4)";
 
 	private final static String SQL_STREET_NIS = 
 		"SELECT s.id, s.city_id, s.name_nl, s.name_fr, s.name_de " +
@@ -123,7 +123,7 @@ public class Repository {
 		"FROM streets s " +
 		"INNER JOIN municipalities m ON s.city_id = m.id " +
 		"WHERE m.niscode = $1 " +
-		"AND (s.name_nl LIKE '$1' or s.name_fr LIKE '$2' or s.name_de LIKE '$3')";
+		"AND (s.name_nl LIKE $2 or s.name_fr LIKE $3 or s.name_de LIKE $4)";
 
 	/**
 	 * Convert rows to a multi result
@@ -279,7 +279,7 @@ public class Repository {
 	 * @return streets
 	 */
 	public Multi<Street> findStreetsByNiscodeAndName(String niscode, String name) {
-		String str = name + '%';
+		String str = "'" + name + "%'";
 		return multi(
 			pg.preparedQuery(SQL_STREET_NIS_NAME).execute(Tuple.of(niscode, str, str, str))
 		).transform(Street::from);
@@ -305,7 +305,7 @@ public class Repository {
 	 * @return streets
 	 */
 	public Multi<Street> findStreetsByZipcodeAndName(String zipcode, String name) {
-		String str = name + '%';
+		String str = "'" + name + "%'";
 		return multi(
 			pg.preparedQuery(SQL_STREET_ZIP_NAME).execute(Tuple.of(zipcode, str, str, str))
 		).transform(Street::from);
