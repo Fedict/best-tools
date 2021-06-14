@@ -1,0 +1,9 @@
+FROM openjdk:11.0.11-9-jre-slim-buster
+MAINTAINER bart.hanssens@bosa.fgov.be
+RUN useradd -m best 
+COPY webservice-*-runner.jar /home/best/runner.jar
+ENV PATH=/usr/lib/x86_64-linux-gnu:$PATH
+WORKDIR /home/best
+USER best
+EXPOSE 8080
+CMD ["java", "-Xmx2G", "-jar", "runner.jar" ] 
