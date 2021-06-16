@@ -54,7 +54,6 @@ public class Repository {
 		"INNER JOIN municipalities m ON a.city_id = m.id " +
 		"INNER JOIN postals p ON a.postal_id = p.id " +
 		"WHERE ST_DWithin(a.geom, ST_SetSRID(ST_MakePoint($3, $4), 31370), $5) = TRUE " + 
-		"ORDER by distance " + 
 		"LIMIT $6";
 
 	private final static String SQL_ADDRESS_ID = 
