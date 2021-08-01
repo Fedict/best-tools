@@ -39,6 +39,8 @@ public class Address extends BestObject {
 	private String number = "";
 	private String box = "";
 	private String status = "";
+	private String fromDate;
+	private String tillDate;
 
 	/**
 	 * Get the geo-position
@@ -137,6 +139,22 @@ public class Address extends BestObject {
 	 */
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	
+	public void setFromDate(String date) {
+		this.fromDate = date;
+	}
+	
+	public String getFromDate() {
+		return fromDate;
+	}
+
+	public void setTillDate(String date) {
+		this.tillDate = date;
+	}
+
+	public String getTillDate() {
+		return tillDate;
 	}
 	
 	/**

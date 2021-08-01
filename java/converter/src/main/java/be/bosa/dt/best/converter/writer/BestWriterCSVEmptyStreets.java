@@ -145,7 +145,8 @@ public class BestWriterCSVEmptyStreets extends BestWriterCSV {
 			new Object[] { streets.size(), cities.size(), postals.size() });
 	
 		// remove streets that have at least one address
-		addresses.filter(a -> a.getStatus().equals("current"))
+		addresses.filter(a -> a.getStatus().equals("current") || a.getStatus().equals("reserved"))
+					.filter(a -> a.getTillDate() == null)
 					.peek(a -> fillPostals(a, cities, NL, FR, DE))
 					.map(a -> a.getStreet().getId())
 					.forEach(s -> emptyStreets.remove(s));

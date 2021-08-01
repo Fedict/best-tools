@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>be.bosa.dt</groupId>
 		<artifactId>best</artifactId>
-		<version>1.2.7</version>
+		<version>1.2.8</version>
 	</parent>
 	<groupId>be.bosa.dt.best</groupId>
 	<artifactId>webservice</artifactId>
@@ -21,7 +21,7 @@
 			<dependency>
 				<groupId>io.quarkus</groupId>
 				<artifactId>quarkus-bom</artifactId>
-				<version>2.0.0.CR3</version>
+				<version>2.1.0.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -55,12 +55,12 @@
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-main</artifactId>
-			<version>25.0</version>
+			<version>25.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-epsg-wkt</artifactId>
-			<version>25.0</version>
+			<version>25.2</version>
 		</dependency>
 		<dependency>
 			<groupId>io.quarkus</groupId>
@@ -90,7 +90,7 @@
 		<dependency>
 			<groupId>org.geolatte</groupId>
 			<artifactId>geolatte-geojson</artifactId>
-			<version>1.8.0</version>
+			<version>1.8.2</version>
 		</dependency>
 	<!--
 		<dependency>
@@ -109,7 +109,7 @@
 			<plugin>
 				<groupId>io.quarkus</groupId>
 				<artifactId>quarkus-maven-plugin</artifactId>
-				<version>2.0.0.CR3</version>
+				<version>2.1.0.Final</version>
 				<executions>
 					<execution>
 						<goals>
