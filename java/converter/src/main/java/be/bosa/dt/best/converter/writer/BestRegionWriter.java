@@ -75,7 +75,7 @@ public class BestRegionWriter {
 			}
 			Map<String, String[]> cachePostals = writer.writePostals(region, outPath, postals);
 			Map<String, String[]> cacheStreets = writer.writeStreets(region, outPath, streets, cacheCities);
-			
+
 			Map<String, Map<String, String[]>> cachePostalStreets = 
 				writer.writeAddresses(region, outPath, addresses, cacheStreets, cacheCities, cacheCityParts, cachePostals);
 			

@@ -120,8 +120,7 @@ public class BestWriterCSVEmptyStreets extends BestWriterCSV {
 			Map<String, String[]> cities) {
 	
 		return streets
-			.filter(s -> s.getStatus().equals("current"))
-			.filter(s -> s.getTillDate() == null)		// remove streets with end date, even if status is current 
+			.filter(s -> s.getStatus().equals("current") && s.getTillDate() == null) // remove streets with end date, even if status is current 
 			.collect(Collectors.toMap(
 				s -> s.getId(), 
 				s -> new String[]{ s.getName("nl"), s.getName("fr"), s.getName("de"), 
@@ -171,7 +170,7 @@ public class BestWriterCSVEmptyStreets extends BestWriterCSV {
 			});
 			cache.put(p[0], postalStreet);
 		});
-	
+
 		return cache;
 	}
 	

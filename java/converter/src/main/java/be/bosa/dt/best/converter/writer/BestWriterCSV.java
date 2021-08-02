@@ -180,42 +180,42 @@ public class BestWriterCSV implements BestWriter {
 			"lambertx", "lamberty",
 			"gpsx", "gpsy",
 			"status"};
-		Function<Address, String[]> func = (Address s) -> {
-			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[3]);
-			String[] cParts = cityParts.getOrDefault(s.getCityPart().getId(), new String[3]);
-			String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[3]);
-			String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[3]);
+		Function<Address, String[]> func = (Address a) -> {
+			String[] cCities = cities.getOrDefault(a.getCity().getId(), new String[3]);
+			String[] cParts = cityParts.getOrDefault(a.getCityPart().getId(), new String[3]);
+			String[] cStreet = streets.getOrDefault(a.getStreet().getId(), new String[3]);
+			String[] cPostal = postals.getOrDefault(a.getPostal().getId(), new String[3]);
 
-			ProjCoordinate src = new ProjCoordinate(s.getPoint().getX(), s.getPoint().getY());
+			ProjCoordinate src = new ProjCoordinate(a.getPoint().getX(), a.getPoint().getY());
 			ProjCoordinate dest = new ProjCoordinate();
 
 			TRANS.transform(src, dest);
 
 			// A street can have different postal codes, so create a cache of info per street per postal code
-			if (s.getStatus().equals("current")) {
-				Map<String, String[]> postalStreet = cache.getOrDefault(s.getPostal().getId(), new HashMap<>());
-				if (!postalStreet.containsKey(s.getStreet().getId())) {
-					postalStreet.put(s.getStreet().getId(), new String[]{
-						s.getPostal().getId(), cPostal[0], cPostal[1], cPostal[2],
+			if ((a.getStatus().equals("current") && a.getTillDate() == null) || a.getStatus().equals("reserved")) {
+				Map<String, String[]> postalStreet = cache.getOrDefault(a.getPostal().getId(), new HashMap<>());
+				if (!postalStreet.containsKey(a.getStreet().getId())) {
+					postalStreet.put(a.getStreet().getId(), new String[]{
+						a.getPostal().getId(), cPostal[0], cPostal[1], cPostal[2],
 						cStreet[0], cStreet[1], cStreet[2],
 						cCities[0], cCities[1], cCities[2],
 						cParts[0], cParts[1], cParts[2],
-						s.getStreet().getNamespace(), s.getStreet().getId(), s.getStreet().getVersion(),
-						s.getCity().getNamespace(), s.getCity().getId(), s.getCity().getVersion(),
-						s.getCityPart().getNamespace(), s.getCityPart().getId(), s.getCityPart().getVersion()
+						a.getStreet().getNamespace(), a.getStreet().getId(), a.getStreet().getVersion(),
+						a.getCity().getNamespace(), a.getCity().getId(), a.getCity().getVersion(),
+						a.getCityPart().getNamespace(), a.getCityPart().getId(), a.getCityPart().getVersion()
 					});
 				}
-				cache.put(s.getPostal().getId(), postalStreet);
+				cache.put(a.getPostal().getId(), postalStreet);
 			}
-			return new String[]{s.getIDVersion(),
-				s.getStreet().getIDVersion(), cStreet[0], cStreet[1], cStreet[2],
-				s.getNumber(), s.getBox(),
-				s.getCity().getIDVersion(), cCities[0], cCities[1], cCities[2],
-				s.getCityPart().getIDVersion(), cParts[0], cParts[1], cParts[2],
-				s.getPostal().getId(), cPostal[0], cPostal[1], cPostal[2],
-				String.valueOf(s.getPoint().getX()), String.valueOf(s.getPoint().getY()),
+			return new String[]{a.getIDVersion(),
+				a.getStreet().getIDVersion(), cStreet[0], cStreet[1], cStreet[2],
+				a.getNumber(), a.getBox(),
+				a.getCity().getIDVersion(), cCities[0], cCities[1], cCities[2],
+				a.getCityPart().getIDVersion(), cParts[0], cParts[1], cParts[2],
+				a.getPostal().getId(), cPostal[0], cPostal[1], cPostal[2],
+				String.valueOf(a.getPoint().getX()), String.valueOf(a.getPoint().getY()),
 				String.format(Locale.US, "%.4f", dest.x), String.format(Locale.US, "%.4f", dest.y),
-				s.getStatus()
+				a.getStatus()
 			};
 		};
 
