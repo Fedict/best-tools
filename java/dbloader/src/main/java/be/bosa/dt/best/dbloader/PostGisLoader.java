@@ -234,7 +234,7 @@ public class PostGisLoader {
 			Statement stmt = conn.createStatement();
 
 			LOG.info("Set spatial index");			
-			stmt.execute("CREATE INDEX ON Addresses USING GIST(point)");
+			stmt.execute("CREATE INDEX ON Address USING GIST(point)");
 			
 			LOG.info("Update statistics");
 			stmt.execute("VACUUM FULL ANALYZE");
