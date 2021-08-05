@@ -10,9 +10,12 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath be.bosa.dt.best.dbloader.Main -x c:\data\best\xml -c c:/data/best/csv</exec.args>
+                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir></exec.workingdir>
+                <exec.appArgs>-x c:\data\best\xml -d jdbc:postgresql://localhost/best</exec.appArgs>
+                <exec.vmArgs></exec.vmArgs>
+                <exec.mainClass>be.bosa.dt.best.dbloader.Main</exec.mainClass>
             </properties>
         </action>
         <action>
@@ -25,10 +28,13 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath be.bosa.dt.best.dbloader.Main -x c:\data\best\xml -c c:/data/best/csv</exec.args>
+                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
                 <exec.workingdir></exec.workingdir>
+                <exec.appArgs>-x c:\data\best\xml -d jdbc:postgresql://localhost/best</exec.appArgs>
+                <exec.vmArgs>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+                <exec.mainClass>be.bosa.dt.best.dbloader.Main</exec.mainClass>
             </properties>
         </action>
         <action>
@@ -41,9 +47,12 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath be.bosa.dt.best.dbloader.Main -x c:\data\best\xml -c c:/data/best/csv</exec.args>
+                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir></exec.workingdir>
+                <exec.appArgs>-x c:\data\best\xml -d jdbc:postgresql://localhost/best</exec.appArgs>
+                <exec.vmArgs></exec.vmArgs>
+                <exec.mainClass>be.bosa.dt.best.dbloader.Main</exec.mainClass>
             </properties>
         </action>
     </actions>

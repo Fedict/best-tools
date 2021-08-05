@@ -50,7 +50,7 @@ public class Main {
 	private final static Options OPTS = new Options()
 		.addRequiredOption("x", "xmldir", true, "directory with unzipped BeST XML files")
 		.addOption("c", "csv", true, "CSV output directory")
-		.addOption("d", "db", true, "JDBC connection string (postgis, h2gis, spatialite)")
+		.addOption("d", "db", true, "JDBC connection string (postgis)")
 		.addOption("g", "gps", false, "store coordinates as WGS84/GPS instead of Lambert72");
 
 	/**
@@ -101,9 +101,14 @@ public class Main {
 		
 		// load to database using JDBC _or_ write to CSV (so tables can be read later)
 		if (dbstr != null) {
-			DbLoader loader = null;
+			PostGisLoader loader = null;
 			if (dbstr.contains("postg") || dbstr.contains("pgsql")) {
-				loader = new PostGisLoader(dbstr);
+				try {
+					loader = new PostGisLoader(dbstr);
+				} catch (Exception ex) {
+					LOG.severe("Database loader count not be initialized");
+					System.exit(-3);
+				}
 			} else {
 				LOG.severe("Database type not supported");
 				System.exit(-3);
@@ -116,12 +121,18 @@ public class Main {
 				System.exit(-4);
 			}
 		} else if (csvstr != null) {
-			CsvPreparer w = new CsvPreparer();
+			CsvPreparer w = null;
+			try {
+				w = new CsvPreparer();
+			} catch (Exception ex) {
+				LOG.severe("Database loader count not be initialized");
+				System.exit(-5);
+			}
 	
 			Path p = Paths.get(csvstr);
 			if (!p.toFile().exists() && !p.toFile().mkdirs()) {
 				LOG.severe("Output directory does not exist and could not be created");
-				System.exit(-2);
+				System.exit(-6);
 			}
 
 			try {

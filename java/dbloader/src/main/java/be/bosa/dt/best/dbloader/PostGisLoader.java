@@ -38,11 +38,15 @@ import be.bosa.dt.best.xmlreader.PostalReader;
 import be.bosa.dt.best.xmlreader.StreetnameReader;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.BatchUpdateException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -75,6 +79,24 @@ public class PostGisLoader {
 		return DriverManager.getConnection(getDbStr(), getDbProp());
 	}
 	
+	/**
+	 * Truncatet ables
+	 * 
+	 * @throws SQLException 
+	 */
+	public void truncateTables() throws SQLException {
+		LOG.info("Truncate tables");
+
+		try(Connection conn = getConnection()) {
+			Statement stmt = conn.createStatement();
+			
+			stmt.execute("TRUNCATE PostalInfo CASCADE");
+			stmt.execute("TRUNCATE Street CASCADE");
+			stmt.execute("TRUNCATE PartOfMunicipality CASCADE");
+			stmt.execute("TRUNCATE Municipality CASCADE");
+			stmt.execute("TRUNCATE Address CASCADE");
+		}
+	}	
 	/**
 	 * Create enums
 	 * 
@@ -109,30 +131,30 @@ public class PostGisLoader {
 			Statement stmt = conn.createStatement();
 
 			stmt.execute("CREATE TABLE Address(" +
-					"	identifier VARCHAR(40) NOT NULL, " +
+					"	identifier VARCHAR(100) NOT NULL, " +
 					"	minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1, " +
-					"	mIdentifier VARCHAR(40) NOT NULL, " +
+					"	mIdentifier VARCHAR(100) NOT NULL, " +
 					"	mMinorVersionIdentifier SMALLINT, " +
-					"	mpIdentifier VARCHAR(40), " +
+					"	mpIdentifier VARCHAR(100), " +
 					"	mpMinorVersionIdentifier SMALLINT, " +
-					"	sIdentifier VARCHAR(4) NOT NULL, " +
+					"	sIdentifier VARCHAR(100) NOT NULL, " +
 					"	sMinorVersionIdentifier SMALLINT, " +
-					"	pIdentifier VARCHAR(40) NOT NULL, " +
+					"	pIdentifier VARCHAR(100) NOT NULL, " +
 					"	pMinorVersionIdentifier SMALLINT, " +
 					"	housenumber VARCHAR(15), " +
 					"	boxnumber VARCHAR(35), " +
 					"	officiallyAssigned BOOLEAN, " +
 					"	status enumStatus NOT NULL, " +
-					"	validFrom TIMESTAMP NOT NULL, " +
-					"	validTo TIMESTAMP, " +
-					"	beginLifeSpanVersion TIMESTAMP NOT NULL," +
-					"	endLifeSpanVersion TIMESTAMP, " +
+					"	validFrom TIMESTAMPTZ NOT NULL, " +
+					"	validTo TIMESTAMPTZ, " +
+					"	beginLifeSpanVersion TIMESTAMPTZ NOT NULL," +
+					"	endLifeSpanVersion TIMESTAMPTZ, " +
 					"	point GEOMETRY(POINT, 31370) NOT NULL, " +
 					"	positionGeometryMethod enumPositionGeometryMethodValueType, " +
 					"	positionSpecification enumPositionSpecificationValueType) ");
 
 			stmt.execute("CREATE TABLE Municipality(" +
-					"	identifier VARCHAR(40) NOT NULL, " +
+					"	identifier VARCHAR(100) NOT NULL, " +
 					"	minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1, " +
 					"	refnisCode VARCHAR(5) NOT NULL, " +
 					"	nameNL VARCHAR(100), " +
@@ -140,14 +162,14 @@ public class PostGisLoader {
 					"	nameDE VARCHAR(100))");
 
 			stmt.execute("CREATE TABLE PartOfMunicipality(" +
-					"	identifier VARCHAR(40) NOT NULL, " +
+					"	identifier VARCHAR(100) NOT NULL, " +
 					"	minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1, " +
 					"	nameNL VARCHAR(100), " +
 					"	nameFR VARCHAR(100), " +
 					"	nameDE VARCHAR(100));");
 
 			stmt.execute("CREATE TABLE PostalInfo( " +
-					"	identifier VARCHAR(40) NOT NULL, " +
+					"	identifier VARCHAR(100) NOT NULL, " +
 					"	minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1, " +
 					"	postalCode VARCHAR(4) NOT NULL, " +
 					"	nameNL VARCHAR(240), " +
@@ -155,9 +177,9 @@ public class PostGisLoader {
 					"	nameDE VARCHAR(240))");
 	
 			stmt.execute("CREATE TABLE Street(" +
-					"	identifier VARCHAR(40) NOT NULL, " +
+					"	identifier VARCHAR(100) NOT NULL, " +
 					"	minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1, " +
-					"	mIdentifier VARCHAR(40) NOT NULL, " +
+					"	mIdentifier VARCHAR(100) NOT NULL, " +
 					"	mMinorVersionIdentifier SMALLINT, " +
 					"	nameNL VARCHAR(100), " +
 					"	nameFR VARCHAR(100), " +
@@ -165,10 +187,10 @@ public class PostGisLoader {
 					"	homonymAddition VARCHAR(25), " +
 					"	streetnameType enumStreetnameType, " +
 					"	status enumStatus NOT NULL, " +
-					"	validFrom TIMESTAMP NOT NULL, " +
-					"	validTo TIMESTAMP, " +
-					"	beginLifeSpanVersion TIMESTAMP NOT NULL, " +
-					"	endLifeSpanVersion TIMESTAMP);");
+					"	validFrom TIMESTAMPTZ NOT NULL, " +
+					"	validTo TIMESTAMPTZ, " +
+					"	beginLifeSpanVersion TIMESTAMPTZ NOT NULL, " +
+					"	endLifeSpanVersion TIMESTAMPTZ);");
 		}
 	}
 
@@ -188,8 +210,8 @@ public class PostGisLoader {
 				" ADD CONSTRAINT pkPostalInfo PRIMARY KEY(identifier, minorVersionIdentifier)");
 			stmt.execute("ALTER TABLE Street " +
 				" ADD CONSTRAINT pkStreet PRIMARY KEY(identifier, minorVersionIdentifier)");
-			stmt.execute("ALTER TABLE Event " +
-				" ADD CONSTRAINT pkEvent PRIMARY KEY(eventIdentifier)");
+			//stmt.execute("ALTER TABLE Event " +
+			//	" ADD CONSTRAINT pkEvent PRIMARY KEY(eventIdentifier)");
 
 			LOG.info("Set foreign keys");
 			stmt.execute("ALTER TABLE Address ADD CONSTRAINT fkAddressMunicipality "+
@@ -212,7 +234,7 @@ public class PostGisLoader {
 			Statement stmt = conn.createStatement();
 
 			LOG.info("Set spatial index");			
-			stmt.execute("CREATE INDEX ON addresses USING GIST(geom)");
+			stmt.execute("CREATE INDEX ON Addresses USING GIST(point)");
 			
 			LOG.info("Update statistics");
 			stmt.execute("VACUUM FULL ANALYZE");
@@ -238,7 +260,7 @@ public class PostGisLoader {
 			while (iter.hasNext()) {
 				Postal a = iter.next();
 				prep.setString(1, a.getIDVersion());
-				prep.setString(1, a.getId() + "/" + a.getId());
+				prep.setString(2, a.getId());
 				prep.setString(3, a.getName("nl"));
 				prep.setString(4, a.getName("fr"));
 				prep.setString(5, a.getName("de"));
@@ -280,8 +302,8 @@ public class PostGisLoader {
 				prep.setString(5, a.getName("de"));
 
 				prep.addBatch();
-				// insert per 10000 records
-				if (++cnt % 10_000 == 0) {
+				// insert per 1000 records
+				if (++cnt % 1000 == 0) {
 					prep.executeBatch();
 					LOG.log(Level.INFO, "Inserted {0}", cnt);
 				}
@@ -314,8 +336,8 @@ public class PostGisLoader {
 				prep.setString(4, a.getName("de"));
 
 				prep.addBatch();
-				// insert per 10000 records
-				if (++cnt % 10_000 == 0) {
+				// insert per 1000 records
+				if (++cnt % 1000 == 0) {
 					prep.executeBatch();
 					LOG.log(Level.INFO, "Inserted {0}", cnt);
 				}
@@ -349,21 +371,29 @@ public class PostGisLoader {
 				prep.setString(3, a.getName("nl"));
 				prep.setString(4, a.getName("fr"));
 				prep.setString(5, a.getName("de"));
-				prep.setString(6, a.getStatus());
-				prep.setString(7, a.getFromDate());
-				prep.setString(8, a.getTillDate());
-				prep.setString(9, a.getBeginLife());
-				prep.setString(10, a.getEndLife());
-				
+				prep.setObject(6, a.getStatus(), Types.OTHER);
+				prep.setDate(7, Date.valueOf(LocalDate.now()));
+				prep.setDate(8, Date.valueOf(LocalDate.now()));
+				prep.setDate(9, Date.valueOf(LocalDate.now()));
+				prep.setDate(10, Date.valueOf(LocalDate.now()));
+
 				prep.addBatch();
-				// insert per 10000 records
-				if (++cnt % 10_000 == 0) {
-					prep.executeBatch();
-					LOG.log(Level.INFO, "Inserted {0}", cnt);
+				// insert per 1000 records
+				if (++cnt % 1000 == 0) {
+					try {
+						prep.executeBatch();
+						LOG.log(Level.INFO, "Inserted {0}", cnt);
+					} catch (BatchUpdateException b) {
+						LOG.log(Level.WARNING, "Insert failed", b.getMessage());
+					}
 				}
 			}
-			prep.executeBatch();
-			LOG.log(Level.INFO, "Inserted {0}", cnt);
+			try {
+				prep.executeBatch();
+				LOG.log(Level.INFO, "Inserted {0}", cnt);
+			} catch (BatchUpdateException b) {
+				LOG.log(Level.WARNING, "Insert failed", b.getMessage());
+			}
 		}
 	}
 
@@ -397,27 +427,33 @@ public class PostGisLoader {
 
 				prep.setString(1, a.getIDVersion());
 				prep.setString(2, a.getCity().getIDVersion());
-				prep.setString(3, a.getCityPart().getIDVersion());
+				prep.setString(3, null);
 				prep.setString(4, a.getStreet().getIDVersion());
 				prep.setString(5, a.getPostal().getIDVersion());
 				prep.setString(6, a.getNumber());
 				prep.setString(7, a.getBox());
-				prep.setString(8, a.getStatus());
-				prep.setString(9, a.getFromDate());
-				prep.setString(10, a.getTillDate());
-				prep.setString(11, a.getBeginLife());
-				prep.setString(12, a.getEndLife());
-				prep.setString(13, geom);
+				prep.setObject(8, a.getStatus(), Types.OTHER);
+				prep.setDate(9, Date.valueOf(LocalDate.now()));
+				prep.setDate(10, Date.valueOf(LocalDate.now()));
+				prep.setDate(11, Date.valueOf(LocalDate.now()));
+				prep.setDate(12, Date.valueOf(LocalDate.now()));
+				prep.setObject(13, geom, Types.OTHER);
 
 				prep.addBatch();
-				// insert per 10000 records
-				if (++cnt % 10_000 == 0) {
-					prep.executeBatch();
-					LOG.log(Level.INFO, "Inserted {0}", cnt);
+				// insert per 1000 records
+				if (++cnt % 1000 == 0) {
+						prep.executeBatch();
+						LOG.log(Level.INFO, "Inserted {0}", cnt);
+
 				}
 			}
-			prep.executeBatch();
-			LOG.log(Level.INFO, "Inserted {0}", cnt);
+			// insert per 1000 records
+			try {
+				prep.executeBatch();
+				LOG.log(Level.INFO, "Inserted {0}", cnt);
+			} catch (BatchUpdateException b) {
+				LOG.log(Level.WARNING, "Insert failed", b.getMessage());
+			}
 		}
 	}
 
@@ -430,8 +466,10 @@ public class PostGisLoader {
 	 * @throws SQLException 
 	 */
 	public void loadData(Path xmlPath, boolean gps) throws ClassNotFoundException, SQLException {
-		createTables();
-		addConstraints();
+		//createEnums();
+		//createTables();
+		//addConstraints();
+		truncateTables();
 	
 		try(Connection conn = getConnection()) {		
 			PreparedStatement prep = conn.prepareStatement(
@@ -445,13 +483,13 @@ public class PostGisLoader {
 			loadMunicipalities(prep, xmlPath);
 
 			prep = conn.prepareStatement(
-				"INSERT INTO PartOfMunicipality(identifier, refnisCode, nameNL, nameFR, nameDE) " +
+				"INSERT INTO PartOfMunicipality(identifier, nameNL, nameFR, nameDE) " +
 				" VALUES (?, ?, ?, ?)");
 			loadMunicipalityParts(prep, xmlPath);
 			prep = conn.prepareStatement(
-				"INSERT INTO Street(identifier, nameNL, nameFR, nameDE, " +
+				"INSERT INTO Street(identifier, mIdentifier, nameNL, nameFR, nameDE, " +
 					" status, validFrom, validTo, beginLifeSpanVersion, endLifeSpanVersion ) " +
-				" VALUES (?, ?, ?, ?, " + 
+				" VALUES (?, ?, ?, ?, ?, " + 
 						" ?, ?, ?, ?, ?)");
 			loadStreets(prep, xmlPath);
 
@@ -459,7 +497,7 @@ public class PostGisLoader {
 				"INSERT INTO Address(identifier, mIdentifier, mpIdentifier, sIdentifier, pIdentifier, " +
 					" housenumber, boxnumber, status, validFrom, " +
 					" validTo, beginLifespanVersion, endLifespanVersion, point) " +
-				" VALUES (?, ?, ?, ?, ? " +
+				" VALUES (?, ?, ?, ?, ?, " +
 						" ?, ?, ?, ?, " +
 						" ?, ?, ?, ?)");
 			loadAddresses(prep, xmlPath);
