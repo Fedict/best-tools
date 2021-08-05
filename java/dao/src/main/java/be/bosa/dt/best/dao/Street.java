@@ -35,6 +35,8 @@ public class Street extends BestNamedObject {
 	private String status = "";
 	private String fromDate;
 	private String tillDate;
+	private String beginLife;
+	private String endLife;
 
 	public Municipality getCity() {
 		return city;
@@ -62,6 +64,22 @@ public class Street extends BestNamedObject {
 
 	public String getTillDate() {
 		return tillDate;
+	}
+
+	public void setBeginLife(String date) {
+		this.beginLife = date;
+	}
+
+	public String getBeginLife() {
+		return beginLife;
+	}
+
+	public void setEndLife(String date) {
+		this.endLife = date;
+	}
+
+	public String getEndLife() {
+		return endLife;
 	}
 
 	public Street() {

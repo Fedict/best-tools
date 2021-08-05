@@ -41,6 +41,8 @@ public class Address extends BestObject {
 	private String status = "";
 	private String fromDate;
 	private String tillDate;
+	private String beginLife;
+	private String endLife;
 
 	/**
 	 * Get the geo-position
@@ -156,7 +158,23 @@ public class Address extends BestObject {
 	public String getTillDate() {
 		return tillDate;
 	}
-	
+
+	public void setBeginLife(String date) {
+		this.beginLife = date;
+	}
+
+	public String getBeginLife() {
+		return beginLife;
+	}
+
+	public void setEndLife(String date) {
+		this.endLife = date;
+	}
+
+	public String getEndLife() {
+		return endLife;
+	}
+
 	/**
 	 * Constructor
 	 */

@@ -59,6 +59,8 @@ public class AddressReader extends AbstractXMLReader<Address> {
 	private final static QName POS = new QName(AbstractXMLReader.GML, "pos");
 	private final static QName STATUS = new QName(AbstractXMLReader.ADD, "status");
 	private final static QName SRSNAME = new QName("", "srsName");
+	private final static QName BEGIN_LIFESPAN = new QName("", "beginLifeSpanVersion");
+	private final static QName END_LIFESPAN = new QName("", "endLifeSpanVersion");
 	private final static QName VALID_FROM = new QName(AbstractXMLReader.ADD, "validFrom");
 	private final static QName VALID_TO = new QName(AbstractXMLReader.ADD, "validTo");
 	private final static Logger LOG = Logger.getLogger(AddressReader.class.getName());
@@ -110,6 +112,9 @@ public class AddressReader extends AbstractXMLReader<Address> {
 					} else if (el.equals(BOXNUMBER)) {
 						String txt = reader.getElementText();
 						obj.setBox(txt);
+					} else if (el.equals(STATUS)) {
+						String txt = reader.getElementText();
+						obj.setStatus(txt);
 					} else if (el.equals(POS)) {
 						Object attr = event.asStartElement().getAttributeByName(SRSNAME).getValue();
 						String srs = (attr == null) ? "" : attr.toString();
