@@ -51,16 +51,7 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
-import org.geotools.geometry.jts.JTS;
-import org.geotools.geometry.jts.JTSFactoryFinder;
-import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.io.WKBWriter;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 
 
 /**
@@ -72,45 +63,8 @@ public class CsvPreparer {
 	private static final Logger LOG = Logger.getLogger(CsvPreparer.class.getName());
 	
 	private final CsvWriterBuilder builder;
-
-	// geo transformations
-	private final static GeometryFactory fac = JTSFactoryFinder.getGeometryFactory();
-	private final static WKBWriter wkb = new WKBWriter();
-	private CoordinateReferenceSystem l72;
-	private CoordinateReferenceSystem wgs84;
-	private MathTransform trans;
-
+	private final GeoCoder geoCoder;
 	
-	/**
-	 * Convert x y to a set of coordinates, optionally convert lambert72 to GPS coordinates
-	 * 
-	 * @param x x coordinate
-	 * @param y y coordinate
-	 * @param gps convert to gps or not
-	 * @return hex string
-	 */
-	private Coordinate toCoords(double x, double y, boolean gps) throws IOException {
-		Coordinate coords = new Coordinate(x, y);
-		if (gps) {
-			try {
-				coords = JTS.transform(coords, null, trans);
-			} catch (TransformException ex) {
-				throw new IOException("Could not convert coordinates");
-			}
-		}
-		return coords;
-	}
-
-	/**
-	 * Convert geo coordinates to a hex representation of "well-known binary" format
-	 * 
-	 * @param coords coordinates
-	 * @return hex string
-	 */
-	private String toWkb(Coordinate coords) {
-		return WKBWriter.toHex(wkb.write(fac.createPoint(coords)));
-	}
-
 	/**
 	 * Write postal code info
 	 * 
@@ -253,12 +207,12 @@ public class CsvPreparer {
 					Geopoint p = a.getPoint();
 					
 					// if GPS flag is set, write the WKB as GPS but x,y as Lambert72 (and vice versa)
-					Coordinate coordl72 = toCoords(p.getX(), p.getY(), false);
-					Coordinate coordgps = toCoords(p.getX(), p.getY(), true);
+					Coordinate coordl72 = geoCoder.toCoords(p.getX(), p.getY(), false);
+					Coordinate coordgps = geoCoder.toCoords(p.getX(), p.getY(), true);
 					
 					String x = String.valueOf(gps ? coordl72.x : coordgps.x);
 					String y = String.valueOf(gps ? coordl72.y : coordgps.y);
-					String c = toWkb(gps ? coordgps : coordl72);
+					String c = geoCoder.toWkb(gps ? coordgps : coordl72);
 
 					// calculate geom afterwards, using separate UPDATE statement
 					w.writeRow(a.getIDVersion(), a.getCity().getIDVersion(), a.getCityPart().getIDVersion(),
@@ -293,17 +247,12 @@ public class CsvPreparer {
 	/**
 	 * Constructor
 	 * 
+	 * @throws java.lang.Exception
 	 */
-	public CsvPreparer() {
+	public CsvPreparer() throws Exception {
 		builder = CsvWriter.builder()
 						.fieldSeparator(';').quoteCharacter('"').quoteStrategy(QuoteStrategy.REQUIRED)
 						.lineDelimiter(LineDelimiter.LF);
-		try {
-			l72 = CRS.decode("EPSG:31370");
-			wgs84 = CRS.decode("EPSG:4326");
-			trans = CRS.findMathTransform(l72, wgs84);
-		} catch (FactoryException e) {
-			LOG.log(Level.SEVERE, "Could not initialize geo{0}", e.getMessage());
-		}
+		geoCoder = new GeoCoder();
 	}
 }

@@ -104,10 +104,6 @@ public class Main {
 			DbLoader loader = null;
 			if (dbstr.contains("postg") || dbstr.contains("pgsql")) {
 				loader = new PostGisLoader(dbstr);
-			} else if (dbstr.contains("spatialite") || dbstr.contains("sqlite")) {
-				loader = new SpatiaLiteLoader(dbstr);
-			} else if (dbstr.contains("h2")) {
-				loader = new H2GisLoader(dbstr);
 			} else {
 				LOG.severe("Database type not supported");
 				System.exit(-3);
