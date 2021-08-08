@@ -98,6 +98,23 @@ public class PostGisLoader {
 
 		}
 	}
+	/**
+	 * Drop various enum types
+	 * 
+	 * @throws SQLException 
+	 */
+	public void dropEnums() throws SQLException {
+		LOG.info("Drop enums");
+
+		try(Connection conn = getConnection()) {
+			Statement stmt = conn.createStatement();
+			
+			stmt.execute("DROP TYPE IF EXISTS enumStatus");
+			stmt.execute("DROP TYPE IF EXISTS enumStreetnameType");
+			stmt.execute("DROP TYPE IF EXISTS enumPositionGeometryMethodValueType");
+			stmt.execute("DROP TYPE IF EXISTS  enumPositionSpecificationValueType");
+		}
+	}
 
 	/**
 	 * Create various enum types
@@ -507,6 +524,8 @@ public class PostGisLoader {
 	 */
 	public void loadData(Path xmlPath) throws ClassNotFoundException, SQLException {
 		dropTables();
+		dropEnums();
+	
 		createEnums();
 		createTables();
 		addConstraints();
