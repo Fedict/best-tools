@@ -36,9 +36,9 @@ public class Address extends BestObject {
 	private final Municipality cityPart = new Municipality();
 	private final Postal postal = new Postal();
 	private final Street street = new Street();
-	private String number = "";
-	private String box = "";
-	private String status = "";
+	private String number;
+	private String box;
+	private String status;
 	private String fromDate;
 	private String tillDate;
 	private String beginLife;

@@ -47,9 +47,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -530,11 +530,9 @@ public class PostGisLoader {
 		createTables();
 		addConstraints();
 
-
-		ExecutorService executor = Executors.newFixedThreadPool(REGIONS.length);
-	
+		List<Runnable> tasks = new ArrayList<>();
 		for (BestRegion reg: REGIONS){
-			executor.execute(() -> {
+			tasks.add(() -> {
 				try {
 					loadDataRegion(xmlPath, reg);
 				} catch (SQLException ex) {
@@ -542,7 +540,7 @@ public class PostGisLoader {
 				}
 			});
 		}
-		executor.shutdown();
+		tasks.stream().parallel().forEach(Runnable::run);
 
 		updateIndex();
 		//addPostalTables();
