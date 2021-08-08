@@ -25,6 +25,9 @@
  */
 package be.bosa.dt.best.dao;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
+
 /**
  * Helper class for addresses
  * 
@@ -39,10 +42,10 @@ public class Address extends BestObject {
 	private String number;
 	private String box;
 	private String status;
-	private String fromDate;
-	private String tillDate;
-	private String beginLife;
-	private String endLife;
+	private OffsetDateTime fromDate;
+	private OffsetDateTime tillDate;
+	private OffsetDateTime beginLife;
+	private OffsetDateTime endLife;
 
 	/**
 	 * Get the geo-position
@@ -143,35 +146,43 @@ public class Address extends BestObject {
 		this.status = status;
 	}
 	
-	public void setFromDate(String date) {
-		this.fromDate = date;
+	private OffsetDateTime parseDate(String str) {
+		try {
+			return OffsetDateTime.parse(str);
+		} catch (DateTimeParseException dte) {
+			return null;
+		}
 	}
 	
-	public String getFromDate() {
+	public void setFromDate(String date) {
+		this.fromDate = parseDate(date);
+	}
+	
+	public OffsetDateTime getFromDate() {
 		return fromDate;
 	}
 
 	public void setTillDate(String date) {
-		this.tillDate = date;
+		this.tillDate = parseDate(date);
 	}
 
-	public String getTillDate() {
+	public OffsetDateTime getTillDate() {
 		return tillDate;
 	}
 
 	public void setBeginLife(String date) {
-		this.beginLife = date;
+		this.beginLife = parseDate(date);
 	}
 
-	public String getBeginLife() {
+	public OffsetDateTime getBeginLife() {
 		return beginLife;
 	}
 
 	public void setEndLife(String date) {
-		this.endLife = date;
+		this.endLife = parseDate(date);
 	}
 
-	public String getEndLife() {
+	public OffsetDateTime getEndLife() {
 		return endLife;
 	}
 

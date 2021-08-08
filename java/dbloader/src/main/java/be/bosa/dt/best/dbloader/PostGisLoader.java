@@ -40,13 +40,11 @@ import be.bosa.dt.best.xmlreader.StreetnameReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -263,7 +261,17 @@ public class PostGisLoader {
 			Statement stmt = conn.createStatement();
 
 			LOG.info("Set spatial index");			
-			stmt.execute("CREATE INDEX ON Address USING GIST(point)");
+			stmt.execute("CREATE INDEX idxAddressPoint ON Address USING GIST(point)");
+
+			LOG.info("Set street text indexes");				
+			stmt.execute("CREATE INDEX idxStreetNL ON Street(LOWER(nameNL) varchar_pattern_ops)");
+			stmt.execute("CREATE INDEX idxStreetFR ON Street(LOWER(nameFR) varchar_pattern_ops)");
+			stmt.execute("CREATE INDEX idxStreetDE ON Street(LOWER(nameDE) varchar_pattern_ops)");
+
+			LOG.info("Set Municipality text indexes");				
+			stmt.execute("CREATE INDEX idxMunicipalityNL ON Municipality(LOWER(nameNL) varchar_pattern_ops)");
+			stmt.execute("CREATE INDEX idxMunicipalityFR ON Municipality(LOWER(nameFR) varchar_pattern_ops)");
+			stmt.execute("CREATE INDEX idxMunicipalityDE ON Municipality(LOWER(nameDE) varchar_pattern_ops)");
 			
 			LOG.info("Update statistics");
 			stmt.execute("VACUUM FULL ANALYZE");
@@ -399,10 +407,10 @@ public class PostGisLoader {
 			prep.setString(4, a.getName("fr"));
 			prep.setString(5, a.getName("de"));
 			prep.setObject(6, a.getStatus(), Types.OTHER);
-			prep.setDate(7, Date.valueOf(LocalDate.now()));
-			prep.setDate(8, Date.valueOf(LocalDate.now()));
-			prep.setDate(9, Date.valueOf(LocalDate.now()));
-			prep.setDate(10, Date.valueOf(LocalDate.now()));
+			prep.setObject(7, a.getFromDate(), Types.TIMESTAMP_WITH_TIMEZONE);
+			prep.setObject(8, a.getTillDate(), Types.TIMESTAMP_WITH_TIMEZONE);
+			prep.setObject(9, a.getBeginLife(), Types.TIMESTAMP_WITH_TIMEZONE);
+			prep.setObject(10, a.getEndLife(), Types.TIMESTAMP_WITH_TIMEZONE);
 
 			prep.addBatch();
 			// insert per 10.000 records
@@ -452,10 +460,10 @@ public class PostGisLoader {
 			prep.setString(6, a.getNumber());
 			prep.setString(7, a.getBox());
 			prep.setObject(8, a.getStatus(), Types.OTHER);
-			prep.setDate(9, Date.valueOf(LocalDate.now()));
-			prep.setDate(10, Date.valueOf(LocalDate.now()));
-			prep.setDate(11, Date.valueOf(LocalDate.now()));
-			prep.setDate(12, Date.valueOf(LocalDate.now()));
+			prep.setObject(9, a.getFromDate(), Types.TIMESTAMP_WITH_TIMEZONE);
+			prep.setObject(10, a.getTillDate(), Types.TIMESTAMP_WITH_TIMEZONE);
+			prep.setObject(11, a.getBeginLife(), Types.TIMESTAMP_WITH_TIMEZONE);
+			prep.setObject(12, a.getEndLife(), Types.TIMESTAMP_WITH_TIMEZONE);
 			prep.setObject(13, geom, Types.OTHER);
 
 			prep.addBatch();
