@@ -168,7 +168,7 @@ public class PostGisLoader {
 					"	validTo TIMESTAMPTZ, " +
 					"	beginLifeSpanVersion TIMESTAMPTZ NOT NULL," +
 					"	endLifeSpanVersion TIMESTAMPTZ, " +
-					"	point GEOMETRY(POINT, 31370) NOT NULL, " +
+					"	point GEOMETRY(POINT, 31370), " +
 					"	positionGeometryMethod enumPositionGeometryMethodValueType, " +
 					"	positionSpecification enumPositionSpecificationValueType) ");
 
