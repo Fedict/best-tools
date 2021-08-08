@@ -164,7 +164,7 @@ public class PostGisLoader {
 					"	status enumStatus NOT NULL, " +
 					"	validFrom TIMESTAMPTZ NOT NULL, " +
 					"	validTo TIMESTAMPTZ, " +
-					"	beginLifeSpanVersion TIMESTAMPTZ NOT NULL," +
+					"	beginLifeSpanVersion TIMESTAMPTZ, " +
 					"	endLifeSpanVersion TIMESTAMPTZ, " +
 					"	point GEOMETRY(POINT, 31370), " +
 					"	positionGeometryMethod enumPositionGeometryMethodValueType, " +
@@ -206,7 +206,7 @@ public class PostGisLoader {
 					"	status enumStatus NOT NULL, " +
 					"	validFrom TIMESTAMPTZ NOT NULL, " +
 					"	validTo TIMESTAMPTZ, " +
-					"	beginLifeSpanVersion TIMESTAMPTZ NOT NULL, " +
+					"	beginLifeSpanVersion TIMESTAMPTZ, " +
 					"	endLifeSpanVersion TIMESTAMPTZ);");
 		}
 	}
