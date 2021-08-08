@@ -421,6 +421,20 @@ public class PostGisLoader {
 		}
 		prep.executeBatch();
 	}
+	
+	private String encodePoint(Geopoint p) {
+		if (p.getX() > 0 && p.getY() > 0 && p.getSrs().equals("31370")) {
+			try {
+				Coordinate coord = geoCoder.toCoords(p.getX(), p.getY(), false);
+				return geoCoder.toWkb(coord);
+			} catch (IOException ioe) {
+				LOG.warning("Could not convert coordinates");
+			}
+		} else {
+			LOG.warning("Invalid coordinates");
+		}
+		return null;
+	}
 
 	/**
 	 * Load addresses
@@ -442,15 +456,8 @@ public class PostGisLoader {
 			Address a = iter.next();
 
 			Geopoint p = a.getPoint();
-			String geom = null;
-			try {
-				if (p.getX() != 0) {
-					Coordinate coord = geoCoder.toCoords(p.getX(), p.getY(), false);
-					geom = geoCoder.toWkb(coord);
-				}
-			} catch (IOException ioe) {
-				LOG.warning("Could not convert coordinates");
-			}
+			
+			String geom = encodePoint(p);
 
 			prep.setString(1, a.getIDVersion());
 			prep.setString(2, a.getCity().getIDVersion());
