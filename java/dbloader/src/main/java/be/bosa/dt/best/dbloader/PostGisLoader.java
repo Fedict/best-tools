@@ -204,7 +204,7 @@ public class PostGisLoader {
 					"	homonymAddition VARCHAR(25), " +
 					"	streetnameType enumStreetnameType, " +
 					"	status enumStatus NOT NULL, " +
-					"	validFrom TIMESTAMPTZ NOT NULL, " +
+					"	validFrom TIMESTAMPTZ, " +
 					"	validTo TIMESTAMPTZ, " +
 					"	beginLifeSpanVersion TIMESTAMPTZ, " +
 					"	endLifeSpanVersion TIMESTAMPTZ);");
