@@ -154,7 +154,7 @@ public class BestWriterCSV implements BestWriter {
 
 			return new String[]{s.getIDVersion(), s.getName("nl"), s.getName("fr"), s.getName("de"),
 				s.getCity().getIDVersion(), cCities[0], cCities[1], cCities[2],
-				s.getVersion(), s.getStatus(), s.getFromDate()};
+				s.getVersion(), s.getStatus(), s.getFromDate().toString()};
 		};
 
 		write(file, header, streets, func, true);
