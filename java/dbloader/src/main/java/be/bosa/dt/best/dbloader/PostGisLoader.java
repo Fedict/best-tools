@@ -36,6 +36,7 @@ import be.bosa.dt.best.xmlreader.MunicipalityPartReader;
 import be.bosa.dt.best.xmlreader.MunicipalityReader;
 import be.bosa.dt.best.xmlreader.PostalReader;
 import be.bosa.dt.best.xmlreader.StreetnameReader;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.BatchUpdateException;
@@ -52,6 +53,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
+
 import org.locationtech.jts.geom.Coordinate;
 
 /**
@@ -80,7 +82,7 @@ public class PostGisLoader {
 	}
 	
 	/**
-	 * Truncatet ables
+	 * Truncate all tables
 	 * 
 	 * @throws SQLException 
 	 */
@@ -98,7 +100,7 @@ public class PostGisLoader {
 		}
 	}	
 	/**
-	 * Create enums
+	 * Create various enum types
 	 * 
 	 * @throws SQLException 
 	 */
@@ -194,6 +196,11 @@ public class PostGisLoader {
 		}
 	}
 
+	/**
+	 * Create primary/foreign keys and additional constraints
+	 * 
+	 * @throws SQLException 
+	 */
 	public void addConstraints() throws SQLException {
 		// add primary keys, indices and constraints after loading data, for performance
 		try(Connection conn = getConnection()) {
@@ -229,6 +236,11 @@ public class PostGisLoader {
 		}
 	}
 	
+	/**
+	 * Create spatial index and update statistics
+	 * 
+	 * @throws SQLException 
+	 */
 	public void updateIndex() throws SQLException {
 		try(Connection conn = getConnection()) {
 			Statement stmt = conn.createStatement();
@@ -466,10 +478,10 @@ public class PostGisLoader {
 	 * @throws SQLException 
 	 */
 	public void loadData(Path xmlPath, boolean gps) throws ClassNotFoundException, SQLException {
-		//createEnums();
-		//createTables();
-		//addConstraints();
-		truncateTables();
+		createEnums();
+		createTables();
+		addConstraints();
+		//truncateTables();
 	
 		try(Connection conn = getConnection()) {		
 			PreparedStatement prep = conn.prepareStatement(
@@ -519,6 +531,12 @@ public class PostGisLoader {
 		geoCoder = new GeoCoder();
 	}
 
+	/**
+	 * Constructor 
+	 *
+	 * @param dbStr
+	 * @throws Exception 
+	 */
 	public PostGisLoader(String dbStr) throws Exception {
 		this(dbStr, new Properties());
 	}

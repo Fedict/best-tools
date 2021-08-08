@@ -6,7 +6,6 @@
 package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.Address;
-import be.bosa.dt.best.webservice.entities.AddressDistance;
 import be.bosa.dt.best.webservice.entities.Municipality;
 import be.bosa.dt.best.webservice.entities.Street;
 
@@ -24,7 +23,6 @@ import io.vertx.mutiny.sqlclient.Tuple;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.locationtech.jts.geom.Coordinate;
 
 /**
  * Connect to database
@@ -144,21 +142,6 @@ public class Repository {
 	 */
 	private UniOnItem<RowIterator<Row>> uni(Uni<RowSet<Row>> res) {
 		return res.onItem().transform(RowSet::iterator).onItem();
-	}
-
-	/**
-	 * Find the list of addresses within a range of 100m, and calculate distance to GPS location
-	 * 
-	 * @param x GPS x coordinate
-	 * @param y GPS y coordinat
-	 * @param maxdist maximum distance (in meters)
-	 * @param maxres maximum number of results
-	 * @return address with distance to location
-	 */
-	public Multi<AddressDistance> findAddressDistance(double x, double y, int maxdist, int maxres) {
-		Coordinate l72 = CoordConverter.gpsToLambert(x, y);
-		return multi(pg.preparedQuery(SQL_NEAR_DISTANCE).execute(Tuple.of(l72.x, l72.y, l72.x, l72.y, maxdist, maxres))
-		).transform(AddressDistance::from);
 	}
 
 	/**

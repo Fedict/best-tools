@@ -26,7 +26,6 @@
 package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.Address;
-import be.bosa.dt.best.webservice.entities.AddressDistance;
 import be.bosa.dt.best.webservice.entities.Municipality;
 import be.bosa.dt.best.webservice.entities.Street;
 
@@ -82,29 +81,6 @@ public class LookupResource {
 			@Parameter(description = "ID of second address", required = true, example = "https://data.vlaanderen.be/id/adres/1273627/2015-05-22T05:53:08.330")	
 			@Param("b") String b) {
 		return repo.findDistance(a, b);
-	}
-
-	@Route(path = "near", methods = HttpMethod.GET, produces = "application/json")
-	@Operation(summary = "Get (maximum) 200 addresses within (maximum) 100 meters + calculate distance")
-	@Blocking
-	public Multi<AddressDistance> nearestAddress(
-			@Parameter(description = "X coordinate (longitude)", required = true, example = "4.23")
-			@Param("x") Double x, 
-			@Parameter(description = "Y coordinate (latitude)", required = true, example = "50.73")	
-			@Param("y") Double y,
-			@Parameter(description = "Maximum distance (meters)", required = false, example = "100")	
-			@Param("maxdist") Optional<Integer> maxdist,
-			@Parameter(description = "Maximum number of results", example = "200")
-			@Param("limit") Optional<Integer> limit,
-			@Parameter(description = "Calculate distance", example = "true")
-			@Param("calc") Optional<Boolean> calc) {
-	
-		int dist = maxdist.orElse(100);
-		int res = limit.orElse(200);
-		if (dist > 100 || res > 200) {
-			throw new IllegalArgumentException("Invalid parameters");
-		}	
-		return ReactiveRoutes.asJsonArray(repo.findAddressDistance(x, y, dist, res));
 	}
 
 	@Route(path = "address", methods = HttpMethod.GET, produces = "application/json")
