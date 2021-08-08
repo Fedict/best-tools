@@ -39,7 +39,6 @@ import be.bosa.dt.best.xmlreader.StreetnameReader;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -49,7 +48,8 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.time.LocalDate;
 import java.util.Iterator;
-import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -63,24 +63,23 @@ import org.locationtech.jts.geom.Coordinate;
  * @author Bart Hanssens
  */
 public class PostGisLoader {
-	private String dbStr;
-	private Properties dbProp;
+	private final String dbStr;
 	private final GeoCoder geoCoder;
 		
 	private static final Logger LOG = Logger.getLogger(PostGisLoader.class.getName());
+	private static final BestRegion[] REGIONS = new BestRegion[] { 
+									BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA };
 
-	public String getDbStr() {
-		return dbStr;
+	/**
+	 * Get database connection based on JDBC string
+	 * 
+	 * @return
+	 * @throws SQLException 
+	 */
+	private Connection getConnection() throws SQLException {
+		return DriverManager.getConnection(dbStr);
 	}
 
-	public Properties getDbProp() {
-		return dbProp;
-	}
-
-	public Connection getConnection() throws SQLException {
-		return DriverManager.getConnection(getDbStr(), getDbProp());
-	}
-	
 	/**
 	 * Truncate all tables
 	 * 
@@ -98,7 +97,8 @@ public class PostGisLoader {
 			stmt.execute("TRUNCATE Municipality CASCADE");
 			stmt.execute("TRUNCATE Address CASCADE");
 		}
-	}	
+	}
+
 	/**
 	 * Create various enum types
 	 * 
@@ -258,35 +258,34 @@ public class PostGisLoader {
 	 * 
 	 * @param prep prepared statement
 	 * @param xmlPath XML BeST directory
+	 * @param reg region
 	 * @throws SQLException 
 	 */
-	private void loadPostals(PreparedStatement prep, Path xmlPath) throws SQLException {
-		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
-			LOG.log(Level.INFO, "Starting postals {0}", reg.getName());
-			int cnt = 0;
+	private void loadPostals(PreparedStatement prep, Path xmlPath, BestRegion reg) throws SQLException {
+		LOG.log(Level.INFO, "Starting postals {0}", reg.getName());
+		int cnt = 0;
 
-			PostalReader reader = new PostalReader();
-			Stream<Postal> postals = reader.read(reg, xmlPath);
-			Iterator<Postal> iter = postals.iterator();
+		PostalReader reader = new PostalReader();
+		Stream<Postal> postals = reader.read(reg, xmlPath);
+		Iterator<Postal> iter = postals.iterator();
 
-			while (iter.hasNext()) {
-				Postal a = iter.next();
-				prep.setString(1, a.getIDVersion());
-				prep.setString(2, a.getId());
-				prep.setString(3, a.getName("nl"));
-				prep.setString(4, a.getName("fr"));
-				prep.setString(5, a.getName("de"));
+		while (iter.hasNext()) {
+			Postal a = iter.next();
+			prep.setString(1, a.getIDVersion());
+			prep.setString(2, a.getId());
+			prep.setString(3, a.getName("nl"));
+			prep.setString(4, a.getName("fr"));
+			prep.setString(5, a.getName("de"));
 
-				prep.addBatch();
-				// insert per 10000 records
-				if (++cnt % 10_000 == 0) {
-					prep.executeBatch();
-					LOG.log(Level.INFO, "Inserted {0}", cnt);
-				}
+			prep.addBatch();
+			// insert per 10000 records
+			if (++cnt % 10_000 == 0) {
+				prep.executeBatch();
+				LOG.log(Level.INFO, "Inserted {0}", cnt);
 			}
-			prep.executeBatch();
-			LOG.log(Level.INFO, "Inserted {0}", cnt);
 		}
+		prep.executeBatch();
+		LOG.log(Level.INFO, "Inserted {0}", cnt);
 	}
 
 	/**
@@ -294,69 +293,68 @@ public class PostGisLoader {
 	 * 
 	 * @param prep prepared statement
 	 * @param xmlPath XML BeST directory
+	 * @param reg region code
 	 * @throws SQLException 
 	 */
-	private void loadMunicipalities(PreparedStatement prep, Path xmlPath) throws SQLException {
-		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
-			LOG.log(Level.INFO, "Starting municipalities {0}", reg.getName());
-			int cnt = 0;
+	private void loadMunicipalities(PreparedStatement prep, Path xmlPath, BestRegion reg) throws SQLException {
+		LOG.log(Level.INFO, "Starting municipalities {0}", reg.getName());
+		int cnt = 0;
 
-			MunicipalityReader reader = new MunicipalityReader();
-			Stream<Municipality> municipalities = reader.read(reg, xmlPath);
-			Iterator<Municipality> iter = municipalities.iterator();
+		MunicipalityReader reader = new MunicipalityReader();
+		Stream<Municipality> municipalities = reader.read(reg, xmlPath);
+		Iterator<Municipality> iter = municipalities.iterator();
 
-			while (iter.hasNext()) {
-				Municipality a = iter.next();
-				prep.setString(1, a.getIDVersion());
-				prep.setString(2, a.getId());
-				prep.setString(3, a.getName("nl"));
-				prep.setString(4, a.getName("fr"));
-				prep.setString(5, a.getName("de"));
+		while (iter.hasNext()) {
+			Municipality a = iter.next();
+			prep.setString(1, a.getIDVersion());
+			prep.setString(2, a.getId());
+			prep.setString(3, a.getName("nl"));
+			prep.setString(4, a.getName("fr"));
+			prep.setString(5, a.getName("de"));
 
-				prep.addBatch();
-				// insert per 1000 records
-				if (++cnt % 1000 == 0) {
-					prep.executeBatch();
-					LOG.log(Level.INFO, "Inserted {0}", cnt);
-				}
+			prep.addBatch();
+			// insert per 1000 records
+			if (++cnt % 1000 == 0) {
+				prep.executeBatch();
+				LOG.log(Level.INFO, "Inserted {0}", cnt);
 			}
-			prep.executeBatch();
-			LOG.log(Level.INFO, "Inserted {0}", cnt);
 		}
+		prep.executeBatch();
+		LOG.log(Level.INFO, "Inserted {0}", cnt);
 	}
+
 	/**
 	 * Load municipality part info
 	 * 
 	 * @param prep prepared statement
 	 * @param xmlPath XML BeST directory
+	 * @param reg region
 	 * @throws SQLException 
 	 */
-	private void loadMunicipalityParts(PreparedStatement prep, Path xmlPath) throws SQLException {
-		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
-			LOG.log(Level.INFO, "Starting municipality parts {0}", reg.getName());
-			int cnt = 0;
+	private void loadMunicipalityParts(PreparedStatement prep, Path xmlPath, BestRegion reg) throws SQLException {
+		LOG.log(Level.INFO, "Starting municipality parts {0}", reg.getName());
+		int cnt = 0;
 
-			MunicipalityPartReader reader = new MunicipalityPartReader();
-			Stream<Municipality> parts = reader.read(reg, xmlPath);
-			Iterator<Municipality> iter = parts.iterator();
+		MunicipalityPartReader reader = new MunicipalityPartReader();
+		Stream<Municipality> parts = reader.read(reg, xmlPath);
+		Iterator<Municipality> iter = parts.iterator();
 
-			while (iter.hasNext()) {
-				Municipality a = iter.next();
-				prep.setString(1, a.getIDVersion());
-				prep.setString(2, a.getName("nl"));
-				prep.setString(3, a.getName("fr"));
-				prep.setString(4, a.getName("de"));
+		while (iter.hasNext()) {
+			Municipality a = iter.next();
+			prep.setString(1, a.getIDVersion());
+			prep.setString(2, a.getName("nl"));
+			prep.setString(3, a.getName("fr"));
+			prep.setString(4, a.getName("de"));
 
-				prep.addBatch();
-				// insert per 1000 records
-				if (++cnt % 1000 == 0) {
-					prep.executeBatch();
-					LOG.log(Level.INFO, "Inserted {0}", cnt);
-				}
+			prep.addBatch();
+			// insert per 1000 records
+			if (++cnt % 1000 == 0) {
+				prep.executeBatch();
+				LOG.log(Level.INFO, "Inserted {0}", cnt);
 			}
-			prep.executeBatch();
-			LOG.log(Level.INFO, "Inserted {0}", cnt);
 		}
+		prep.executeBatch();
+		LOG.log(Level.INFO, "Inserted {0}", cnt);
 	}
 
 	/**
@@ -364,49 +362,39 @@ public class PostGisLoader {
 	 * 
 	 * @param prep prepared statement
 	 * @param xmlPath XML BeST directory
+	 * @param reg region code
 	 * @throws SQLException 
 	 */
-	private void loadStreets(PreparedStatement prep, Path xmlPath) throws SQLException {
-		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
-			LOG.log(Level.INFO, "Starting streets {0} ", reg.getName());
-			int cnt = 0;
+	private void loadStreets(PreparedStatement prep, Path xmlPath, BestRegion reg) throws SQLException {
+		LOG.log(Level.INFO, "Starting streets {0} ", reg.getName());
+		int cnt = 0;
 
-			StreetnameReader reader = new StreetnameReader();
-			Stream<Street> streets = reader.read(reg, xmlPath);
-			Iterator<Street> iter = streets.iterator();
+		StreetnameReader reader = new StreetnameReader();
+		Stream<Street> streets = reader.read(reg, xmlPath);
+		Iterator<Street> iter = streets.iterator();
 
-			while (iter.hasNext()) {
-				Street a = iter.next();
+		while (iter.hasNext()) {
+			Street a = iter.next();
 
-				prep.setString(1, a.getIDVersion());
-				prep.setString(2, a.getCity().getIDVersion());
-				prep.setString(3, a.getName("nl"));
-				prep.setString(4, a.getName("fr"));
-				prep.setString(5, a.getName("de"));
-				prep.setObject(6, a.getStatus(), Types.OTHER);
-				prep.setDate(7, Date.valueOf(LocalDate.now()));
-				prep.setDate(8, Date.valueOf(LocalDate.now()));
-				prep.setDate(9, Date.valueOf(LocalDate.now()));
-				prep.setDate(10, Date.valueOf(LocalDate.now()));
+			prep.setString(1, a.getIDVersion());
+			prep.setString(2, a.getCity().getIDVersion());
+			prep.setString(3, a.getName("nl"));
+			prep.setString(4, a.getName("fr"));
+			prep.setString(5, a.getName("de"));
+			prep.setObject(6, a.getStatus(), Types.OTHER);
+			prep.setDate(7, Date.valueOf(LocalDate.now()));
+			prep.setDate(8, Date.valueOf(LocalDate.now()));
+			prep.setDate(9, Date.valueOf(LocalDate.now()));
+			prep.setDate(10, Date.valueOf(LocalDate.now()));
 
-				prep.addBatch();
-				// insert per 1000 records
-				if (++cnt % 1000 == 0) {
-					try {
-						prep.executeBatch();
-						LOG.log(Level.INFO, "Inserted {0}", cnt);
-					} catch (BatchUpdateException b) {
-						LOG.log(Level.WARNING, "Insert failed", b.getMessage());
-					}
-				}
-			}
-			try {
+			prep.addBatch();
+			// insert per 10.000 records
+			if (++cnt % 10_000 == 0) {
 				prep.executeBatch();
 				LOG.log(Level.INFO, "Inserted {0}", cnt);
-			} catch (BatchUpdateException b) {
-				LOG.log(Level.WARNING, "Insert failed", b.getMessage());
 			}
 		}
+		prep.executeBatch();
 	}
 
 	/**
@@ -414,97 +402,89 @@ public class PostGisLoader {
 	 * 
 	 * @param prep prepared statement
 	 * @param xmlPath XML BeST directory
+	 * @param reg region code
 	 * @throws SQLException 
 	 */
-	private void loadAddresses(PreparedStatement prep, Path xmlPath) throws SQLException {
-		for (BestRegion reg: new BestRegion[] { BestRegion.BRUSSELS, BestRegion.FLANDERS, BestRegion.WALLONIA }) {
-			LOG.log(Level.INFO, "Starting addresses {0}", reg.getName());
-			int cnt = 0;
+	private void loadAddresses(PreparedStatement prep, Path xmlPath, BestRegion reg) throws SQLException {
+		LOG.log(Level.INFO, "Starting addresses {0}", reg.getName());
+		int cnt = 0;
 
-			AddressReader reader = new AddressReader();
-			Stream<Address> addresses = reader.read(reg, xmlPath);
-			Iterator<Address> iter = addresses.iterator();
+		AddressReader reader = new AddressReader();
+		Stream<Address> addresses = reader.read(reg, xmlPath);
+		Iterator<Address> iter = addresses.iterator();
 
-			while (iter.hasNext()) {
-				Address a = iter.next();
+		while (iter.hasNext()) {
+			Address a = iter.next();
 
-				Geopoint p = a.getPoint();
-				String geom = "";
-				try {
-					Coordinate coord = geoCoder.toCoords(p.getX(), p.getY(), false);
-					geom = geoCoder.toWkb(coord);
-				} catch(IOException ioe) {
-					LOG.warning("Could not convert coordinates");
-				}
-
-				prep.setString(1, a.getIDVersion());
-				prep.setString(2, a.getCity().getIDVersion());
-				prep.setString(3, null);
-				prep.setString(4, a.getStreet().getIDVersion());
-				prep.setString(5, a.getPostal().getIDVersion());
-				prep.setString(6, a.getNumber());
-				prep.setString(7, a.getBox());
-				prep.setObject(8, a.getStatus(), Types.OTHER);
-				prep.setDate(9, Date.valueOf(LocalDate.now()));
-				prep.setDate(10, Date.valueOf(LocalDate.now()));
-				prep.setDate(11, Date.valueOf(LocalDate.now()));
-				prep.setDate(12, Date.valueOf(LocalDate.now()));
-				prep.setObject(13, geom, Types.OTHER);
-
-				prep.addBatch();
-				// insert per 1000 records
-				if (++cnt % 1000 == 0) {
-						prep.executeBatch();
-						LOG.log(Level.INFO, "Inserted {0}", cnt);
-
-				}
-			}
-			// insert per 1000 records
+			Geopoint p = a.getPoint();
+			String geom = "";
 			try {
+				Coordinate coord = geoCoder.toCoords(p.getX(), p.getY(), false);
+				geom = geoCoder.toWkb(coord);
+			} catch (IOException ioe) {
+				LOG.warning("Could not convert coordinates");
+			}
+
+			prep.setString(1, a.getIDVersion());
+			prep.setString(2, a.getCity().getIDVersion());
+			prep.setString(3, null);
+			prep.setString(4, a.getStreet().getIDVersion());
+			prep.setString(5, a.getPostal().getIDVersion());
+			prep.setString(6, a.getNumber());
+			prep.setString(7, a.getBox());
+			prep.setObject(8, a.getStatus(), Types.OTHER);
+			prep.setDate(9, Date.valueOf(LocalDate.now()));
+			prep.setDate(10, Date.valueOf(LocalDate.now()));
+			prep.setDate(11, Date.valueOf(LocalDate.now()));
+			prep.setDate(12, Date.valueOf(LocalDate.now()));
+			prep.setObject(13, geom, Types.OTHER);
+
+			prep.addBatch();
+			// insert per 10_000 records
+			if (++cnt % 10_000 == 0) {
 				prep.executeBatch();
 				LOG.log(Level.INFO, "Inserted {0}", cnt);
-			} catch (BatchUpdateException b) {
-				LOG.log(Level.WARNING, "Insert failed", b.getMessage());
 			}
 		}
+		// insert per 10_000 records
+		prep.executeBatch();
+		LOG.log(Level.INFO, "Inserted {0}", cnt);
 	}
 
 	/**
-	 * Load XML BeST data files in a database file.
+	 * Load XML BeST data files for a specific regionin a database file.
 	 * 
 	 * @param xmlPath path to XML BeST files
-	 * @param gps store coordinates as GPS coordinates
+	 * @param reg best region
 	 * @throws ClassNotFoundException
 	 * @throws SQLException 
 	 */
-	public void loadData(Path xmlPath, boolean gps) throws ClassNotFoundException, SQLException {
-		createEnums();
-		createTables();
-		addConstraints();
-		//truncateTables();
-	
-		try(Connection conn = getConnection()) {		
+	private void loadDataRegion(Path xmlPath, BestRegion reg) throws SQLException {
+		LOG.log(Level.INFO, "Loading data for region {}", reg);
+
+		try(Connection conn = getConnection()) {
 			PreparedStatement prep = conn.prepareStatement(
 				"INSERT INTO PostalInfo(identifier, postalCode, nameNL, nameFR, nameDE) " +
 				" VALUES (?, ?, ?, ?, ?)");
-			loadPostals(prep, xmlPath);
-
+			loadPostals(prep, xmlPath, reg);
+			
 			prep = conn.prepareStatement(
 				"INSERT INTO Municipality(identifier, refnisCode, nameNL, nameFR, nameDE) " +
 				" VALUES (?, ?, ?, ?, ?)");
-			loadMunicipalities(prep, xmlPath);
+			loadMunicipalities(prep, xmlPath, reg);
 
 			prep = conn.prepareStatement(
 				"INSERT INTO PartOfMunicipality(identifier, nameNL, nameFR, nameDE) " +
 				" VALUES (?, ?, ?, ?)");
-			loadMunicipalityParts(prep, xmlPath);
+			loadMunicipalityParts(prep, xmlPath, reg);
+
 			prep = conn.prepareStatement(
 				"INSERT INTO Street(identifier, mIdentifier, nameNL, nameFR, nameDE, " +
 					" status, validFrom, validTo, beginLifeSpanVersion, endLifeSpanVersion ) " +
 				" VALUES (?, ?, ?, ?, ?, " + 
 						" ?, ?, ?, ?, ?)");
-			loadStreets(prep, xmlPath);
-
+			loadStreets(prep, xmlPath, reg);
+	
 			prep = conn.prepareStatement(
 				"INSERT INTO Address(identifier, mIdentifier, mpIdentifier, sIdentifier, pIdentifier, " +
 					" housenumber, boxnumber, status, validFrom, " +
@@ -512,32 +492,46 @@ public class PostGisLoader {
 				" VALUES (?, ?, ?, ?, ?, " +
 						" ?, ?, ?, ?, " +
 						" ?, ?, ?, ?)");
-			loadAddresses(prep, xmlPath);
+			loadAddresses(prep, xmlPath, reg);
+		}
+	}
+
+	/**
+	 * Load XML BeST data files in a database.
+	 * 
+	 * @param xmlPath path to XML BeST files
+	 * @throws ClassNotFoundException
+	 * @throws SQLException 
+	 */
+	public void loadData(Path xmlPath) throws ClassNotFoundException, SQLException {
+		createEnums();
+		createTables();
+		addConstraints();
+		//truncateTables();
+
+		ExecutorService executor = Executors.newFixedThreadPool(REGIONS.length);
+	
+		for (BestRegion reg: REGIONS){
+			executor.execute(() -> {
+				try {
+					loadDataRegion(xmlPath, reg);
+				} catch (SQLException ex) {
+					LOG.log(Level.SEVERE, "Loading for region failed", ex);
+				}
+			});
 		}
 		updateIndex();
 		//addPostalTables();
 	}
 
 	/**
-	 * Constructor
-	 * 
-	 * @param dbstr 
-	 * @param prop 
-	 * @throws java.lang.Exception 
-	 */
-	public PostGisLoader(String dbstr, Properties prop) throws Exception {
-		this.dbStr = dbstr;
-		this.dbProp = prop;
-		geoCoder = new GeoCoder();
-	}
-
-	/**
 	 * Constructor 
 	 *
-	 * @param dbStr
+	 * @param dbstr
 	 * @throws Exception 
 	 */
-	public PostGisLoader(String dbStr) throws Exception {
-		this(dbStr, new Properties());
+	public PostGisLoader(String dbstr) throws Exception {
+		this.dbStr = dbstr;
+		geoCoder = new GeoCoder();
 	}
 }

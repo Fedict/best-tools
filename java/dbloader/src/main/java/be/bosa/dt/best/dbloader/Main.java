@@ -26,8 +26,10 @@
 package be.bosa.dt.best.dbloader;
 
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +41,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 /**
- * Loads XML BeST data into a GIS-enabled RDBMS, currently only PostGIS and SpatiaLite
+ * Loads XML BeST data into a PostGIS RDMBS
  * Requires (flat) directory of unzipped BeST XML files
  * 
  * @author Bart Hanssens
@@ -76,7 +78,69 @@ public class Main {
 		}
 		return null;
 	}
+	
+	/**
+	 * Load data into Postgis database
+	 * 
+	 * @param dbstr JDBC string
+	 * @param xmlPath path of BeST XML files
+	 * @return true upon success
+	 */
+	private static boolean loadPostgis(String dbstr, Path xmlPath) {
+		PostGisLoader loader = null;
+		if (dbstr.contains("postg") || dbstr.contains("pgsql")) {
+			try {
+				loader = new PostGisLoader(dbstr);
+			} catch (Exception ex) {
+				LOG.severe("Database loader count not be initialized");
+				return false;
+				}
+		} else {
+			LOG.severe("Database type not supported");
+			return false;
+		}
+		
+		try {
+			loader.loadData(xmlPath);
+		} catch (ClassNotFoundException | SQLException e) {
+			LOG.log(Level.SEVERE, "Failed", e);
+			return false;
+		}
+		return true;
+	}
 
+	/**
+	 * Export data to CSV file
+	 * 
+	 * @param csvstr
+	 * @param xmlPath path of BeST XML files
+	 * @param gps
+	 * @return true upon success
+	 */
+	private static boolean writeCSV(String csvstr, Path xmlPath, boolean gps) {
+		CsvPreparer w = null;
+		try {
+			w = new CsvPreparer();
+		} catch (Exception ex) {
+			LOG.severe("Database loader count not be initialized");
+			return false;
+		}
+	
+		Path p = Paths.get(csvstr);
+		if (!p.toFile().exists() && !p.toFile().mkdirs()) {
+			LOG.severe("Output directory does not exist and could not be created");
+			return false;
+		}
+
+		try {
+			w.write(xmlPath, p, gps);
+		} catch (IOException e) {
+			LOG.log(Level.SEVERE, "Failed", e);
+			return false;
+		}
+		return true;
+	}
+	
 	/**
 	 * Main
 	 * 
@@ -99,48 +163,16 @@ public class Main {
 			System.exit(-2);
 		}
 		
+		boolean ok = false;
 		// load to database using JDBC _or_ write to CSV (so tables can be read later)
 		if (dbstr != null) {
-			PostGisLoader loader = null;
-			if (dbstr.contains("postg") || dbstr.contains("pgsql")) {
-				try {
-					loader = new PostGisLoader(dbstr);
-				} catch (Exception ex) {
-					LOG.severe("Database loader count not be initialized");
-					System.exit(-3);
-				}
-			} else {
-				LOG.severe("Database type not supported");
-				System.exit(-3);
-			}
-		
-			try {
-				loader.loadData(xmlPath, gps);
-			} catch (Exception e) {
-				LOG.log(Level.SEVERE, "Failed", e);
-				System.exit(-4);
-			}
+			ok = loadPostgis(dbstr, xmlPath);
 		} else if (csvstr != null) {
-			CsvPreparer w = null;
-			try {
-				w = new CsvPreparer();
-			} catch (Exception ex) {
-				LOG.severe("Database loader count not be initialized");
-				System.exit(-5);
-			}
-	
-			Path p = Paths.get(csvstr);
-			if (!p.toFile().exists() && !p.toFile().mkdirs()) {
-				LOG.severe("Output directory does not exist and could not be created");
-				System.exit(-6);
-			}
+			ok = writeCSV(csvstr, xmlPath, gps);
+		}
 
-			try {
-				w.write(xmlPath, p, gps);
-			} catch (Exception e) {
-				LOG.log(Level.SEVERE, "Failed", e);
-				System.exit(-4);
-			}
+		if (ok == false) {
+			System.exit(-30);
 		}
 
 		LOG.info("Done");
