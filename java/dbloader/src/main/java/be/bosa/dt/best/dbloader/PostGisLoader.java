@@ -85,17 +85,17 @@ public class PostGisLoader {
 	 * 
 	 * @throws SQLException 
 	 */
-	public void truncateTables() throws SQLException {
-		LOG.info("Truncate tables");
+	public void dropTables() throws SQLException {
+		LOG.info("Drop tables");
 
 		try(Connection conn = getConnection()) {
 			Statement stmt = conn.createStatement();
-			
-			stmt.execute("TRUNCATE PostalInfo CASCADE");
-			stmt.execute("TRUNCATE Street CASCADE");
-			stmt.execute("TRUNCATE PartOfMunicipality CASCADE");
-			stmt.execute("TRUNCATE Municipality CASCADE");
-			stmt.execute("TRUNCATE Address CASCADE");
+			stmt.execute("DROP TABLE IF EXISTS Address CASCADE");			
+			stmt.execute("DROP TABLE IF EXISTS PostalInfo CASCADE");
+			stmt.execute("DROP TABLE IF EXISTS Street CASCADE");
+			stmt.execute("DROP TABLE IF EXISTS PartOfMunicipality CASCADE");
+			stmt.execute("DROP TABLE IF EXISTS Municipality CASCADE");
+
 		}
 	}
 
@@ -417,10 +417,12 @@ public class PostGisLoader {
 			Address a = iter.next();
 
 			Geopoint p = a.getPoint();
-			String geom = "";
+			String geom = null;
 			try {
-				Coordinate coord = geoCoder.toCoords(p.getX(), p.getY(), false);
-				geom = geoCoder.toWkb(coord);
+				if (p.getX() != 0) {
+					Coordinate coord = geoCoder.toCoords(p.getX(), p.getY(), false);
+					geom = geoCoder.toWkb(coord);
+				}
 			} catch (IOException ioe) {
 				LOG.warning("Could not convert coordinates");
 			}
@@ -504,10 +506,11 @@ public class PostGisLoader {
 	 * @throws SQLException 
 	 */
 	public void loadData(Path xmlPath) throws ClassNotFoundException, SQLException {
+		dropTables();
 		createEnums();
 		createTables();
 		addConstraints();
-		//truncateTables();
+
 
 		ExecutorService executor = Executors.newFixedThreadPool(REGIONS.length);
 	
@@ -520,6 +523,8 @@ public class PostGisLoader {
 				}
 			});
 		}
+		executor.shutdown();
+
 		updateIndex();
 		//addPostalTables();
 	}

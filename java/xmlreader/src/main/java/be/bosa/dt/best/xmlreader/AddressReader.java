@@ -133,6 +133,12 @@ public class AddressReader extends AbstractXMLReader<Address> {
 					} else if (el.equals(VALID_TO)) {
 						String txt = reader.getElementText();
 						obj.setTillDate(txt);
+					} else if (el.equals(BEGIN_LIFESPAN)) {
+						String txt = reader.getElementText();
+						obj.setBeginLife(txt);
+					} else if (el.equals(END_LIFESPAN)) {
+						String txt = reader.getElementText();
+						obj.setEndLife(txt);
 					}
 				}
 			}
