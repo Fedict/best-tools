@@ -459,11 +459,16 @@ public class PostGisLoader {
 	 * @param reg region code
 	 * @throws SQLException 
 	 */
-	private void loadAddresses(PreparedStatement prep, Path xmlPath, BestRegion reg) throws SQLException, Exception {
+	private void loadAddresses(PreparedStatement prep, Path xmlPath, BestRegion reg) throws SQLException {
 		LOG.log(Level.INFO, "Starting addresses {0}", reg.getName());
 		int cnt = 0;
 
-		GeoCoder geoCoder = new GeoCoder();
+		GeoCoder geoCoder = null;
+		try {
+			geoCoder = new GeoCoder();
+		} catch(Exception e) {
+			throw new SQLException("Could not init coder", e);
+		}
 
 		AddressReader reader = new AddressReader();
 		Stream<Address> addresses = reader.read(reg, xmlPath);
