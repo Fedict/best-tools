@@ -62,6 +62,7 @@ import org.locationtech.jts.geom.Coordinate;
  */
 public class PostGisLoader {
 	private final String dbStr;
+	private final GeoCoder geoCoder;
 		
 	private static final Logger LOG = Logger.getLogger(PostGisLoader.class.getName());
 	private static final BestRegion[] REGIONS = new BestRegion[] { 
@@ -426,7 +427,7 @@ public class PostGisLoader {
 		prep.executeBatch();
 	}
 	
-	private String encodePoint(GeoCoder geoCoder, Geopoint p) {
+	private String encodePoint(Geopoint p) {
 		double x = p.getX();
 		double y = p.getY();
 
@@ -457,7 +458,7 @@ public class PostGisLoader {
 
 		GeoCoder geoCoder = null;
 		try {
-			geoCoder = new GeoCoder();
+
 		} catch(Exception e) {
 			throw new SQLException("Could not init coder", e);
 		}
@@ -471,7 +472,7 @@ public class PostGisLoader {
 
 			Geopoint p = a.getPoint();
 			
-			String geom = encodePoint(geoCoder, p);
+			String geom = encodePoint(p);
 
 			prep.setString(1, a.getIDVersion());
 			prep.setString(2, a.getCity().getIDVersion());
@@ -583,5 +584,6 @@ public class PostGisLoader {
 	 */
 	public PostGisLoader(String dbstr) throws Exception {
 		this.dbStr = dbstr;
+		this.geoCoder = new GeoCoder();
 	}
 }

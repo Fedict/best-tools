@@ -25,8 +25,8 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.vertx.mutiny.sqlclient.Row;
+import java.time.OffsetDateTime;
 
 
 import org.geolatte.geom.Point;
@@ -37,24 +37,24 @@ import org.geolatte.geom.Point;
  * @author Bart Hanssens
  */
 public class Address {
-	public String id;
+	public final static String BY_ID = 
+		"SELECT a.identifier, a.sIdentifier, a.mIdentifier, a.pIdentifier, a.mpIdentifier, " +
+				"a.housenumber, a.boxnumber, " +
+				"a.validFrom, a.validTo, a.status, a.point " +
+		"FROM addresses a " +
+		"WHERE a.identifier = $1";
 
-	public Municipality municipality;
-	public String part_id;
-	public Street street;
-	public Postal postal;
-
-	@JsonProperty("houseNumber")
-	public String houseno;
-	@JsonProperty("poBox")
-	public String boxno;
-
-	public double x;
-	public double y;
-
-	public Point geom;
-	
+	public String identifier;
+	public String sIdentifier;
+	public String mIdentifier;
+	public String pIdentifier;
+	public String mpIdentifier;
+	public String housenumber;
+	public String boxnumber;
 	public String status;
+	public OffsetDateTime validFrom;
+	public OffsetDateTime validTo;
+	public Point point;
 
 	/**
 	 * Convert database result to object
@@ -64,55 +64,41 @@ public class Address {
 	 */
 	public static Address from(Row res) {
 		return new Address(
-			res.getString(0), res.getString(1), res.getString(2), res.getString(3), 
-			res.getDouble(4), res.getDouble(5), null, res.getString(7),
-			res.getString(8), res.getString(9), res.getString(10), res.getString(11), res.getString(12), 
-			res.getString(13), res.getString(14), res.getString(15), res.getString(16), res.getString(17), 
-			res.getString(18), res.getString(19), res.getString(20), res.getString(21), res.getString(22));
+			res.getString(0), 
+			res.getString(1), res.getString(2), res.getString(3), res.getString(4), 
+			res.getString(5), res.getString(6),
+			res.getOffsetDateTime(7), res.getOffsetDateTime(8), res.getValue(9), res.getString(10));
 	}
 
 	/**
 	 * Constructor
 	 * 
-	 * @param id
-	 * @param part_id
-	 * @param houseno
-	 * @param boxno
-	 * @param x
-	 * @param y
-	 * @param geom
+	 * @param identifier
+	 * @param sIdentifier
+	 * @param mIdentifier
+	 * @param pIdentifier
+	 * @param mpIdentifier
+	 * @param housenumber
+	 * @param boxnumber
+	 * @param validFrom
+	 * @param validTo
+	 * @param point
 	 * @param status 
-	 * @param s_id 
-	 * @param s_city_id 
-	 * @param s_name_nl 
-	 * @param s_name_fr 
-	 * @param s_name_de 
-	 * @param m_id 
-	 * @param m_niscode 
-	 * @param m_name_nl 
-	 * @param m_name_fr 
-	 * @param m_name_de 
-	 * @param p_id 
-	 * @param p_zipcode 
-	 * @param p_name_fr 
-	 * @param p_name_nl 
-	 * @param p_name_de 
 	 */
-	public Address(String id, String part_id, String houseno, String boxno, 
-					double x, double y, Object geom, String status,
-					String s_id, String s_city_id, String s_name_nl, String s_name_fr, String s_name_de,
-					String m_id, String m_niscode, String m_name_nl, String m_name_fr, String m_name_de,
-					String p_id, String p_zipcode, String p_name_nl, String p_name_fr, String p_name_de) {
-		this.id = id;
-		this.part_id = part_id;
-		this.houseno = houseno;
-		this.boxno = boxno;
-		this.x = x;
-		this.y = y;
-		this.geom = (Point) geom;
+	public Address(String identifier, 
+					String sIdentifier, String mIdentifier, String pIdentifier, String mpIdentifier,
+					String housenumber, String boxnumber, 
+					OffsetDateTime validFrom, OffsetDateTime validTo, Object point, String status) {
+		this.identifier = identifier;
+		this.sIdentifier = sIdentifier;
+		this.mIdentifier = mIdentifier;
+		this.pIdentifier = pIdentifier;
+		this.mpIdentifier = mpIdentifier;
+		this.housenumber = housenumber;
+		this.boxnumber = boxnumber;
+		this.validFrom = validFrom;
+		this.validTo = validTo;
+		this.point = (Point) point;
 		this.status = status;
-		this.municipality = new Municipality(m_id, m_niscode, m_name_nl, m_name_fr, m_name_de);
-		this.street = new Street(s_id, s_city_id, s_name_nl, s_name_fr, s_name_de);
-		this.postal = new Postal(p_id, p_zipcode, p_name_nl, p_name_fr, p_name_de);
 	}
 }

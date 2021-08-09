@@ -138,7 +138,7 @@ public class Address extends BestObject {
 	}
 	
 	/**
-	 * Set the status of thie address
+	 * Set the status of the address
 	 * 
 	 * @param status 
 	 */

@@ -26,6 +26,7 @@
 package be.bosa.dt.best.webservice.entities;
 
 import io.vertx.mutiny.sqlclient.Row;
+import java.time.OffsetDateTime;
 
 /**
  * Street entity
@@ -33,11 +34,20 @@ import io.vertx.mutiny.sqlclient.Row;
  * @author Bart Hanssens
  */
 public class Street {
-	public String id;
-	public String city_id;
-	public String name_nl;
-	public String name_fr;
-	public String name_de;
+	public final static String BY_ID = 
+		"SELECT s.identifier, s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, " +
+				"s.validFrom, s.validTo, s.status " +
+		"FROM street s " +
+		"WHERE a.identifier = $1";
+	
+	public String identifier;
+	public String mIdentifier;
+	public String nameNL;
+	public String nameFR;
+	public String nameDE;
+	public OffsetDateTime validFrom;
+	public OffsetDateTime validTo;
+	public String status;
 
 	/**
 	 * Convert database result to object
@@ -46,22 +56,33 @@ public class Street {
 	 * @return data object
 	 */
 	public static Street from(Row res) {
-		return new Street(res.getString(0), res.getString(1), res.getString(2), res.getString(3), res.getString(4));
+		return new Street(res.getString(0), 
+			res.getString(1), res.getString(2), res.getString(3), res.getString(4), 
+			res.getOffsetDateTime(5), res.getOffsetDateTime(6), res.getString(7));
 	}
 	
 	/**
 	* Constructor
 	* 
-	* @param id
-	* @param name_nl
-	* @param name_fr
-	* @param name_de 
+	 * @param identifier
+	 * @param mIdentifier
+	 * @param nameNL
+	 * @param nameFR
+	 * @param nameDE
+	 * @param validFrom
+	 * @param validTo
+	 * @param status
 	*/
-	public Street(String id, String city_id, String name_nl, String name_fr, String name_de) {
-		this.id = id;
-		this.city_id = city_id;
-		this.name_nl = name_nl;
-		this.name_fr = name_fr;
-		this.name_de = name_de;
+	public Street(String identifier, 
+				String mIdentifier, String nameNL, String nameFR, String nameDE,
+				OffsetDateTime validFrom, OffsetDateTime validTo, String status) {
+		this.identifier = identifier;
+		this.mIdentifier = mIdentifier;
+		this.nameNL = nameNL;
+		this.nameFR = nameFR;
+		this.nameDE = nameDE;
+		this.validFrom = validFrom;
+		this.validTo = validTo;
+		this.status = status;
 	}
 }

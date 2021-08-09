@@ -49,7 +49,6 @@ import org.opengis.referencing.operation.TransformException;
 public class GeoCoder {
 	// geo transformations
 	private final GeometryFactory fac = JTSFactoryFinder.getGeometryFactory();
-	private final WKBWriter wkb = new WKBWriter();
 	private final CoordinateReferenceSystem l72;
 	private final CoordinateReferenceSystem wgs84;
 	private final MathTransform trans;
@@ -62,6 +61,7 @@ public class GeoCoder {
 	 * @param y y coordinate
 	 * @param gps convert to gps or not
 	 * @return hex string
+	 * @throws java.io.IOException
 	 */
 	public Coordinate toCoords(double x, double y, boolean gps) throws IOException {
 		Coordinate coords = new Coordinate(x, y);
@@ -82,6 +82,7 @@ public class GeoCoder {
 	 * @return hex string
 	 */
 	public String toWkb(Coordinate coords) {
+		WKBWriter wkb = new WKBWriter();
 		return WKBWriter.toHex(wkb.write(fac.createPoint(coords)));
 	}
 

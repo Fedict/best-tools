@@ -26,31 +26,22 @@
 package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.Address;
-import be.bosa.dt.best.webservice.entities.Municipality;
-import be.bosa.dt.best.webservice.entities.Street;
 
-import io.quarkus.vertx.web.Param;
-import io.quarkus.vertx.web.ReactiveRoutes;
-import io.quarkus.vertx.web.Route;
-import io.quarkus.vertx.web.Route.HandlerType;
-import io.quarkus.vertx.web.Route.HttpMethod;
-import io.quarkus.vertx.web.RouteBase;
-
-import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
-import io.vertx.mutiny.core.http.HttpServerResponse;
-
 import java.util.Optional;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.Path;
 
 import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.info.Contact;
 import org.eclipse.microprofile.openapi.annotations.info.Info;
-import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+
+import org.jboss.resteasy.reactive.RestPath;
+import org.jboss.resteasy.reactive.RestQuery;
 
 /**
  *
@@ -58,103 +49,45 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
  */
 @OpenAPIDefinition(
 	 info = @Info(
-        title="Demo BeST API application",
-        version = "1.0.0")
+        title="v2 Belgian Streets and Addresses REST API Demo",
+        version = "2.0.0",
+		description = " OpenAPI specification of the v2 Belgian Streets and Addresses (BeSt) REST API. \n" +
+			"By relying on a consolidated dataset, this new version delivers even greater performance and more features than ever.\n" +
+			"\n" +
+			"An address is an identification of the fixed location of a property.\n" +
+			"The full address is a hierarchy consisting of components such as geographic names, with an increasing level of detail (e.g.,town, then street name, then house number or name).\n" +
+			"It may also include a post code or other postal descriptors.",
+		contact = @Contact(
+			name = "BOSA DG DT servicedesk",
+			email = "servicedesk.DTO@bosa.fgov.be"
+		)
+	)
 )
+
 @ApplicationScoped
-@RouteBase(path = "best/api/v2")
+@Path("best/api/v2")
 public class LookupResource {
 	@Inject
 	Repository repo;
 
-	@Route(type = HandlerType.FAILURE)
-	public void invalidArgException(IllegalArgumentException e, HttpServerResponse response) {
-		response.setStatusCode(400).end(e.getMessage());
-	}
-
-	@Route(path = "distance", methods = HttpMethod.GET, produces = "application/json")
-	@Operation(summary = "Get (approximate) distance between two addresses")
-	@Blocking
-	public Uni<Double> distance(
-			@Parameter(description = "ID of first address", required = true, example = "BE.BRUSSELS.BRIC.ADM.ADDR/172821/2")
-			@Param("a") String a, 
-			@Parameter(description = "ID of second address", required = true, example = "https://data.vlaanderen.be/id/adres/1273627/2015-05-22T05:53:08.330")	
-			@Param("b") String b) {
-		return repo.findDistance(a, b);
-	}
-
-	@Route(path = "address", methods = HttpMethod.GET, produces = "application/json")
 	@Operation(summary = "Get an address by full ID")
-	public Uni<Address> getAddressById(
-			@Parameter(description = "Address ID", required = true, example = "BE.BRUSSELS.BRIC.ADM.ADDR/1299/2")
-			@Param("id") String id) {
-		return repo.findAddressById(id);
+	@Path("/addresses/{identifier}")
+	public Uni<Address> getAddress(@RestPath String identifier) {
+		return repo.findAddressById(identifier);
 	}
-
-	@Route(path = "street", methods = HttpMethod.GET, produces = "application/json")
-	@Operation(summary = "Get a street by full id")
-	public Uni<Street> getStreetById(
-			@Parameter(description = "Street ID", required = true, example = "https://data.vlaanderen.be/doc/straatnaam/178908")
-			@Param("id") String id) {
-		return repo.findStreetById(id);
-	}
-
-	@Route(path = "municipality", methods = HttpMethod.GET, produces = "application/json")
-	@Operation(summary = "Get a municipality by full id")
-	public Uni<Municipality> getMunicipalityById(
-			@Parameter(description = "Municipality ID", required = true, example = "https://data.vlaanderen.be/id/gemeente/23027/2002-08-13T17:32:32")
-			@Param("id") String id) {
-		return repo.findMunicipalityById(id);
-	}
-
-	@Route(path = "municipalities", methods = HttpMethod.GET, produces = "application/json")
-	@Operation(summary = "Get a list of all municipalities, or search by (part of) name or zipcode")
-	@Blocking
-	public Multi<Municipality> allMunicipalities(
-			@Parameter(description = "Part of the name", example = "Halle")
-			@Param("name") Optional<String> name,
-			@Parameter(description = "NIS code", example = "23027")
-			@Param("niscode") Optional<String> niscode,
-			@Parameter(description = "Postal code", example = "1500")
-			@Param("zipcode") Optional<String> zipcode) {
-		Multi<Municipality> res = null;
-		if (name.isPresent()) {
-			res = ReactiveRoutes.asJsonArray(repo.findMunicipalitiesByName(name.get()));
-		} else if (niscode.isPresent()) {
-			res = repo.findMunicipalitiesByNiscode(niscode.get());
-		} else if (zipcode.isPresent()) {
-			res = repo.findMunicipalitiesByZipcode(zipcode.get());
-		} else {
-			res = repo.findMunicipalities();
-		}
-		return ReactiveRoutes.asJsonArray(res);
-	}
-
-	@Route(path = "streets", methods = HttpMethod.GET, produces = "application/json")
-	@Operation(summary = "Search for streets by postal or nis code, optionally by (part of) name ")
-	@Blocking
-	public Multi<Street> streetsByCode(
-			@Parameter(description = "postal code", example = "1500")	
-			@Param("zipcode") Optional<String> zipcode,
-			@Parameter(description = "REFNIS code", example = "23027")	
-			@Param("niscode") Optional<String> niscode,
-			@Parameter(description = "Part of the name (at least 2 characters)", example = "Markt")
-			@Param("name") Optional<String> name) {
-		if (zipcode.isEmpty() && niscode.isEmpty()) {
-			throw new IllegalArgumentException("Invalid parameters");
-		}
-		
-		Multi<Street> res = null;
-		
-		if (zipcode.isPresent()) {
-			String zipstr = zipcode.get();
-			res = name.isPresent() ? repo.findStreetsByZipcodeAndName(zipstr, name.get()) 
-									: repo.findStreetsByZipcode(zipstr);
-		} else if (niscode.isPresent()) {
-			String nisstr = niscode.get();
-			res = name.isPresent() ? repo.findStreetsByNiscodeAndName(nisstr, name.get()) 
-									: repo.findStreetsByNiscode(nisstr);
-		}
-		return ReactiveRoutes.asJsonArray(res);
+	
+	@Operation(summary = "Get an address by full ID")
+	@Path("/addresses")
+	public Multi<Address> getAddresses(
+			@RestQuery Optional<String> municipalityId,
+			@RestQuery Optional<String> municipalityName,
+			@RestQuery Optional<String> partOfMunicipalityId,
+			@RestQuery Optional<String> partOfMunicipalityName,
+			@RestQuery Optional<String> streetId,
+			@RestQuery Optional<String> streetName,
+			@RestQuery Optional<String> housenumber,
+			@RestQuery Optional<String> boxnumber,
+			@RestQuery Optional<String> status) {
+		return null;
 	}
 }
