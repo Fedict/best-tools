@@ -256,22 +256,35 @@ public class PostGisLoader {
 	 * 
 	 * @throws SQLException 
 	 */
-	public void updateIndex() throws SQLException {
+	public void createIndex() throws SQLException {
 		try(Connection conn = getConnection()) {
 			Statement stmt = conn.createStatement();
 
 			LOG.info("Set spatial index");			
 			stmt.execute("CREATE INDEX idxAddressPoint ON Address USING GIST(point)");
 
+			LOG.info("Set foreign key idexes");			
+			stmt.execute("CREATE INDEX idxAddressMunicipality ON Address(mIdentifier))");
+			stmt.execute("CREATE INDEX idxAddressPostal ON Address(pIdentifier))");
+			stmt.execute("CREATE INDEX idxStreetMunicipality ON Street(mIdentifier))");
+
 			LOG.info("Set street text indexes");				
 			stmt.execute("CREATE INDEX idxStreetNL ON Street(LOWER(nameNL) varchar_pattern_ops)");
 			stmt.execute("CREATE INDEX idxStreetFR ON Street(LOWER(nameFR) varchar_pattern_ops)");
 			stmt.execute("CREATE INDEX idxStreetDE ON Street(LOWER(nameDE) varchar_pattern_ops)");
 
+			stmt.execute("CREATE INDEX idxGinStreetNL ON Street USING (LOWER(nameNL) gin_trgm_ops)");
+			stmt.execute("CREATE INDEX idxGinStreetFR ON Street USING (LOWER(nameFR) gin_trgm_ops)");
+			stmt.execute("CREATE INDEX idxGinStreetDE ON Street USING (LOWER(nameDE) gin_trgm_ops)");
+			
 			LOG.info("Set Municipality text indexes");				
 			stmt.execute("CREATE INDEX idxMunicipalityNL ON Municipality(LOWER(nameNL) varchar_pattern_ops)");
 			stmt.execute("CREATE INDEX idxMunicipalityFR ON Municipality(LOWER(nameFR) varchar_pattern_ops)");
 			stmt.execute("CREATE INDEX idxMunicipalityDE ON Municipality(LOWER(nameDE) varchar_pattern_ops)");
+
+			stmt.execute("CREATE INDEX idxGinMunicipalityNL ON Municipality USING (LOWER(nameNL) gin_trgm_ops)");
+			stmt.execute("CREATE INDEX idxGinMunicipalityFR ON Municipality USING (LOWER(nameFR) gin_trgm_ops)");
+			stmt.execute("CREATE INDEX idxGinMunicipalityDE ON Municipality USING (LOWER(nameDE) gin_trgm_ops)");
 			
 			LOG.info("Update statistics");
 			stmt.execute("VACUUM FULL ANALYZE");
@@ -423,15 +436,18 @@ public class PostGisLoader {
 	}
 	
 	private String encodePoint(Geopoint p) {
-		if (p.getX() > 0 && p.getY() > 0 && p.getSrs().equals("31370")) {
+		double x = p.getX();
+		double y = p.getY();
+
+		if (x > 1 && y > 1 && p.getSrs().equals("31370")) {
 			try {
-				Coordinate coord = geoCoder.toCoords(p.getX(), p.getY(), false);
+				Coordinate coord = geoCoder.toCoords(x, y, false);
 				return geoCoder.toWkb(coord);
 			} catch (IOException ioe) {
-				LOG.warning("Could not convert coordinates");
+				LOG.log(Level.WARNING, "Could not convert coordinates", ioe);
 			}
 		} else {
-			LOG.warning("Invalid coordinates");
+			LOG.log(Level.WARNING, "Invalid coordinates {0} {1} ({2})", new Object[] { x, y, p.getSrs() });
 		}
 		return null;
 	}
@@ -557,7 +573,7 @@ public class PostGisLoader {
 		}
 		tasks.stream().parallel().forEach(Runnable::run);
 
-		updateIndex();
+		createIndex();
 		//addPostalTables();
 	}
 
