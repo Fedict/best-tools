@@ -264,9 +264,9 @@ public class PostGisLoader {
 			stmt.execute("CREATE INDEX idxAddressPoint ON Address USING GIST(point)");
 
 			LOG.info("Set foreign key idexes");			
-			stmt.execute("CREATE INDEX idxAddressMunicipality ON Address(mIdentifier))");
-			stmt.execute("CREATE INDEX idxAddressPostal ON Address(pIdentifier))");
-			stmt.execute("CREATE INDEX idxStreetMunicipality ON Street(mIdentifier))");
+			stmt.execute("CREATE INDEX idxAddressMunicipality ON Address(mIdentifier)");
+			stmt.execute("CREATE INDEX idxAddressPostal ON Address(pIdentifier)");
+			stmt.execute("CREATE INDEX idxStreetMunicipality ON Street(mIdentifier)");
 
 			LOG.info("Set street text indexes");				
 			stmt.execute("CREATE INDEX idxStreetNL ON Street(LOWER(nameNL) varchar_pattern_ops)");
