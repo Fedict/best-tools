@@ -268,19 +268,11 @@ public class PostGisLoader {
 			stmt.execute("CREATE INDEX idxStreetMunicipality ON Street(mIdentifier)");
 
 			LOG.info("Set street text indexes");				
-			stmt.execute("CREATE INDEX idxStreetNL ON Street(LOWER(nameNL) varchar_pattern_ops)");
-			stmt.execute("CREATE INDEX idxStreetFR ON Street(LOWER(nameFR) varchar_pattern_ops)");
-			stmt.execute("CREATE INDEX idxStreetDE ON Street(LOWER(nameDE) varchar_pattern_ops)");
-
 			stmt.execute("CREATE INDEX idxGinStreetNL ON Street USING GIN(nameNL gin_trgm_ops)");
 			stmt.execute("CREATE INDEX idxGinStreetFR ON Street USING GIN(nameFR gin_trgm_ops)");
 			stmt.execute("CREATE INDEX idxGinStreetDE ON Street USING GIN(nameDE gin_trgm_ops)");
 			
 			LOG.info("Set Municipality text indexes");				
-			stmt.execute("CREATE INDEX idxMunicipalityNL ON Municipality(LOWER(nameNL) varchar_pattern_ops)");
-			stmt.execute("CREATE INDEX idxMunicipalityFR ON Municipality(LOWER(nameFR) varchar_pattern_ops)");
-			stmt.execute("CREATE INDEX idxMunicipalityDE ON Municipality(LOWER(nameDE) varchar_pattern_ops)");
-
 			stmt.execute("CREATE INDEX idxGinMunicipalityNL ON Municipality USING GIN(nameNL gin_trgm_ops)");
 			stmt.execute("CREATE INDEX idxGinMunicipalityFR ON Municipality USING GIN(nameFR gin_trgm_ops)");
 			stmt.execute("CREATE INDEX idxGinMunicipalityDE ON Municipality USING GIN(nameDE gin_trgm_ops)");
