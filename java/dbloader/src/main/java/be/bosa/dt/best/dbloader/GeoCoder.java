@@ -48,8 +48,8 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class GeoCoder {
 	// geo transformations
-	private final static GeometryFactory fac = JTSFactoryFinder.getGeometryFactory();
-	private final static WKBWriter wkb = new WKBWriter();
+	private final GeometryFactory fac = JTSFactoryFinder.getGeometryFactory();
+	private final WKBWriter wkb = new WKBWriter();
 	private final CoordinateReferenceSystem l72;
 	private final CoordinateReferenceSystem wgs84;
 	private final MathTransform trans;
@@ -67,9 +67,7 @@ public class GeoCoder {
 		Coordinate coords = new Coordinate(x, y);
 		if (gps) {
 			try {
-				synchronized(this) {
-					coords = JTS.transform(coords, null, trans);
-				}
+				coords = JTS.transform(coords, null, trans);
 			} catch (TransformException ex) {
 				throw new IOException("Could not convert coordinates");
 			}

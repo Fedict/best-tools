@@ -62,7 +62,6 @@ import org.locationtech.jts.geom.Coordinate;
  */
 public class PostGisLoader {
 	private final String dbStr;
-	private final GeoCoder geoCoder;
 		
 	private static final Logger LOG = Logger.getLogger(PostGisLoader.class.getName());
 	private static final BestRegion[] REGIONS = new BestRegion[] { 
@@ -273,18 +272,18 @@ public class PostGisLoader {
 			stmt.execute("CREATE INDEX idxStreetFR ON Street(LOWER(nameFR) varchar_pattern_ops)");
 			stmt.execute("CREATE INDEX idxStreetDE ON Street(LOWER(nameDE) varchar_pattern_ops)");
 
-			stmt.execute("CREATE INDEX idxGinStreetNL ON Street USING (LOWER(nameNL) gin_trgm_ops)");
-			stmt.execute("CREATE INDEX idxGinStreetFR ON Street USING (LOWER(nameFR) gin_trgm_ops)");
-			stmt.execute("CREATE INDEX idxGinStreetDE ON Street USING (LOWER(nameDE) gin_trgm_ops)");
+			stmt.execute("CREATE INDEX idxGinStreetNL ON Street USING (nameNL gin_trgm_ops)");
+			stmt.execute("CREATE INDEX idxGinStreetFR ON Street USING (nameFR gin_trgm_ops)");
+			stmt.execute("CREATE INDEX idxGinStreetDE ON Street USING (nameDE gin_trgm_ops)");
 			
 			LOG.info("Set Municipality text indexes");				
 			stmt.execute("CREATE INDEX idxMunicipalityNL ON Municipality(LOWER(nameNL) varchar_pattern_ops)");
 			stmt.execute("CREATE INDEX idxMunicipalityFR ON Municipality(LOWER(nameFR) varchar_pattern_ops)");
 			stmt.execute("CREATE INDEX idxMunicipalityDE ON Municipality(LOWER(nameDE) varchar_pattern_ops)");
 
-			stmt.execute("CREATE INDEX idxGinMunicipalityNL ON Municipality USING (LOWER(nameNL) gin_trgm_ops)");
-			stmt.execute("CREATE INDEX idxGinMunicipalityFR ON Municipality USING (LOWER(nameFR) gin_trgm_ops)");
-			stmt.execute("CREATE INDEX idxGinMunicipalityDE ON Municipality USING (LOWER(nameDE) gin_trgm_ops)");
+			stmt.execute("CREATE INDEX idxGinMunicipalityNL ON Municipality USING (nameNL gin_trgm_ops)");
+			stmt.execute("CREATE INDEX idxGinMunicipalityFR ON Municipality USING (nameFR gin_trgm_ops)");
+			stmt.execute("CREATE INDEX idxGinMunicipalityDE ON Municipality USING (nameDE gin_trgm_ops)");
 			
 			LOG.info("Update statistics");
 			stmt.execute("VACUUM FULL ANALYZE");
@@ -435,7 +434,7 @@ public class PostGisLoader {
 		prep.executeBatch();
 	}
 	
-	private String encodePoint(Geopoint p) {
+	private String encodePoint(GeoCoder geoCoder, Geopoint p) {
 		double x = p.getX();
 		double y = p.getY();
 
@@ -460,9 +459,11 @@ public class PostGisLoader {
 	 * @param reg region code
 	 * @throws SQLException 
 	 */
-	private void loadAddresses(PreparedStatement prep, Path xmlPath, BestRegion reg) throws SQLException {
+	private void loadAddresses(PreparedStatement prep, Path xmlPath, BestRegion reg) throws SQLException, Exception {
 		LOG.log(Level.INFO, "Starting addresses {0}", reg.getName());
 		int cnt = 0;
+
+		GeoCoder geoCoder = new GeoCoder();
 
 		AddressReader reader = new AddressReader();
 		Stream<Address> addresses = reader.read(reg, xmlPath);
@@ -473,7 +474,7 @@ public class PostGisLoader {
 
 			Geopoint p = a.getPoint();
 			
-			String geom = encodePoint(p);
+			String geom = encodePoint(geoCoder, p);
 
 			prep.setString(1, a.getIDVersion());
 			prep.setString(2, a.getCity().getIDVersion());
@@ -585,6 +586,5 @@ public class PostGisLoader {
 	 */
 	public PostGisLoader(String dbstr) throws Exception {
 		this.dbStr = dbstr;
-		geoCoder = new GeoCoder();
 	}
 }
