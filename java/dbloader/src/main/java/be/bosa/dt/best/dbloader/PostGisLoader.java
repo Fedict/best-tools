@@ -478,7 +478,7 @@ public class PostGisLoader {
 			prep.setString(1, NamespaceCoder.address(a.getIDVersion(), reg));
 			prep.setString(2, NamespaceCoder.municipality(a.getCity().getIDVersion(), reg));
 			prep.setString(3, null);
-			prep.setString(4, NamespaceCoder.address(a.getStreet().getIDVersion(), reg));
+			prep.setString(4, NamespaceCoder.street(a.getStreet().getIDVersion(), reg));
 			prep.setString(5, NamespaceCoder.postal(a.getPostal().getIDVersion(), reg));
 			prep.setString(6, a.getNumber());
 			prep.setString(7, a.getBox());
