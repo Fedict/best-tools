@@ -110,7 +110,7 @@ public class PostGisLoader {
 			stmt.execute("DROP TYPE IF EXISTS enumStatus");
 			stmt.execute("DROP TYPE IF EXISTS enumStreetnameType");
 			stmt.execute("DROP TYPE IF EXISTS enumPositionGeometryMethodValueType");
-			stmt.execute("DROP TYPE IF EXISTS  enumPositionSpecificationValueType");
+			stmt.execute("DROP TYPE IF EXISTS enumPositionSpecificationValueType");
 		}
 	}
 
@@ -168,7 +168,8 @@ public class PostGisLoader {
 					"	endLifeSpanVersion TIMESTAMPTZ, " +
 					"	point GEOMETRY(POINT, 31370), " +
 					"	positionGeometryMethod enumPositionGeometryMethodValueType, " +
-					"	positionSpecification enumPositionSpecificationValueType) ");
+					"	positionSpecification enumPositionSpecificationValueType, " +
+					"	firstAddress BOOLEAN)");
 
 			stmt.execute("CREATE TABLE Municipality(" +
 					"	identifier VARCHAR(100) NOT NULL, " +
@@ -487,6 +488,7 @@ public class PostGisLoader {
 			prep.setObject(11, a.getBeginLife(), Types.TIMESTAMP_WITH_TIMEZONE);
 			prep.setObject(12, a.getEndLife(), Types.TIMESTAMP_WITH_TIMEZONE);
 			prep.setObject(13, geom, Types.OTHER);
+			prep.setBoolean(14, false);
 
 			prep.addBatch();
 			// insert per 10_000 records
@@ -537,10 +539,10 @@ public class PostGisLoader {
 			prep = conn.prepareStatement(
 				"INSERT INTO Address(identifier, mIdentifier, mpIdentifier, sIdentifier, pIdentifier, " +
 					" housenumber, boxnumber, status, validFrom, " +
-					" validTo, beginLifespanVersion, endLifespanVersion, point) " +
+					" validTo, beginLifespanVersion, endLifespanVersion, point, firstAddress) " +
 				" VALUES (?, ?, ?, ?, ?, " +
 						" ?, ?, ?, ?, " +
-						" ?, ?, ?, ?)");
+						" ?, ?, ?, ?, ?)");
 			loadAddresses(prep, xmlPath, reg);
 		}
 	}
