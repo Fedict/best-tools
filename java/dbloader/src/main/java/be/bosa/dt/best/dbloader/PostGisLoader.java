@@ -101,7 +101,7 @@ public class PostGisLoader {
 	 * 
 	 * @throws SQLException 
 	 */
-	public void dropEnums() throws SQLException {
+	private void dropEnums() throws SQLException {
 		LOG.info("Drop enums");
 
 		try(Connection conn = getConnection()) {
@@ -119,7 +119,7 @@ public class PostGisLoader {
 	 * 
 	 * @throws SQLException 
 	 */
-	public void createEnums() throws SQLException {
+	private void createEnums() throws SQLException {
 		LOG.info("Create enums");
 
 		try(Connection conn = getConnection()) {
@@ -141,7 +141,7 @@ public class PostGisLoader {
 	 * 
 	 * @throws SQLException 
 	 */
-	public void createTables() throws SQLException {
+	private void createTables() throws SQLException {
 		LOG.info("Create tables");
 
 		try(Connection conn = getConnection()) {
@@ -217,7 +217,7 @@ public class PostGisLoader {
 	 * 
 	 * @throws SQLException 
 	 */
-	public void addConstraints() throws SQLException {
+	private void addConstraints() throws SQLException {
 		// add primary keys, indices and constraints after loading data, for performance
 		try(Connection conn = getConnection()) {
 			Statement stmt = conn.createStatement();
@@ -257,7 +257,7 @@ public class PostGisLoader {
 	 * 
 	 * @throws SQLException 
 	 */
-	public void createIndex() throws SQLException {
+	private void createIndex() throws SQLException {
 		try(Connection conn = getConnection()) {
 			Statement stmt = conn.createStatement();
 
@@ -302,7 +302,7 @@ public class PostGisLoader {
 
 		while (iter.hasNext()) {
 			Postal a = iter.next();
-			prep.setString(1, a.getIDVersion());
+			prep.setString(1, NamespaceCoder.postal(a.getIDVersion(), reg));
 			prep.setString(2, a.getId());
 			prep.setString(3, a.getName("nl"));
 			prep.setString(4, a.getName("fr"));
@@ -337,7 +337,7 @@ public class PostGisLoader {
 
 		while (iter.hasNext()) {
 			Municipality a = iter.next();
-			prep.setString(1, a.getIDVersion());
+			prep.setString(1, NamespaceCoder.municipality(a.getIDVersion(),reg));
 			prep.setString(2, a.getId());
 			prep.setString(3, a.getName("nl"));
 			prep.setString(4, a.getName("fr"));
@@ -372,7 +372,7 @@ public class PostGisLoader {
 
 		while (iter.hasNext()) {
 			Municipality a = iter.next();
-			prep.setString(1, a.getIDVersion());
+			prep.setString(1, NamespaceCoder.municipalityPart(a.getIDVersion(), reg));
 			prep.setString(2, a.getName("nl"));
 			prep.setString(3, a.getName("fr"));
 			prep.setString(4, a.getName("de"));
@@ -407,8 +407,8 @@ public class PostGisLoader {
 		while (iter.hasNext()) {
 			Street a = iter.next();
 
-			prep.setString(1, a.getIDVersion());
-			prep.setString(2, a.getCity().getIDVersion());
+			prep.setString(1, NamespaceCoder.street(a.getIDVersion(), reg));
+			prep.setString(2, NamespaceCoder.municipality(a.getCity().getIDVersion(), reg));
 			prep.setString(3, a.getName("nl"));
 			prep.setString(4, a.getName("fr"));
 			prep.setString(5, a.getName("de"));
@@ -456,14 +456,14 @@ public class PostGisLoader {
 	private void loadAddresses(PreparedStatement prep, Path xmlPath, BestRegion reg) throws SQLException {
 		LOG.log(Level.INFO, "Starting addresses {0}", reg.getName());
 		int cnt = 0;
-
+/*
 		GeoCoder geoCoder = null;
 		try {
-
+		
 		} catch(Exception e) {
 			throw new SQLException("Could not init coder", e);
 		}
-
+*/
 		AddressReader reader = new AddressReader();
 		Stream<Address> addresses = reader.read(reg, xmlPath);
 		Iterator<Address> iter = addresses.iterator();
@@ -475,11 +475,11 @@ public class PostGisLoader {
 			
 			String geom = encodePoint(p);
 
-			prep.setString(1, a.getIDVersion());
-			prep.setString(2, a.getCity().getIDVersion());
+			prep.setString(1, NamespaceCoder.address(a.getIDVersion(), reg));
+			prep.setString(2, NamespaceCoder.municipality(a.getCity().getIDVersion(), reg));
 			prep.setString(3, null);
-			prep.setString(4, a.getStreet().getIDVersion());
-			prep.setString(5, a.getPostal().getIDVersion());
+			prep.setString(4, NamespaceCoder.address(a.getStreet().getIDVersion(), reg));
+			prep.setString(5, NamespaceCoder.postal(a.getPostal().getIDVersion(), reg));
 			prep.setString(6, a.getNumber());
 			prep.setString(7, a.getBox());
 			prep.setObject(8, a.getStatus(), Types.OTHER);
@@ -503,7 +503,7 @@ public class PostGisLoader {
 	}
 
 	/**
-	 * Load XML BeST data files for a specific regionin a database file.
+	 * Load XML BeST data files for a specific region in a database file.
 	 * 
 	 * @param xmlPath path to XML BeST files
 	 * @param reg best region
