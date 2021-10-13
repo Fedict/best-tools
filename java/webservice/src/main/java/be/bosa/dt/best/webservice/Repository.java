@@ -27,6 +27,7 @@ package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.Address;
 import be.bosa.dt.best.webservice.entities.Street;
+import be.bosa.dt.best.webservice.queries.SqlGeo;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -83,7 +84,7 @@ public class Repository {
 	 */
 	public Uni<Address> findAddressById(String id) {
 		return uni(
-			pg.preparedQuery(Address.BY_ID).execute(Tuple.of(id))
+			pg.preparedQuery("").execute(Tuple.of(id))
 		).transform(row -> row.hasNext() ? Address.from(row.next()) : null);
 	}
 
@@ -97,6 +98,22 @@ public class Repository {
 		return uni(
 			pg.preparedQuery(Street.BY_ID).execute(Tuple.of(id))
 		).transform(row -> row.hasNext() ? Street.from(row.next()) : null);
+	}
+	
+	public Multi<Address> findByCoordinates(int x, int y, int meters, int limit, String startId) {
+		Tuple tuple;
+		SqlGeo qry = new SqlGeo();
+		if (startId != null) {
+			qry.paginate();
+			tuple = Tuple.of(x, y, meters, limit, startId);
+		} else {
+			qry.limit();
+			tuple = Tuple.of(x, y, meters, limit);
+		}
+
+		return multi(
+			pg.preparedQuery(qry.build()).execute(tuple)
+		).transform(Address::from);
 	}
 	
 	/**

@@ -26,10 +26,9 @@
 package be.bosa.dt.best.webservice.entities;
 
 import io.vertx.mutiny.sqlclient.Row;
+import io.vertx.pgclient.data.Point;
 import java.time.OffsetDateTime;
 
-
-import org.geolatte.geom.Point;
 
 /**
  * Full address entity
@@ -37,13 +36,6 @@ import org.geolatte.geom.Point;
  * @author Bart Hanssens
  */
 public class Address {
-	public final static String BY_ID = 
-		"SELECT a.identifier, a.sIdentifier, a.mIdentifier, a.pIdentifier, a.mpIdentifier, " +
-				"a.housenumber, a.boxnumber, " +
-				"a.validFrom, a.validTo, a.status, a.point " +
-		"FROM addresses a " +
-		"WHERE a.identifier = $1";
-
 	public String identifier;
 	public String sIdentifier;
 	public String mIdentifier;
@@ -67,7 +59,8 @@ public class Address {
 			res.getString(0), 
 			res.getString(1), res.getString(2), res.getString(3), res.getString(4), 
 			res.getString(5), res.getString(6),
-			res.getOffsetDateTime(7), res.getOffsetDateTime(8), res.getValue(9), res.getString(10));
+			res.getOffsetDateTime(7), res.getOffsetDateTime(8), res.getString(9), 
+			res.get(Point.class, 10));
 	}
 
 	/**
@@ -88,7 +81,8 @@ public class Address {
 	public Address(String identifier, 
 					String sIdentifier, String mIdentifier, String pIdentifier, String mpIdentifier,
 					String housenumber, String boxnumber, 
-					OffsetDateTime validFrom, OffsetDateTime validTo, Object point, String status) {
+					OffsetDateTime validFrom, OffsetDateTime validTo, String status,
+					Point point) {
 		this.identifier = identifier;
 		this.sIdentifier = sIdentifier;
 		this.mIdentifier = mIdentifier;
@@ -98,7 +92,7 @@ public class Address {
 		this.boxnumber = boxnumber;
 		this.validFrom = validFrom;
 		this.validTo = validTo;
-		this.point = (Point) point;
+		this.point = point;
 		this.status = status;
 	}
 }

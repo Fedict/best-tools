@@ -27,21 +27,25 @@ package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.Address;
 
-import io.smallrye.mutiny.Multi;
+import io.quarkus.vertx.web.Param;
+import io.quarkus.vertx.web.Route;
+import io.quarkus.vertx.web.Route.HttpMethod;
+import io.quarkus.vertx.web.RouteBase;
+
 import io.smallrye.mutiny.Uni;
 
-import java.util.Optional;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.RoutingContext;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.ws.rs.Path;
 
 import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.info.Contact;
 import org.eclipse.microprofile.openapi.annotations.info.Info;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 
-import org.jboss.resteasy.reactive.RestPath;
-import org.jboss.resteasy.reactive.RestQuery;
 
 /**
  *
@@ -65,19 +69,28 @@ import org.jboss.resteasy.reactive.RestQuery;
 )
 
 @ApplicationScoped
-@Path("best/api/v2")
+@RouteBase(path = "best/api/v2")
 public class LookupResource {
 	@Inject
 	Repository repo;
-
-	@Operation(summary = "Get an address by full ID")
-	@Path("/addresses/{identifier}")
-	public Uni<Address> getAddress(@RestPath String identifier) {
-		return repo.findAddressById(identifier);
-	}
 	
+	@Route(path = "addresses/:id", methods = HttpMethod.GET, produces = "application/json")
 	@Operation(summary = "Get an address by full ID")
+	public void getAddressById(
+			@Parameter(description = "Address ID", required = true, example = "BE.BRUSSELS.BRIC.ADM.ADDR/1299/2")
+			@Param("id") String id,
+			RoutingContext rc) {
+		Uni<Address> add = repo.findAddressById(id);
+		add.subscribe().with(addr ->  {
+			JsonObject obj = JsonObject.mapFrom(addr).put("self", rc.request().absoluteURI());
+			rc.response().send(obj.toBuffer());
+		});
+	}
+
+	/*
+	@Operation(summary = "Search for addresses")
 	@Path("/addresses")
+	@GET
 	public Multi<Address> getAddresses(
 			@RestQuery Optional<String> municipalityId,
 			@RestQuery Optional<String> municipalityName,
@@ -89,5 +102,5 @@ public class LookupResource {
 			@RestQuery Optional<String> boxnumber,
 			@RestQuery Optional<String> status) {
 		return null;
-	}
+	} */
 }
