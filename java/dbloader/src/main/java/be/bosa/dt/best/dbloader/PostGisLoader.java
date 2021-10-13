@@ -548,6 +548,28 @@ public class PostGisLoader {
 	}
 
 	/**
+	 * Set first address (e.g house or first apartment in a building)
+	 * 
+	 * @throws SQLException 
+	 */
+	private void setFirstAddress() throws SQLException {
+		LOG.log(Level.INFO, "Setting first address flag");
+
+		try(Connection conn = getConnection()) {
+			PreparedStatement prep = conn.prepareStatement(
+				"UPDATE address a1 SET firstaddress = true FROM "+
+				"(SELECT midentifier, sidentifier, housenumber, MIN(COALESCE(boxnumber,'0')) AS minboxnumber " + 
+					"FROM address " +
+					"GROUP BY midentifier, sidentifier, housenumber" +
+				") AS a2 " +
+				"WHERE a1.midentifier = a2.midentifier AND a1.sidentifier = a2.sidentifier " +
+				" AND a1.housenumber = a2.housenumber AND COALESCE(a1.boxnumber,'0') = minboxnumber");
+
+			prep.execute();
+		}
+	}
+
+	/**
 	 * Load XML BeST data files in a database.
 	 * 
 	 * @param xmlPath path to XML BeST files
@@ -575,6 +597,7 @@ public class PostGisLoader {
 		tasks.stream().parallel().forEach(Runnable::run);
 
 		createIndex();
+		setFirstAddress();
 		//addPostalTables();
 	}
 

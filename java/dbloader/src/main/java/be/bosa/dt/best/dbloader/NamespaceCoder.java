@@ -139,7 +139,7 @@ public class NamespaceCoder {
 			case FLANDERS:
 				return id.replace("https://data.vlaanderen.be/id/straatnaam", "VS");
 			case WALLONIA:
-				return id.replace("geodata.wallonie.be/id/StreetName", "WS");
+				return id.replace("geodata.wallonie.be/id/Streetname", "WS");
 		}
 		return id;
 	}
