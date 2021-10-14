@@ -34,12 +34,6 @@ import java.time.OffsetDateTime;
  * @author Bart Hanssens
  */
 public class Street {
-	public final static String BY_ID = 
-		"SELECT s.identifier, s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, " +
-				"s.validFrom, s.validTo, s.status " +
-		"FROM street s " +
-		"WHERE a.identifier = $1";
-	
 	public String identifier;
 	public String mIdentifier;
 	public String nameNL;

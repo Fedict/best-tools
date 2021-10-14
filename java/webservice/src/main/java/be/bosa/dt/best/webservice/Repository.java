@@ -26,8 +26,10 @@
 package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.Address;
+import be.bosa.dt.best.webservice.entities.Municipality;
 import be.bosa.dt.best.webservice.entities.Street;
 import be.bosa.dt.best.webservice.queries.SqlGeo;
+import be.bosa.dt.best.webservice.queries.SqlStreet;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -83,9 +85,29 @@ public class Repository {
 	 * @return address or null
 	 */
 	public Uni<Address> findAddressById(String id) {
+		Tuple tuple = Tuple.of(NsConverter.addressEncode(id));
+		SqlStreet qry = new SqlStreet();
+		qry.where("identifier");
+
 		return uni(
-			pg.preparedQuery("").execute(Tuple.of(id))
+			pg.preparedQuery(qry.build()).execute(tuple)
 		).transform(row -> row.hasNext() ? Address.from(row.next()) : null);
+	}
+	
+	/**
+	 * Find a municipality by ID
+	 * 
+	 * @param id municipality id
+	 * @return municipality or null
+	 */
+	public Uni<Municipality> findMunicipalityById(String id) {
+		Tuple tuple = Tuple.of(NsConverter.municipalityEncode(id));
+		SqlStreet qry = new SqlStreet();
+		qry.where("identifier");
+
+		return uni(
+			pg.preparedQuery(qry.build()).execute(tuple)
+		).transform(row -> row.hasNext() ? Municipality.from(row.next()) : null);
 	}
 
 	/**
@@ -95,11 +117,15 @@ public class Repository {
 	 * @return street or null
 	 */
 	public Uni<Street> findStreetById(String id) {
+		Tuple tuple = Tuple.of(NsConverter.streetEncode(id));
+		SqlStreet qry = new SqlStreet();
+		qry.where("identifier");
+
 		return uni(
-			pg.preparedQuery(Street.BY_ID).execute(Tuple.of(id))
+			pg.preparedQuery(qry.build()).execute(tuple)
 		).transform(row -> row.hasNext() ? Street.from(row.next()) : null);
 	}
-	
+
 	public Multi<Address> findByCoordinates(int x, int y, int meters, int limit, String startId) {
 		Tuple tuple;
 		SqlGeo qry = new SqlGeo();

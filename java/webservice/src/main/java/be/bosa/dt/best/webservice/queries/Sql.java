@@ -26,7 +26,8 @@
 package be.bosa.dt.best.webservice.queries;
 
 /**
- *
+ * Helper class for building SQL select statements
+ * 
  * @author Bart.Hanssens
  */
 public abstract class Sql {
@@ -37,20 +38,36 @@ public abstract class Sql {
 	String limit = "";
 	int vars = 0;
 	
+	/**
+	 * Add where clause with variable
+	 * 
+	 * @param str 
+	 */
 	public void where(String str) {
 		String tmp = str + "$" + ++vars;
 		this.where = (this.where.equals("")) ? tmp : this.where + " AND " + tmp;
 	}
 
+	/**
+	 * Add pagination with start identifier (don't use OFFSET, that's more resource intensive)
+	 */
 	public void paginate() {
 		where("identifier > $" + ++vars);
 		limit();
 	}
 	
+	/**
+	 * Add limit clause
+	 */
 	public void limit(){
 		this.limit = "$" + ++vars;
 	}
 
+	/**
+	 * Build the SQL select string
+	 * 
+	 * @return 
+	 */
 	public String build() {
 		return String.join(" ", "SELECT", select, "FROM", from, "WHERE", where, "ORDER BY", order, "LIMIT", limit);
 	}

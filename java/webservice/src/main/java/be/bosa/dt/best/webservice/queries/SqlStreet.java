@@ -26,8 +26,9 @@
 package be.bosa.dt.best.webservice.queries;
 
 /**
- *
- * @author Bart.Hanssens
+ * Select from street table
+ * 
+ * @author Bart Hanssens
  */
 public class SqlStreet extends Sql {
 	

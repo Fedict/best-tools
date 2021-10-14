@@ -26,8 +26,9 @@
 package be.bosa.dt.best.webservice.queries;
 
 /**
- *
- * @author Bart.Hanssens
+ * Select from addresses based on geo-location
+ * 
+ * @author Bart Hanssens
  */
 public class SqlGeo extends Sql {
 	

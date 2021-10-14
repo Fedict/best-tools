@@ -26,6 +26,8 @@
 package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.Address;
+import be.bosa.dt.best.webservice.entities.Municipality;
+import be.bosa.dt.best.webservice.entities.Street;
 
 import io.quarkus.vertx.web.Param;
 import io.quarkus.vertx.web.Route;
@@ -48,7 +50,8 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 
 
 /**
- *
+ * End points for web service
+ * 
  * @author Bart Hanssens
  */
 @OpenAPIDefinition(
@@ -73,7 +76,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 public class LookupResource {
 	@Inject
 	Repository repo;
-	
+
 	@Route(path = "addresses/:id", methods = HttpMethod.GET, produces = "application/json")
 	@Operation(summary = "Get an address by full ID")
 	public void getAddressById(
@@ -81,8 +84,34 @@ public class LookupResource {
 			@Param("id") String id,
 			RoutingContext rc) {
 		Uni<Address> add = repo.findAddressById(id);
-		add.subscribe().with(addr ->  {
-			JsonObject obj = JsonObject.mapFrom(addr).put("self", rc.request().absoluteURI());
+		add.subscribe().with(a ->  {
+			JsonObject obj = JsonObject.mapFrom(a).put("self", rc.request().absoluteURI());
+			rc.response().send(obj.toBuffer());
+		});
+	}
+
+	@Route(path = "municipalities/:id", methods = HttpMethod.GET, produces = "application/json")
+	@Operation(summary = "Get a municipality by full ID")
+	public void getMunicipalityById(
+			@Parameter(description = "Municipality ID", required = true, example = "BE.BRUSSELS.BRIC.ADM.ADDR/1299/2")
+			@Param("id") String id,
+			RoutingContext rc) {
+		Uni<Municipality> city = repo.findMunicipalityById(id);
+		city.subscribe().with(m ->  {
+			JsonObject obj = JsonObject.mapFrom(m).put("self", rc.request().absoluteURI());
+			rc.response().send(obj.toBuffer());
+		});
+	}
+
+	@Route(path = "streets/:id", methods = HttpMethod.GET, produces = "application/json")
+	@Operation(summary = "Get a street by full ID")
+	public void getStreetById(
+			@Parameter(description = "Street ID", required = true, example = "BE.BRUSSELS.BRIC.ADM.ADDR/1299/2")
+			@Param("id") String id,
+			RoutingContext rc) {
+		Uni<Street> street = repo.findStreetById(id);
+		street.subscribe().with(s ->  {
+			JsonObject obj = JsonObject.mapFrom(s).put("self", rc.request().absoluteURI());
 			rc.response().send(obj.toBuffer());
 		});
 	}

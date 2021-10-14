@@ -26,16 +26,15 @@
 package be.bosa.dt.best.webservice.queries;
 
 /**
- * Select from address table
+ * Select from municipality table
  * 
  * @author Bart Hanssens
  */
-public class SqlAddress extends Sql {
+public class SqlMunicipality extends Sql {
 	
-	public SqlAddress() {
-		this.select = "identifier, sIdentifier, mIdentifier, pIdentifier, mpIdentifier, " +
-							" housenumber, boxnumber, validFrom, validTo, status, point::point ";
-		this.from = "address";
+	public SqlMunicipality() {
+		this.select = "identifier, refnisCode, nameNL, nameFR, nameDE";
+		this.from = "municipality";
 		this.order = "identifier";
 		this.vars = 0;
 	}
