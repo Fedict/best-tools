@@ -25,6 +25,8 @@
  */
 package be.bosa.dt.best.webservice.queries;
 
+import io.quarkus.logging.Log;
+
 /**
  * Helper class for building SQL select statements
  * 
@@ -44,7 +46,7 @@ public abstract class Sql {
 	 * @param str 
 	 */
 	public void where(String str) {
-		String tmp = str + "$" + ++vars;
+		String tmp = str + " = $" + ++vars;
 		this.where = (this.where.equals("")) ? tmp : this.where + " AND " + tmp;
 	}
 
@@ -69,6 +71,11 @@ public abstract class Sql {
 	 * @return 
 	 */
 	public String build() {
-		return String.join(" ", "SELECT", select, "FROM", from, "WHERE", where, "ORDER BY", order, "LIMIT", limit);
+		String str = String.join(" ", "SELECT", select, "FROM", from, "WHERE", where);
+		if (!order.isEmpty()) {
+			str = String.join(" ", str, "ORDER BY", order, "LIMIT", limit);
+		}
+		Log.debug(str);
+		return str;
 	}
 }

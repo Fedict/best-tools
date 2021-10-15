@@ -47,6 +47,7 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.info.Contact;
 import org.eclipse.microprofile.openapi.annotations.info.Info;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 
 /**
@@ -68,19 +69,27 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 			name = "BOSA DG DT servicedesk",
 			email = "servicedesk.DTO@bosa.fgov.be"
 		)
+	),
+	tags = {
+		@Tag(name = "addresses", description = "Everything about addresses" ),
+		@Tag(name = "municipalities", description = "Everything about municipalities" ),
+		@Tag(name = "streets", description = "Everything about streets" )
+		}
 	)
-)
 
 @ApplicationScoped
-@RouteBase(path = "best/api/v2")
+@RouteBase(path = "api/belgianAddress/v2")
 public class LookupResource {
 	@Inject
 	Repository repo;
 
 	@Route(path = "addresses/:id", methods = HttpMethod.GET, produces = "application/json")
-	@Operation(summary = "Get an address by full ID")
+	@Operation(summary = "The external identifier of the address",
+			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
 	public void getAddressById(
-			@Parameter(description = "Address ID", required = true, example = "BE.BRUSSELS.BRIC.ADM.ADDR/1299/2")
+			@Parameter(description = "Address ID", 
+						required = true, 
+						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
 			@Param("id") String id,
 			RoutingContext rc) {
 		Uni<Address> add = repo.findAddressById(id);
@@ -106,7 +115,7 @@ public class LookupResource {
 	@Route(path = "streets/:id", methods = HttpMethod.GET, produces = "application/json")
 	@Operation(summary = "Get a street by full ID")
 	public void getStreetById(
-			@Parameter(description = "Street ID", required = true, example = "BE.BRUSSELS.BRIC.ADM.ADDR/1299/2")
+			@Parameter(description = "Street ID", required = true, example = "https://data.vlaanderen.be/id/straatnaam/1/2013-04-12T20:06:58.583'")
 			@Param("id") String id,
 			RoutingContext rc) {
 		Uni<Street> street = repo.findStreetById(id);

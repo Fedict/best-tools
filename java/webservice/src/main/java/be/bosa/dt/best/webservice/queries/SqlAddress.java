@@ -36,7 +36,5 @@ public class SqlAddress extends Sql {
 		this.select = "identifier, sIdentifier, mIdentifier, pIdentifier, mpIdentifier, " +
 							" housenumber, boxnumber, validFrom, validTo, status, point::point ";
 		this.from = "address";
-		this.order = "identifier";
-		this.vars = 0;
 	}
 }

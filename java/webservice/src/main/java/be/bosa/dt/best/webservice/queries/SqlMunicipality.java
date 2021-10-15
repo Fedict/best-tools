@@ -35,7 +35,5 @@ public class SqlMunicipality extends Sql {
 	public SqlMunicipality() {
 		this.select = "identifier, refnisCode, nameNL, nameFR, nameDE";
 		this.from = "municipality";
-		this.order = "identifier";
-		this.vars = 0;
 	}
 }

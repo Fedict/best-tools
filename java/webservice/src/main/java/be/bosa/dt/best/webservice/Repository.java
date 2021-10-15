@@ -28,6 +28,7 @@ package be.bosa.dt.best.webservice;
 import be.bosa.dt.best.webservice.entities.Address;
 import be.bosa.dt.best.webservice.entities.Municipality;
 import be.bosa.dt.best.webservice.entities.Street;
+import be.bosa.dt.best.webservice.queries.SqlAddress;
 import be.bosa.dt.best.webservice.queries.SqlGeo;
 import be.bosa.dt.best.webservice.queries.SqlStreet;
 
@@ -86,7 +87,7 @@ public class Repository {
 	 */
 	public Uni<Address> findAddressById(String id) {
 		Tuple tuple = Tuple.of(NsConverter.addressEncode(id));
-		SqlStreet qry = new SqlStreet();
+		SqlAddress qry = new SqlAddress();
 		qry.where("identifier");
 
 		return uni(
