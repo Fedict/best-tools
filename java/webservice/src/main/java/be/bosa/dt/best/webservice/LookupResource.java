@@ -119,7 +119,7 @@ public class LookupResource {
 		String url = rc.request().absoluteURI();
 		obj.put("self", url);
 		JsonArray arr = new JsonArray();
-		adds.subscribe().asStream().forEach(a -> arr.add(a));
+		adds.subscribe().asStream().forEach(a -> arr.add(JsonObject.mapFrom(a)));
 	
 		JsonObject last = arr.getJsonObject(arr.size() -1);
 		String next = last.getString("identifier");
