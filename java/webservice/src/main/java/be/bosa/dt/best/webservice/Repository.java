@@ -127,6 +127,24 @@ public class Repository {
 		).transform(row -> row.hasNext() ? Street.from(row.next()) : null);
 	}
 
+	public Multi<Address> findAddresses(String startId) {
+		Tuple tuple;
+		SqlAddress qry = new SqlAddress();
+		qry.order();
+	
+		if (startId != null) {
+			qry.paginate();
+			tuple = Tuple.of(startId, 100);
+		} else {
+			qry.limit();
+			tuple = Tuple.of(100);
+		}
+
+		return multi(
+			pg.preparedQuery(qry.build()).execute(tuple)
+		).transform(Address::from);
+	}
+
 	public Multi<Address> findByCoordinates(int x, int y, int meters, int limit, String startId) {
 		Tuple tuple;
 		SqlGeo qry = new SqlGeo();

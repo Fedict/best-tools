@@ -34,9 +34,13 @@ import io.quarkus.vertx.web.Route;
 import io.quarkus.vertx.web.Route.HttpMethod;
 import io.quarkus.vertx.web.RouteBase;
 
+import io.smallrye.common.annotation.Blocking;
+import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+
 import io.vertx.ext.web.RoutingContext;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -99,6 +103,31 @@ public class LookupResource {
 		});
 	}
 
+	@Route(path = "addresses", methods = HttpMethod.GET, produces = "application/json")
+	@Operation(summary = "The external identifier of the address",
+			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	@Blocking
+	public void getAddresses(
+			@Parameter(description = "After address", 
+						required = false, 
+						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
+			@Param("afterAddress") String afterAddress,
+			RoutingContext rc) {
+		Multi<Address> adds = repo.findAddresses(afterAddress);
+
+		JsonObject obj = new JsonObject();
+		String url = rc.request().absoluteURI();
+		obj.put("self", url);
+		JsonArray arr = new JsonArray();
+		adds.subscribe().asStream().forEach(a -> arr.add(a));
+	
+		JsonObject last = arr.getJsonObject(arr.size() -1);
+		String next = last.getString("identifier");
+		obj.put("items", arr); 
+		obj.put("next", url + "?afterAddress=" + next);
+		rc.response().send(obj.toBuffer());
+	}
+
 	@Route(path = "municipalities/:id", methods = HttpMethod.GET, produces = "application/json")
 	@Operation(summary = "Get a municipality by full ID")
 	public void getMunicipalityById(
@@ -124,7 +153,7 @@ public class LookupResource {
 			rc.response().send(obj.toBuffer());
 		});
 	}
-
+}
 	/*
 	@Operation(summary = "Search for addresses")
 	@Path("/addresses")
@@ -141,4 +170,4 @@ public class LookupResource {
 			@RestQuery Optional<String> status) {
 		return null;
 	} */
-}
+

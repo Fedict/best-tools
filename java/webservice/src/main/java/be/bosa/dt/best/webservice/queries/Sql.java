@@ -39,14 +39,22 @@ public abstract class Sql {
 	String order = "";
 	String limit = "";
 	int vars = 0;
-	
+
+	/**
+	 * Add order by clause
+	 * @param str 
+	 */
+	public void order(String str) {
+		this.order = str;
+	}
+
 	/**
 	 * Add where clause with variable
 	 * 
 	 * @param str 
 	 */
 	public void where(String str) {
-		String tmp = str + " = $" + ++vars;
+		String tmp = str + " $" + ++vars;
 		this.where = (this.where.equals("")) ? tmp : this.where + " AND " + tmp;
 	}
 
@@ -54,7 +62,7 @@ public abstract class Sql {
 	 * Add pagination with start identifier (don't use OFFSET, that's more resource intensive)
 	 */
 	public void paginate() {
-		where("identifier > $" + ++vars);
+		where("identifier > ");
 		limit();
 	}
 	
@@ -71,7 +79,10 @@ public abstract class Sql {
 	 * @return 
 	 */
 	public String build() {
-		String str = String.join(" ", "SELECT", select, "FROM", from, "WHERE", where);
+		String str = String.join(" ", "SELECT", select, "FROM", from);
+		if (!where.isEmpty()) {
+			str = String.join(" ", str, "WHERE", where);
+		}
 		if (!order.isEmpty()) {
 			str = String.join(" ", str, "ORDER BY", order, "LIMIT", limit);
 		}
