@@ -25,6 +25,7 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
+import be.bosa.dt.best.webservice.NsConverter;
 import io.vertx.mutiny.sqlclient.Row;
 
 /**
@@ -35,7 +36,7 @@ import io.vertx.mutiny.sqlclient.Row;
  * @author Bart Hanssens
  */
 public class Municipality {
-	public String id;
+	public String identifier;
 	public String niscode;
 	public String name_nl;
 	public String name_fr;
@@ -54,14 +55,14 @@ public class Municipality {
 	/**
 	 * Constructor
 	 * 
-	 * @param id
+	 * @param identifier
 	 * @param niscode
 	 * @param name_nl
 	 * @param name_fr
 	 * @param name_de 
 	 */
-	public Municipality(String id, String niscode, String name_nl, String name_fr, String name_de) {
-		this.id = id;
+	public Municipality(String identifier, String niscode, String name_nl, String name_fr, String name_de) {
+		this.identifier = NsConverter.municipalityDecode(identifier);
 		this.niscode = niscode;
 		this.name_nl = name_nl;
 		this.name_fr = name_fr;

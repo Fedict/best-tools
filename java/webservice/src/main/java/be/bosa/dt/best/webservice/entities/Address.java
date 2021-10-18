@@ -25,6 +25,7 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
+import be.bosa.dt.best.webservice.NsConverter;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.pgclient.data.Point;
 import java.time.OffsetDateTime;
@@ -83,11 +84,11 @@ public class Address {
 					String housenumber, String boxnumber, 
 					OffsetDateTime validFrom, OffsetDateTime validTo, String status,
 					Point point) {
-		this.identifier = identifier;
-		this.sIdentifier = sIdentifier;
-		this.mIdentifier = mIdentifier;
-		this.pIdentifier = pIdentifier;
-		this.mpIdentifier = mpIdentifier;
+		this.identifier = NsConverter.addressDecode(identifier);
+		this.sIdentifier = NsConverter.streetDecode(sIdentifier);
+		this.mIdentifier = NsConverter.municipalityDecode(mIdentifier);
+		this.pIdentifier = NsConverter.postalDecode(pIdentifier);
+		this.mpIdentifier =mpIdentifier;
 		this.housenumber = housenumber;
 		this.boxnumber = boxnumber;
 		this.validFrom = validFrom;

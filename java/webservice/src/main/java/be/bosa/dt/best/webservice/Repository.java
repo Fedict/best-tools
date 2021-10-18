@@ -54,6 +54,8 @@ import javax.inject.Inject;
  */
 @ApplicationScoped
 public class Repository {
+	private static int LIMIT = 100;
+
 	@Inject
 	PgPool pg;
 
@@ -134,10 +136,10 @@ public class Repository {
 	
 		if (startId != null) {
 			qry.paginate();
-			tuple = Tuple.of(startId, 100);
+			tuple = Tuple.of(startId, LIMIT);
 		} else {
 			qry.limit();
-			tuple = Tuple.of(100);
+			tuple = Tuple.of(LIMIT);
 		}
 
 		return multi(

@@ -25,6 +25,7 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
+import be.bosa.dt.best.webservice.NsConverter;
 import io.vertx.mutiny.sqlclient.Row;
 import java.time.OffsetDateTime;
 
@@ -70,8 +71,8 @@ public class Street {
 	public Street(String identifier, 
 				String mIdentifier, String nameNL, String nameFR, String nameDE,
 				OffsetDateTime validFrom, OffsetDateTime validTo, String status) {
-		this.identifier = identifier;
-		this.mIdentifier = mIdentifier;
+		this.identifier = NsConverter.streetDecode(identifier);
+		this.mIdentifier = NsConverter.municipalityDecode(mIdentifier);
 		this.nameNL = nameNL;
 		this.nameFR = nameFR;
 		this.nameDE = nameDE;

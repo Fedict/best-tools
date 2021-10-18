@@ -25,13 +25,15 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
+import be.bosa.dt.best.webservice.NsConverter;
+
 /**
  * Postal codes (bPost.be).
  * 
  * @author Bart Hanssens
  */
 public class Postal {
-	public String id;
+	public String identifier;
 	public String zipcode;
 	public String name_nl;
 	public String name_fr;
@@ -40,14 +42,14 @@ public class Postal {
 	/**
 	 * Constructor
 	 * 
-	 * @param id
+	 * @param identifier
 	 * @param zipcode
 	 * @param name_nl
 	 * @param name_fr
 	 * @param name_de 
 	 */
-	public Postal(String id, String zipcode, String name_nl, String name_fr, String name_de) {
-		this.id = id;
+	public Postal(String identifier, String zipcode, String name_nl, String name_fr, String name_de) {
+		this.identifier = NsConverter.postalDecode(identifier);
 		this.zipcode = zipcode;
 		this.name_nl = name_nl;
 		this.name_fr = name_fr;
