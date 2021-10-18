@@ -78,7 +78,7 @@ public class Repository {
 	 * @return multi of data objects
 	 */
 	private UniOnItem<RowIterator<Row>> uni(Uni<RowSet<Row>> res) {
-		return res.onItem().transform(RowSet::iterator).onItem();
+		return res.map(RowSet::iterator).onItem();
 	}
 
 	/**

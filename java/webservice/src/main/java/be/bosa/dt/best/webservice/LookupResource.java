@@ -26,25 +26,21 @@
 package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.Address;
-import be.bosa.dt.best.webservice.entities.Municipality;
-import be.bosa.dt.best.webservice.entities.Street;
-
-import io.quarkus.vertx.web.Param;
-import io.quarkus.vertx.web.Route;
-import io.quarkus.vertx.web.Route.HttpMethod;
-import io.quarkus.vertx.web.RouteBase;
 
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Multi;
-import io.smallrye.mutiny.Uni;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-import io.vertx.ext.web.RoutingContext;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
 import org.eclipse.microprofile.openapi.annotations.Operation;
@@ -52,6 +48,7 @@ import org.eclipse.microprofile.openapi.annotations.info.Contact;
 import org.eclipse.microprofile.openapi.annotations.info.Info;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.jboss.resteasy.reactive.RestQuery;
 
 
 /**
@@ -82,41 +79,42 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 	)
 
 @ApplicationScoped
-@RouteBase(path = "api/belgianAddress/v2")
+@Path("api/belgianAddress/v2")
 public class LookupResource {
 	@Inject
 	Repository repo;
 
-	@Route(path = "addresses/:id", methods = HttpMethod.GET, produces = "application/json")
+	@GET
+	@Path("addresses/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "The external identifier of the address",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
-	public void getAddressById(
+	public JsonObject getAddressById(
 			@Parameter(description = "Address ID", 
 						required = true, 
 						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
-			@Param("id") String id,
-			RoutingContext rc) {
-		Uni<Address> add = repo.findAddressById(id);
-		add.subscribe().with(a ->  {
-			JsonObject obj = JsonObject.mapFrom(a).put("self", rc.request().absoluteURI());
-			rc.response().send(obj.toBuffer());
-		});
+			String id,
+			UriInfo info) {
+		Address add = repo.findAddressById(id).await().indefinitely();
+		return JsonObject.mapFrom(add).put("self", info.getAbsolutePath());
 	}
 
-	@Route(path = "addresses", methods = HttpMethod.GET, produces = "application/json")
+	@GET
+	@Path("addresses")
+	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "The external identifier of the address",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
 	@Blocking
-	public void getAddresses(
+	public JsonObject getAddresses(
 			@Parameter(description = "After address", 
 						required = false, 
 						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
-			@Param("afterAddress") String afterAddress,
-			RoutingContext rc) {
+			@RestQuery String afterAddress,
+			UriInfo info) {
 		Multi<Address> adds = repo.findAddresses(afterAddress);
 
 		JsonObject obj = new JsonObject();
-		String url = rc.request().absoluteURI();
+		String url = info.getAbsolutePath().toString();
 		obj.put("self", url);
 		JsonArray arr = new JsonArray();
 		adds.subscribe().asStream().forEach(a -> arr.add(JsonObject.mapFrom(a)));
@@ -125,9 +123,10 @@ public class LookupResource {
 		String next = last.getString("identifier");
 		obj.put("items", arr); 
 		obj.put("next", url + "?afterAddress=" + next);
-		rc.response().send(obj.toBuffer());
+		return obj;
 	}
-
+}
+/*
 	@Route(path = "municipalities/:id", methods = HttpMethod.GET, produces = "application/json")
 	@Operation(summary = "Get a municipality by full ID")
 	public void getMunicipalityById(
@@ -154,7 +153,7 @@ public class LookupResource {
 		});
 	}
 }
-	/*
+*/	/*
 	@Operation(summary = "Search for addresses")
 	@Path("/addresses")
 	@GET
