@@ -35,8 +35,7 @@ import io.vertx.mutiny.sqlclient.Row;
  * 
  * @author Bart Hanssens
  */
-public class Municipality {
-	public String identifier;
+public class Municipality extends BestEntity {
 	public String niscode;
 	public String name_nl;
 	public String name_fr;

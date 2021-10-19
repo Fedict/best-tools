@@ -34,8 +34,7 @@ import java.time.OffsetDateTime;
  * 
  * @author Bart Hanssens
  */
-public class Street {
-	public String identifier;
+public class Street extends BestEntity {
 	public String mIdentifier;
 	public String nameNL;
 	public String nameFR;

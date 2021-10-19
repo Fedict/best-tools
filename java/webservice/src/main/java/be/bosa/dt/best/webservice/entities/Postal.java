@@ -32,8 +32,7 @@ import be.bosa.dt.best.webservice.NsConverter;
  * 
  * @author Bart Hanssens
  */
-public class Postal {
-	public String identifier;
+public class Postal extends BestEntity {
 	public String zipcode;
 	public String name_nl;
 	public String name_fr;

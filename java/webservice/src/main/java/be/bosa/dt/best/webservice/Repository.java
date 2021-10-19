@@ -127,7 +127,7 @@ public class Repository {
 	public Uni<Address> findAddressById(String id) {
 		Tuple tuple = Tuple.of(NsConverter.addressEncode(id));
 		SqlAddress qry = new SqlAddress();
-		qry.where("identifier");
+		qry.where("identifier =");
 
 		return uni(
 			pg.preparedQuery(qry.build()).execute(tuple)

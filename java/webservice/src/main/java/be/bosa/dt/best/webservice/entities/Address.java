@@ -36,8 +36,7 @@ import java.time.OffsetDateTime;
  *
  * @author Bart Hanssens
  */
-public class Address {
-	public String identifier;
+public class Address extends BestEntity {
 	public String sIdentifier;
 	public String mIdentifier;
 	public String pIdentifier;

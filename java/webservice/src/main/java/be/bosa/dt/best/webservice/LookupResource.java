@@ -26,6 +26,7 @@
 package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.Address;
+import be.bosa.dt.best.webservice.entities.BestEntity;
 import be.bosa.dt.best.webservice.entities.Municipality;
 import be.bosa.dt.best.webservice.entities.Street;
 
@@ -108,11 +109,14 @@ public class LookupResource {
 	 * @param items entities
 	 * @return JSON object
 	 */
-	private static <T> JsonObject toJson(UriInfo info, Multi<T> items) {
+	private static <T extends BestEntity> JsonObject toJson(UriInfo info, Multi<T> items) {
 		String self = info.getAbsolutePath().toString();
-		
+
 		JsonArray arr = new JsonArray();
-		items.subscribe().asStream().forEach(a -> arr.add(JsonObject.mapFrom(a)));
+		items.subscribe().asStream().forEach(a -> {
+			String href = self + "/" + a.identifier.replaceAll("/", "%2F");
+			arr.add(JsonObject.mapFrom(a).put("href", href));
+		});
 
 		JsonObject obj = new JsonObject();		
 		obj.put("self", self);
