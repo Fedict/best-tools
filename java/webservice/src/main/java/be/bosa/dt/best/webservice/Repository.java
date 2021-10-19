@@ -28,6 +28,7 @@ package be.bosa.dt.best.webservice;
 import be.bosa.dt.best.webservice.entities.Address;
 import be.bosa.dt.best.webservice.entities.Municipality;
 import be.bosa.dt.best.webservice.entities.Street;
+import be.bosa.dt.best.webservice.queries.Sql;
 import be.bosa.dt.best.webservice.queries.SqlAddress;
 import be.bosa.dt.best.webservice.queries.SqlGeo;
 import be.bosa.dt.best.webservice.queries.SqlStreet;
@@ -43,6 +44,9 @@ import io.vertx.mutiny.sqlclient.RowIterator;
 import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -54,7 +58,7 @@ import javax.inject.Inject;
  */
 @ApplicationScoped
 public class Repository {
-	private static int LIMIT = 100;
+	protected static int LIMIT = 100;
 
 	@Inject
 	PgPool pg;
@@ -79,6 +83,39 @@ public class Repository {
 	 */
 	private UniOnItem<RowIterator<Row>> uni(Uni<RowSet<Row>> res) {
 		return res.map(RowSet::iterator).onItem();
+	}
+
+
+	/**
+	 * Add paginate / limit clause to SQL query, optionally start after last ID of previous page
+	 * 
+	 * @param lst list of SQL parameter values
+	 * @param qry SQL query
+	 * @param afterID last ID on previous result page
+	 */
+	private static void paginate(List lst, Sql qry, String afterId) {
+		if (afterId != null) {
+			qry.paginate();
+			lst.add(afterId);
+		} else {
+			qry.limit();
+		}
+		lst.add(LIMIT);
+	}
+
+	/**
+	 * Add non-empty fields to SQL where clause
+	 * 
+	 * @param lst list of SQL parameter values
+	 * @param qry SQL query
+	 * @param field field name (+ " = " operator for equal to value)
+	 * @param value value
+	 */
+	private static void where(List lst, Sql qry, String field, String value) {
+		if (value != null && !value.isEmpty()) {
+			qry.where(field);
+			lst.add(value);
+		}
 	}
 
 	/**
@@ -129,21 +166,31 @@ public class Repository {
 		).transform(row -> row.hasNext() ? Street.from(row.next()) : null);
 	}
 
-	public Multi<Address> findAddresses(String startId) {
-		Tuple tuple;
+	/**
+	 * Find address by different parameters
+	 * 
+	 * @param startId
+	 * @param mIdentifier
+	 * @param sIdentifier
+	 * @param houseNumber
+	 * @param boxNumber
+	 * @return 
+	 */
+	public Multi<Address> findAddresses(String startId, String mIdentifier, String sIdentifier, 
+										String houseNumber, String boxNumber) {
+		List lst = new ArrayList();
 		SqlAddress qry = new SqlAddress();
+
+		paginate(lst, qry, NsConverter.addressEncode(startId));
+		where(lst, qry, "mIdentifier =", NsConverter.municipalityEncode(mIdentifier));
+		where(lst, qry, "sIdentifier =", NsConverter.streetEncode(sIdentifier));
+		where(lst, qry, "houseNumber =", houseNumber);
+		where(lst, qry, "boxNumber =", boxNumber);
+
 		qry.order();
-	
-		if (startId != null) {
-			qry.paginate();
-			tuple = Tuple.of(startId, LIMIT);
-		} else {
-			qry.limit();
-			tuple = Tuple.of(LIMIT);
-		}
 
 		return multi(
-			pg.preparedQuery(qry.build()).execute(tuple)
+			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
 		).transform(Address::from);
 	}
 

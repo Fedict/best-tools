@@ -26,16 +26,18 @@
 package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.Address;
+import be.bosa.dt.best.webservice.entities.Municipality;
+import be.bosa.dt.best.webservice.entities.Street;
 
-import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -48,6 +50,7 @@ import org.eclipse.microprofile.openapi.annotations.info.Contact;
 import org.eclipse.microprofile.openapi.annotations.info.Info;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+
 import org.jboss.resteasy.reactive.RestQuery;
 
 
@@ -84,6 +87,57 @@ public class LookupResource {
 	@Inject
 	Repository repo;
 
+	/**
+	 * Convert uni of address, street, ... into JSON
+	 * 
+	 * @param <T>
+	 * @param info information about web request
+	 * @param item entity
+	 * @return JSON object
+	 */
+	private static <T> JsonObject toJson(UriInfo info, Uni<T> item) {
+		String self = info.getAbsolutePath().toString();
+		return JsonObject.mapFrom(item.await().indefinitely()).put("self", self);
+	}
+
+	/**
+	 * Convert multi of address, street, ... into JSON
+	 * 
+	 * @param <T>
+	 * @param info information about web request
+	 * @param items entities
+	 * @return JSON object
+	 */
+	private static <T> JsonObject toJson(UriInfo info, Multi<T> items) {
+		String self = info.getAbsolutePath().toString();
+		
+		JsonArray arr = new JsonArray();
+		items.subscribe().asStream().forEach(a -> arr.add(JsonObject.mapFrom(a)));
+
+		JsonObject obj = new JsonObject();		
+		obj.put("self", self);
+		obj.put("items", arr); 
+
+		//pagination
+		int size = arr.size();
+		if (size >= Repository.LIMIT) {
+			JsonObject lastObj = arr.getJsonObject(size - 1);
+			String first = info.getRequestUriBuilder()
+								.replaceQueryParam("after", null)
+								.queryParam("pageSize", Repository.LIMIT)
+								.build().toString();
+			String next = info.getRequestUriBuilder()
+								.replaceQueryParam("after", lastObj.getString("identifier"))
+								.queryParam("pageSize", Repository.LIMIT)
+								.build().toString();
+			obj.put("pageSize", Repository.LIMIT);
+			obj.put("first", first);
+			obj.put("next", next);
+		}
+
+		return obj;
+	}
+
 	@GET
 	@Path("addresses/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -95,8 +149,8 @@ public class LookupResource {
 						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
 			String id,
 			UriInfo info) {
-		Address add = repo.findAddressById(id).await().indefinitely();
-		return JsonObject.mapFrom(add).put("self", info.getAbsolutePath());
+		Uni<Address> address = repo.findAddressById(id);
+		return toJson(info, address);
 	}
 
 	@GET
@@ -104,56 +158,53 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "The external identifier of the address",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
-	@Blocking
 	public JsonObject getAddresses(
 			@Parameter(description = "After address", 
 						required = false, 
 						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
-			@RestQuery String afterAddress,
+			@RestQuery String after,
+			@Parameter(description = "Municipality identifier", 
+						required = false)
+			@RestQuery String municipalityID,
+			@Parameter(description = "Street identifier", 
+						required = false)
+			@RestQuery String streetID,
+			@Parameter(description = "House number", 
+						required = false)
+			@RestQuery String houseNumber,
+			@Parameter(description = "Box number", 
+						required = false)
+			@RestQuery String boxNumber,
 			UriInfo info) {
-		Multi<Address> adds = repo.findAddresses(afterAddress);
-
-		JsonObject obj = new JsonObject();
-		String url = info.getAbsolutePath().toString();
-		obj.put("self", url);
-		JsonArray arr = new JsonArray();
-		adds.subscribe().asStream().forEach(a -> arr.add(JsonObject.mapFrom(a)));
-	
-		JsonObject last = arr.getJsonObject(arr.size() -1);
-		String next = last.getString("identifier");
-		obj.put("items", arr); 
-		obj.put("next", url + "?afterAddress=" + next);
-		return obj;
+		Multi<Address> addresses = repo.findAddresses(after, municipalityID, streetID, houseNumber, boxNumber);
+		return toJson(info, addresses);
 	}
-}
-/*
-	@Route(path = "municipalities/:id", methods = HttpMethod.GET, produces = "application/json")
+
+	@GET
+	@Path("municipalities/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a municipality by full ID")
-	public void getMunicipalityById(
+	public JsonObject getMunicipalityById(
 			@Parameter(description = "Municipality ID", required = true, example = "BE.BRUSSELS.BRIC.ADM.ADDR/1299/2")
-			@Param("id") String id,
-			RoutingContext rc) {
-		Uni<Municipality> city = repo.findMunicipalityById(id);
-		city.subscribe().with(m ->  {
-			JsonObject obj = JsonObject.mapFrom(m).put("self", rc.request().absoluteURI());
-			rc.response().send(obj.toBuffer());
-		});
+			String id,
+			UriInfo info) {
+		Uni<Municipality> municipality = repo.findMunicipalityById(id);
+		return toJson(info, municipality);
 	}
 
-	@Route(path = "streets/:id", methods = HttpMethod.GET, produces = "application/json")
+	@GET
+	@Path("streets/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a street by full ID")
-	public void getStreetById(
+	public JsonObject getStreetById(
 			@Parameter(description = "Street ID", required = true, example = "https://data.vlaanderen.be/id/straatnaam/1/2013-04-12T20:06:58.583'")
-			@Param("id") String id,
-			RoutingContext rc) {
+			String id,
+			UriInfo info) {
 		Uni<Street> street = repo.findStreetById(id);
-		street.subscribe().with(s ->  {
-			JsonObject obj = JsonObject.mapFrom(s).put("self", rc.request().absoluteURI());
-			rc.response().send(obj.toBuffer());
-		});
+		return toJson(info, street);
 	}
 }
-*/	/*
+	/*
 	@Operation(summary = "Search for addresses")
 	@Path("/addresses")
 	@GET
