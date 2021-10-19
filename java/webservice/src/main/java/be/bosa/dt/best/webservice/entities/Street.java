@@ -54,6 +54,15 @@ public class Street extends BestEntity {
 			res.getString(1), res.getString(2), res.getString(3), res.getString(4), 
 			res.getOffsetDateTime(5), res.getOffsetDateTime(6), res.getString(7));
 	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param identifier 
+	 */
+	public Street(String identifier) {
+		this.id = NsConverter.streetDecode(identifier);
+	}
 	
 	/**
 	* Constructor
@@ -70,7 +79,7 @@ public class Street extends BestEntity {
 	public Street(String identifier, 
 				String mIdentifier, String nameNL, String nameFR, String nameDE,
 				OffsetDateTime validFrom, OffsetDateTime validTo, String status) {
-		this.identifier = NsConverter.streetDecode(identifier);
+		this.id = NsConverter.streetDecode(identifier);
 		this.mIdentifier = NsConverter.municipalityDecode(mIdentifier);
 		this.nameNL = nameNL;
 		this.nameFR = nameFR;

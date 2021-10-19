@@ -114,7 +114,7 @@ public class LookupResource {
 
 		JsonArray arr = new JsonArray();
 		items.subscribe().asStream().forEach(a -> {
-			String href = self + "/" + a.identifier.replaceAll("/", "%2F");
+			String href = self + "/" + a.id.replaceAll("/", "%2F");
 			arr.add(JsonObject.mapFrom(a).put("href", href));
 		});
 
@@ -131,7 +131,7 @@ public class LookupResource {
 								.queryParam("pageSize", Repository.LIMIT)
 								.build().toString();
 			String next = info.getRequestUriBuilder()
-								.replaceQueryParam("after", lastObj.getString("identifier"))
+								.replaceQueryParam("after", lastObj.getString("id"))
 								.queryParam("pageSize", Repository.LIMIT)
 								.build().toString();
 			obj.put("pageSize", Repository.LIMIT);

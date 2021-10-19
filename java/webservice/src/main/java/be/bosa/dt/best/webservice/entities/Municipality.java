@@ -51,6 +51,16 @@ public class Municipality extends BestEntity {
 		return new Municipality(res.getString(0), res.getString(1), res.getString(2), res.getString(3), res.getString(4));
 	}
 
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param identifier 
+	 */
+	public Municipality(String identifier) {
+		this.id = NsConverter.municipalityDecode(identifier);
+	}
+
 	/**
 	 * Constructor
 	 * 
@@ -61,7 +71,7 @@ public class Municipality extends BestEntity {
 	 * @param name_de 
 	 */
 	public Municipality(String identifier, String niscode, String name_nl, String name_fr, String name_de) {
-		this.identifier = NsConverter.municipalityDecode(identifier);
+		this.id = NsConverter.municipalityDecode(identifier);
 		this.niscode = niscode;
 		this.name_nl = name_nl;
 		this.name_fr = name_fr;

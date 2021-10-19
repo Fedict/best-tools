@@ -25,10 +25,12 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
+import be.bosa.dt.best.webservice.CoordConverter;
 import be.bosa.dt.best.webservice.NsConverter;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.pgclient.data.Point;
 import java.time.OffsetDateTime;
+import org.locationtech.jts.geom.Coordinate;
 
 
 /**
@@ -37,9 +39,9 @@ import java.time.OffsetDateTime;
  * @author Bart Hanssens
  */
 public class Address extends BestEntity {
-	public String sIdentifier;
-	public String mIdentifier;
-	public String pIdentifier;
+	public BestEntity municipality;
+	public BestEntity street;
+	public BestEntity postalInfo;
 	public String mpIdentifier;
 	public String housenumber;
 	public String boxnumber;
@@ -79,20 +81,21 @@ public class Address extends BestEntity {
 	 * @param status 
 	 */
 	public Address(String identifier, 
-					String sIdentifier, String mIdentifier, String pIdentifier, String mpIdentifier,
-					String housenumber, String boxnumber, 
+					String mIdentifier, String pIdentifier, String mpIdentifier,
+					String sIdentifier, String housenumber, String boxnumber, 
 					OffsetDateTime validFrom, OffsetDateTime validTo, String status,
 					Point point) {
-		this.identifier = NsConverter.addressDecode(identifier);
-		this.sIdentifier = NsConverter.streetDecode(sIdentifier);
-		this.mIdentifier = NsConverter.municipalityDecode(mIdentifier);
-		this.pIdentifier = NsConverter.postalDecode(pIdentifier);
-		this.mpIdentifier =mpIdentifier;
+		this.id = NsConverter.addressDecode(identifier);
+		this.municipality = new BestEntity(NsConverter.municipalityDecode(mIdentifier));
+		this.street = new BestEntity(NsConverter.streetDecode(sIdentifier));
+		this.postalInfo = new BestEntity(NsConverter.postalDecode(pIdentifier));
+		this.mpIdentifier = mpIdentifier;
 		this.housenumber = housenumber;
 		this.boxnumber = boxnumber;
 		this.validFrom = validFrom;
 		this.validTo = validTo;
-		this.point = point;
+		Coordinate coord = CoordConverter.lambertToGps(point.x, point.y);
+		this.point = new Point(coord.x, coord.y);
 		this.status = status;
 	}
 }

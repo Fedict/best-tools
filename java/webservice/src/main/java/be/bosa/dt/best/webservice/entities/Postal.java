@@ -41,6 +41,15 @@ public class Postal extends BestEntity {
 	/**
 	 * Constructor
 	 * 
+	 * @param identifier 
+	 */
+	public Postal(String identifier) {
+		super(NsConverter.postalDecode(identifier));
+	}
+	
+	/**
+	 * Constructor
+	 * 
 	 * @param identifier
 	 * @param zipcode
 	 * @param name_nl
@@ -48,7 +57,7 @@ public class Postal extends BestEntity {
 	 * @param name_de 
 	 */
 	public Postal(String identifier, String zipcode, String name_nl, String name_fr, String name_de) {
-		this.identifier = NsConverter.postalDecode(identifier);
+		this.id = NsConverter.postalDecode(identifier);
 		this.zipcode = zipcode;
 		this.name_nl = name_nl;
 		this.name_fr = name_fr;
