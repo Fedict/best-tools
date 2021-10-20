@@ -31,36 +31,27 @@ import be.bosa.dt.best.webservice.entities.Address;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
 import javax.inject.Singleton;
 
-import org.eclipse.microprofile.config.ConfigProvider;
 import org.locationtech.jts.geom.Coordinate;
 
 /**
- *
+ * Serializes BeST address to JSON.
+ * 
+ * Note that the serialization is not complete, additional processing is required to create the final JSON
+ * (e.g. to embed additional objects, add links to first / next page)
+ * 
+ * @see <a ahref="https://www.gcloud.belgium.be/rest/">G-Cloud REST guidelines</a>
  * @author Bart.Hanssens
  */
 @Singleton
-public class AddressSerializer extends StdSerializer<Address> {
-	// can't use ConfigProperty annotation here
-	private final static String BASEURL = 
-			ConfigProvider.getConfig().getValue("be.bosa.dt.best.webservice.url", String.class);
-
-    public AddressSerializer() {
-        this(null);
-    }
- 
-    public AddressSerializer(Class<Address> address) {
-        super(address);
-    }
-
+public class AddressSerializer extends BestSerializer<Address> {
 	/**
-	 * Write best entity as object
+	 * Write best entity as object with ID and HTTP URI (used to point to embedded object)
 	 * 
-	 * @param jg json generator
+	 * @param jg JSON writer
 	 * @param field field name
 	 * @param id full identifier
 	 * @param type entity type
@@ -69,7 +60,7 @@ public class AddressSerializer extends StdSerializer<Address> {
 	private void writeObject(JsonGenerator jg, String field, String id, String type) throws IOException {
 		jg.writeObjectFieldStart(field);
 		jg.writeStringField("id", id);
-		String href = BASEURL + LookupResource.API + type + "/" + id.replace("/", "%2F");
+		String href = BestSerializer.BASEURL + LookupResource.API + type + "/" + id.replace("/", "%2F");
 		jg.writeStringField("href", href);
 	}
 
@@ -102,5 +93,4 @@ public class AddressSerializer extends StdSerializer<Address> {
 		}
         jg.writeEndObject();
 	}
-	
 }

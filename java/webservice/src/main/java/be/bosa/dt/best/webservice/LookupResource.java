@@ -28,6 +28,7 @@ package be.bosa.dt.best.webservice;
 import be.bosa.dt.best.webservice.entities.Address;
 import be.bosa.dt.best.webservice.entities.BestEntity;
 import be.bosa.dt.best.webservice.entities.Municipality;
+import be.bosa.dt.best.webservice.entities.PostalInfo;
 import be.bosa.dt.best.webservice.entities.Street;
 
 import io.smallrye.mutiny.Multi;
@@ -170,7 +171,7 @@ public class LookupResource {
 	@Operation(summary = "The external identifier of the address",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
 	public JsonObject getAddresses(
-			@Parameter(description = "After address", 
+			@Parameter(description = "After address (used in pagination)", 
 						required = false, 
 						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
 			@RestQuery String after,
@@ -180,6 +181,9 @@ public class LookupResource {
 			@Parameter(description = "Street identifier", 
 						required = false)
 			@RestQuery String streetID,
+			@Parameter(description = "Postal identifier", 
+						required = false)
+			@RestQuery String postalID,
 			@Parameter(description = "House number", 
 						required = false)
 			@RestQuery String houseNumber,
@@ -190,7 +194,7 @@ public class LookupResource {
 						required = false)
 			@RestQuery String embedded,
 			UriInfo info) {
-		Multi<Address> addresses = repo.findAddresses(after, municipalityID, streetID, houseNumber, boxNumber);
+		Multi<Address> addresses = repo.findAddresses(after, municipalityID, streetID, postalID, houseNumber, boxNumber);
 		return toJson(info, addresses);
 	}
 
@@ -217,21 +221,16 @@ public class LookupResource {
 		Uni<Street> street = repo.findStreetById(id);
 		return toJson(info, street);
 	}
-}
-	/*
-	@Operation(summary = "Search for addresses")
-	@Path("/addresses")
-	@GET
-	public Multi<Address> getAddresses(
-			@RestQuery Optional<String> municipalityId,
-			@RestQuery Optional<String> municipalityName,
-			@RestQuery Optional<String> partOfMunicipalityId,
-			@RestQuery Optional<String> partOfMunicipalityName,
-			@RestQuery Optional<String> streetId,
-			@RestQuery Optional<String> streetName,
-			@RestQuery Optional<String> housenumber,
-			@RestQuery Optional<String> boxnumber,
-			@RestQuery Optional<String> status) {
-		return null;
-	} */
 
+	@GET
+	@Path(LookupResource.POSTAL + "/id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Get a postal info by full ID")
+	public JsonObject getPostalById(
+			@Parameter(description = "Postal ID", required = true, example = "https://data.vlaanderen.be/id/straatnaam/1/2013-04-12T20:06:58.583'")
+			String id,
+			UriInfo info) {
+		Uni<PostalInfo> postal = repo.findPostalInfoById(id);
+		return toJson(info, postal);
+	}
+}

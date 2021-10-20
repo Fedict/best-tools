@@ -36,9 +36,9 @@ import java.time.OffsetDateTime;
  */
 public class Street extends BestEntity {
 	public String mIdentifier;
-	public String nameNL;
-	public String nameFR;
-	public String nameDE;
+	public String name_nl;
+	public String name_fr;
+	public String name_de;
 	public OffsetDateTime validFrom;
 	public OffsetDateTime validTo;
 	public String status;
@@ -81,9 +81,9 @@ public class Street extends BestEntity {
 				OffsetDateTime validFrom, OffsetDateTime validTo, String status) {
 		this.id = NsConverter.streetDecode(identifier);
 		this.mIdentifier = NsConverter.municipalityDecode(mIdentifier);
-		this.nameNL = nameNL;
-		this.nameFR = nameFR;
-		this.nameDE = nameDE;
+		this.name_nl = nameNL;
+		this.name_fr= nameFR;
+		this.name_de = nameDE;
 		this.validFrom = validFrom;
 		this.validTo = validTo;
 		this.status = status;

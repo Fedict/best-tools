@@ -27,10 +27,13 @@ package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.Address;
 import be.bosa.dt.best.webservice.entities.Municipality;
+import be.bosa.dt.best.webservice.entities.PostalInfo;
 import be.bosa.dt.best.webservice.entities.Street;
 import be.bosa.dt.best.webservice.queries.Sql;
 import be.bosa.dt.best.webservice.queries.SqlAddress;
 import be.bosa.dt.best.webservice.queries.SqlGeo;
+import be.bosa.dt.best.webservice.queries.SqlMunicipality;
+import be.bosa.dt.best.webservice.queries.SqlPostalInfo;
 import be.bosa.dt.best.webservice.queries.SqlStreet;
 
 import io.smallrye.mutiny.Multi;
@@ -142,7 +145,7 @@ public class Repository {
 	 */
 	public Uni<Municipality> findMunicipalityById(String id) {
 		Tuple tuple = Tuple.of(NsConverter.municipalityEncode(id));
-		SqlStreet qry = new SqlStreet();
+		SqlMunicipality qry = new SqlMunicipality();
 		qry.where("identifier");
 
 		return uni(
@@ -167,16 +170,34 @@ public class Repository {
 	}
 
 	/**
+	 * Find a postal info by ID
+	 * 
+	 * @param id full postalinfo id
+	 * @return postalinfo or null
+	 */
+	public Uni<PostalInfo> findPostalInfoById(String id) {
+		Tuple tuple = Tuple.of(NsConverter.postalEncode(id));
+		SqlPostalInfo qry = new SqlPostalInfo();
+		qry.where("identifier");
+
+		return uni(
+			pg.preparedQuery(qry.build()).execute(tuple)
+		).transform(row -> row.hasNext() ? PostalInfo.from(row.next()) : null);
+	}
+
+	/**
 	 * Find address by different parameters
 	 * 
 	 * @param startId
 	 * @param mIdentifier
 	 * @param sIdentifier
+	 * @param pIdentifier
 	 * @param houseNumber
 	 * @param boxNumber
 	 * @return 
 	 */
 	public Multi<Address> findAddresses(String startId, String mIdentifier, String sIdentifier, 
+										String pIdentifier,
 										String houseNumber, String boxNumber) {
 		List lst = new ArrayList();
 		SqlAddress qry = new SqlAddress();
@@ -184,6 +205,7 @@ public class Repository {
 		paginate(lst, qry, NsConverter.addressEncode(startId));
 		where(lst, qry, "mIdentifier =", NsConverter.municipalityEncode(mIdentifier));
 		where(lst, qry, "sIdentifier =", NsConverter.streetEncode(sIdentifier));
+		where(lst, qry, "pIdentifier =", NsConverter.postalEncode(pIdentifier));
 		where(lst, qry, "houseNumber =", houseNumber);
 		where(lst, qry, "boxNumber =", boxNumber);
 
@@ -194,6 +216,16 @@ public class Repository {
 		).transform(Address::from);
 	}
 
+	/**
+	 * Find by GPS coordinates
+	 * 
+	 * @param x
+	 * @param y
+	 * @param meters
+	 * @param limit
+	 * @param startId
+	 * @return 
+	 */
 	public Multi<Address> findByCoordinates(int x, int y, int meters, int limit, String startId) {
 		Tuple tuple;
 		SqlGeo qry = new SqlGeo();
@@ -209,16 +241,4 @@ public class Repository {
 			pg.preparedQuery(qry.build()).execute(tuple)
 		).transform(Address::from);
 	}
-	
-	/**
-	 * Find the address by ID
-	 * 
-	 * @param id full address id
-	 * @return address
-	 *//*
-	public Multi<Address> findAddressByCriteria(Map maps, int limit, String startIdentifier) {
-		return multi(
-			pg.preparedQuery(Address.SQL_ADDRESS_ID).execute()
-		).transform(Address::from);
-	}*/
 }

@@ -23,44 +23,17 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.webservice.entities;
-
-import be.bosa.dt.best.webservice.NsConverter;
+package be.bosa.dt.best.webservice.queries;
 
 /**
- * Postal codes (bPost.be).
+ * Select from postalinfo table
  * 
  * @author Bart Hanssens
  */
-public class Postal extends BestEntity {
-	public String zipcode;
-	public String name_nl;
-	public String name_fr;
-	public String name_de;
-
-	/**
-	 * Constructor
-	 * 
-	 * @param identifier 
-	 */
-	public Postal(String identifier) {
-		super(NsConverter.postalDecode(identifier));
-	}
+public class SqlPostalInfo extends Sql {
 	
-	/**
-	 * Constructor
-	 * 
-	 * @param identifier
-	 * @param zipcode
-	 * @param name_nl
-	 * @param name_fr
-	 * @param name_de 
-	 */
-	public Postal(String identifier, String zipcode, String name_nl, String name_fr, String name_de) {
-		this.id = NsConverter.postalDecode(identifier);
-		this.zipcode = zipcode;
-		this.name_nl = name_nl;
-		this.name_fr = name_fr;
-		this.name_de = name_de;
+	public SqlPostalInfo() {
+		this.select = "identifier, zipcode, nameNL, nameFR, nameDE";
+		this.from = "postalinfo";
 	}
 }

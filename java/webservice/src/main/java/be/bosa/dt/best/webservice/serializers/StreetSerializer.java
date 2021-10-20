@@ -25,7 +25,7 @@
  */
 package be.bosa.dt.best.webservice.serializers;
 
-import be.bosa.dt.best.webservice.entities.Municipality;
+import be.bosa.dt.best.webservice.entities.Street;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -36,7 +36,7 @@ import javax.inject.Singleton;
 
 
 /**
- * Serializes BeST municipality to JSON.
+ * Serializes BeST street to JSON
  * 
  * Note that the serialization is not complete, additional processing is required to create the final JSON
  * (e.g. to embed additional objects, add links to first / next page)
@@ -45,13 +45,12 @@ import javax.inject.Singleton;
  * @author Bart Hanssens
  */
 @Singleton
-public class MunicipalitySerializer extends BestSerializer<Municipality> {
+public class StreetSerializer extends BestSerializer<Street> {
 	@Override
-	public void serialize(Municipality municipality, JsonGenerator jg, SerializerProvider sp) throws IOException {
+	public void serialize(Street street, JsonGenerator jg, SerializerProvider sp) throws IOException {
 		jg.writeStartObject();
-        jg.writeStringField("id", municipality.id);
-		jg.writeStringField("niscode", municipality.niscode);
-		writeLangObject(jg, municipality.name_nl, municipality.name_fr, municipality.name_de);
+        jg.writeStringField("id", street.id);
+		writeLangObject(jg, street.name_nl, street.name_fr, street.name_de);
         jg.writeEndObject();
 	}
 }

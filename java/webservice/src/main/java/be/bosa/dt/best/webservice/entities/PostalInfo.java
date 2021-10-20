@@ -26,20 +26,15 @@
 package be.bosa.dt.best.webservice.entities;
 
 import be.bosa.dt.best.webservice.NsConverter;
-import be.bosa.dt.best.webservice.serializers.MunicipalitySerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.vertx.mutiny.sqlclient.Row;
 
 /**
- * Municipality entity.
- * Note that each municipality has a unique REFNIS code, which is NOT a postal code.
- * Municipalities may have multiple postal codes and postal codes can be shared by different municipalities 
+ * PostalInfo codes (bPost.be).
  * 
  * @author Bart Hanssens
  */
-@JsonSerialize(using = MunicipalitySerializer.class)
-public class Municipality extends BestEntity {
-	public String niscode;
+public class PostalInfo extends BestEntity {
+	public String zipcode;
 	public String name_nl;
 	public String name_fr;
 	public String name_de;
@@ -50,8 +45,8 @@ public class Municipality extends BestEntity {
 	 * @param res database row
 	 * @return data object
 	 */
-	public static Municipality from(Row res) {
-		return new Municipality(res.getString(0), res.getString(1), res.getString(2), res.getString(3), res.getString(4));
+	public static PostalInfo from(Row res) {
+		return new PostalInfo(res.getString(0), res.getString(1), res.getString(2), res.getString(3), res.getString(4));
 	}
 
 	/**
@@ -59,22 +54,22 @@ public class Municipality extends BestEntity {
 	 * 
 	 * @param identifier 
 	 */
-	public Municipality(String identifier) {
-		this.id = NsConverter.municipalityDecode(identifier);
+	public PostalInfo(String identifier) {
+		super(NsConverter.postalDecode(identifier));
 	}
-
+	
 	/**
 	 * Constructor
 	 * 
 	 * @param identifier
-	 * @param niscode
+	 * @param zipcode
 	 * @param name_nl
 	 * @param name_fr
 	 * @param name_de 
 	 */
-	public Municipality(String identifier, String niscode, String name_nl, String name_fr, String name_de) {
-		this.id = NsConverter.municipalityDecode(identifier);
-		this.niscode = niscode;
+	public PostalInfo(String identifier, String zipcode, String name_nl, String name_fr, String name_de) {
+		this.id = NsConverter.postalDecode(identifier);
+		this.zipcode = zipcode;
 		this.name_nl = name_nl;
 		this.name_fr = name_fr;
 		this.name_de = name_de;

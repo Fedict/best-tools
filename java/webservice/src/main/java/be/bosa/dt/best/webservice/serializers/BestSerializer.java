@@ -25,33 +25,46 @@
  */
 package be.bosa.dt.best.webservice.serializers;
 
-import be.bosa.dt.best.webservice.entities.Municipality;
-
+import be.bosa.dt.best.webservice.entities.BestEntity;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import java.io.IOException;
-
-import javax.inject.Singleton;
+import org.eclipse.microprofile.config.ConfigProvider;
 
 
 /**
- * Serializes BeST municipality to JSON.
+ * Abstract serializer, helper class
  * 
- * Note that the serialization is not complete, additional processing is required to create the final JSON
- * (e.g. to embed additional objects, add links to first / next page)
- * 
- * @see <a ahref="https://www.gcloud.belgium.be/rest/">G-Cloud REST guidelines</a>
  * @author Bart Hanssens
+ * @param <T>
  */
-@Singleton
-public class MunicipalitySerializer extends BestSerializer<Municipality> {
-	@Override
-	public void serialize(Municipality municipality, JsonGenerator jg, SerializerProvider sp) throws IOException {
-		jg.writeStartObject();
-        jg.writeStringField("id", municipality.id);
-		jg.writeStringField("niscode", municipality.niscode);
-		writeLangObject(jg, municipality.name_nl, municipality.name_fr, municipality.name_de);
-        jg.writeEndObject();
+public abstract class BestSerializer<T extends BestEntity> extends StdSerializer<T> {
+	// can't use ConfigProperty annotation here
+	protected final static String BASEURL = 
+			ConfigProvider.getConfig().getValue("be.bosa.dt.best.webservice.url", String.class);
+
+	/**
+	 * Write language object
+	 * 
+	 * @param jg JSON writer
+	 * @param nl Dutch name
+	 * @param fr French name
+	 * @param de German name
+	 * @throws IOException 
+	 */
+	protected void writeLangObject(JsonGenerator jg, String nl, String fr, String de) throws IOException {
+		jg.writeObjectFieldStart("name");
+		jg.writeStringField("nl", nl);
+		jg.writeStringField("fr", fr);
+		jg.writeStringField("de", de);
+		jg.writeEndObject();
 	}
+
+    public BestSerializer() {
+        this(null);
+    }
+ 
+    public BestSerializer(Class<T> t) {
+        super(t);
+    }
 }
