@@ -31,9 +31,9 @@ package be.bosa.dt.best.webservice.queries;
  * @author Bart Hanssens
  */
 public class SqlStreet extends Sql {
-	
+
 	public SqlStreet() {
-		this.select = "identifier, mIdentifier, nameNL, nameFR, nameDE, validFrom, validTo, status";
+		this.select = "identifier, mIdentifier, nameNL, nameFR, nameDE, validFrom, validTo, status::text";
 		this.from = "street";
 	}
 }

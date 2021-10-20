@@ -153,7 +153,7 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.ADDRESSES + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "The external identifier of the address",
+	@Operation(summary = "Get address by id",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
 	public JsonObject getAddressById(
 			@Parameter(description = "Address ID", 
@@ -168,7 +168,7 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.ADDRESSES)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "The external identifier of the address",
+	@Operation(summary = "Search for addresses",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
 	public JsonObject getAddresses(
 			@Parameter(description = "After address (used in pagination)", 
@@ -211,7 +211,23 @@ public class LookupResource {
 	}
 
 	@GET
-	@Path(LookupResource.STREETS + "/id}")
+	@Path(LookupResource.MUNICIPALITIES)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Search for municipalities",
+			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	public JsonObject getMunicipalities(
+			@Parameter(description = "After address (used in pagination)", 
+						required = false, 
+						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
+			@RestQuery String after,
+			@RestQuery String embedded,
+			UriInfo info) {
+		Multi<Municipality> municipalities = repo.findMunicipalities(after);
+		return toJson(info, municipalities);
+	}
+
+	@GET
+	@Path(LookupResource.STREETS + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a street by full ID")
 	public JsonObject getStreetById(
@@ -223,7 +239,23 @@ public class LookupResource {
 	}
 
 	@GET
-	@Path(LookupResource.POSTAL + "/id}")
+	@Path(LookupResource.STREETS)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Search for streets",
+			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	public JsonObject getStreets(
+			@Parameter(description = "After street (used in pagination)", 
+						required = false, 
+						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
+			@RestQuery String after,
+			@RestQuery String embedded,
+			UriInfo info) {
+		Multi<Street> streets = repo.findStreets(after);
+		return toJson(info, streets);
+	}
+
+	@GET
+	@Path(LookupResource.POSTAL + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a postal info by full ID")
 	public JsonObject getPostalById(

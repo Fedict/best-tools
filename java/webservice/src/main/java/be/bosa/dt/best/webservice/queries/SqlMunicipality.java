@@ -31,7 +31,7 @@ package be.bosa.dt.best.webservice.queries;
  * @author Bart Hanssens
  */
 public class SqlMunicipality extends Sql {
-	
+
 	public SqlMunicipality() {
 		this.select = "identifier, refnisCode, nameNL, nameFR, nameDE";
 		this.from = "municipality";

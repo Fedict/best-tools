@@ -188,7 +188,7 @@ public class Repository {
 	/**
 	 * Find address by different parameters
 	 * 
-	 * @param startId
+	 * @param afterId search after ID (paginated results)
 	 * @param mIdentifier
 	 * @param sIdentifier
 	 * @param pIdentifier
@@ -196,20 +196,20 @@ public class Repository {
 	 * @param boxNumber
 	 * @return 
 	 */
-	public Multi<Address> findAddresses(String startId, String mIdentifier, String sIdentifier, 
+	public Multi<Address> findAddresses(String afterId, String mIdentifier, String sIdentifier, 
 										String pIdentifier,
 										String houseNumber, String boxNumber) {
 		List lst = new ArrayList();
 		SqlAddress qry = new SqlAddress();
 
-		paginate(lst, qry, NsConverter.addressEncode(startId));
+		paginate(lst, qry, NsConverter.addressEncode(afterId));
 		where(lst, qry, "mIdentifier =", NsConverter.municipalityEncode(mIdentifier));
 		where(lst, qry, "sIdentifier =", NsConverter.streetEncode(sIdentifier));
 		where(lst, qry, "pIdentifier =", NsConverter.postalEncode(pIdentifier));
 		where(lst, qry, "houseNumber =", houseNumber);
 		where(lst, qry, "boxNumber =", boxNumber);
 
-		qry.order();
+		qry.orderById();
 
 		return multi(
 			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
@@ -217,7 +217,7 @@ public class Repository {
 	}
 
 	/**
-	 * Find by GPS coordinates
+	 * Find addresses by GPS coordinates
 	 * 
 	 * @param x
 	 * @param y
@@ -240,5 +240,41 @@ public class Repository {
 		return multi(
 			pg.preparedQuery(qry.build()).execute(tuple)
 		).transform(Address::from);
+	}
+	
+	/**
+	 * Find municipalities
+	 * 
+	 * @param afterId search after ID (paginated results)
+	 * @return 
+	 */
+	public Multi<Municipality> findMunicipalities(String afterId) {
+		List lst = new ArrayList();
+		SqlMunicipality qry = new SqlMunicipality();
+
+		paginate(lst, qry, NsConverter.municipalityEncode(afterId));
+		qry.orderById();
+
+		return multi(
+			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
+		).transform(Municipality::from);
+	}
+
+	/**
+	 * Find streets
+	 * 
+	 * @param afterId search after ID (paginated results)
+	 * @return 
+	 */
+	public Multi<Street> findStreets(String afterId) {
+		List lst = new ArrayList();
+		SqlStreet qry = new SqlStreet();
+
+		paginate(lst, qry, NsConverter.streetEncode(afterId));
+		qry.orderById();
+
+		return multi(
+			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
+		).transform(Street::from);
 	}
 }

@@ -54,9 +54,15 @@ public abstract class BestSerializer<T extends BestEntity> extends StdSerializer
 	 */
 	protected void writeLangObject(JsonGenerator jg, String nl, String fr, String de) throws IOException {
 		jg.writeObjectFieldStart("name");
-		jg.writeStringField("nl", nl);
-		jg.writeStringField("fr", fr);
-		jg.writeStringField("de", de);
+		if (nl != null && !nl.isEmpty()) {
+			jg.writeStringField("nl", nl);
+		}
+		if (fr != null && !fr.isEmpty()) {
+			jg.writeStringField("fr", fr);
+		}
+		if (de != null && !de.isEmpty()) {
+			jg.writeStringField("de", de);
+		}
 		jg.writeEndObject();
 	}
 

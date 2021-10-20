@@ -31,10 +31,7 @@ package be.bosa.dt.best.webservice.queries;
  * @author Bart Hanssens
  */
 public class SqlAddress extends Sql {
-	public void order() {
-		this.order = "identifier";
-	}
-	
+
 	public SqlAddress() {
 		this.select = "identifier, mIdentifier, pIdentifier, mpIdentifier, sIdentifier, " +
 							" housenumber, boxnumber, validFrom, validTo, status::text, point::point ";

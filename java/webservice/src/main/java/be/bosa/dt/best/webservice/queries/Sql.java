@@ -42,12 +42,16 @@ public abstract class Sql {
 
 	/**
 	 * Add order by clause
+	 * 
 	 * @param str 
 	 */
 	public void order(String str) {
 		this.order = str;
 	}
-
+	
+	public void orderById() {
+		order("identifier");
+	}
 	/**
 	 * Add where clause with variable
 	 * 

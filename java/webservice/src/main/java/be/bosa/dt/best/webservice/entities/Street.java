@@ -26,6 +26,8 @@
 package be.bosa.dt.best.webservice.entities;
 
 import be.bosa.dt.best.webservice.NsConverter;
+import be.bosa.dt.best.webservice.serializers.StreetSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.vertx.mutiny.sqlclient.Row;
 import java.time.OffsetDateTime;
 
@@ -34,6 +36,7 @@ import java.time.OffsetDateTime;
  * 
  * @author Bart Hanssens
  */
+@JsonSerialize(using = StreetSerializer.class)
 public class Street extends BestEntity {
 	public String mIdentifier;
 	public String name_nl;
