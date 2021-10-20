@@ -25,12 +25,16 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
-import be.bosa.dt.best.webservice.CoordConverter;
 import be.bosa.dt.best.webservice.NsConverter;
+import be.bosa.dt.best.webservice.serializers.AddressSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.pgclient.data.Point;
+
 import java.time.OffsetDateTime;
-import org.locationtech.jts.geom.Coordinate;
+
 
 
 /**
@@ -38,10 +42,11 @@ import org.locationtech.jts.geom.Coordinate;
  *
  * @author Bart Hanssens
  */
+@JsonSerialize(using = AddressSerializer.class)
 public class Address extends BestEntity {
-	public BestEntity municipality;
-	public BestEntity street;
-	public BestEntity postalInfo;
+	public String mIdentifier;
+	public String sIdentifier;
+	public String pIdentifier;
 	public String mpIdentifier;
 	public String housenumber;
 	public String boxnumber;
@@ -86,16 +91,15 @@ public class Address extends BestEntity {
 					OffsetDateTime validFrom, OffsetDateTime validTo, String status,
 					Point point) {
 		this.id = NsConverter.addressDecode(identifier);
-		this.municipality = new BestEntity(NsConverter.municipalityDecode(mIdentifier));
-		this.street = new BestEntity(NsConverter.streetDecode(sIdentifier));
-		this.postalInfo = new BestEntity(NsConverter.postalDecode(pIdentifier));
+		this.mIdentifier = NsConverter.municipalityDecode(mIdentifier);
+		this.sIdentifier = NsConverter.streetDecode(sIdentifier);
+		this.pIdentifier = NsConverter.postalDecode(pIdentifier);
 		this.mpIdentifier = mpIdentifier;
 		this.housenumber = housenumber;
 		this.boxnumber = boxnumber;
 		this.validFrom = validFrom;
 		this.validTo = validTo;
-		Coordinate coord = CoordConverter.lambertToGps(point.x, point.y);
-		this.point = new Point(coord.x, coord.y);
+		this.point = point;
 		this.status = status;
 	}
 }

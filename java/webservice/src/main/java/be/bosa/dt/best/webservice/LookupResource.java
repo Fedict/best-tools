@@ -83,8 +83,14 @@ import org.jboss.resteasy.reactive.RestQuery;
 	)
 
 @ApplicationScoped
-@Path("api/belgianAddress/v2")
+@Path(LookupResource.API)
 public class LookupResource {
+	public final static String API = "/api/belgianAddress/v2";
+	public final static String ADDRESSES = "/addresses";	
+	public final static String MUNICIPALITIES = "/municipalities";
+	public final static String POSTAL = "/postal";
+	public final static String STREETS = "/streets";
+
 	@Inject
 	Repository repo;
 
@@ -114,7 +120,8 @@ public class LookupResource {
 
 		JsonArray arr = new JsonArray();
 		items.subscribe().asStream().forEach(a -> {
-			String href = self + "/" + a.id.replaceAll("/", "%2F");
+			// add href here instead of in serializer, because href is only used when writing multiple items
+			String href = self + "/" + a.id.replace("/", "%2F");
 			arr.add(JsonObject.mapFrom(a).put("href", href));
 		});
 
@@ -143,7 +150,7 @@ public class LookupResource {
 	}
 
 	@GET
-	@Path("addresses/{id}")
+	@Path(LookupResource.ADDRESSES + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "The external identifier of the address",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
@@ -158,7 +165,7 @@ public class LookupResource {
 	}
 
 	@GET
-	@Path("addresses")
+	@Path(LookupResource.ADDRESSES)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "The external identifier of the address",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
@@ -179,13 +186,16 @@ public class LookupResource {
 			@Parameter(description = "Box number", 
 						required = false)
 			@RestQuery String boxNumber,
+			@Parameter(description = "Embed all info", 
+						required = false)
+			@RestQuery String embedded,
 			UriInfo info) {
 		Multi<Address> addresses = repo.findAddresses(after, municipalityID, streetID, houseNumber, boxNumber);
 		return toJson(info, addresses);
 	}
 
 	@GET
-	@Path("municipalities/{id}")
+	@Path(LookupResource.MUNICIPALITIES +"/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a municipality by full ID")
 	public JsonObject getMunicipalityById(
@@ -197,7 +207,7 @@ public class LookupResource {
 	}
 
 	@GET
-	@Path("streets/{id}")
+	@Path(LookupResource.STREETS + "/id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a street by full ID")
 	public JsonObject getStreetById(
