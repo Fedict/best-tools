@@ -31,7 +31,7 @@ package be.bosa.dt.best.webservice.entities;
  */
 public class BestEntity {
 	public String id;
-
+	public BestEntity embedded;
 	/**
 	 * Constructor
 	 */

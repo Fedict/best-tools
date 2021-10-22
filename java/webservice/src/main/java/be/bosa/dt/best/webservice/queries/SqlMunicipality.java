@@ -31,9 +31,13 @@ package be.bosa.dt.best.webservice.queries;
  * @author Bart Hanssens
  */
 public class SqlMunicipality extends Sql {
+	@Override
+	public void orderById() {
+		order("m.identifier");
+	}
 
 	public SqlMunicipality() {
-		this.select = "identifier, refnisCode, nameNL, nameFR, nameDE";
-		this.from = "municipality";
+		this.select = "m.identifier, m.refnisCode, m.nameNL, m.nameFR, m.nameDE";
+		this.from = "municipality m";
 	}
 }

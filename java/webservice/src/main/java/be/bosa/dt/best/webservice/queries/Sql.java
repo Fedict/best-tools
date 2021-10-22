@@ -33,11 +33,11 @@ import io.quarkus.logging.Log;
  * @author Bart.Hanssens
  */
 public abstract class Sql {
-	String select = "";
-	String from = "";
-	String where = "";
-	String order = "";
-	String limit = "";
+	protected String select = "";
+	protected String from = "";
+	protected String where = "";
+	protected String order = "";
+	protected String limit = "";
 	int vars = 0;
 
 	/**

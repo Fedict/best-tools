@@ -62,6 +62,7 @@ public class AddressSerializer extends BestSerializer<Address> {
 		jg.writeStringField("id", id);
 		String href = BestSerializer.BASEURL + LookupResource.API + type + "/" + id.replace("/", "%2F");
 		jg.writeStringField("href", href);
+		jg.writeEndObject();
 	}
 
 	@Override

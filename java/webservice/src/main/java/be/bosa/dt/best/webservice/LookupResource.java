@@ -36,6 +36,8 @@ import io.smallrye.mutiny.Uni;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -119,16 +121,28 @@ public class LookupResource {
 	private static <T extends BestEntity> JsonObject toJson(UriInfo info, Multi<T> items) {
 		String self = info.getAbsolutePath().toString();
 
+		Map<String,BestEntity> embedded = new HashMap<>();
 		JsonArray arr = new JsonArray();
 		items.subscribe().asStream().forEach(a -> {
 			// add href here instead of in serializer, because href is only used when writing multiple items
 			String href = self + "/" + a.id.replace("/", "%2F");
+			if (a.embedded != null) {
+				embedded.put(a.embedded.id, a.embedded);
+			}
 			arr.add(JsonObject.mapFrom(a).put("href", href));
 		});
 
 		JsonObject obj = new JsonObject();		
 		obj.put("self", self);
 		obj.put("items", arr); 
+
+		if (!embedded.isEmpty()) {
+			JsonArray arrEm = new JsonArray();
+			embedded.forEach((k,v) -> {
+				arrEm.add(JsonObject.mapFrom(v));
+			});
+			obj.put("embedded", arrEm);
+		}
 
 		//pagination
 		int size = arr.size();
@@ -160,8 +174,11 @@ public class LookupResource {
 						required = true, 
 						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
 			String id,
+			@Parameter(description = "Embed street, municipality and postal info", 
+						required = false)
+			@RestQuery boolean embed,
 			UriInfo info) {
-		Uni<Address> address = repo.findAddressById(id);
+		Uni<Address> address = repo.findAddressById(id, embed);
 		return toJson(info, address);
 	}
 
@@ -190,11 +207,12 @@ public class LookupResource {
 			@Parameter(description = "Box number", 
 						required = false)
 			@RestQuery String boxNumber,
-			@Parameter(description = "Embed all info", 
+			@Parameter(description = "Embed street, municipality and postal info", 
 						required = false)
-			@RestQuery String embedded,
+			@RestQuery boolean embed,
 			UriInfo info) {
-		Multi<Address> addresses = repo.findAddresses(after, municipalityID, streetID, postalID, houseNumber, boxNumber);
+		Multi<Address> addresses = repo.findAddresses(after, municipalityID, streetID, postalID, 
+													houseNumber, boxNumber, embed);
 		return toJson(info, addresses);
 	}
 

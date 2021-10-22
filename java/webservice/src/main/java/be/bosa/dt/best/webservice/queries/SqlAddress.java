@@ -31,10 +31,19 @@ package be.bosa.dt.best.webservice.queries;
  * @author Bart Hanssens
  */
 public class SqlAddress extends Sql {
+	@Override
+	public void orderById() {
+		order("a.identifier");
+	}
 
-	public SqlAddress() {
-		this.select = "identifier, mIdentifier, pIdentifier, mpIdentifier, sIdentifier, " +
-							" housenumber, boxnumber, validFrom, validTo, status::text, point::point ";
-		this.from = "address";
+	public SqlAddress(boolean embed) {
+		this.select = "a.identifier, a.mIdentifier, a.pIdentifier, a.mpIdentifier, a.sIdentifier, " +
+						" a.housenumber, a.boxnumber, a.validFrom, a.validTo, a.status::text, a.point::point";
+		this.from = "address a";
+
+		if (embed) {
+			this.select += ", s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, s.validFrom, s.validTo, s.status::text";
+			this.from += " INNER JOIN street s ON a.sIdentifier = s.identifier";	
+		}
 	}
 }

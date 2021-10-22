@@ -125,12 +125,13 @@ public class Repository {
 	 * Find an address by ID
 	 * 
 	 * @param id full address id
+	 * @param embed embed street, postal etc or not
 	 * @return address or null
 	 */
-	public Uni<Address> findAddressById(String id) {
+	public Uni<Address> findAddressById(String id, boolean embed) {
 		Tuple tuple = Tuple.of(NsConverter.addressEncode(id));
-		SqlAddress qry = new SqlAddress();
-		qry.where("identifier =");
+		SqlAddress qry = new SqlAddress(embed);
+		qry.where("a.identifier =");
 
 		return uni(
 			pg.preparedQuery(qry.build()).execute(tuple)
@@ -146,7 +147,7 @@ public class Repository {
 	public Uni<Municipality> findMunicipalityById(String id) {
 		Tuple tuple = Tuple.of(NsConverter.municipalityEncode(id));
 		SqlMunicipality qry = new SqlMunicipality();
-		qry.where("identifier");
+		qry.where("m.identifier =");
 
 		return uni(
 			pg.preparedQuery(qry.build()).execute(tuple)
@@ -162,7 +163,7 @@ public class Repository {
 	public Uni<Street> findStreetById(String id) {
 		Tuple tuple = Tuple.of(NsConverter.streetEncode(id));
 		SqlStreet qry = new SqlStreet();
-		qry.where("identifier");
+		qry.where("s.identifier =");
 
 		return uni(
 			pg.preparedQuery(qry.build()).execute(tuple)
@@ -178,7 +179,7 @@ public class Repository {
 	public Uni<PostalInfo> findPostalInfoById(String id) {
 		Tuple tuple = Tuple.of(NsConverter.postalEncode(id));
 		SqlPostalInfo qry = new SqlPostalInfo();
-		qry.where("identifier");
+		qry.where("p.identifier =");
 
 		return uni(
 			pg.preparedQuery(qry.build()).execute(tuple)
@@ -189,25 +190,27 @@ public class Repository {
 	 * Find address by different parameters
 	 * 
 	 * @param afterId search after ID (paginated results)
-	 * @param mIdentifier
-	 * @param sIdentifier
-	 * @param pIdentifier
-	 * @param houseNumber
-	 * @param boxNumber
+	 * @param mIdentifier municipality identifier
+	 * @param sIdentifier street identifier
+	 * @param pIdentifier postal identifier
+	 * @param houseNumber house number
+	 * @param boxNumber box number
+	 * @param embed embed street, postal etc or not
 	 * @return 
 	 */
 	public Multi<Address> findAddresses(String afterId, String mIdentifier, String sIdentifier, 
 										String pIdentifier,
-										String houseNumber, String boxNumber) {
+										String houseNumber, String boxNumber,
+										boolean embed) {
 		List lst = new ArrayList();
-		SqlAddress qry = new SqlAddress();
+		SqlAddress qry = new SqlAddress(embed);
 
 		paginate(lst, qry, NsConverter.addressEncode(afterId));
-		where(lst, qry, "mIdentifier =", NsConverter.municipalityEncode(mIdentifier));
-		where(lst, qry, "sIdentifier =", NsConverter.streetEncode(sIdentifier));
-		where(lst, qry, "pIdentifier =", NsConverter.postalEncode(pIdentifier));
-		where(lst, qry, "houseNumber =", houseNumber);
-		where(lst, qry, "boxNumber =", boxNumber);
+		where(lst, qry, "a.mIdentifier =", NsConverter.municipalityEncode(mIdentifier));
+		where(lst, qry, "a.sIdentifier =", NsConverter.streetEncode(sIdentifier));
+		where(lst, qry, "a.pIdentifier =", NsConverter.postalEncode(pIdentifier));
+		where(lst, qry, "a.houseNumber =", houseNumber);
+		where(lst, qry, "a.boxNumber =", boxNumber);
 
 		qry.orderById();
 
@@ -223,15 +226,16 @@ public class Repository {
 	 * @param y
 	 * @param meters
 	 * @param limit
-	 * @param startId
+	 * @param afterId search after ID (paginated results)
+	 * @param embed embed street, postal etc or not
 	 * @return 
 	 */
-	public Multi<Address> findByCoordinates(int x, int y, int meters, int limit, String startId) {
+	public Multi<Address> findByCoordinates(int x, int y, int meters, int limit, String afterId, boolean embed) {
 		Tuple tuple;
-		SqlGeo qry = new SqlGeo();
-		if (startId != null) {
+		SqlGeo qry = new SqlGeo(embed);
+		if (afterId != null) {
 			qry.paginate();
-			tuple = Tuple.of(x, y, meters, limit, startId);
+			tuple = Tuple.of(x, y, meters, limit, afterId);
 		} else {
 			qry.limit();
 			tuple = Tuple.of(x, y, meters, limit);

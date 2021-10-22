@@ -62,12 +62,18 @@ public class Address extends BestEntity {
 	 * @return data object
 	 */
 	public static Address from(Row res) {
-		return new Address(
-			res.getString(0), 
-			res.getString(1), res.getString(2), res.getString(3), res.getString(4), 
-			res.getString(5), res.getString(6),
-			res.getOffsetDateTime(7), res.getOffsetDateTime(8), res.getString(9), 
-			res.get(Point.class, 10));
+		Address addr = new Address(
+				res.getString(0), 
+				res.getString(1), res.getString(2), res.getString(3), res.getString(4), 
+				res.getString(5), res.getString(6),
+				res.getOffsetDateTime(7), res.getOffsetDateTime(8), res.getString(9), 
+				res.get(Point.class, 10));
+		if (res.size() > 11) {
+			addr.embedded = new Street(res.getString(4), res.getString(11),
+							res.getString(12), res.getString(13), res.getString(14),
+							res.getOffsetDateTime(15), res.getOffsetDateTime(16), res.getString(17));
+		}
+		return addr;	
 	}
 
 	/**
