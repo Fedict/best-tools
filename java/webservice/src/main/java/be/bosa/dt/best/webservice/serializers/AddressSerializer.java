@@ -60,8 +60,7 @@ public class AddressSerializer extends BestSerializer<Address> {
 	private void writeObject(JsonGenerator jg, String field, String id, String type) throws IOException {
 		jg.writeObjectFieldStart(field);
 		jg.writeStringField("id", id);
-		String href = BestSerializer.BASEURL + LookupResource.API + type + "/" + id.replace("/", "%2F");
-		jg.writeStringField("href", href);
+		jg.writeStringField("href", getHref(type, id));
 		jg.writeEndObject();
 	}
 
@@ -69,6 +68,7 @@ public class AddressSerializer extends BestSerializer<Address> {
 	public void serialize(Address address, JsonGenerator jg, SerializerProvider sp) throws IOException {
 		jg.writeStartObject();
         jg.writeStringField("id", address.id);
+		jg.writeStringField("self", getHref(LookupResource.ADDRESSES, address.id));
 		writeObject(jg, "street", address.sIdentifier, LookupResource.STREETS);
 		writeObject(jg, "municipality",address.mIdentifier, LookupResource.MUNICIPALITIES);
 		writeObject(jg, "postal",address.pIdentifier, LookupResource.POSTAL);

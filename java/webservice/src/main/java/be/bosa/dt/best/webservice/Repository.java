@@ -263,6 +263,20 @@ public class Repository {
 			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
 		).transform(Municipality::from);
 	}
+	/**
+	 * Find municipalities
+	 * 
+	 * @return 
+	 */
+	public Multi<Municipality> findMunicipalitiesAll() {
+		SqlMunicipality qry = new SqlMunicipality();
+		qry.orderById();
+		qry.unlimited();
+
+		return multi(
+			pg.preparedQuery(qry.build()).execute()
+		).transform(Municipality::from);
+	}
 
 	/**
 	 * Find streets
@@ -281,4 +295,5 @@ public class Repository {
 			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
 		).transform(Street::from);
 	}
+
 }

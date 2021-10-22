@@ -30,16 +30,20 @@ import be.bosa.dt.best.webservice.entities.BestEntity;
 import be.bosa.dt.best.webservice.entities.Municipality;
 import be.bosa.dt.best.webservice.entities.PostalInfo;
 import be.bosa.dt.best.webservice.entities.Street;
+import io.quarkus.logging.Log;
+import io.quarkus.runtime.StartupEvent;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import javax.ws.rs.GET;
@@ -94,8 +98,24 @@ public class LookupResource {
 	public final static String POSTAL = "/postal";
 	public final static String STREETS = "/streets";
 
+	private final Map<String,JsonObject> cacheMunicipalities = new HashMap<>();
+
 	@Inject
 	Repository repo;
+
+	/**
+	 * Cache the JSON rendering of all municipalities
+	 * 
+	 * @param ev 
+	 */
+	void onStart(@Observes StartupEvent ev) {               
+        Log.info("Caching all municipalities...");
+		Multi<Municipality> municipalities = repo.findMunicipalitiesAll();
+		municipalities.subscribe().asStream().forEach(a -> {
+			cacheMunicipalities.put(a.id, JsonObject.mapFrom(a));
+		});
+		Log.info("... found " + cacheMunicipalities.size());
+    }
 
 	/**
 	 * Convert uni of address, street, ... into JSON
@@ -124,7 +144,6 @@ public class LookupResource {
 		Map<String,BestEntity> embedded = new HashMap<>();
 		JsonArray arr = new JsonArray();
 		items.subscribe().asStream().forEach(a -> {
-			// add href here instead of in serializer, because href is only used when writing multiple items
 			String href = self + "/" + a.id.replace("/", "%2F");
 			if (a.embedded != null) {
 				embedded.put(a.embedded.id, a.embedded);
@@ -132,16 +151,17 @@ public class LookupResource {
 			arr.add(JsonObject.mapFrom(a).put("href", href));
 		});
 
-		JsonObject obj = new JsonObject();		
-		obj.put("self", self);
-		obj.put("items", arr); 
+		JsonObject parentObj = new JsonObject();		
+		parentObj.put("self", self);
+		parentObj.put("items", arr); 
 
 		if (!embedded.isEmpty()) {
-			JsonArray arrEm = new JsonArray();
-			embedded.forEach((k,v) -> {
-				arrEm.add(JsonObject.mapFrom(v));
+			embedded.values().forEach(v -> {
+				JsonObject embObj = new JsonObject();
+				JsonObject obj = JsonObject.mapFrom(v);
+				embObj.put(obj.getString("self"), obj);
+				parentObj.put("embedded", embObj);
 			});
-			obj.put("embedded", arrEm);
 		}
 
 		//pagination
@@ -156,12 +176,12 @@ public class LookupResource {
 								.replaceQueryParam("after", lastObj.getString("id"))
 								.queryParam("pageSize", Repository.LIMIT)
 								.build().toString();
-			obj.put("pageSize", Repository.LIMIT);
-			obj.put("first", first);
-			obj.put("next", next);
+			parentObj.put("pageSize", Repository.LIMIT);
+			parentObj.put("first", first);
+			parentObj.put("next", next);
 		}
 
-		return obj;
+		return parentObj;
 	}
 
 	@GET

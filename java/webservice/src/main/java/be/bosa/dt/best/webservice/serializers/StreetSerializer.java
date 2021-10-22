@@ -25,7 +25,9 @@
  */
 package be.bosa.dt.best.webservice.serializers;
 
+import be.bosa.dt.best.webservice.LookupResource;
 import be.bosa.dt.best.webservice.entities.Street;
+import static be.bosa.dt.best.webservice.serializers.BestSerializer.getHref;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -50,6 +52,7 @@ public class StreetSerializer extends BestSerializer<Street> {
 	public void serialize(Street street, JsonGenerator jg, SerializerProvider sp) throws IOException {
 		jg.writeStartObject();
         jg.writeStringField("id", street.id);
+		jg.writeStringField("self", getHref(LookupResource.STREETS, street.id));
 		writeLangObject(jg, street.name_nl, street.name_fr, street.name_de);
 		jg.writeStringField("status", street.status);
 		jg.writeStringField("validFrom", street.validFrom.toString());

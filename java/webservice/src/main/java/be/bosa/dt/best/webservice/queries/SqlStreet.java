@@ -31,14 +31,11 @@ package be.bosa.dt.best.webservice.queries;
  * @author Bart Hanssens
  */
 public class SqlStreet extends Sql {
-	@Override
-	public void orderById() {
-		order("s.identifier");
-	}
 
 	public SqlStreet() {
 		this.select = "s.identifier, s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, " +
 						"s.validFrom, s.validTo, s.status::text";
-		this.from = "street s";
+		this.alias = "s";
+		this.from = "street";
 	}
 }

@@ -25,7 +25,9 @@
  */
 package be.bosa.dt.best.webservice.serializers;
 
+import be.bosa.dt.best.webservice.LookupResource;
 import be.bosa.dt.best.webservice.entities.Municipality;
+import static be.bosa.dt.best.webservice.serializers.BestSerializer.getHref;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -50,6 +52,7 @@ public class MunicipalitySerializer extends BestSerializer<Municipality> {
 	public void serialize(Municipality municipality, JsonGenerator jg, SerializerProvider sp) throws IOException {
 		jg.writeStartObject();
         jg.writeStringField("id", municipality.id);
+		jg.writeStringField("self", getHref(LookupResource.MUNICIPALITIES, municipality.id));
 		jg.writeStringField("niscode", municipality.niscode);
 		writeLangObject(jg, municipality.name_nl, municipality.name_fr, municipality.name_de);
         jg.writeEndObject();

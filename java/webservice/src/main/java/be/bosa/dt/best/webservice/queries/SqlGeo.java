@@ -31,22 +31,18 @@ package be.bosa.dt.best.webservice.queries;
  * @author Bart Hanssens
  */
 public class SqlGeo extends Sql {
-	@Override
-	public void orderById() {
-		order("a.identifier");
-	}
 	
 	public SqlGeo(boolean embed) {
 		this.select = "a.identifier, a.sIdentifier, a.mIdentifier, a.pIdentifier, a.mpIdentifier, " +
 						" a.housenumber, a.boxnumber, a.validFrom, a.validTo, a.status, a.point::point";
-		this.from = "address a";
+		this.from = "address";
+		this.alias = "a";
 		this.where = "ST_DWITHIN(a.point, ST_SetSRID(ST_MakePoint($1, $2), 31370), $3) = TRUE)";
-		this.order = "a.identifier";
 		this.vars = 3;
 		
 		if (embed) {
 			this.select += ", s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, s.validFrom, s.validTo, s.status::text";
-			this.from += " INNER JOIN street s ON a.sIdentifier = s.identifier";			
+			this.join = " INNER JOIN street s ON a.sIdentifier = s.identifier";			
 		}
 	}
 }

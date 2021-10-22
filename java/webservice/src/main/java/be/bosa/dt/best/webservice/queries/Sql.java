@@ -34,7 +34,9 @@ import io.quarkus.logging.Log;
  */
 public abstract class Sql {
 	protected String select = "";
+	protected String alias = "";
 	protected String from = "";
+	protected String join = "";
 	protected String where = "";
 	protected String order = "";
 	protected String limit = "";
@@ -50,7 +52,7 @@ public abstract class Sql {
 	}
 	
 	public void orderById() {
-		order("identifier");
+		order(alias + ".identifier");
 	}
 	/**
 	 * Add where clause with variable
@@ -66,7 +68,7 @@ public abstract class Sql {
 	 * Add pagination with start identifier (don't use OFFSET, that's more resource intensive)
 	 */
 	public void paginate() {
-		where("identifier > ");
+		where(alias + ".identifier > ");
 		limit();
 	}
 	
@@ -78,12 +80,19 @@ public abstract class Sql {
 	}
 
 	/**
+	 * Add limit clause
+	 */
+	public void unlimited(){
+		this.limit = "ALL";
+	}
+
+	/**
 	 * Build the SQL select string
 	 * 
 	 * @return 
 	 */
 	public String build() {
-		String str = String.join(" ", "SELECT", select, "FROM", from);
+		String str = String.join(" ", "SELECT", select, "FROM", from, alias, join);
 		if (!where.isEmpty()) {
 			str = String.join(" ", str, "WHERE", where);
 		}

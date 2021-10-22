@@ -25,6 +25,7 @@
  */
 package be.bosa.dt.best.webservice.serializers;
 
+import be.bosa.dt.best.webservice.LookupResource;
 import be.bosa.dt.best.webservice.entities.BestEntity;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -42,6 +43,10 @@ public abstract class BestSerializer<T extends BestEntity> extends StdSerializer
 	// can't use ConfigProperty annotation here
 	protected final static String BASEURL = 
 			ConfigProvider.getConfig().getValue("be.bosa.dt.best.webservice.url", String.class);
+
+	protected static String getHref(String type, String id) {
+		return BestSerializer.BASEURL + LookupResource.API + type + "/" + id.replace("/", "%2F");
+	}
 
 	/**
 	 * Write language object
