@@ -27,12 +27,14 @@ package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.Address;
 import be.bosa.dt.best.webservice.entities.Municipality;
+import be.bosa.dt.best.webservice.entities.MunicipalityPart;
 import be.bosa.dt.best.webservice.entities.PostalInfo;
 import be.bosa.dt.best.webservice.entities.Street;
 import be.bosa.dt.best.webservice.queries.Sql;
 import be.bosa.dt.best.webservice.queries.SqlAddress;
 import be.bosa.dt.best.webservice.queries.SqlGeo;
 import be.bosa.dt.best.webservice.queries.SqlMunicipality;
+import be.bosa.dt.best.webservice.queries.SqlMunicipalityPart;
 import be.bosa.dt.best.webservice.queries.SqlPostalInfo;
 import be.bosa.dt.best.webservice.queries.SqlStreet;
 
@@ -137,54 +139,6 @@ public class Repository {
 			pg.preparedQuery(qry.build()).execute(tuple)
 		).transform(row -> row.hasNext() ? Address.from(row.next()) : null);
 	}
-	
-	/**
-	 * Find a municipality by ID
-	 * 
-	 * @param id municipality id
-	 * @return municipality or null
-	 */
-	public Uni<Municipality> findMunicipalityById(String id) {
-		Tuple tuple = Tuple.of(NsConverter.municipalityEncode(id));
-		SqlMunicipality qry = new SqlMunicipality();
-		qry.where("m.identifier =");
-
-		return uni(
-			pg.preparedQuery(qry.build()).execute(tuple)
-		).transform(row -> row.hasNext() ? Municipality.from(row.next()) : null);
-	}
-
-	/**
-	 * Find a street by ID
-	 * 
-	 * @param id full street id
-	 * @return street or null
-	 */
-	public Uni<Street> findStreetById(String id) {
-		Tuple tuple = Tuple.of(NsConverter.streetEncode(id));
-		SqlStreet qry = new SqlStreet();
-		qry.where("s.identifier =");
-
-		return uni(
-			pg.preparedQuery(qry.build()).execute(tuple)
-		).transform(row -> row.hasNext() ? Street.from(row.next()) : null);
-	}
-
-	/**
-	 * Find a postal info by ID
-	 * 
-	 * @param id full postalinfo id
-	 * @return postalinfo or null
-	 */
-	public Uni<PostalInfo> findPostalInfoById(String id) {
-		Tuple tuple = Tuple.of(NsConverter.postalEncode(id));
-		SqlPostalInfo qry = new SqlPostalInfo();
-		qry.where("p.identifier =");
-
-		return uni(
-			pg.preparedQuery(qry.build()).execute(tuple)
-		).transform(row -> row.hasNext() ? PostalInfo.from(row.next()) : null);
-	}
 
 	/**
 	 * Find address by different parameters
@@ -247,6 +201,22 @@ public class Repository {
 	}
 	
 	/**
+	 * Find a municipality by ID
+	 * 
+	 * @param id municipality id
+	 * @return municipality or null
+	 */
+	public Uni<Municipality> findMunicipalityById(String id) {
+		Tuple tuple = Tuple.of(NsConverter.municipalityEncode(id));
+		SqlMunicipality qry = new SqlMunicipality();
+		qry.where("m.identifier =");
+
+		return uni(
+			pg.preparedQuery(qry.build()).execute(tuple)
+		).transform(row -> row.hasNext() ? Municipality.from(row.next()) : null);
+	}
+
+	/**
 	 * Find municipalities
 	 * 
 	 * @param afterId search after ID (paginated results)
@@ -263,8 +233,9 @@ public class Repository {
 			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
 		).transform(Municipality::from);
 	}
+	
 	/**
-	 * Find municipalities
+	 * Get all municipalities
 	 * 
 	 * @return 
 	 */
@@ -276,6 +247,120 @@ public class Repository {
 		return multi(
 			pg.preparedQuery(qry.build()).execute()
 		).transform(Municipality::from);
+	}
+
+		/**
+	 * Find a municipality by ID
+	 * 
+	 * @param id municipality part id
+	 * @return municipality part or null
+	 */
+	public Uni<MunicipalityPart> findMunicipalityPartById(String id) {
+		Tuple tuple = Tuple.of(NsConverter.municipalityPartEncode(id));
+		SqlMunicipalityPart qry = new SqlMunicipalityPart();
+		qry.where("mp.identifier =");
+
+		return uni(
+			pg.preparedQuery(qry.build()).execute(tuple)
+		).transform(row -> row.hasNext() ? MunicipalityPart.from(row.next()) : null);
+	}
+
+	/**
+	 * Find municipality parts
+	 * 
+	 * @param afterId search after ID (paginated results)
+	 * @return 
+	 */
+	public Multi<MunicipalityPart> findMunicipalityParts(String afterId) {
+		List lst = new ArrayList();
+		SqlMunicipalityPart qry = new SqlMunicipalityPart();
+
+		paginate(lst, qry, NsConverter.municipalityPartEncode(afterId));
+		qry.orderById();
+
+		return multi(
+			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
+		).transform(MunicipalityPart::from);
+	}
+	
+	/**
+	 * Get all municipality parts
+	 * 
+	 * @return 
+	 */
+	public Multi<MunicipalityPart> findMunicipalityPartsAll() {
+		SqlMunicipalityPart qry = new SqlMunicipalityPart();
+		qry.orderById();
+		qry.unlimited();
+
+		return multi(
+			pg.preparedQuery(qry.build()).execute()
+		).transform(MunicipalityPart::from);
+	}
+
+	/**
+	 * Find a postal info by ID
+	 * 
+	 * @param id full postalinfo id
+	 * @return postalinfo or null
+	 */
+	public Uni<PostalInfo> findPostalInfoById(String id) {
+		Tuple tuple = Tuple.of(NsConverter.postalEncode(id));
+		SqlPostalInfo qry = new SqlPostalInfo();
+		qry.where("p.identifier =");
+
+		return uni(
+			pg.preparedQuery(qry.build()).execute(tuple)
+		).transform(row -> row.hasNext() ? PostalInfo.from(row.next()) : null);
+	}
+
+	/**
+	 * Find postal info
+	 * 
+	 * @param afterId search after ID (paginated results)
+	 * @return 
+	 */
+	public Multi<PostalInfo> findPostalInfos(String afterId) {
+		List lst = new ArrayList();
+		SqlPostalInfo qry = new SqlPostalInfo();
+
+		paginate(lst, qry, NsConverter.postalEncode(afterId));
+		qry.orderById();
+
+		return multi(
+			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
+		).transform(PostalInfo::from);
+	}
+	
+	/**
+	 * Get all postal infos
+	 * 
+	 * @return 
+	 */
+	public Multi<PostalInfo> findPostalInfosAll() {
+		SqlPostalInfo qry = new SqlPostalInfo();
+		qry.orderById();
+		qry.unlimited();
+
+		return multi(
+			pg.preparedQuery(qry.build()).execute()
+		).transform(PostalInfo::from);
+	}
+
+	/**
+	 * Find a street by ID
+	 * 
+	 * @param id full street id
+	 * @return street or null
+	 */
+	public Uni<Street> findStreetById(String id) {
+		Tuple tuple = Tuple.of(NsConverter.streetEncode(id));
+		SqlStreet qry = new SqlStreet();
+		qry.where("s.identifier =");
+
+		return uni(
+			pg.preparedQuery(qry.build()).execute(tuple)
+		).transform(row -> row.hasNext() ? Street.from(row.next()) : null);
 	}
 
 	/**
@@ -295,5 +380,4 @@ public class Repository {
 			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
 		).transform(Street::from);
 	}
-
 }

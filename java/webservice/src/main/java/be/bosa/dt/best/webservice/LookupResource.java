@@ -28,6 +28,7 @@ package be.bosa.dt.best.webservice;
 import be.bosa.dt.best.webservice.entities.Address;
 import be.bosa.dt.best.webservice.entities.BestEntity;
 import be.bosa.dt.best.webservice.entities.Municipality;
+import be.bosa.dt.best.webservice.entities.MunicipalityPart;
 import be.bosa.dt.best.webservice.entities.PostalInfo;
 import be.bosa.dt.best.webservice.entities.Street;
 import io.quarkus.logging.Log;
@@ -41,6 +42,7 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -95,11 +97,14 @@ public class LookupResource {
 	public final static String API = "/api/belgianAddress/v2";
 	public final static String ADDRESSES = "/addresses";	
 	public final static String MUNICIPALITIES = "/municipalities";
+	public final static String MUNICIPALITY_PARTS = "/municipalityParts";
 	public final static String POSTAL = "/postal";
 	public final static String STREETS = "/streets";
 
-	private final Map<String,JsonObject> cacheMunicipalities = new HashMap<>();
-
+	private final Map<String,JsonObject> cacheMunicipalities = new TreeMap<>();
+	private final Map<String,JsonObject> cacheMunicipalityParts = new TreeMap<>();
+	private final Map<String,JsonObject> cachePostals = new TreeMap<>();
+	
 	@Inject
 	Repository repo;
 
@@ -110,11 +115,26 @@ public class LookupResource {
 	 */
 	void onStart(@Observes StartupEvent ev) {               
         Log.info("Caching all municipalities...");
+		
 		Multi<Municipality> municipalities = repo.findMunicipalitiesAll();
 		municipalities.subscribe().asStream().forEach(a -> {
 			cacheMunicipalities.put(a.id, JsonObject.mapFrom(a));
 		});
 		Log.info("... found " + cacheMunicipalities.size());
+
+        Log.info("Caching all municipality parts...");		
+		Multi<MunicipalityPart> parts = repo.findMunicipalityPartsAll();
+		parts.subscribe().asStream().forEach(a -> {
+			cacheMunicipalityParts.put(a.id, JsonObject.mapFrom(a));
+		});
+		Log.info("... found " + cacheMunicipalityParts.size());
+
+		Log.info("Caching all postal info...");		
+		Multi<PostalInfo> postals = repo.findPostalInfosAll();
+		postals.subscribe().asStream().forEach(a -> {
+			cachePostals.put(a.id, JsonObject.mapFrom(a));
+		});
+		Log.info("... found " + cachePostals.size());
     }
 
 	/**
@@ -241,7 +261,8 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a municipality by full ID")
 	public JsonObject getMunicipalityById(
-			@Parameter(description = "Municipality ID", required = true, example = "BE.BRUSSELS.BRIC.ADM.ADDR/1299/2")
+			@Parameter(description = "Municipality ID", 
+						required = true)
 			String id,
 			UriInfo info) {
 		Uni<Municipality> municipality = repo.findMunicipalityById(id);
@@ -254,14 +275,68 @@ public class LookupResource {
 	@Operation(summary = "Search for municipalities",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
 	public JsonObject getMunicipalities(
-			@Parameter(description = "After address (used in pagination)", 
-						required = false, 
-						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
+			@Parameter(description = "After municipality (used in pagination)", 
+						required = false)
 			@RestQuery String after,
 			@RestQuery String embedded,
 			UriInfo info) {
 		Multi<Municipality> municipalities = repo.findMunicipalities(after);
 		return toJson(info, municipalities);
+	}
+	@GET
+	@Path(LookupResource.MUNICIPALITY_PARTS +"/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Get a municipality part by full ID")
+	public JsonObject getMunicipalityPartsById(
+			@Parameter(description = "Municipality part ID", 
+						required = true)
+			String id,
+			UriInfo info) {
+		Uni<MunicipalityPart> part = repo.findMunicipalityPartById(id);
+		return toJson(info, part);
+	}
+
+	@GET
+	@Path(LookupResource.MUNICIPALITY_PARTS)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Search for municipality parts",
+			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	public JsonObject getMunicipalityParts(
+			@Parameter(description = "After municipality part (used in pagination)", 
+						required = false)
+			@RestQuery String after,
+			@RestQuery String embedded,
+			UriInfo info) {
+		Multi<MunicipalityPart> parts = repo.findMunicipalityParts(after);
+		return toJson(info, parts);
+	}
+
+	@GET
+	@Path(LookupResource.POSTAL + "/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Get a postal info by full ID")
+	public JsonObject getPostalById(
+			@Parameter(description = "Postal ID", 
+						required = true)
+			String id,
+			UriInfo info) {
+		Uni<PostalInfo> postal = repo.findPostalInfoById(id);
+		return toJson(info, postal);
+	}
+
+	@GET
+	@Path(LookupResource.POSTAL)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Search for postal info",
+			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	public JsonObject getPostalInfos(
+			@Parameter(description = "After postal info (used in pagination)", 
+						required = false)
+			@RestQuery String after,
+			@RestQuery String embedded,
+			UriInfo info) {
+		Multi<PostalInfo> postals = repo.findPostalInfos(after);
+		return toJson(info, postals);
 	}
 
 	@GET
@@ -269,7 +344,9 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a street by full ID")
 	public JsonObject getStreetById(
-			@Parameter(description = "Street ID", required = true, example = "https://data.vlaanderen.be/id/straatnaam/1/2013-04-12T20:06:58.583'")
+			@Parameter(description = "Street ID", 
+						required = true,
+						example = "https://data.vlaanderen.be/id/straatnaam/1/2013-04-12T20:06:58.583'")
 			String id,
 			UriInfo info) {
 		Uni<Street> street = repo.findStreetById(id);
@@ -283,8 +360,7 @@ public class LookupResource {
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
 	public JsonObject getStreets(
 			@Parameter(description = "After street (used in pagination)", 
-						required = false, 
-						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
+						required = false)
 			@RestQuery String after,
 			@RestQuery String embedded,
 			UriInfo info) {
@@ -292,15 +368,4 @@ public class LookupResource {
 		return toJson(info, streets);
 	}
 
-	@GET
-	@Path(LookupResource.POSTAL + "/{id}")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Get a postal info by full ID")
-	public JsonObject getPostalById(
-			@Parameter(description = "Postal ID", required = true, example = "https://data.vlaanderen.be/id/straatnaam/1/2013-04-12T20:06:58.583'")
-			String id,
-			UriInfo info) {
-		Uni<PostalInfo> postal = repo.findPostalInfoById(id);
-		return toJson(info, postal);
-	}
 }

@@ -23,29 +23,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.webservice.entities;
+package be.bosa.dt.best.webservice.queries;
 
 /**
- * Base class
+ * Select from municipality table
  * 
  * @author Bart Hanssens
  */
-public class BestEntity {
-	public String id;
-	public BestEntity embedded;
+public class SqlMunicipalityPart extends Sql {
 
-	/**
-	 * Constructor
-	 */
-	public BestEntity() {
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param identifier 
-	 */
-	public BestEntity(String identifier) {
-		this.id = identifier;
+	public SqlMunicipalityPart() {
+		this.select = "mp.identifier, mp.refnisCode, mp.nameNL, mp.nameFR, mp.nameDE";
+		this.alias = "mp";
+		this.from = "municipalitypart";
 	}
 }

@@ -23,29 +23,37 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.webservice.entities;
+package be.bosa.dt.best.webservice.serializers;
+
+import be.bosa.dt.best.webservice.LookupResource;
+import be.bosa.dt.best.webservice.entities.MunicipalityPart;
+import static be.bosa.dt.best.webservice.serializers.BestSerializer.getHref;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+
+import java.io.IOException;
+
+import javax.inject.Singleton;
+
 
 /**
- * Base class
+ * Serializes BeST municipality parts (only used in Wallonia) to JSON.
  * 
+ * Note that the serialization is not complete, additional processing is required to create the final JSON
+ * (e.g. to embed additional objects, add links to first / next page)
+ * 
+ * @see <a ahref="https://www.gcloud.belgium.be/rest/">G-Cloud REST guidelines</a>
  * @author Bart Hanssens
  */
-public class BestEntity {
-	public String id;
-	public BestEntity embedded;
-
-	/**
-	 * Constructor
-	 */
-	public BestEntity() {
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param identifier 
-	 */
-	public BestEntity(String identifier) {
-		this.id = identifier;
+@Singleton
+public class MunicipalityPartSerializer extends BestSerializer<MunicipalityPart> {
+	@Override
+	public void serialize(MunicipalityPart part, JsonGenerator jg, SerializerProvider sp) throws IOException {
+		jg.writeStartObject();
+        jg.writeStringField("id", part.id);
+		jg.writeStringField("self", getHref(LookupResource.MUNICIPALITIES, part.id));
+		writeLangObject(jg, part.name_nl, part.name_fr, part.name_de);
+        jg.writeEndObject();
 	}
 }

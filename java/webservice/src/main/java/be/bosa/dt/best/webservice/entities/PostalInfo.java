@@ -26,6 +26,10 @@
 package be.bosa.dt.best.webservice.entities;
 
 import be.bosa.dt.best.webservice.NsConverter;
+import be.bosa.dt.best.webservice.serializers.PostalInfoSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import io.vertx.mutiny.sqlclient.Row;
 
 /**
@@ -33,6 +37,7 @@ import io.vertx.mutiny.sqlclient.Row;
  * 
  * @author Bart Hanssens
  */
+@JsonSerialize(using = PostalInfoSerializer.class)
 public class PostalInfo extends BestEntity {
 	public String zipcode;
 	public String name_nl;

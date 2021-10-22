@@ -27,7 +27,9 @@ package be.bosa.dt.best.webservice.entities;
 
 import be.bosa.dt.best.webservice.NsConverter;
 import be.bosa.dt.best.webservice.serializers.MunicipalitySerializer;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import io.vertx.mutiny.sqlclient.Row;
 
 /**

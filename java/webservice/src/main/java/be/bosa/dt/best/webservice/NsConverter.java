@@ -43,6 +43,8 @@ public class NsConverter {
 	private final static String WM = "geodata.wallonie.be/id/Municipality";
 	private final static String[][] ENC_M = { { BM, "BM" }, { VM, "VM" }, { WM, "WM" } };
 	private final static String[][] DEC_M = { { "BM", BM }, { "VM", VM }, { "WM", WM } };
+
+	private final static String WMP = "geodata.wallonie.be/id/PartOfMunicipality";
 	
 	private final static String BP = "BE.BRUSSELS.BRIC.ADM.PZ";
 	private final static String VP = "https://data.vlaanderen.be/id/postinfo";
@@ -115,6 +117,32 @@ public class NsConverter {
 	 */
 	public static String municipalityDecode(String id) {
 		return encode(id, DEC_M);
+	}
+
+	/**
+	 * Encode municipality part (only used by Wallonia)
+	 * 
+	 * @param id full municipality part ID
+	 * @return municipality part ID with short namespace
+	 */
+	public static String municipalityPartEncode(String id) {
+		if (id.startsWith(WMP)) {
+			return id.replace(WMP, "WMP");
+		}
+		return id;
+	}
+
+	/**
+	 * Decode municipality part
+	 * 
+	 * @param id municipality part ID with short namespace
+	 * @return full municipality part ID
+	 */
+	public static String municipalityPartDecode(String id) {
+		if (id.startsWith("WMP")) {
+			return id.replace("WMP", WMP);
+		}
+		return id;
 	}
 
 	/**

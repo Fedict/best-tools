@@ -25,19 +25,35 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
+import be.bosa.dt.best.webservice.NsConverter;
+import be.bosa.dt.best.webservice.serializers.MunicipalityPartSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import io.vertx.mutiny.sqlclient.Row;
+
 /**
- * Base class
+ * Municipality entity.
+ * Note that each municipality has a unique REFNIS code, which is NOT a postal code.
+ * Municipalities may have multiple postal codes and postal codes can be shared by different municipalities 
  * 
  * @author Bart Hanssens
  */
-public class BestEntity {
-	public String id;
-	public BestEntity embedded;
+@JsonSerialize(using = MunicipalityPartSerializer.class)
+public class MunicipalityPart extends BestEntity {
+	public String niscode;
+	public String name_nl;
+	public String name_fr;
+	public String name_de;
 
 	/**
-	 * Constructor
+	 * Convert database result to object
+	 * 
+	 * @param res database row
+	 * @return data object
 	 */
-	public BestEntity() {
+	public static MunicipalityPart from(Row res) {
+		return new MunicipalityPart(res.getString(0), res.getString(1), res.getString(2), res.getString(3), res.getString(4));
 	}
 
 	/**
@@ -45,7 +61,24 @@ public class BestEntity {
 	 * 
 	 * @param identifier 
 	 */
-	public BestEntity(String identifier) {
-		this.id = identifier;
+	public MunicipalityPart(String identifier) {
+		this.id = NsConverter.municipalityDecode(identifier);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param identifier
+	 * @param niscode
+	 * @param name_nl
+	 * @param name_fr
+	 * @param name_de 
+	 */
+	public MunicipalityPart(String identifier, String niscode, String name_nl, String name_fr, String name_de) {
+		this.id = NsConverter.municipalityDecode(identifier);
+		this.niscode = niscode;
+		this.name_nl = name_nl;
+		this.name_fr = name_fr;
+		this.name_de = name_de;
 	}
 }
