@@ -55,7 +55,9 @@ public class StreetSerializer extends BestSerializer<Street> {
 		jg.writeStringField("self", getHref(LookupResource.STREETS, street.id));
 		writeLangObject(jg, street.name_nl, street.name_fr, street.name_de);
 		jg.writeStringField("status", street.status);
-		jg.writeStringField("validFrom", street.validFrom.toString());
+		if (street.validFrom != null) {
+			jg.writeStringField("validFrom", street.validFrom.toString());
+		}
 		if (street.validTo != null) {
 			jg.writeStringField("validTo", street.validTo.toString());			
 		}

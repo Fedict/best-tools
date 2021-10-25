@@ -169,17 +169,17 @@ public class LookupResource {
 	private static JsonObject paginate(UriInfo info, JsonObject parentObj, JsonArray arr) {
 		//pagination
 		int size = arr.size();
-		if (size >= Repository.LIMIT) {
+		if (size >= Repository.PAGE_LIMIT) {
 			JsonObject lastObj = arr.getJsonObject(size - 1);
 			String first = info.getRequestUriBuilder()
 								.replaceQueryParam("after", null)
-								.queryParam("pageSize", Repository.LIMIT)
+								.queryParam("pageSize", Repository.PAGE_LIMIT)
 								.build().toString();
 			String next = info.getRequestUriBuilder()
 								.replaceQueryParam("after", lastObj.getString("id"))
-								.queryParam("pageSize", Repository.LIMIT)
+								.queryParam("pageSize", Repository.PAGE_LIMIT)
 								.build().toString();
-			parentObj.put("pageSize", Repository.LIMIT);
+			parentObj.put("pageSize", Repository.PAGE_LIMIT);
 			parentObj.put("first", first);
 			parentObj.put("next", next);
 		}
@@ -316,12 +316,23 @@ public class LookupResource {
 			@Parameter(description = "Box number", 
 						required = false)
 			@RestQuery String boxNumber,
-			@Parameter(description = "Embed street, municipality and postal info", 
+			@Parameter(description = "GPS X coordinate", 
 						required = false)
+			@RestQuery double gpsx,
+			@Parameter(description = "GPS Y coordinate", 
+						required = false)
+			@RestQuery double gpsy,
+			@Parameter(description = "Maximum distance in meters", 
+						required = false)
+			@RestQuery int meters,
+			@Parameter(description = "Maximum numbers of results", 
+						required = false)	
+			@RestQuery int limit,
 			@RestQuery boolean embed,
 			UriInfo info) {
-		Multi<Address> addresses = repo.findAddresses(after, municipalityID, streetID, postalID, 
-													houseNumber, boxNumber, embed);
+		Multi<Address> addresses = (gpsx == 0 || gpsy == 0)
+			? repo.findAddresses(after, municipalityID, streetID, postalID, houseNumber, boxNumber, limit, embed)
+			: repo.findByCoordinates(after, gpsx, gpsy, meters, limit, embed);
 		return toJsonEmbed(info, addresses);
 	}
 

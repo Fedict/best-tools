@@ -54,6 +54,7 @@ import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import org.locationtech.jts.geom.Coordinate;
 
 
 /**
@@ -63,7 +64,7 @@ import javax.inject.Inject;
  */
 @ApplicationScoped
 public class Repository {
-	protected static int LIMIT = 100;
+	protected static int PAGE_LIMIT = 100;
 
 	@Inject
 	PgPool pg;
@@ -105,7 +106,7 @@ public class Repository {
 		} else {
 			qry.limit();
 		}
-		lst.add(LIMIT);
+		lst.add(PAGE_LIMIT);
 	}
 
 	/**
@@ -149,14 +150,15 @@ public class Repository {
 	 * @param pIdentifier postal identifier
 	 * @param houseNumber house number
 	 * @param boxNumber box number
+	 * @param limit maximum number of results
 	 * @param embed embed street, postal etc or not
 	 * @return 
 	 */
 	public Multi<Address> findAddresses(String afterId, String mIdentifier, String sIdentifier, 
 										String pIdentifier,
-										String houseNumber, String boxNumber,
+										String houseNumber, String boxNumber, int limit,
 										boolean embed) {
-		List lst = new ArrayList();
+		List lst = new ArrayList(8);
 		SqlAddress qry = new SqlAddress(embed);
 
 		paginate(lst, qry, NsConverter.addressEncode(afterId));
@@ -166,6 +168,10 @@ public class Repository {
 		where(lst, qry, "a.houseNumber =", houseNumber);
 		where(lst, qry, "a.boxNumber =", boxNumber);
 
+		if (limit > 0) {
+			qry.limit();
+			lst.add(limit);
+		}
 		qry.orderById();
 
 		return multi(
@@ -176,27 +182,32 @@ public class Repository {
 	/**
 	 * Find addresses by GPS coordinates
 	 * 
-	 * @param x
-	 * @param y
+	 * @param afterId search after ID (paginated results)
+	 * @param gpsx
+	 * @param gpsy
 	 * @param meters
 	 * @param limit
-	 * @param afterId search after ID (paginated results)
 	 * @param embed embed street, postal etc or not
 	 * @return 
 	 */
-	public Multi<Address> findByCoordinates(int x, int y, int meters, int limit, String afterId, boolean embed) {
-		Tuple tuple;
+	public Multi<Address> findByCoordinates(String afterId, double gpsx, double gpsy, int meters, int limit, boolean embed) {
+		Coordinate l72 = CoordConverter.gpsToLambert(gpsx, gpsy);
+		List lst = new ArrayList<>(6); 
+		lst.add(l72.x);
+		lst.add(l72.y);
+		lst.add(meters);
+
 		SqlGeo qry = new SqlGeo(embed);
-		if (afterId != null) {
-			qry.paginate();
-			tuple = Tuple.of(x, y, meters, limit, afterId);
-		} else {
+		paginate(lst, qry, NsConverter.addressEncode(afterId));
+
+		if (limit > 0) {
 			qry.limit();
-			tuple = Tuple.of(x, y, meters, limit);
+			lst.add(limit);
 		}
+		qry.orderById();
 
 		return multi(
-			pg.preparedQuery(qry.build()).execute(tuple)
+			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
 		).transform(Address::from);
 	}
 	
@@ -223,7 +234,7 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<Municipality> findMunicipalities(String afterId) {
-		List lst = new ArrayList();
+		List lst = new ArrayList(2);
 		SqlMunicipality qry = new SqlMunicipality();
 
 		paginate(lst, qry, NsConverter.municipalityEncode(afterId));
@@ -249,7 +260,7 @@ public class Repository {
 		).transform(Municipality::from);
 	}
 
-		/**
+	/**
 	 * Find a municipality by ID
 	 * 
 	 * @param id municipality part id
@@ -272,7 +283,7 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<MunicipalityPart> findMunicipalityParts(String afterId) {
-		List lst = new ArrayList();
+		List lst = new ArrayList(2);
 		SqlMunicipalityPart qry = new SqlMunicipalityPart();
 
 		paginate(lst, qry, NsConverter.municipalityPartEncode(afterId));
@@ -321,7 +332,7 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<PostalInfo> findPostalInfos(String afterId) {
-		List lst = new ArrayList();
+		List lst = new ArrayList(2);
 		SqlPostalInfo qry = new SqlPostalInfo();
 
 		paginate(lst, qry, NsConverter.postalEncode(afterId));
@@ -370,7 +381,7 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<Street> findStreets(String afterId) {
-		List lst = new ArrayList();
+		List lst = new ArrayList(2);
 		SqlStreet qry = new SqlStreet();
 
 		paginate(lst, qry, NsConverter.streetEncode(afterId));

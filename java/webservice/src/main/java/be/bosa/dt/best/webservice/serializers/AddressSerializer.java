@@ -88,7 +88,9 @@ public class AddressSerializer extends BestSerializer<Address> {
 			jg.writeEndObject();
 		}
 		jg.writeStringField("status", address.status);
-		jg.writeStringField("validFrom", address.validFrom.toString());
+		if (address.validFrom != null) {
+			jg.writeStringField("validFrom", address.validFrom.toString());
+		}
 		if (address.validTo != null) {
 			jg.writeStringField("validTo", address.validTo.toString());			
 		}
