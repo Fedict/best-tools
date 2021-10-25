@@ -33,7 +33,7 @@ package be.bosa.dt.best.webservice.queries;
 public class SqlPostalInfo extends Sql {
 	
 	public SqlPostalInfo() {
-		this.select = "p.identifier, p.zipcode, p.nameNL, p.nameFR, p.nameDE";
+		this.select = "p.identifier, p.postalcode, p.nameNL, p.nameFR, p.nameDE";
 		this.alias = "p"; 
 		this.from = "postalinfo";
 	}

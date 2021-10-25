@@ -31,6 +31,7 @@ import be.bosa.dt.best.webservice.entities.Municipality;
 import be.bosa.dt.best.webservice.entities.MunicipalityPart;
 import be.bosa.dt.best.webservice.entities.PostalInfo;
 import be.bosa.dt.best.webservice.entities.Street;
+
 import io.quarkus.logging.Log;
 import io.quarkus.runtime.StartupEvent;
 
@@ -39,8 +40,10 @@ import io.smallrye.mutiny.Uni;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import java.util.ArrayList;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -62,6 +65,8 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import org.jboss.resteasy.reactive.RestQuery;
+import org.jboss.resteasy.reactive.RestResponse;
+import org.jboss.resteasy.reactive.RestResponse.ResponseBuilder;
 
 
 /**
@@ -101,9 +106,7 @@ public class LookupResource {
 	public final static String POSTAL = "/postal";
 	public final static String STREETS = "/streets";
 
-	private final Map<String,JsonObject> cacheMunicipalities = new TreeMap<>();
-	private final Map<String,JsonObject> cacheMunicipalityParts = new TreeMap<>();
-	private final Map<String,JsonObject> cachePostals = new TreeMap<>();
+	private final static Map<String,JsonObject> cache = new TreeMap<>();
 	
 	@Inject
 	Repository repo;
@@ -114,27 +117,27 @@ public class LookupResource {
 	 * @param ev 
 	 */
 	void onStart(@Observes StartupEvent ev) {               
-        Log.info("Caching all municipalities...");
+        Log.info("Caching");
 		
 		Multi<Municipality> municipalities = repo.findMunicipalitiesAll();
 		municipalities.subscribe().asStream().forEach(a -> {
-			cacheMunicipalities.put(a.id, JsonObject.mapFrom(a));
+			cache.put(a.id, JsonObject.mapFrom(a));
 		});
-		Log.info("... found " + cacheMunicipalities.size());
-
-        Log.info("Caching all municipality parts...");		
+		int size = cache.size();
+		Log.infof("%d municipalities", size);
+	
 		Multi<MunicipalityPart> parts = repo.findMunicipalityPartsAll();
 		parts.subscribe().asStream().forEach(a -> {
-			cacheMunicipalityParts.put(a.id, JsonObject.mapFrom(a));
+			cache.put(a.id, JsonObject.mapFrom(a));
 		});
-		Log.info("... found " + cacheMunicipalityParts.size());
-
-		Log.info("Caching all postal info...");		
+		Log.infof("%d municipality parts", cache.size() - size);
+		size = cache.size();
+		
 		Multi<PostalInfo> postals = repo.findPostalInfosAll();
 		postals.subscribe().asStream().forEach(a -> {
-			cachePostals.put(a.id, JsonObject.mapFrom(a));
+			cache.put(a.id, JsonObject.mapFrom(a));
 		});
-		Log.info("... found " + cachePostals.size());
+		Log.infof("%d postal info", cache.size() - size);
     }
 
 	/**
@@ -143,47 +146,27 @@ public class LookupResource {
 	 * @param <T>
 	 * @param info information about web request
 	 * @param item entity
-	 * @return JSON object
+	 * @return JSON object or null when not found
 	 */
-	private static <T> JsonObject toJson(UriInfo info, Uni<T> item) {
+	private static <T extends BestEntity> JsonObject toJson(UriInfo info, Uni<T> item) {
+		BestEntity entity = item.await().indefinitely();
+		if (entity == null) {
+			return null;
+		}
 		String self = info.getAbsolutePath().toString();
-		return JsonObject.mapFrom(item.await().indefinitely()).put("self", self);
+		return JsonObject.mapFrom(entity).put("self", self);
 	}
 
+	
 	/**
-	 * Convert multi of address, street, ... into JSON
+	 * Add pagination links to parent object
 	 * 
-	 * @param <T>
-	 * @param info information about web request
-	 * @param items entities
-	 * @return JSON object
+	 * @param info URI info
+	 * @param parentObj parent JSON object
+	 * @param arr result array
+	 * @return JSON object with pagination
 	 */
-	private static <T extends BestEntity> JsonObject toJson(UriInfo info, Multi<T> items) {
-		String self = info.getAbsolutePath().toString();
-
-		Map<String,BestEntity> embedded = new HashMap<>();
-		JsonArray arr = new JsonArray();
-		items.subscribe().asStream().forEach(a -> {
-			String href = self + "/" + a.id.replace("/", "%2F");
-			if (a.embedded != null) {
-				embedded.put(a.embedded.id, a.embedded);
-			}
-			arr.add(JsonObject.mapFrom(a).put("href", href));
-		});
-
-		JsonObject parentObj = new JsonObject();		
-		parentObj.put("self", self);
-		parentObj.put("items", arr); 
-
-		if (!embedded.isEmpty()) {
-			embedded.values().forEach(v -> {
-				JsonObject embObj = new JsonObject();
-				JsonObject obj = JsonObject.mapFrom(v);
-				embObj.put(obj.getString("self"), obj);
-				parentObj.put("embedded", embObj);
-			});
-		}
-
+	private static JsonObject paginate(UriInfo info, JsonObject parentObj, JsonArray arr) {
 		//pagination
 		int size = arr.size();
 		if (size >= Repository.LIMIT) {
@@ -200,8 +183,94 @@ public class LookupResource {
 			parentObj.put("first", first);
 			parentObj.put("next", next);
 		}
-
 		return parentObj;
+	}
+
+	/**
+	 * Convert multi(ple results) of addresses into JSON
+	 * 
+	 * @param info information about web request
+	 * @param items entities
+	 * @return JSON object
+	 */
+	private static JsonObject toJsonEmbed(UriInfo info, Multi<Address> items) {
+		String self = info.getAbsolutePath().toString();
+	
+		Map<String,BestEntity> streets = new HashMap<>();
+		List<String> embedded = new ArrayList<>();
+		JsonArray arr = new JsonArray();
+		items.subscribe().asStream().forEach(a -> {
+			String href = self + "/" + a.id.replace("/", "%2F");
+			if (a.street != null) {
+				streets.put(a.street.id, a.street);
+			}
+			embedded.add(a.mIdentifier);
+			if (a.mpIdentifier != null) {
+				embedded.add(a.mpIdentifier);
+			}
+			embedded.add(a.pIdentifier);
+			arr.add(JsonObject.mapFrom(a).put("href", href));
+		});
+
+		JsonObject parentObj = new JsonObject();		
+		parentObj.put("self", self);
+		parentObj.put("items", arr); 
+
+		JsonObject embObj = new JsonObject();
+		streets.values().forEach(v -> {
+			JsonObject obj = JsonObject.mapFrom(v);
+			embObj.put(obj.getString("self"), obj);
+		});
+
+		embedded.forEach(e -> { 
+			JsonObject obj = cache.get(e);
+			embObj.put(obj.getString("self"), obj);
+		});
+		parentObj.put("embedded", embObj);
+
+		return paginate(info, parentObj, arr);
+	}
+
+	/**
+	 * Convert multi(ple results) of streets, municipalities, ... into JSON
+	 * 
+	 * @param info information about web request
+	 * @param items entities
+	 * @return JSON object
+	 */
+	private static <T extends BestEntity> JsonObject toJson(UriInfo info, Multi<T> items) {
+		String self = info.getAbsolutePath().toString();
+	
+		JsonArray arr = new JsonArray();
+		items.subscribe().asStream().forEach(a -> {
+			String href = self + "/" + a.id.replace("/", "%2F");
+			arr.add(JsonObject.mapFrom(a).put("href", href));
+		});
+
+		JsonObject parentObj = new JsonObject();		
+		parentObj.put("self", self);
+		parentObj.put("items", arr); 
+
+		return paginate(info, parentObj, arr);
+	}
+
+	/**
+	 * Return single result or "not found" JSON object
+	 * 
+	 * @param json
+	 * @return response with single JSON result or a not found JSON object
+	 */
+	private RestResponse<JsonObject> responseOrEmpty(JsonObject json) {
+		if (json != null) { 
+			return RestResponse.ok(json);
+		}
+
+		JsonObject obj = new JsonObject();
+		obj.put("type", "urn:problem-type:belgif:resourceNotFound");
+		obj.put("href", "https://www.gcloud.belgium.be/rest/problems/resourceNotFound.html");
+		obj.put("status", RestResponse.Status.NOT_FOUND.getStatusCode());
+
+		return ResponseBuilder.create(RestResponse.Status.NOT_FOUND, obj).build();
 	}
 
 	@GET
@@ -209,7 +278,7 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get address by id",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
-	public JsonObject getAddressById(
+	public RestResponse<JsonObject> getAddressById(
 			@Parameter(description = "Address ID", 
 						required = true, 
 						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
@@ -219,7 +288,7 @@ public class LookupResource {
 			@RestQuery boolean embed,
 			UriInfo info) {
 		Uni<Address> address = repo.findAddressById(id, embed);
-		return toJson(info, address);
+		return responseOrEmpty(toJson(info, address));
 	}
 
 	@GET
@@ -253,20 +322,20 @@ public class LookupResource {
 			UriInfo info) {
 		Multi<Address> addresses = repo.findAddresses(after, municipalityID, streetID, postalID, 
 													houseNumber, boxNumber, embed);
-		return toJson(info, addresses);
+		return toJsonEmbed(info, addresses);
 	}
 
 	@GET
 	@Path(LookupResource.MUNICIPALITIES +"/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a municipality by full ID")
-	public JsonObject getMunicipalityById(
+	public RestResponse<JsonObject> getMunicipalityById(
 			@Parameter(description = "Municipality ID", 
 						required = true)
 			String id,
 			UriInfo info) {
 		Uni<Municipality> municipality = repo.findMunicipalityById(id);
-		return toJson(info, municipality);
+		return responseOrEmpty(toJson(info, municipality));
 	}
 
 	@GET
@@ -283,17 +352,18 @@ public class LookupResource {
 		Multi<Municipality> municipalities = repo.findMunicipalities(after);
 		return toJson(info, municipalities);
 	}
+
 	@GET
 	@Path(LookupResource.MUNICIPALITY_PARTS +"/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a municipality part by full ID")
-	public JsonObject getMunicipalityPartsById(
+	public RestResponse<JsonObject> getMunicipalityPartsById(
 			@Parameter(description = "Municipality part ID", 
 						required = true)
 			String id,
 			UriInfo info) {
 		Uni<MunicipalityPart> part = repo.findMunicipalityPartById(id);
-		return toJson(info, part);
+		return responseOrEmpty(toJson(info, part));		
 	}
 
 	@GET
@@ -315,13 +385,13 @@ public class LookupResource {
 	@Path(LookupResource.POSTAL + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a postal info by full ID")
-	public JsonObject getPostalById(
+	public RestResponse<JsonObject> getPostalById(
 			@Parameter(description = "Postal ID", 
 						required = true)
 			String id,
 			UriInfo info) {
 		Uni<PostalInfo> postal = repo.findPostalInfoById(id);
-		return toJson(info, postal);
+		return responseOrEmpty(toJson(info, postal));
 	}
 
 	@GET
@@ -343,14 +413,14 @@ public class LookupResource {
 	@Path(LookupResource.STREETS + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a street by full ID")
-	public JsonObject getStreetById(
+	public RestResponse<JsonObject> getStreetById(
 			@Parameter(description = "Street ID", 
 						required = true,
 						example = "https://data.vlaanderen.be/id/straatnaam/1/2013-04-12T20:06:58.583'")
 			String id,
 			UriInfo info) {
 		Uni<Street> street = repo.findStreetById(id);
-		return toJson(info, street);
+		return responseOrEmpty(toJson(info, street));
 	}
 
 	@GET
@@ -367,5 +437,4 @@ public class LookupResource {
 		Multi<Street> streets = repo.findStreets(after);
 		return toJson(info, streets);
 	}
-
 }

@@ -54,6 +54,7 @@ public class Address extends BestEntity {
 	public OffsetDateTime validFrom;
 	public OffsetDateTime validTo;
 	public Point point;
+	public Street street;
 
 	/**
 	 * Convert database result to object
@@ -69,7 +70,7 @@ public class Address extends BestEntity {
 				res.getOffsetDateTime(7), res.getOffsetDateTime(8), res.getString(9), 
 				res.get(Point.class, 10));
 		if (res.size() > 11) {
-			addr.embedded = new Street(res.getString(4), res.getString(11),
+			addr.street = new Street(res.getString(4), res.getString(11),
 							res.getString(12), res.getString(13), res.getString(14),
 							res.getOffsetDateTime(15), res.getOffsetDateTime(16), res.getString(17));
 		}

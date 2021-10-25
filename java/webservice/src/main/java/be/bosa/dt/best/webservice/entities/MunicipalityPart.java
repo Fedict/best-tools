@@ -53,7 +53,7 @@ public class MunicipalityPart extends BestEntity {
 	 * @return data object
 	 */
 	public static MunicipalityPart from(Row res) {
-		return new MunicipalityPart(res.getString(0), res.getString(1), res.getString(2), res.getString(3), res.getString(4));
+		return new MunicipalityPart(res.getString(0), res.getString(1),res.getString(2), res.getString(3));
 	}
 
 	/**
@@ -69,14 +69,12 @@ public class MunicipalityPart extends BestEntity {
 	 * Constructor
 	 * 
 	 * @param identifier
-	 * @param niscode
 	 * @param name_nl
 	 * @param name_fr
 	 * @param name_de 
 	 */
-	public MunicipalityPart(String identifier, String niscode, String name_nl, String name_fr, String name_de) {
+	public MunicipalityPart(String identifier, String name_nl, String name_fr, String name_de) {
 		this.id = NsConverter.municipalityDecode(identifier);
-		this.niscode = niscode;
 		this.name_nl = name_nl;
 		this.name_fr = name_fr;
 		this.name_de = name_de;

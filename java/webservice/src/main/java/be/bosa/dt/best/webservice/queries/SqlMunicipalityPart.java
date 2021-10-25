@@ -33,8 +33,8 @@ package be.bosa.dt.best.webservice.queries;
 public class SqlMunicipalityPart extends Sql {
 
 	public SqlMunicipalityPart() {
-		this.select = "mp.identifier, mp.refnisCode, mp.nameNL, mp.nameFR, mp.nameDE";
+		this.select = "mp.identifier, mp.nameNL, mp.nameFR, mp.nameDE";
 		this.alias = "mp";
-		this.from = "municipalitypart";
+		this.from = "partofmunicipality";
 	}
 }
