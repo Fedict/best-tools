@@ -181,8 +181,10 @@ public class CsvPreparer {
 								"1",
 								a.getName("nl"), a.getName("fr"), a.getName("de"), 
 								"", "", a.getStatus(),
-								a.getFromDate().toString(), a.getTillDate().toString(), 
-								a.getBeginLife().toString(), a.getEndLife().toString());
+								(a.getFromDate() != null) ? a.getFromDate().toString() : "", 
+								(a.getTillDate() != null) ? a.getTillDate().toString() : "", 
+								(a.getBeginLife() != null) ? a.getBeginLife().toString() : "",
+								(a.getEndLife() != null) ? a.getEndLife().toString() : "");
 				
 					if (++cnt % 10_000 == 0) {
 						LOG.log(Level.INFO, "Wrote {0}", cnt);
@@ -235,8 +237,10 @@ public class CsvPreparer {
 						"1",
 						a.getNumber(), a.getBox(), "", 
 						a.getStatus(), 
-						a.getFromDate().toString(),a.getTillDate().toString(),
-						a.getBeginLife().toString(), a.getEndLife().toString(),
+						(a.getFromDate() != null) ? a.getFromDate().toString() : "", 
+						(a.getTillDate() != null) ? a.getTillDate().toString() : "", 
+						(a.getBeginLife() != null) ? a.getBeginLife().toString() : "",
+						(a.getEndLife() != null) ? a.getEndLife().toString() : "",
 						c, "", "", "false");
 
 					if (++cnt % 10_000 == 0) {

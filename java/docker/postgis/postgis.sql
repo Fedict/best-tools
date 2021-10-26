@@ -1,6 +1,10 @@
+CREATE DATABASE best;
+
+\c best;
+
 CREATE EXTENSION postgis;
-CREATE EXTENSION postgis_topology;
 CREATE EXTENSION fuzzystrmatch;
+CREATE EXTENSION pg_trgm;
 
 CREATE USER best_reader WITH PASSWORD 'best_reader';
 GRANT CONNECT ON DATABASE best to best_reader;
@@ -83,7 +87,7 @@ CREATE UNLOGGED TABLE Street(
 \COPY Municipality FROM 'municipalities.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
 \COPY PartOfMunicipality FROM 'municipalityparts.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
 \COPY Postalinfo FROM 'postals.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
-\COPY Stree FROM 'streets.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
+\COPY Street FROM 'streets.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
 
 CREATE INDEX ON Street(mIdentifier);
 CREATE INDEX ON Address(pIdentifier);
