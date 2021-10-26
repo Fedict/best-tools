@@ -120,21 +120,21 @@ public class LookupResource {
         Log.info("Caching");
 		
 		Multi<Municipality> municipalities = repo.findMunicipalitiesAll();
-		municipalities.subscribe().asStream().forEach(a -> {
+		municipalities.subscribe().with(a -> {
 			cache.put(a.id, JsonObject.mapFrom(a));
 		});
 		int size = cache.size();
 		Log.infof("%d municipalities", size);
 	
 		Multi<MunicipalityPart> parts = repo.findMunicipalityPartsAll();
-		parts.subscribe().asStream().forEach(a -> {
+		parts.subscribe().with(a -> {
 			cache.put(a.id, JsonObject.mapFrom(a));
 		});
 		Log.infof("%d municipality parts", cache.size() - size);
 		size = cache.size();
 		
 		Multi<PostalInfo> postals = repo.findPostalInfosAll();
-		postals.subscribe().asStream().forEach(a -> {
+		postals.subscribe().with(a -> {
 			cache.put(a.id, JsonObject.mapFrom(a));
 		});
 		Log.infof("%d postal info", cache.size() - size);
