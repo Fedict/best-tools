@@ -267,6 +267,7 @@ public class PostGisLoader {
 			LOG.info("Set foreign key idexes");			
 			stmt.execute("CREATE INDEX idxAddressMunicipality ON Address(mIdentifier)");
 			stmt.execute("CREATE INDEX idxAddressPostal ON Address(pIdentifier)");
+			stmt.execute("CREATE INDEX idxAddressStreet ON Address(sIdentifier)");
 			stmt.execute("CREATE INDEX idxStreetMunicipality ON Street(mIdentifier)");
 
 			LOG.info("Set street text indexes");				
@@ -302,7 +303,7 @@ public class PostGisLoader {
 
 		while (iter.hasNext()) {
 			Postal a = iter.next();
-			prep.setString(1, NamespaceCoder.postal(a.getIDVersion(), reg));
+			prep.setString(1, NsConverter.postalEncode(a.getIDVersion()));
 			prep.setString(2, a.getId());
 			prep.setString(3, a.getName("nl"));
 			prep.setString(4, a.getName("fr"));
@@ -337,7 +338,7 @@ public class PostGisLoader {
 
 		while (iter.hasNext()) {
 			Municipality a = iter.next();
-			prep.setString(1, NamespaceCoder.municipality(a.getIDVersion(),reg));
+			prep.setString(1, NsConverter.municipalityEncode(a.getIDVersion()));
 			prep.setString(2, a.getId());
 			prep.setString(3, a.getName("nl"));
 			prep.setString(4, a.getName("fr"));
@@ -372,7 +373,7 @@ public class PostGisLoader {
 
 		while (iter.hasNext()) {
 			Municipality a = iter.next();
-			prep.setString(1, NamespaceCoder.municipalityPart(a.getIDVersion(), reg));
+			prep.setString(1, NsConverter.municipalityEncode(a.getIDVersion()));
 			prep.setString(2, a.getName("nl"));
 			prep.setString(3, a.getName("fr"));
 			prep.setString(4, a.getName("de"));
@@ -407,8 +408,8 @@ public class PostGisLoader {
 		while (iter.hasNext()) {
 			Street a = iter.next();
 
-			prep.setString(1, NamespaceCoder.street(a.getIDVersion(), reg));
-			prep.setString(2, NamespaceCoder.municipality(a.getCity().getIDVersion(), reg));
+			prep.setString(1, NsConverter.streetEncode(a.getIDVersion()));
+			prep.setString(2, NsConverter.municipalityEncode(a.getCity().getIDVersion()));
 			prep.setString(3, a.getName("nl"));
 			prep.setString(4, a.getName("fr"));
 			prep.setString(5, a.getName("de"));
@@ -475,11 +476,11 @@ public class PostGisLoader {
 			
 			String geom = encodePoint(p);
 
-			prep.setString(1, NamespaceCoder.address(a.getIDVersion(), reg));
-			prep.setString(2, NamespaceCoder.municipality(a.getCity().getIDVersion(), reg));
+			prep.setString(1, NsConverter.addressEncode(a.getIDVersion()));
+			prep.setString(2, NsConverter.municipalityEncode(a.getCity().getIDVersion()));
 			prep.setString(3, null);
-			prep.setString(4, NamespaceCoder.street(a.getStreet().getIDVersion(), reg));
-			prep.setString(5, NamespaceCoder.postal(a.getPostal().getIDVersion(), reg));
+			prep.setString(4, NsConverter.streetEncode(a.getStreet().getIDVersion()));
+			prep.setString(5, NsConverter.postalEncode(a.getPostal().getIDVersion()));
 			prep.setString(6, a.getNumber());
 			prep.setString(7, a.getBox());
 			prep.setObject(8, a.getStatus(), Types.OTHER);

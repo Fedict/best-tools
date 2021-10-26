@@ -84,7 +84,8 @@ public class CsvPreparer {
 
 				while (iter.hasNext()) {
 					Postal a = iter.next();
-					w.writeRow(a.getIDVersion(), a.getId(), a.getName("nl"), a.getName("fr"), a.getName("de"));
+					w.writeRow(NsConverter.postalEncode(a.getIDVersion()), "1", a.getId(),
+								a.getName("nl"), a.getName("fr"), a.getName("de"));
 					if (++cnt % 10_000 == 0) {
 						LOG.log(Level.INFO, "Wrote {0}", cnt);
 					}
@@ -113,7 +114,8 @@ public class CsvPreparer {
 
 				while (iter.hasNext()) {
 					Municipality a = iter.next();
-					w.writeRow(a.getIDVersion(), a.getId(), a.getName("nl"), a.getName("fr"), a.getName("de"));
+					w.writeRow( NsConverter.municipalityEncode(a.getIDVersion()), "1", a.getId(), 
+								a.getName("nl"), a.getName("fr"), a.getName("de"));
 					if (++cnt % 10_000 == 0) {
 						LOG.log(Level.INFO, "Wrote {0}", cnt);
 					}
@@ -142,7 +144,8 @@ public class CsvPreparer {
 
 				while (iter.hasNext()) {
 					Municipality a = iter.next();
-					w.writeRow(a.getIDVersion(), a.getName("nl"), a.getName("fr"), a.getName("de"));
+					w.writeRow(NsConverter.municipalityPartEncode(a.getIDVersion()), "1", 
+								a.getName("nl"), a.getName("fr"), a.getName("de"));
 					if (++cnt % 10_000 == 0) {
 						LOG.log(Level.INFO, "Wrote {0}", cnt);
 					}
@@ -172,8 +175,14 @@ public class CsvPreparer {
 
 				while (iter.hasNext()) {
 					Street a = iter.next();
-					w.writeRow(a.getIDVersion(), a.getCity().getIDVersion(), 
-								a.getName("nl"), a.getName("fr"), a.getName("de"), a.getStatus());
+					w.writeRow(NsConverter.streetEncode(a.getIDVersion()),
+								"1",
+								NsConverter.municipalityEncode(a.getCity().getIDVersion()), 
+								"1",
+								a.getName("nl"), a.getName("fr"), a.getName("de"), 
+								"", "", a.getStatus(),
+								a.getFromDate().toString(), a.getTillDate().toString(), 
+								a.getBeginLife().toString(), a.getEndLife().toString());
 				
 					if (++cnt % 10_000 == 0) {
 						LOG.log(Level.INFO, "Wrote {0}", cnt);
@@ -215,9 +224,20 @@ public class CsvPreparer {
 					String c = geoCoder.toWkb(gps ? coordgps : coordl72);
 
 					// calculate geom afterwards, using separate UPDATE statement
-					w.writeRow(a.getIDVersion(), a.getCity().getIDVersion(), a.getCityPart().getIDVersion(),
-							a.getStreet().getIDVersion(), a.getPostal().getIDVersion(), a.getNumber(),
-							a.getBox(), a.getStatus(), x, y, c);
+					w.writeRow(NsConverter.addressEncode(a.getIDVersion()), 
+						NsConverter.municipalityEncode(a.getCity().getIDVersion()),
+						"1",
+						NsConverter.municipalityPartEncode(a.getCityPart().getIDVersion()),
+						"1",
+						NsConverter.streetEncode(a.getStreet().getIDVersion()),
+						"1",
+						NsConverter.postalEncode(a.getPostal().getIDVersion()),
+						"1",
+						a.getNumber(), a.getBox(), "", 
+						a.getStatus(), 
+						a.getFromDate().toString(),a.getTillDate().toString(),
+						a.getBeginLife().toString(), a.getEndLife().toString(),
+						c, "", "", "false");
 
 					if (++cnt % 10_000 == 0) {
 						LOG.log(Level.INFO, "Wrote {0}", cnt);

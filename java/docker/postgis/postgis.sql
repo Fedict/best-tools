@@ -5,77 +5,140 @@ CREATE EXTENSION fuzzystrmatch;
 CREATE USER best_reader WITH PASSWORD 'best_reader';
 GRANT CONNECT ON DATABASE best to best_reader;
 
-CREATE TABLE addresses(
-	id VARCHAR(88) NOT NULL,
-	city_id VARCHAR(88) NOT NULL,
-	part_id VARCHAR(88),
-	street_id VARCHAR(88) NOT NULL,
-	postal_id VARCHAR(88) NOT NULL,
-	houseno VARCHAR(12),
-	boxno VARCHAR(40),
-	status VARCHAR(10), 
-	x DOUBLE PRECISION NOT NULL,
-	y DOUBLE PRECISION NOT NULL,
-	geom GEOMETRY NOT NULL);
+CREATE TYPE enumStatus 
+    AS ENUM('current', 'proposed', 'retired', 'reserved');
+CREATE TYPE enumStreetnameType
+    AS ENUM('hamlet', 'streetname');
+CREATE TYPE enumPositionGeometryMethodValueType
+    AS ENUM('assignedByAdministrator', 'derivedFromObject');
+CREATE TYPE enumPositionSpecificationValueType
+    AS ENUM('building','buildingUnit', 'entrance', 'mooringPlace', 'municipality', 
+        'parcel', 'plot', 'stand', 'street');
 
-CREATE TABLE municipalities(
-	id VARCHAR(88) NOT NULL,
-	niscode VARCHAR(5) NOT NULL,
-	name_nl VARCHAR(80),
-	name_fr VARCHAR(80),
-	name_de VARCHAR(80));
+CREATE UNLOGGED TABLE Address(
+    identifier VARCHAR(100) NOT NULL,
+    minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1,
+    mIdentifier VARCHAR(100) NOT NULL,
+    mMinorVersionIdentifier SMALLINT,
+    mpIdentifier VARCHAR(100),
+    mpMinorVersionIdentifier SMALLINT,
+    sIdentifier VARCHAR(100) NOT NULL,
+    sMinorVersionIdentifier SMALLINT,
+    pIdentifier VARCHAR(100) NOT NULL,
+    pMinorVersionIdentifier SMALLINT,
+    housenumber VARCHAR(15),
+    boxnumber VARCHAR(35),
+    officiallyAssigned BOOLEAN,
+    status enumStatus NOT NULL,
+    validFrom TIMESTAMPTZ,
+    validTo TIMESTAMPTZ,
+    beginLifeSpanVersion TIMESTAMPTZ,
+    endLifeSpanVersion TIMESTAMPTZ,
+    point GEOMETRY(POINT, 31370),
+    positionGeometryMethod enumPositionGeometryMethodValueType,
+    positionSpecification enumPositionSpecificationValueType,
+    firstAddress BOOLEAN);
 
-CREATE TABLE municipalityparts(
-	id VARCHAR(88) NOT NULL,
-	name_nl VARCHAR(80),
-	name_fr VARCHAR(80),
-	name_de VARCHAR(80));
+CREATE UNLOGGED TABLE Municipality(
+    identifier VARCHAR(100) NOT NULL,
+    minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1,
+    refnisCode VARCHAR(5) NOT NULL,
+    nameNL VARCHAR(100),
+    nameFR VARCHAR(100),
+    nameDE VARCHAR(100));
 
-CREATE TABLE postals(
-	id VARCHAR(88) NOT NULL,
-	zipcode VARCHAR(4) NOT NULL,
-	name_nl VARCHAR(240),
-	name_fr VARCHAR(240),
-	name_de VARCHAR(240));
+CREATE UNLOGGED TABLE PartOfMunicipality(
+    identifier VARCHAR(100) NOT NULL, 
+    minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1,
+    nameNL VARCHAR(100),
+    nameFR VARCHAR(100),
+    nameDE VARCHAR(100));
 
-CREATE TABLE streets(
-	id VARCHAR(88) NOT NULL,
-	city_id VARCHAR(88) NOT NULL,
-	name_nl VARCHAR(80),
-	name_fr VARCHAR(80),
-	name_de VARCHAR(80),
-	status VARCHAR(10));
+CREATE UNLOGGED TABLE PostalInfo(
+    identifier VARCHAR(100) NOT NULL,
+    minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1,
+    postalCode VARCHAR(4) NOT NULL,
+    nameNL VARCHAR(240),
+    nameFR VARCHAR(240),
+    nameDE VARCHAR(240));
+	
+CREATE UNLOGGED TABLE Street(
+    identifier VARCHAR(100) NOT NULL,
+    minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1,
+    mIdentifier VARCHAR(100) NOT NULL,
+    mMinorVersionIdentifier SMALLINT,
+    nameNL VARCHAR(100),
+    nameFR VARCHAR(100),
+    nameDE VARCHAR(100),
+    homonymAddition VARCHAR(25),
+    streetnameType enumStreetnameType,
+    status enumStatus NOT NULL,
+    validFrom TIMESTAMPTZ,
+    validTo TIMESTAMPTZ,
+    beginLifeSpanVersion TIMESTAMPTZ,
+    endLifeSpanVersion TIMESTAMPTZ);
 
-\COPY addresses FROM 'addresses.csv' WITH DELIMITER ';' QUOTE '"' csv;
-\COPY municipalities FROM 'municipalities.csv' WITH DELIMITER ';' QUOTE '"' csv;
-\COPY municipalityparts FROM 'municipalityparts.csv' WITH DELIMITER ';' QUOTE '"' csv;
-\COPY postals FROM 'postals.csv' WITH DELIMITER ';' QUOTE '"' csv;
-\COPY streets FROM 'streets.csv' WITH DELIMITER ';' QUOTE '"' csv;
 
-SELECT UpdateGeometrySRID('addresses','geom', 31370);
+\COPY Address FROM 'addresses.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
+\COPY Municipality FROM 'municipalities.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
+\COPY PartOfMunicipality FROM 'municipalityparts.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
+\COPY Postalinfo FROM 'postals.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
+\COPY Stree FROM 'streets.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
 
-CREATE INDEX ON streets(city_id);
-CREATE INDEX ON addresses(postal_id);
-CREATE INDEX ON addresses(city_id);
-CREATE INDEX ON addresses(part_id);
+CREATE INDEX ON Street(mIdentifier);
+CREATE INDEX ON Address(pIdentifier);
+CREATE INDEX ON Address(mIdentifier);
+CREATE INDEX ON Address(mpIdentifier);
 
-CREATE TABLE postal_municipalities AS (
-	SELECT DISTINCT city_id, zipcode
-	FROM addresses a, postals p
-	WHERE a.postal_id = p.id);
+CREATE UNLOGGED TABLE PostalMunicipalities AS (
+	SELECT DISTINCT a.mIdentifier, p.postalCode
+	FROM Address a, PostalInfo p
+	WHERE a.pIdentifier = p.identifier);
 
-CREATE TABLE postal_streets AS (
-	SELECT DISTINCT street_id, zipcode
-	FROM addresses a, postals p
-	WHERE a.postal_id = p.id);
+CREATE UNLOGGED TABLE PostalStreets AS (
+	SELECT DISTINCT a.sIdentifier, p.postalCode
+	FROM Address a, PostalInfo p
+	WHERE a.pIdentifier = p.identifier);
 
-ALTER TABLE addresses ADD PRIMARY KEY(id);
-ALTER TABLE municipalities ADD PRIMARY KEY(id);
-ALTER TABLE municipalityparts ADD PRIMARY KEY(id);
-ALTER TABLE streets ADD PRIMARY KEY(id);
+ALTER TABLE Address 
+    ADD CONSTRAINT pkAddress PRIMARY KEY(identifier, minorVersionIdentifier);
+ALTER TABLE Municipality
+    ADD CONSTRAINT pkMunicipality PRIMARY KEY(identifier, minorVersionIdentifier);
+ALTER TABLE PartOfMunicipality
+    ADD CONSTRAINT pkPartOfMunicipality PRIMARY KEY(identifier, minorVersionIdentifier);
+ALTER TABLE PostalInfo
+    ADD CONSTRAINT pkPostalInfo PRIMARY KEY(identifier, minorVersionIdentifier);
+ALTER TABLE Street
+    ADD CONSTRAINT pkStreet PRIMARY KEY(identifier, minorVersionIdentifier);
 
-CREATE INDEX ON addresses USING GIST(geom);
-			
+ALTER TABLE Address ADD CONSTRAINT fkAddressMunicipality
+    FOREIGN KEY (mIdentifier, mMinorVersionIdentifier)
+    REFERENCES Municipality(identifier, minorVersionIdentifier);
+ALTER TABLE Address ADD CONSTRAINT fkAddressPartOfMunicipality
+    FOREIGN KEY (mpIdentifier, mpMinorVersionIdentifier)
+    REFERENCES PartOfMunicipality(identifier, minorVersionIdentifier);
+ALTER TABLE Address ADD CONSTRAINT fkAddressPostalInfo
+    FOREIGN KEY (pIdentifier, pMinorVersionIdentifier)
+    REFERENCES PostalInfo(identifier, minorVersionIdentifier);
+ALTER TABLE Address ADD CONSTRAINT fkAddressStreet
+    FOREIGN KEY (sIdentifier, sMinorVersionIdentifier)
+    REFERENCES Street(identifier, minorVersionIdentifier);
+
+CREATE INDEX idxAddressPoint ON Address USING GIST(point);
+
+CREATE INDEX idxAddressMunicipality ON Address(mIdentifier);
+CREATE INDEX idxAddressPostal ON Address(pIdentifier);
+CREATE INDEX idxAddressStreet ON Address(sIdentifier);
+CREATE INDEX idxStreetMunicipality ON Street(mIdentifier);
+
+CREATE INDEX idxGinStreetNL ON Street USING GIN(nameNL gin_trgm_ops);
+CREATE INDEX idxGinStreetFR ON Street USING GIN(nameFR gin_trgm_ops);
+CREATE INDEX idxGinStreetDE ON Street USING GIN(nameDE gin_trgm_ops);
+
+CREATE INDEX idxGinMunicipalityNL ON Municipality USING GIN(nameNL gin_trgm_ops);
+CREATE INDEX idxGinMunicipalityFR ON Municipality USING GIN(nameFR gin_trgm_ops);
+CREATE INDEX idxGinMunicipalityDE ON Municipality USING GIN(nameDE gin_trgm_ops);
+
 VACUUM FULL ANALYZE;
 
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO best_reader;
