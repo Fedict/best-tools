@@ -26,18 +26,11 @@ Usage:
 
 ## DbLoader tool
 
-Loads (unzipped) BeST XML files into a [PostGIS](https://postgis.net) or [SpatiaLite](https://www.gaia-gis.it/fossil/libspatialite/home) RDBMS, optionally converting Lambert72 coordinates to WGS84/GPS
-
-For PostGIS, the user has to have admin rights to create the PostGIS extensions
+Loads (unzipped) BeST XML files into a [PostGIS](https://postgis.net),
+the user has to have admin rights to create the PostGIS extensions
 
 Usage:
 `java -jar dbloader.jar -x <directory_unzipped_xml> -d jdbc:postgresql://localhost/best?user=foo&password=bar`
-
-For spatialite, the `mod_spatialite` .dll or .so must be in the `PATH` environment variable.
-In addition, when converting Lambert coordinates to GPS coordinates, the `PROJ_LIB` environment variable needs to be set to the directory containing proj.db database file, which is part of the precompiled [Windows executables](http://www.gaia-gis.it/gaia-sins/).
-
-Usage:
-`java -jar dbloader.jar -x <directory_unzipped_xml> -d jdbc:sqlite:C:/data/best.db -g`
 
 Alternatively, the data can be written to a few CSV table files that can be loaded e.g. by Postgres' psql COPY command
 
