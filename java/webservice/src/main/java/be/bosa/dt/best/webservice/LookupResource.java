@@ -117,7 +117,7 @@ public class LookupResource {
 	 */
 	void onStart(@Observes StartupEvent ev) {               
         Log.info("Caching");
-		
+	
 		Multi<Municipality> municipalities = repo.findMunicipalitiesAll();
 		municipalities.subscribe().with(a -> {
 			cache.put(a.id, JsonObject.mapFrom(a));
@@ -259,7 +259,7 @@ public class LookupResource {
 	 * @param json
 	 * @return response with single JSON result or a not found JSON object
 	 */
-	private RestResponse<JsonObject> responseOrEmpty(JsonObject json) {
+	private static RestResponse<JsonObject> responseOrEmpty(JsonObject json) {
 		if (json != null) { 
 			return RestResponse.ok(json);
 		}

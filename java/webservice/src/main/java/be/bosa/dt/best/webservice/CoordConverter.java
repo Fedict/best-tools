@@ -26,9 +26,9 @@
 package be.bosa.dt.best.webservice;
 
 
+import io.quarkus.logging.Log;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
-import org.jboss.logging.Logger;
 import org.locationtech.jts.geom.Coordinate;
 
 import org.opengis.referencing.FactoryException;
@@ -46,9 +46,7 @@ public class CoordConverter {
 	private static CoordinateReferenceSystem wgs84;
 	private static MathTransform L72ToWgs84;
 	private static MathTransform Wgs84ToL72;
-
-	private final static Logger LOG = Logger.getLogger(CoordConverter.class);
-
+	
 	static {
 		try {
 			l72 = CRS.decode("EPSG:31370");
@@ -56,7 +54,7 @@ public class CoordConverter {
 			Wgs84ToL72 = CRS.findMathTransform(wgs84, l72);
 			L72ToWgs84 = CRS.findMathTransform(l72, wgs84);
 		} catch (FactoryException ex) {
-			LOG.fatal(ex.getMessage(), ex);
+			Log.fatal(ex.getMessage(), ex);
 		}
 	}
 
