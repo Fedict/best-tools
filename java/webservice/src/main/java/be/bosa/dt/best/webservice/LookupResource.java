@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -106,7 +105,7 @@ public class LookupResource {
 	public final static String POSTAL = "/postal";
 	public final static String STREETS = "/streets";
 
-	private final static Map<String,JsonObject> cache = new TreeMap<>();
+	private final static Map<String,JsonObject> cache = new HashMap<>(5000);
 	
 	@Inject
 	Repository repo;
