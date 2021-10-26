@@ -62,7 +62,7 @@ public class MunicipalityPart extends BestEntity {
 	 * @param identifier 
 	 */
 	public MunicipalityPart(String identifier) {
-		this.id = NsConverter.municipalityDecode(identifier);
+		this.id = NsConverter.municipalityPartDecode(identifier);
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class MunicipalityPart extends BestEntity {
 	 * @param name_de 
 	 */
 	public MunicipalityPart(String identifier, String name_nl, String name_fr, String name_de) {
-		this.id = NsConverter.municipalityDecode(identifier);
+		this.id = NsConverter.municipalityPartDecode(identifier);
 		this.name_nl = name_nl;
 		this.name_fr = name_fr;
 		this.name_de = name_de;

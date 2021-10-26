@@ -40,11 +40,11 @@ import io.smallrye.mutiny.Uni;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import java.util.ArrayList;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -119,22 +119,22 @@ public class LookupResource {
         Log.info("Caching");
 	
 		Multi<Municipality> municipalities = repo.findMunicipalitiesAll();
-		municipalities.subscribe().with(a -> {
-			cache.put(a.id, JsonObject.mapFrom(a));
+		municipalities.subscribe().with(m -> {
+			cache.put(m.id, JsonObject.mapFrom(m));
 		});
 		int size = cache.size();
 		Log.infof("%d municipalities", size);
 	
 		Multi<MunicipalityPart> parts = repo.findMunicipalityPartsAll();
-		parts.subscribe().with(a -> {
-			cache.put(a.id, JsonObject.mapFrom(a));
+		parts.subscribe().with(mp -> {
+			cache.put(mp.id, JsonObject.mapFrom(mp));
 		});
 		Log.infof("%d municipality parts", cache.size() - size);
 		size = cache.size();
 		
 		Multi<PostalInfo> postals = repo.findPostalInfosAll();
-		postals.subscribe().with(a -> {
-			cache.put(a.id, JsonObject.mapFrom(a));
+		postals.subscribe().with(p -> {			
+			cache.put(p.id, JsonObject.mapFrom(p));
 		});
 		Log.infof("%d postal info", cache.size() - size);
     }
@@ -190,13 +190,15 @@ public class LookupResource {
 	 * 
 	 * @param info information about web request
 	 * @param items entities
+	 * @param embed add embedded part to JSON or not
 	 * @return JSON object
 	 */
-	private static JsonObject toJsonEmbed(UriInfo info, Multi<Address> items) {
+	private static JsonObject toJsonEmbeddable(UriInfo info, Multi<Address> items, boolean embed) {
 		String self = info.getAbsolutePath().toString();
 	
-		Map<String,BestEntity> streets = new HashMap<>();
-		List<String> embedded = new ArrayList<>();
+		Map<String,Street> streets = new HashMap<>();
+		Set<String> embedded = new HashSet<>();
+
 		JsonArray arr = new JsonArray();
 		items.subscribe().asStream().forEach(a -> {
 			String href = self + "/" + a.id.replace("/", "%2F");
@@ -215,18 +217,23 @@ public class LookupResource {
 		parentObj.put("self", self);
 		parentObj.put("items", arr); 
 
-		JsonObject embObj = new JsonObject();
-		streets.values().forEach(v -> {
-			JsonObject obj = JsonObject.mapFrom(v);
-			embObj.put(obj.getString("self"), obj);
-		});
+		if (embed) {
+			JsonObject embObj = new JsonObject();
+			streets.forEach((k,v) -> {
+				JsonObject obj = JsonObject.mapFrom(v);
+				embObj.put(obj.getString("self"), obj);
+			});
 
-		embedded.forEach(e -> { 
-			JsonObject obj = cache.get(e);
-			embObj.put(obj.getString("self"), obj);
-		});
-		parentObj.put("embedded", embObj);
-
+			embedded.forEach(e -> { 
+				JsonObject obj = cache.get(e);
+				if (obj == null) {
+					Log.errorf("%s not found in cache", e);
+				} else {
+					embObj.put(obj.getString("self"), obj);
+				}
+			});
+			parentObj.put("embedded", embObj);
+		}	
 		return paginate(info, parentObj, arr);
 	}
 
@@ -332,7 +339,7 @@ public class LookupResource {
 		Multi<Address> addresses = (gpsx == 0 || gpsy == 0)
 			? repo.findAddresses(after, municipalityID, streetID, postalID, houseNumber, boxNumber, limit, embed)
 			: repo.findByCoordinates(after, gpsx, gpsy, meters, limit, embed);
-		return toJsonEmbed(info, addresses);
+		return toJsonEmbeddable(info, addresses, embed);
 	}
 
 	@GET
