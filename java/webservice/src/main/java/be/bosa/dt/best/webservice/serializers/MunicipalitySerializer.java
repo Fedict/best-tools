@@ -52,7 +52,7 @@ public class MunicipalitySerializer extends BestSerializer<Municipality> {
 	public void serialize(Municipality municipality, JsonGenerator jg, SerializerProvider sp) throws IOException {
 		jg.writeStartObject();
         jg.writeStringField("id", municipality.id);
-		jg.writeStringField("self", getHref(LookupResource.MUNICIPALITY_PARTS, municipality.id));
+		jg.writeStringField("self", getHref(LookupResource.MUNICIPALITIES, municipality.id));
 		jg.writeStringField("niscode", municipality.niscode);
 		writeLangObject(jg, municipality.name_nl, municipality.name_fr, municipality.name_de);
         jg.writeEndObject();
