@@ -36,9 +36,8 @@ RUN service postgresql start && \
 STOPSIGNAL SIGINT
 
 WORKDIR /home/best
-USER best
 
 EXPOSE 8080 
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD ["bash", "-c", "postgres -c config_file=/etc/postgresql/14/main/postgresql.conf && exec java -Xmx2G -jar runner.jar"]
+CMD ["bash", "-c", "pg_ctl start -o '-c config_file=/etc/postgresql/14/main/postgresql.conf' && exec java -Xmx2G -jar runner.jar"]
