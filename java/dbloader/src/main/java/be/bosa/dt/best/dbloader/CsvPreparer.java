@@ -227,6 +227,7 @@ public class CsvPreparer {
 
 					// calculate geom afterwards, using separate UPDATE statement
 					w.writeRow(NsConverter.addressEncode(a.getIDVersion()), 
+						"1",
 						NsConverter.municipalityEncode(a.getCity().getIDVersion()),
 						"1",
 						NsConverter.municipalityPartEncode(a.getCityPart().getIDVersion()),
