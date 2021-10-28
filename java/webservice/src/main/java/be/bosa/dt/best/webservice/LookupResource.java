@@ -34,6 +34,7 @@ import be.bosa.dt.best.webservice.entities.Street;
 
 import io.quarkus.logging.Log;
 import io.quarkus.runtime.StartupEvent;
+import io.smallrye.common.annotation.Blocking;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -300,6 +301,7 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.ADDRESSES)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Blocking
 	@Operation(summary = "Search for addresses",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
 	public JsonObject getAddresses(
