@@ -89,11 +89,6 @@ CREATE UNLOGGED TABLE Street(
 \COPY Postalinfo FROM 'postals.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
 \COPY Street FROM 'streets.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
 
-CREATE INDEX ON Street(mIdentifier);
-CREATE INDEX ON Address(pIdentifier);
-CREATE INDEX ON Address(mIdentifier);
-CREATE INDEX ON Address(mpIdentifier);
-
 CREATE UNLOGGED TABLE PostalMunicipalities AS (
 	SELECT DISTINCT a.mIdentifier, p.postalCode
 	FROM Address a, PostalInfo p
