@@ -289,7 +289,8 @@ public class LookupResource {
 						required = true, 
 						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
 			String id,
-			@Parameter(description = "Embed street, municipality and postal info", 
+			@Parameter(description = "Embed referenced streets, municipalities ...",
+						example = "true",
 						required = false)
 			@RestQuery boolean embed,
 			UriInfo info) {
@@ -303,7 +304,7 @@ public class LookupResource {
 	@Operation(summary = "Search for addresses",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
 	public JsonObject getAddresses(
-			@Parameter(description = "After address (used in pagination)", 
+			@Parameter(description = "Show addresses with an ID after this address (used in pagination)", 
 						required = false, 
 						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
 			@RestQuery String after,
@@ -316,24 +317,33 @@ public class LookupResource {
 			@Parameter(description = "Postal identifier", 
 						required = false)
 			@RestQuery String postalID,
-			@Parameter(description = "House number", 
+			@Parameter(description = "House number",
+						example = "71",
 						required = false)
 			@RestQuery String houseNumber,
-			@Parameter(description = "Box number", 
+			@Parameter(description = "Box number",
+						example = "12",
 						required = false)
 			@RestQuery String boxNumber,
-			@Parameter(description = "GPS X coordinate", 
+			@Parameter(description = "GPS X coordinate",
+						example = "4.23",
 						required = false)
 			@RestQuery double gpsx,
-			@Parameter(description = "GPS Y coordinate", 
+			@Parameter(description = "GPS Y coordinate",
+						example = "50.699",
 						required = false)
 			@RestQuery double gpsy,
-			@Parameter(description = "Maximum distance in meters", 
+			@Parameter(description = "Maximum distance in meters",
+						example = "100",
 						required = false)
 			@RestQuery int meters,
-			@Parameter(description = "Maximum numbers of results", 
+			@Parameter(description = "Maximum numbers of results",
+						example = "200",
 						required = false)	
 			@RestQuery int limit,
+			@Parameter(description = "Embed referenced streets, municipalities ...",
+						example = "true",
+						required = false)
 			@RestQuery boolean embed,
 			UriInfo info) {
 		Multi<Address> addresses = (gpsx == 0 || gpsy == 0)
@@ -361,19 +371,30 @@ public class LookupResource {
 	@Operation(summary = "Search for municipalities",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
 	public JsonObject getMunicipalities(
-			@Parameter(description = "After municipality (used in pagination)", 
+			@Parameter(description = "REFNIS code (Statbel)",
+						example = "23027",
 						required = false)
-			@RestQuery String after,
-			@RestQuery String embedded,
+			@RestQuery String niscode,
+			@Parameter(description = "Postal code (bPost)",
+						example = "1500",
+						required = false)
+			@RestQuery String postalcode,
 			UriInfo info) {
-		Multi<Municipality> municipalities = repo.findMunicipalities(after);
+		Multi<Municipality> municipalities = null;
+		if (niscode == null && postalcode == null) {
+			municipalities = repo.findMunicipalitiesAll();
+		} else {
+			municipalities = (niscode != null) ? repo.findMunicipalitiesByNis(niscode)
+												: repo.findMunicipalitiesByPostal(postalcode);
+		}
 		return toJson(info, municipalities);
 	}
 
 	@GET
 	@Path(LookupResource.MUNICIPALITY_PARTS +"/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Get a municipality part by full ID")
+	@Operation(summary = "Get a municipality part by full ID",
+				description = "Note: currently only the Walloon Region provides info about municipality parts")
 	public RestResponse<JsonObject> getMunicipalityPartsById(
 			@Parameter(description = "Municipality part ID", 
 						required = true)
@@ -387,7 +408,7 @@ public class LookupResource {
 	@Path(LookupResource.MUNICIPALITY_PARTS)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Search for municipality parts",
-			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+			description = "Note: currently only the Walloon Region provides info about municipality parts")
 	public JsonObject getMunicipalityParts(
 			@Parameter(description = "After municipality part (used in pagination)", 
 						required = false)
