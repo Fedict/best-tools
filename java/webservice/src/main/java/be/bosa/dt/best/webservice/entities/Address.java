@@ -26,6 +26,9 @@
 package be.bosa.dt.best.webservice.entities;
 
 import be.bosa.dt.best.webservice.NsConverter;
+import be.bosa.dt.best.webservice.serializers.AddressSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.pgclient.data.Point;
@@ -39,6 +42,7 @@ import java.time.OffsetDateTime;
  *
  * @author Bart Hanssens
  */
+@JsonSerialize(using = AddressSerializer.class)
 public class Address extends BestEntity {
 	public String mIdentifier;
 	public String sIdentifier;
