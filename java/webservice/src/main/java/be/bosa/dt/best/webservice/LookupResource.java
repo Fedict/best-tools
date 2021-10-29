@@ -34,7 +34,6 @@ import be.bosa.dt.best.webservice.entities.Street;
 
 import io.quarkus.logging.Log;
 import io.quarkus.runtime.StartupEvent;
-import io.smallrye.common.annotation.Blocking;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -124,20 +123,20 @@ public class LookupResource {
 			cache.put(m.id, JsonObject.mapFrom(m));
 		});
 		int size = cache.size();
-		Log.infof("%d municipalities", size);
+		Log.infof("%s municipalities", size);
 	
 		Multi<MunicipalityPart> parts = repo.findMunicipalityPartsAll();
 		parts.subscribe().with(mp -> {
 			cache.put(mp.id, JsonObject.mapFrom(mp));
 		});
-		Log.infof("%d municipality parts", cache.size() - size);
+		Log.infof("%s municipality parts", cache.size() - size);
 		size = cache.size();
 		
 		Multi<PostalInfo> postals = repo.findPostalInfosAll();
 		postals.subscribe().with(p -> {			
 			cache.put(p.id, JsonObject.mapFrom(p));
 		});
-		Log.infof("%d postal info", cache.size() - size);
+		Log.infof("%s postal info", cache.size() - size);
     }
 
 	/**
@@ -301,7 +300,6 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.ADDRESSES)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Blocking
 	@Operation(summary = "Search for addresses",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
 	public JsonObject getAddresses(
@@ -344,6 +342,34 @@ public class LookupResource {
 		return toJsonEmbeddable(info, addresses, embed);
 	}
 
+	@GET
+	@Path(LookupResource.ADDRESSES+"_raw")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Search for addresses",
+			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	public Multi<Address> getAddressesGPS(
+			@Parameter(description = "After address (used in pagination)", 
+						required = false, 
+						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
+			@RestQuery String after,
+			@Parameter(description = "GPS X coordinate", 
+						required = false)
+			@RestQuery double gpsx,
+			@Parameter(description = "GPS Y coordinate", 
+						required = false)
+			@RestQuery double gpsy,
+			@Parameter(description = "Maximum distance in meters", 
+						required = false)
+			@RestQuery int meters,
+			@Parameter(description = "Maximum numbers of results", 
+						required = false)	
+			@RestQuery int limit,
+			@RestQuery boolean embed,
+			UriInfo info) {
+		return repo.findByCoordinates(after, gpsx, gpsy, meters, limit, embed);
+		//return toJsonEmbeddable(info, addresses, embed);
+	}
+	
 	@GET
 	@Path(LookupResource.MUNICIPALITIES +"/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
