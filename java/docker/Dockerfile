@@ -45,15 +45,17 @@ RUN useradd -m best && \
   chown postgres /tmp/*
 
 COPY --from=0 /home/best/best-tools/java/webservice/target/webservice-${version}-runner.jar /home/best/runner.jar
-COPY --from=0 /tmp/best/data/csv/*.csv /tmp
+COPY --from=0 --chown=postgres:postgres /tmp/best/data/csv/*.csv /tmp/
 COPY postgis/postgresql.conf /etc/postgresql/14/main/postgresql.conf
-COPY postgis/postgis.sql /tmp/
+COPY --chown=postgres:postgres postgis/postgis.sql /tmp/
 
 ENV PGDATA=/var/lib/postgresql/14/main
+
 USER postgres
+
 RUN service postgresql start && \
   cd /tmp && \ 
-  psql -d best -f /tmp/postgis.sql && \
+  psql -f /tmp/postgis.sql && \
   service postgresql stop && \
   rm /tmp/*.csv && rm /tmp/*.sql
 STOPSIGNAL SIGINT

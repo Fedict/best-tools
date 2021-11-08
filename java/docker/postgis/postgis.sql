@@ -94,13 +94,18 @@ CREATE UNLOGGED TABLE Street(
 /* Remove addresses that would violate constraints, shouldn't happen but ... it sometimes does */
 DELETE FROM Address a 
 WHERE NOT EXISTS 
-	(SELECT * FROM Municipality m 
-	WHERE a.midentifier = m.identifier)
+	(SELECT 1 FROM Municipality m 
+	WHERE a.midentifier = m.identifier);
 
 DELETE FROM Address a 
 WHERE NOT EXISTS 
-	(SELECT * FROM Street s 
-	WHERE a.sidentifier = s.identifier)
+	(SELECT 1 FROM Postalinfo p 
+	WHERE a.pidentifier = p.identifier);
+ 
+DELETE FROM Address a 
+WHERE NOT EXISTS 
+	(SELECT 1 FROM Street s 
+	WHERE a.sidentifier = s.identifier);
  
 /* Add primary keys */
 ALTER TABLE Address 
@@ -141,7 +146,7 @@ FROM
 	GROUP BY midentifier, sidentifier, housenumber) 
 AS a2
 	WHERE a1.midentifier = a2.midentifier AND a1.sidentifier = a2.sidentifier 
-		AND a1.housenumber = a2.housenumber AND COALESCE(a1.boxnumber,'0') = minboxnumber
+		AND a1.housenumber = a2.housenumber AND COALESCE(a1.boxnumber,'0') = minboxnumber;
 
 /* Create some auxiliary tables to speed up queries */
 CREATE UNLOGGED TABLE PostalMunicipalities AS (
@@ -159,7 +164,7 @@ CREATE INDEX idxAddressPoint ON Address
 	USING GIST(point);
 
 /* Full text indexes on names */
-CREATE INDEX idxGinStreetNL ON Streetx
+CREATE INDEX idxGinStreetNL ON Street
 	USING GIN(LOWER(nameNL) gin_trgm_ops);
 CREATE INDEX idxGinStreetFR ON Street
 	USING GIN(LOWER(nameFR) gin_trgm_ops);
@@ -172,6 +177,9 @@ CREATE INDEX idxGinMunicipalityFR ON Municipality
 	USING GIN(LOWER(nameFR) gin_trgm_ops);
 CREATE INDEX idxGinMunicipalityDE ON Municipality
 	USING GIN(LOWER(nameDE) gin_trgm_ops);
+
+CREATE TABLE version(stamp TIMESTAMPTZ);
+INSERT INTO version(stamp) VALUES (CURRENT_TIMESTAMP);
 
 /* Clean up and update statistics */
 VACUUM FULL ANALYZE;
