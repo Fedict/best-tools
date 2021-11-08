@@ -1,8 +1,29 @@
+# syntax=docker/dockerfile:1
+FROM maven:3-openjdk-17-slim as builder
+MAINTAINER bart.hanssens@bosa.fgov.be
+
+ARG version=1.2.8
+
+RUN apt-get update && \
+  apt-get install -y wget git-core pwgen && \
+  useradd -m best
+
+USER best
+RUN cd /home/best && \
+  git clone https://github.com/fedict/best-tools && \
+  cd /home/best/best-tools/java && \
+  mvn clean install && \
+  wget -q https://opendata.bosa.be/download/best/best-full-latest.zip -O /tmp/best.zip && \
+  mkdir -p /tmp/best/data/xml && mkdir -p /tmp/best/data/csv && \ 
+  java -jar unzip/target/unzip-${version}.jar -i /tmp/best.zip -o /tmp/best/data/xml && \
+  java -Dorg.slf4j.simpleLogger.defaultLogLevel=WARN \
+	 -jar dbloader/target/dbloader-${version}.jar -x /tmp/best/data/xml -c /tmp/best/data/csv
+
+
 FROM debian:11-slim 
 MAINTAINER bart.hanssens@bosa.fgov.be
 
-COPY postgis/csv.tar.gz postgis/postgis.sql /tmp/
-COPY webservice-*-runner.jar /home/best/runner.jar
+ARG version=1.2.8
 
 ENV LANGUAGE=en_US.UTF-8
 ENV LANG=en_US.UTF-8
@@ -23,15 +44,18 @@ RUN useradd -m best && \
   apt-get clean && rm -rf /var/lib/apt/* && \
   chown postgres /tmp/*
 
-COPY webservice-*-runner.jar /home/best/runner.jar
+COPY --from=0 /home/best/best-tools/java/webservice/target/webservice-${version}-runner.jar /home/best/runner.jar
+COPY --from=0 /tmp/best/data/csv/*.csv /tmp
 COPY postgis/postgresql.conf /etc/postgresql/14/main/postgresql.conf
+COPY postgis/postgis.sql /tmp/
 
 ENV PGDATA=/var/lib/postgresql/14/main
 USER postgres
 RUN service postgresql start && \
-  cd /tmp && tar zfx csv.tar.gz && rm csv.tar.gz && \ 
-  createdb best && psql -d best -f /tmp/postgis.sql && rm /tmp/*.csv && rm /tmp/*.sql && \
-  service postgresql stop
+  cd /tmp && \ 
+  psql -d best -f /tmp/postgis.sql && \
+  service postgresql stop && \
+  rm /tmp/*.csv && rm /tmp/*.sql
 STOPSIGNAL SIGINT
 
 WORKDIR /home/best

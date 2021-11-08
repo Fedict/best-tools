@@ -9,6 +9,7 @@ CREATE EXTENSION pg_trgm;
 CREATE USER best_reader WITH PASSWORD 'best_reader';
 GRANT CONNECT ON DATABASE best to best_reader;
 
+/* custom types */
 CREATE TYPE enumStatus 
     AS ENUM('current', 'proposed', 'retired', 'reserved');
 CREATE TYPE enumStreetnameType
@@ -19,6 +20,7 @@ CREATE TYPE enumPositionSpecificationValueType
     AS ENUM('building','buildingUnit', 'entrance', 'mooringPlace', 'municipality', 
         'parcel', 'plot', 'stand', 'street');
 
+/* Create tables, don't write to WAL since it will be a read-only source anyway */
 CREATE UNLOGGED TABLE Address(
     identifier VARCHAR(100) NOT NULL,
     minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1,
@@ -82,23 +84,25 @@ CREATE UNLOGGED TABLE Street(
     beginLifeSpanVersion TIMESTAMPTZ,
     endLifeSpanVersion TIMESTAMPTZ);
 
-
+/* Load data into tables */
 \COPY Address FROM 'addresses.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
 \COPY Municipality FROM 'municipalities.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
 \COPY PartOfMunicipality FROM 'municipalityparts.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
 \COPY Postalinfo FROM 'postals.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
 \COPY Street FROM 'streets.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
 
-CREATE UNLOGGED TABLE PostalMunicipalities AS (
-	SELECT DISTINCT a.mIdentifier, p.postalCode
-	FROM Address a, PostalInfo p
-	WHERE a.pIdentifier = p.identifier);
+/* Remove addresses that would violate constraints, shouldn't happen but ... it sometimes does */
+DELETE FROM Address a 
+WHERE NOT EXISTS 
+	(SELECT * FROM Municipality m 
+	WHERE a.midentifier = m.identifier)
 
-CREATE UNLOGGED TABLE PostalStreets AS (
-	SELECT DISTINCT a.sIdentifier, p.postalCode
-	FROM Address a, PostalInfo p
-	WHERE a.pIdentifier = p.identifier);
-
+DELETE FROM Address a 
+WHERE NOT EXISTS 
+	(SELECT * FROM Street s 
+	WHERE a.sidentifier = s.identifier)
+ 
+/* Add primary keys */
 ALTER TABLE Address 
     ADD CONSTRAINT pkAddress PRIMARY KEY(identifier, minorVersionIdentifier);
 ALTER TABLE Municipality
@@ -123,21 +127,53 @@ ALTER TABLE Address ADD CONSTRAINT fkAddressStreet
     FOREIGN KEY (sIdentifier, sMinorVersionIdentifier)
     REFERENCES Street(identifier, minorVersionIdentifier);
 
-CREATE INDEX idxAddressPoint ON Address USING GIST(point);
-
+/* Set FK-indexes */
 CREATE INDEX idxAddressMunicipality ON Address(mIdentifier);
 CREATE INDEX idxAddressPostal ON Address(pIdentifier);
 CREATE INDEX idxAddressStreet ON Address(sIdentifier);
 CREATE INDEX idxStreetMunicipality ON Street(mIdentifier);
 
-CREATE INDEX idxGinStreetNL ON Street USING GIN(nameNL gin_trgm_ops);
-CREATE INDEX idxGinStreetFR ON Street USING GIN(nameFR gin_trgm_ops);
-CREATE INDEX idxGinStreetDE ON Street USING GIN(nameDE gin_trgm_ops);
+/* Set 'first' address in apartment building: used to reduce number of 'locate-near-GPS-coordinates' results */ 
+UPDATE Address a1 SET firstaddress = true
+FROM 
+	(SELECT midentifier, sidentifier, housenumber, MIN(COALESCE(boxnumber,'0')) AS minboxnumber 
+	FROM Address
+	GROUP BY midentifier, sidentifier, housenumber) 
+AS a2
+	WHERE a1.midentifier = a2.midentifier AND a1.sidentifier = a2.sidentifier 
+		AND a1.housenumber = a2.housenumber AND COALESCE(a1.boxnumber,'0') = minboxnumber
 
-CREATE INDEX idxGinMunicipalityNL ON Municipality USING GIN(nameNL gin_trgm_ops);
-CREATE INDEX idxGinMunicipalityFR ON Municipality USING GIN(nameFR gin_trgm_ops);
-CREATE INDEX idxGinMunicipalityDE ON Municipality USING GIN(nameDE gin_trgm_ops);
+/* Create some auxiliary tables to speed up queries */
+CREATE UNLOGGED TABLE PostalMunicipalities AS (
+	SELECT DISTINCT a.mIdentifier, p.postalCode
+	FROM Address a, PostalInfo p
+	WHERE a.pIdentifier = p.identifier);
 
+CREATE UNLOGGED TABLE PostalStreets AS (
+	SELECT DISTINCT a.sIdentifier, p.postalCode
+	FROM Address a, PostalInfo p
+	WHERE a.pIdentifier = p.identifier);
+
+/* Geo index */
+CREATE INDEX idxAddressPoint ON Address
+	USING GIST(point);
+
+/* Full text indexes on names */
+CREATE INDEX idxGinStreetNL ON Streetx
+	USING GIN(LOWER(nameNL) gin_trgm_ops);
+CREATE INDEX idxGinStreetFR ON Street
+	USING GIN(LOWER(nameFR) gin_trgm_ops);
+CREATE INDEX idxGinStreetDE ON Street
+	USING GIN(LOWER(nameDE) gin_trgm_ops);
+
+CREATE INDEX idxGinMunicipalityNL ON Municipality 
+	USING GIN(LOWER(nameNL) gin_trgm_ops);
+CREATE INDEX idxGinMunicipalityFR ON Municipality
+	USING GIN(LOWER(nameFR) gin_trgm_ops);
+CREATE INDEX idxGinMunicipalityDE ON Municipality
+	USING GIN(LOWER(nameDE) gin_trgm_ops);
+
+/* Clean up and update statistics */
 VACUUM FULL ANALYZE;
 
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO best_reader;
