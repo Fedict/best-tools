@@ -219,7 +219,7 @@ public class Repository {
 	 */
 	public Uni<Municipality> findMunicipalityById(String id) {
 		Tuple tuple = Tuple.of(NsConverter.municipalityEncode(id));
-		SqlMunicipality qry = new SqlMunicipality();
+		SqlMunicipality qry = new SqlMunicipality(false);
 		qry.where("m.identifier =");
 
 		return uni(
@@ -228,20 +228,34 @@ public class Repository {
 	}
 
 	/**
-	 * Find municipalities
+	 * Find municipalities by REFNIS code (Statbel)
 	 * 
-	 * @param afterId search after ID (paginated results)
-	 * @return 
+	 * @param niscode REFNIS code
+	 * @return municipalities or null
 	 */
-	public Multi<Municipality> findMunicipalities(String afterId) {
-		List lst = new ArrayList(2);
-		SqlMunicipality qry = new SqlMunicipality();
+	public Multi<Municipality> findMunicipalitiesByNis(String niscode) {
+		SqlMunicipality qry = new SqlMunicipality(false);
+		qry.where("m.refniscode =");
 
-		paginate(lst, qry, NsConverter.municipalityEncode(afterId));
 		qry.orderById();
 
 		return multi(
-			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
+			pg.preparedQuery(qry.build()).execute(Tuple.of(niscode))
+		).transform(Municipality::from);
+	}
+
+	/**
+	 * Find municipalities by postal code (bPost)
+	 * 
+	 * @param postalcode postal code
+	 * @return municipalities or null
+	 */
+	public Multi<Municipality> findMunicipalitiesByPostal(String postalcode) {
+		SqlMunicipality qry = new SqlMunicipality(true);
+		qry.where("p.postalcode =");
+
+		return multi(
+			pg.preparedQuery(qry.build()).execute(Tuple.of(postalcode))
 		).transform(Municipality::from);
 	}
 	
@@ -251,7 +265,7 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<Municipality> findMunicipalitiesAll() {
-		SqlMunicipality qry = new SqlMunicipality();
+		SqlMunicipality qry = new SqlMunicipality(false);
 		qry.orderById();
 		qry.unlimited();
 
