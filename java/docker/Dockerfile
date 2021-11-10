@@ -63,11 +63,15 @@ USER postgres
 
 RUN service postgresql start && \
   cd /tmp && \ 
-  psql -set=apiversion="${version}" -f /tmp/postgis.sql && \
+  psql --set=apiversion="${version}" -f /tmp/postgis.sql && \
   psql -c "ALTER USER postgres PASSWORD '$(pwgen -s 16 1)';" && \
   service postgresql stop && \
   rm /tmp/*.csv && rm /tmp/*.sql
 STOPSIGNAL SIGINT
+
+# Copy the more restrictive access configuration
+
+COPY postgis/pg_hba.conf /etc/postgresql/14/main/pg_hba.conf
 
 WORKDIR /home/best
 
