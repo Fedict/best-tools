@@ -31,6 +31,7 @@ import be.bosa.dt.best.webservice.entities.Municipality;
 import be.bosa.dt.best.webservice.entities.MunicipalityPart;
 import be.bosa.dt.best.webservice.entities.PostalInfo;
 import be.bosa.dt.best.webservice.entities.Street;
+import be.bosa.dt.best.webservice.entities.Version;
 
 import io.quarkus.logging.Log;
 import io.quarkus.runtime.StartupEvent;
@@ -277,7 +278,7 @@ public class LookupResource {
 			description = "Address not found")	
 	})
 	public RestResponse<JsonObject> getAddressById(
-			@Parameter(description = "Address ID", 
+			@Parameter(description = "Address ID ('/' must be URL-encoded to '%2f')", 
 						required = true, 
 						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
 			String id,
@@ -303,10 +304,6 @@ public class LookupResource {
 			schema = @Schema(
 				type = SchemaType.OBJECT)))
 	public JsonObject getAddresses(
-			@Parameter(description = "Show addresses with an ID after this address (used in pagination)", 
-						required = false, 
-						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
-			@RestQuery String after,
 			@Parameter(description = "Municipality identifier", 
 						required = false)
 			@RestQuery String municipalityID,
@@ -324,15 +321,15 @@ public class LookupResource {
 						example = "12",
 						required = false)
 			@RestQuery String boxNumber,
-			@Parameter(description = "GPS X coordinate",
+			@Parameter(description = "X coordinate",
 						example = "4.23",
 						required = false)
 			@RestQuery double gpsx,
-			@Parameter(description = "GPS Y coordinate",
+			@Parameter(description = "Y coordinate",
 						example = "50.699",
 						required = false)
 			@RestQuery double gpsy,
-			@Parameter(description = "Maximum distance in meters",
+			@Parameter(description = "Maximum distance (in meters)",
 						example = "100",
 						required = false)
 			@RestQuery int meters,
@@ -344,6 +341,10 @@ public class LookupResource {
 						example = "true",
 						required = false)
 			@RestQuery boolean embed,
+			@Parameter(description = "After this address (used in pagination), ('/' must be URL-encoded to '%2f')", 
+						required = false, 
+						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
+			@RestQuery String after,
 			UriInfo info) {
 		Multi<Address> addresses = (gpsx == 0 || gpsy == 0)
 			? repo.findAddresses(after, municipalityID, streetID, postalID, houseNumber, boxNumber, limit, embed)
@@ -461,7 +462,6 @@ public class LookupResource {
 			@Parameter(description = "After postal info (used in pagination)", 
 						required = false)
 			@RestQuery String after,
-			@RestQuery String embedded,
 			UriInfo info) {
 		Multi<PostalInfo> postals = repo.findPostalInfos(after);
 		return toJson(info, postals);
@@ -513,9 +513,18 @@ public class LookupResource {
 			@Parameter(description = "After street (used in pagination)", 
 				required = false)
 			@RestQuery String after,
-			@RestQuery String embedded,
 			UriInfo info) {
 		Multi<Street> streets = repo.findStreets(after);
 		return toJson(info, streets);
 	}
+	
+	@GET
+	@Path("version")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Display version info",
+			description = "For debug / support purposes only, displays version info of source data and API")
+	public Multi<Version> getVersionInfo() {
+		return repo.findVersionInfo();
+	}
+
 }

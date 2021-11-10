@@ -178,8 +178,13 @@ CREATE INDEX idxGinMunicipalityFR ON Municipality
 CREATE INDEX idxGinMunicipalityDE ON Municipality
 	USING GIN(LOWER(nameDE) gin_trgm_ops);
 
-CREATE TABLE version(stamp TIMESTAMPTZ);
-INSERT INTO version(stamp) VALUES (CURRENT_TIMESTAMP);
+/* Values for support / debugging */
+CREATE TABLE version(identifier VARCHAR(20) NOT NULL,
+					valuestr VARCHAR(20) NOT NULL);
+INSERT INTO version(identifier, valuestr) 
+	VALUES ('api verson', :'apiversion');
+INSERT INTO version(identifier, valuestr) 
+	VALUES ('build date', TO_CHAR(CURRENT_TIMESTAMP, 'YYYY-MM-DD'));
 
 /* Clean up and update statistics */
 VACUUM FULL ANALYZE;

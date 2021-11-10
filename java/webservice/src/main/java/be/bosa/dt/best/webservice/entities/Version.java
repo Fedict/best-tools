@@ -23,18 +23,37 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.webservice.queries;
+package be.bosa.dt.best.webservice.entities;
+
+import io.vertx.mutiny.sqlclient.Row;
 
 /**
- * Select data from version table
+ * Version info identity, only used for support purposes
  * 
  * @author Bart Hanssens
  */
-public class SqlVersion extends Sql {
+public class Version {
+	public String key;
+	public String value;
 
-	public SqlVersion() {
-		this.select = "key, value";
-		this.alias = "v";
-		this.from = "version";
+	/**
+	 * Convert database result to object
+	 * 
+	 * @param res database row
+	 * @return data object
+	 */
+	public static Version from(Row res) {
+		return new Version(res.getString(0), res.getString(1));
+	}
+	
+	/**
+	* Constructor
+	* 
+	 * @param key
+	 * @param value
+	*/
+	public Version(String key, String value) { 
+		this.key = key;
+		this.value = value;
 	}
 }

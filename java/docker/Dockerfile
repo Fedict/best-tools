@@ -1,4 +1,7 @@
 # syntax=docker/dockerfile:1
+
+# start with downloading / converting data and compiling latest sources
+
 FROM maven:3-openjdk-17-slim as builder
 MAINTAINER bart.hanssens@bosa.fgov.be
 
@@ -9,6 +12,7 @@ RUN apt-get update && \
   useradd -m best
 
 USER best
+
 RUN cd /home/best && \
   git clone https://github.com/fedict/best-tools && \
   cd /home/best/best-tools/java && \
@@ -16,9 +20,10 @@ RUN cd /home/best && \
   wget -q https://opendata.bosa.be/download/best/best-full-latest.zip -O /tmp/best.zip && \
   mkdir -p /tmp/best/data/xml && mkdir -p /tmp/best/data/csv && \ 
   java -jar unzip/target/unzip-${version}.jar -i /tmp/best.zip -o /tmp/best/data/xml && \
-  java -Dorg.slf4j.simpleLogger.defaultLogLevel=WARN \
+  java -Djava.util.logging.level=WARNING \
 	 -jar dbloader/target/dbloader-${version}.jar -x /tmp/best/data/xml -c /tmp/best/data/csv
 
+# The actual docker with the API + pre-loaded PostGIS database
 
 FROM debian:11-slim 
 MAINTAINER bart.hanssens@bosa.fgov.be
@@ -40,7 +45,8 @@ RUN useradd -m best && \
 	dumb-init \
 	postgresql-14 \
 	postgresql-14-postgis-3 postgresql-14-postgis-3-scripts \
- 	openjdk-17-jre-headless && \
+ 	openjdk-17-jre-headless \
+	pwgen && \
   apt-get clean && rm -rf /var/lib/apt/* && \
   chown postgres /tmp/*
 
@@ -53,9 +59,12 @@ ENV PGDATA=/var/lib/postgresql/14/main
 
 USER postgres
 
+# Load data into Postgresql database and change default password for postgres user
+
 RUN service postgresql start && \
   cd /tmp && \ 
-  psql -f /tmp/postgis.sql && \
+  psql -set=apiversion="${version}" -f /tmp/postgis.sql && \
+  psql -c "ALTER USER postgres PASSWORD '$(pwgen -s 16 1)';" && \
   service postgresql stop && \
   rm /tmp/*.csv && rm /tmp/*.sql
 STOPSIGNAL SIGINT

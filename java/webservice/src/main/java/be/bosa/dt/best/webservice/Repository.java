@@ -30,6 +30,7 @@ import be.bosa.dt.best.webservice.entities.Municipality;
 import be.bosa.dt.best.webservice.entities.MunicipalityPart;
 import be.bosa.dt.best.webservice.entities.PostalInfo;
 import be.bosa.dt.best.webservice.entities.Street;
+import be.bosa.dt.best.webservice.entities.Version;
 import be.bosa.dt.best.webservice.queries.Sql;
 import be.bosa.dt.best.webservice.queries.SqlAddress;
 import be.bosa.dt.best.webservice.queries.SqlGeo;
@@ -37,6 +38,7 @@ import be.bosa.dt.best.webservice.queries.SqlMunicipality;
 import be.bosa.dt.best.webservice.queries.SqlMunicipalityPart;
 import be.bosa.dt.best.webservice.queries.SqlPostalInfo;
 import be.bosa.dt.best.webservice.queries.SqlStreet;
+import be.bosa.dt.best.webservice.queries.SqlVersion;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -404,5 +406,18 @@ public class Repository {
 		return multi(
 			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
 		).transform(Street::from);
+	}
+
+	/**
+	 * Find version info
+	 * 
+	 * @return 
+	 */
+	public Multi<Version> findVersionInfo() {
+		SqlVersion qry = new SqlVersion();
+	
+		return multi(
+			pg.preparedQuery(qry.build()).execute()
+		).transform(Version::from);
 	}
 }
