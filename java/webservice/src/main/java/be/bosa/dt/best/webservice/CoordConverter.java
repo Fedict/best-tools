@@ -80,7 +80,7 @@ public class CoordConverter {
 	 * @param y y coordinate
 	 * @return coordinate
 	 */
-	public static Coordinate gpsToLambert(double x, double y) {
+	public static Coordinate gpsToL72(double x, double y) {
 		return convert(new Coordinate(x,y), Wgs84ToL72);
 	}
 
@@ -91,7 +91,7 @@ public class CoordConverter {
 	 * @param y y coordinate
 	 * @return coordinate
 	 */
-	public static Coordinate lambertToGps(double x, double y) {
+	public static Coordinate l72ToGps(double x, double y) {
 		return convert(new Coordinate(x,y), L72ToWgs84);
 	}	
 }

@@ -56,12 +56,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
 import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.info.Contact;
-import org.eclipse.microprofile.openapi.annotations.info.Info;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
-import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 
 import org.jboss.resteasy.reactive.RestQuery;
 import org.jboss.resteasy.reactive.RestResponse;
@@ -73,28 +74,6 @@ import org.jboss.resteasy.reactive.RestResponse.ResponseBuilder;
  * 
  * @author Bart Hanssens
  */
-@OpenAPIDefinition(
-	 info = @Info(
-        title="v2 Belgian Streets and Addresses REST API Demo",
-        version = "2.0.0",
-		description = " OpenAPI specification of the v2 Belgian Streets and Addresses (BeSt) REST API. \n" +
-			"By relying on a consolidated dataset, this new version delivers even greater performance and more features than ever.\n" +
-			"\n" +
-			"An address is an identification of the fixed location of a property.\n" +
-			"The full address is a hierarchy consisting of components such as geographic names, with an increasing level of detail (e.g.,town, then street name, then house number or name).\n" +
-			"It may also include a post code or other postal descriptors.",
-		contact = @Contact(
-			name = "BOSA DG DT servicedesk",
-			email = "servicedesk.DTO@bosa.fgov.be"
-		)
-	),
-	tags = {
-		@Tag(name = "addresses", description = "Everything about addresses" ),
-		@Tag(name = "municipalities", description = "Everything about municipalities" ),
-		@Tag(name = "streets", description = "Everything about streets" )
-		}
-	)
-
 @ApplicationScoped
 @Path(LookupResource.API)
 public class LookupResource {
@@ -283,7 +262,20 @@ public class LookupResource {
 	@Path(LookupResource.ADDRESSES + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get address by id",
-			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+			description = "The ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	@APIResponses({
+		@APIResponse(
+		   responseCode = "200",
+			name = "ok",
+			description = "Requested address",
+			content = @Content(
+				schema = @Schema(
+				type = SchemaType.OBJECT))),
+		@APIResponse(
+			responseCode = "404",
+			name = "not found",
+			description = "Address not found")	
+	})
 	public RestResponse<JsonObject> getAddressById(
 			@Parameter(description = "Address ID", 
 						required = true, 
@@ -302,7 +294,14 @@ public class LookupResource {
 	@Path(LookupResource.ADDRESSES)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Search for addresses",
-			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+			description = "A series of parameters can be used to search for addresses")
+	@APIResponse(
+		responseCode = "200",
+		name = "ok",
+		description = "A (possibly empty) list of addresses",
+		content = @Content(
+			schema = @Schema(
+				type = SchemaType.OBJECT)))
 	public JsonObject getAddresses(
 			@Parameter(description = "Show addresses with an ID after this address (used in pagination)", 
 						required = false, 
@@ -355,7 +354,21 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.MUNICIPALITIES +"/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Get a municipality by full ID")
+	@Operation(summary = "Get a municipality by ID",
+			description = "The ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	@APIResponses({
+		@APIResponse(
+		   responseCode = "200",
+			name = "ok",
+			description = "Requested municipality",
+			content = @Content(
+				schema = @Schema(
+                type = SchemaType.OBJECT))),
+		@APIResponse(
+			responseCode = "404",
+			name = "not found",
+			description = "Municipality not found")	
+	})
 	public RestResponse<JsonObject> getMunicipalityById(
 			@Parameter(description = "Municipality ID", 
 						required = true)
@@ -370,12 +383,19 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Search for municipalities",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	@APIResponse(
+		responseCode = "200",
+		name = "ok",
+		description = "A (possibly empty) list of municipalities",
+		content = @Content(
+			schema = @Schema(
+				type = SchemaType.OBJECT)))
 	public JsonObject getMunicipalities(
-			@Parameter(description = "REFNIS code (Statbel)",
+			@Parameter(description = "REFNIS code (assigned by Statbel)",
 						example = "23027",
 						required = false)
 			@RestQuery String niscode,
-			@Parameter(description = "Postal code (bPost)",
+			@Parameter(description = "Postal code (assigned by bPost)",
 						example = "1500",
 						required = false)
 			@RestQuery String postalcode,
@@ -422,7 +442,8 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.POSTAL + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Get a postal info by full ID")
+	@Operation(summary = "Get a postal info by ID",
+			description = "The ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
 	public RestResponse<JsonObject> getPostalById(
 			@Parameter(description = "Postal ID", 
 						required = true)
@@ -435,8 +456,7 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.POSTAL)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Search for postal info",
-			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	@Operation(summary = "Search for postal info")
 	public JsonObject getPostalInfos(
 			@Parameter(description = "After postal info (used in pagination)", 
 						required = false)
@@ -450,7 +470,21 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.STREETS + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Get a street by full ID")
+	@Operation(summary = "Get a street by ID",
+			description = "The ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	@APIResponses({
+		@APIResponse(
+		   responseCode = "200",
+			name = "ok",
+			description = "Requested street",
+			content = @Content(
+				schema = @Schema(
+                type = SchemaType.OBJECT))),
+		@APIResponse(
+			responseCode = "404",
+			name = "not found",
+			description = "Street not found")	
+	})
 	public RestResponse<JsonObject> getStreetById(
 			@Parameter(description = "Street ID", 
 						required = true,
@@ -464,11 +498,20 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.STREETS)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Search for streets",
-			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	@Operation(summary = "Search for streets")
+	@APIResponse(
+	   responseCode = "200",
+		name = "ok",
+		description = "A (possibly empty) list of streets",
+		content = @Content(
+		schema = @Schema(
+			type = SchemaType.OBJECT)))
 	public JsonObject getStreets(
+			@Parameter(description = "Municipality identifier", 
+				required = false)
+			@RestQuery String municipalityID,
 			@Parameter(description = "After street (used in pagination)", 
-						required = false)
+				required = false)
 			@RestQuery String after,
 			@RestQuery String embedded,
 			UriInfo info) {

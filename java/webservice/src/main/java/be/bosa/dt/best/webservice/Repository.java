@@ -191,7 +191,7 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<Address> findByCoordinates(String afterId, double gpsx, double gpsy, int meters, int limit, boolean embed) {
-		Coordinate l72 = CoordConverter.gpsToLambert(gpsx, gpsy);
+		Coordinate l72 = CoordConverter.gpsToL72(gpsx, gpsy);
 		List lst = new ArrayList<>(6); 
 		lst.add(l72.x);
 		lst.add(l72.y);

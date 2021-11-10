@@ -81,7 +81,7 @@ public class AddressSerializer extends BestSerializer<Address> {
 			jg.writeNumberField("x", address.point.x);
 			jg.writeNumberField("y", address.point.y);
 			jg.writeEndObject();
-			Coordinate coord = CoordConverter.lambertToGps(address.point.x, address.point.y);
+			Coordinate coord = CoordConverter.l72ToGps(address.point.x, address.point.y);
 			jg.writeObjectFieldStart("gps");
 			jg.writeNumberField("x", coord.x);
 			jg.writeNumberField("y", coord.y);

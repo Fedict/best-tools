@@ -69,6 +69,7 @@ public class Address extends BestEntity {
 				res.getString(5), res.getString(6),
 				res.getOffsetDateTime(7), res.getOffsetDateTime(8), res.getString(9), 
 				res.get(Point.class, 10));
+		// join with street table
 		if (res.size() > 11) {
 			addr.street = new Street(res.getString(4), res.getString(11),
 							res.getString(12), res.getString(13), res.getString(14),
