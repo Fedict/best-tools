@@ -64,6 +64,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import org.jboss.resteasy.reactive.RestQuery;
 import org.jboss.resteasy.reactive.RestResponse;
@@ -264,6 +265,7 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get address by id",
 			description = "The ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	@Tag(name = "addresses")
 	@APIResponses({
 		@APIResponse(
 		   responseCode = "200",
@@ -296,6 +298,7 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Search for addresses",
 			description = "A series of parameters can be used to search for addresses")
+	@Tag(name = "addresses")
 	@APIResponse(
 		responseCode = "200",
 		name = "ok",
@@ -357,6 +360,7 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a municipality by ID",
 			description = "The ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	@Tag(name = "municipalities")
 	@APIResponses({
 		@APIResponse(
 		   responseCode = "200",
@@ -384,6 +388,7 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Search for municipalities",
 			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	@Tag(name = "municipalities")
 	@APIResponse(
 		responseCode = "200",
 		name = "ok",
@@ -416,6 +421,7 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a municipality part by full ID",
 				description = "Note: currently only the Walloon Region provides info about municipality parts")
+	@Tag(name = "municipalities")
 	public RestResponse<JsonObject> getMunicipalityPartsById(
 			@Parameter(description = "Municipality part ID", 
 						required = true)
@@ -430,6 +436,7 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Search for municipality parts",
 			description = "Note: currently only the Walloon Region provides info about municipality parts")
+	@Tag(name = "municipalities")
 	public JsonObject getMunicipalityParts(
 			@Parameter(description = "After municipality part (used in pagination)", 
 						required = false)
@@ -445,6 +452,7 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a postal info by ID",
 			description = "The ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	@Tag(name = "postals")
 	public RestResponse<JsonObject> getPostalById(
 			@Parameter(description = "Postal ID", 
 						required = true)
@@ -458,6 +466,7 @@ public class LookupResource {
 	@Path(LookupResource.POSTAL)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Search for postal info")
+	@Tag(name = "postals")
 	public JsonObject getPostalInfos(
 			@Parameter(description = "After postal info (used in pagination)", 
 						required = false)
@@ -472,6 +481,7 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a street by ID",
 			description = "The ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+	@Tag(name = "streets")
 	@APIResponses({
 		@APIResponse(
 		   responseCode = "200",
@@ -499,6 +509,7 @@ public class LookupResource {
 	@Path(LookupResource.STREETS)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Search for streets")
+	@Tag(name = "streets")
 	@APIResponse(
 	   responseCode = "200",
 		name = "ok",

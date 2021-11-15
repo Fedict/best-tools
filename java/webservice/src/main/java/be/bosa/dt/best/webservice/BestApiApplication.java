@@ -52,9 +52,10 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 		)
 	),
 	tags = {
-		@Tag(name = "addresses", description = "Everything about addresses" ),
-		@Tag(name = "municipalities", description = "Everything about municipalities" ),
-		@Tag(name = "streets", description = "Everything about streets" )
+		@Tag(name = "addresses", description = "Search for addresses" ),
+		@Tag(name = "municipalities", description = "Search for municipalities and municipality parts" ),
+		@Tag(name = "postals", description = "Search for postal info"),
+		@Tag(name = "streets", description = "Search for streets" )
 		}
 	)
 public class BestApiApplication extends Application {
