@@ -56,7 +56,7 @@ import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.proj4j.ProjCoordinate;
 
 
 /**
@@ -193,7 +193,7 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<Address> findByCoordinates(String afterId, double gpsx, double gpsy, int meters, int limit, boolean embed) {
-		Coordinate l72 = CoordConverter.gpsToL72(gpsx, gpsy);
+		ProjCoordinate l72 = CoordConverter.gpsToL72(gpsx, gpsy);
 		List lst = new ArrayList<>(6); 
 		lst.add(l72.x);
 		lst.add(l72.y);

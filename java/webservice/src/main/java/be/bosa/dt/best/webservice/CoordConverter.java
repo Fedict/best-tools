@@ -27,14 +27,15 @@ package be.bosa.dt.best.webservice;
 
 
 import io.quarkus.logging.Log;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.CRS;
-import org.locationtech.jts.geom.Coordinate;
 
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
+import org.locationtech.proj4j.BasicCoordinateTransform;
+import org.locationtech.proj4j.CRSFactory;
+import org.locationtech.proj4j.CoordinateReferenceSystem;
+import org.locationtech.proj4j.InvalidValueException;
+import org.locationtech.proj4j.ProjCoordinate;
+import org.locationtech.proj4j.UnknownAuthorityCodeException;
+import org.locationtech.proj4j.UnsupportedParameterException;
+
 
 /**
  * Helper class to convert Lambert 72 from/to GPS coordinates
@@ -43,33 +44,19 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class CoordConverter {
 	private static CoordinateReferenceSystem l72;
-	private static CoordinateReferenceSystem wgs84;
-	private static MathTransform L72ToWgs84;
-	private static MathTransform Wgs84ToL72;
+	private static CoordinateReferenceSystem gps;
+	private static BasicCoordinateTransform L72toGPS;
+	private static BasicCoordinateTransform GPStoL72;
 	
 	static {
 		try {
-			l72 = CRS.decode("EPSG:31370");
-			wgs84 = CRS.decode("EPSG:4326");
-			Wgs84ToL72 = CRS.findMathTransform(wgs84, l72);
-			L72ToWgs84 = CRS.findMathTransform(l72, wgs84);
-		} catch (FactoryException ex) {
-			Log.fatal(ex.getMessage(), ex);
-		}
-	}
-
-	/**
-	 * Convert one set of coordinates to another one using a specific transformation
-	 * 
-	 * @param coords
-	 * @param transform
-	 * @return 
-	 */
-	private static Coordinate convert(Coordinate coords, MathTransform transform) {
-		try {
-			return JTS.transform(coords, null, transform);
-		} catch (TransformException ex) {
-			return null;
+			CRSFactory factory = new CRSFactory();
+			l72 = factory.createFromName("EPSG:31370");
+			gps = factory.createFromName("EPSG:4258");
+			L72toGPS = new BasicCoordinateTransform(l72, gps);
+			GPStoL72 = new BasicCoordinateTransform(gps, l72);
+		} catch (InvalidValueException | UnknownAuthorityCodeException | UnsupportedParameterException ex) {
+			Log.fatal(ex.getMessage());
 		}
 	}
 
@@ -80,8 +67,10 @@ public class CoordConverter {
 	 * @param y y coordinate
 	 * @return coordinate
 	 */
-	public static Coordinate gpsToL72(double x, double y) {
-		return convert(new Coordinate(x,y), Wgs84ToL72);
+	public static ProjCoordinate gpsToL72(double x, double y) {
+		ProjCoordinate src = new ProjCoordinate(x, y);
+		ProjCoordinate dest = new ProjCoordinate();
+		return GPStoL72.transform(src, dest);
 	}
 
 	/**
@@ -91,7 +80,9 @@ public class CoordConverter {
 	 * @param y y coordinate
 	 * @return coordinate
 	 */
-	public static Coordinate l72ToGps(double x, double y) {
-		return convert(new Coordinate(x,y), L72ToWgs84);
+	public static ProjCoordinate l72ToGps(double x, double y) {
+		ProjCoordinate src = new ProjCoordinate(x, y);
+		ProjCoordinate dest = new ProjCoordinate();
+		return L72toGPS.transform(src, dest);
 	}	
 }

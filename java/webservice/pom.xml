@@ -27,41 +27,12 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	<repositories>
-		<repository>
-			<id>osgeo</id>
-			<name>OSGeo Release Repository</name>
-			<url>https://repo.osgeo.org/repository/release/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
-		<repository>
-			<id>osgeo-snapshot</id>
-			<name>OSGeo Snapshot Repository</name>
-			<url>https://repo.osgeo.org/repository/snapshot/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</repository>
-	</repositories>
 	<dependencies>
 		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-main</artifactId>
-			<version>25.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-epsg-wkt</artifactId>
-			<version>25.2</version>
-		</dependency>
+			<groupId>org.locationtech.proj4j</groupId>
+			<artifactId>proj4j</artifactId>
+			<version>1.1.4</version>
+        </dependency>
        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-resteasy-reactive</artifactId>
@@ -92,13 +63,6 @@
 			<artifactId>geolatte-geojson</artifactId>
 			<version>1.8.2</version>
 		</dependency>
-	<!--
-		<dependency>
-			<groupId>org.n52.jackson</groupId>
-			<artifactId>jackson-datatype-jts</artifactId>
-			<version>1.2.8</version>
-		</dependency>
-				-->
 	</dependencies>
 	<build>
 		<plugins>

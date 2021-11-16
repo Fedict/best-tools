@@ -35,7 +35,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.IOException;
 import javax.inject.Singleton;
 
-import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.proj4j.ProjCoordinate;
 
 /**
  * Serializes BeST address to JSON.
@@ -81,7 +81,7 @@ public class AddressSerializer extends BestSerializer<Address> {
 			jg.writeNumberField("x", address.point.x);
 			jg.writeNumberField("y", address.point.y);
 			jg.writeEndObject();
-			Coordinate coord = CoordConverter.l72ToGps(address.point.x, address.point.y);
+			ProjCoordinate coord = CoordConverter.l72ToGps(address.point.x, address.point.y);
 			jg.writeObjectFieldStart("gps");
 			jg.writeNumberField("x", coord.x);
 			jg.writeNumberField("y", coord.y);
