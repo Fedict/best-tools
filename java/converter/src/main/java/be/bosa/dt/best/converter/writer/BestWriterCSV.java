@@ -214,7 +214,7 @@ public class BestWriterCSV implements BestWriter {
 				a.getCityPart().getIDVersion(), cParts[0], cParts[1], cParts[2],
 				a.getPostal().getId(), cPostal[0], cPostal[1], cPostal[2],
 				String.valueOf(a.getPoint().getX()), String.valueOf(a.getPoint().getY()),
-				String.format(Locale.US, "%.4f", dest.x), String.format(Locale.US, "%.4f", dest.y),
+				String.format(Locale.US, "%.5f", dest.x), String.format(Locale.US, "%.5f", dest.y),
 				a.getStatus()
 			};
 		};
