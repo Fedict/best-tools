@@ -4,7 +4,7 @@
     <parent>
         <groupId>be.bosa.dt</groupId>
         <artifactId>best</artifactId>
-        <version>1.2.8</version>
+        <version>1.2.9</version>
     </parent>
     <groupId>be.bosa.dt.best</groupId>
     <artifactId>xmlreader</artifactId>
@@ -14,6 +14,7 @@
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
     <name>BeSt xmlreader</name>
+    <version>1.2.9</version>
     <dependencies>
         <dependency>
             <groupId>com.fasterxml</groupId>
@@ -26,5 +27,4 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
-    <version>1.2.8</version>
 </project>

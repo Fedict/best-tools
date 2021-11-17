@@ -3,12 +3,13 @@
   <parent>
     <artifactId>best</artifactId>
     <groupId>be.bosa.dt</groupId>
-    <version>1.2.8</version>
+    <version>1.2.9</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>be.bosa.dt.best</groupId>
   <artifactId>unzip</artifactId>
   <name>BeSt unzip utility</name>
+  <version>1.2.9</version>
   <description>Belgian Streets and Addresses unzip utility</description>
   <build>
     <plugins>
