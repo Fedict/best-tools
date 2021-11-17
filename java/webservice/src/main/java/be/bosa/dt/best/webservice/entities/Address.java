@@ -73,7 +73,8 @@ public class Address extends BestEntity {
 		if (res.size() > 11) {
 			addr.street = new Street(res.getString(4), res.getString(11),
 							res.getString(12), res.getString(13), res.getString(14),
-							res.getOffsetDateTime(15), res.getOffsetDateTime(16), res.getString(17));
+							res.getOffsetDateTime(15), res.getOffsetDateTime(16), res.getString(17),
+							res.getString(18));
 		}
 		return addr;	
 	}

@@ -47,6 +47,7 @@ public class Street extends BestEntity {
 	public String name_de;
 	public OffsetDateTime validFrom;
 	public OffsetDateTime validTo;
+	public String streetnameType;
 	public String status;
 
 	/**
@@ -58,7 +59,7 @@ public class Street extends BestEntity {
 	public static Street from(Row res) {
 		return new Street(res.getString(0), 
 			res.getString(1), res.getString(2), res.getString(3), res.getString(4), 
-			res.getOffsetDateTime(5), res.getOffsetDateTime(6), res.getString(7));
+			res.getOffsetDateTime(5), res.getOffsetDateTime(6), res.getString(7), res.getString(8));
 	}
 
 	/**
@@ -80,11 +81,12 @@ public class Street extends BestEntity {
 	 * @param nameDE
 	 * @param validFrom
 	 * @param validTo
+	 * @param streetnameType
 	 * @param status
 	*/
 	public Street(String identifier, 
 				String mIdentifier, String nameNL, String nameFR, String nameDE,
-				OffsetDateTime validFrom, OffsetDateTime validTo, String status) {
+				OffsetDateTime validFrom, OffsetDateTime validTo, String streetnameType, String status) {
 		this.id = NsConverter.streetDecode(identifier);
 		this.mIdentifier = NsConverter.municipalityDecode(mIdentifier);
 		this.name_nl = nameNL;
@@ -92,6 +94,7 @@ public class Street extends BestEntity {
 		this.name_de = nameDE;
 		this.validFrom = validFrom;
 		this.validTo = validTo;
+		this.streetnameType = streetnameType;
 		this.status = status;
 	}
 }

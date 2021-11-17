@@ -34,7 +34,7 @@ public class SqlStreet extends Sql {
 
 	public SqlStreet() {
 		this.select = "s.identifier, s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, " +
-						"s.validFrom, s.validTo, s.status::text";
+						"s.validFrom, s.validTo, s.streetnameType::text, s.status::text";
 		this.alias = "s";
 		this.from = "street";
 	}
