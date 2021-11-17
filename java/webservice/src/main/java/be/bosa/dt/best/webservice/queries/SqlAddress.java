@@ -39,7 +39,8 @@ public class SqlAddress extends Sql {
 		this.alias = "a";
 
 		if (embed) {
-			this.select += ", s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, s.validFrom, s.validTo, s.status::text";
+			this.select += ", s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, s.validFrom, s.validTo, " +
+							" s.streetnameType::text, s.status::text";
 			this.join = " INNER JOIN street s ON a.sIdentifier = s.identifier";	
 		}
 	}
