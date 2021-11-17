@@ -54,6 +54,7 @@ public class StreetnameReader extends AbstractXMLReader<Street> {
 	private final static QName LANGUAGE = new QName(AbstractXMLReader.ADD, "language");
 	private final static QName SPELLING = new QName(AbstractXMLReader.ADD, "spelling");
 	private final static QName STATUS = new QName(AbstractXMLReader.ADD, "status");
+	private final static QName STREET_TYPE = new QName(AbstractXMLReader.ADD, "streetnameType");
 	private final static QName BEGIN_LIFESPAN = new QName("", "beginLifeSpanVersion");
 	private final static QName END_LIFESPAN = new QName("", "endLifeSpanVersion");
 	private final static QName VALID_FROM = new QName(AbstractXMLReader.ADD, "validFrom");
@@ -100,6 +101,9 @@ public class StreetnameReader extends AbstractXMLReader<Street> {
 					} else if (el.equals(STATUS)) {
 						String txt = reader.getElementText();
 						obj.setStatus(txt);
+					} else if (el.equals(STREET_TYPE)) {
+						String txt = reader.getElementText();
+						obj.setStreetType(txt);
 					} else if (el.equals(VALID_FROM)) {
 						String txt = reader.getElementText();
 						obj.setFromDate(txt);

@@ -180,7 +180,7 @@ public class CsvPreparer {
 								NsConverter.municipalityEncode(a.getCity().getIDVersion()), 
 								"1",
 								a.getName("nl"), a.getName("fr"), a.getName("de"), 
-								"", "", a.getStatus(),
+								"", a.getStreetType(), a.getStatus(),
 								(a.getFromDate() != null) ? a.getFromDate().toString() : "", 
 								(a.getTillDate() != null) ? a.getTillDate().toString() : "", 
 								(a.getBeginLife() != null) ? a.getBeginLife().toString() : "",
