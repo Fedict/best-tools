@@ -41,7 +41,6 @@ public class Address extends BestObject {
 	private final Street street = new Street();
 	private String number;
 	private String box;
-	private String status;
 	private OffsetDateTime fromDate;
 	private OffsetDateTime tillDate;
 	private OffsetDateTime beginLife;
@@ -127,25 +126,7 @@ public class Address extends BestObject {
 	public void setBox(String box) {
 		this.box = box;
 	}
-	
-	/**
-	 * Get the status of this address
-	 * 
-	 * @return string
-	 */
-	public String getStatus() {
-		return status;
-	}
-	
-	/**
-	 * Set the status of the address
-	 * 
-	 * @param status 
-	 */
-	public void setStatus(String status) {
-		this.status = status;
-	}
-	
+
 	private OffsetDateTime parseDate(String str) {
 		try {
 			return OffsetDateTime.parse(str);

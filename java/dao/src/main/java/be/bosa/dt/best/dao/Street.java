@@ -35,7 +35,6 @@ import java.time.format.DateTimeParseException;
  */
 public class Street extends BestNamedObject {
 	private final Municipality city = new Municipality();
-	private String status = "";
 	private String streetType = "";
 	private OffsetDateTime fromDate;
 	private OffsetDateTime tillDate;
@@ -44,14 +43,6 @@ public class Street extends BestNamedObject {
 
 	public Municipality getCity() {
 		return city;
-	}
-	
-	public String getStatus() {
-		return status;
-	}
-	
-	public void setStatus(String status) {
-		this.status = status;
 	}
 
 	public String getStreetType() {

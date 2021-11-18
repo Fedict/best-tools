@@ -34,6 +34,7 @@ public abstract class BestObject {
 	private String namespace = "";
 	private String id = "";
 	private String version = "";
+	private String status = "";
 
 	
 	/**
@@ -76,6 +77,24 @@ public abstract class BestObject {
 		this.id = id;
 	}
 	
+	/**
+	 * Get status
+	 * 
+	 * @return status
+	 */
+	public String getStatus() {
+		return status;
+	}
+	
+	/**
+	 * Set status
+	 * 
+	 * @param status 
+	 */
+	public void setStatus(String status) {
+		this.status = status.intern();
+	}
+
 	/**
 	 * Get version ID provided by the region
 	 * Combine the namespace with the ID and version to get a globally unique ID.
