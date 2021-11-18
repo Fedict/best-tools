@@ -154,19 +154,16 @@ public class Repository {
 	 * @param houseNumber house number
 	 * @param boxNumber box number
 	 * @param status status
-	 * @param limit maximum number of results
 	 * @param embed embed street, postal etc or not
 	 * @return 
 	 */
 	public Multi<Address> findAddresses(String afterId, String mIdentifier, String sIdentifier, 
 										String postalCode, String pIdentifier,
-										String houseNumber, String boxNumber, String status,
-										int limit, boolean embed) {
+										String houseNumber, String boxNumber, String status, boolean embed) {
 		boolean joinPostal = !(postalCode == null || postalCode.isEmpty());
 		List lst = new ArrayList(9);
 		SqlAddress qry = new SqlAddress(embed, joinPostal);
 
-		paginate(lst, qry, NsConverter.addressEncode(afterId));
 		where(lst, qry, "a.mIdentifier =", NsConverter.municipalityEncode(mIdentifier));
 		where(lst, qry, "a.sIdentifier =", NsConverter.streetEncode(sIdentifier));
 		where(lst, qry, "p.postalCode =", postalCode);
@@ -174,11 +171,8 @@ public class Repository {
 		where(lst, qry, "a.houseNumber =", houseNumber);
 		where(lst, qry, "a.boxNumber =", boxNumber);
 		where(lst, qry, "a.status::text =", status);
+		paginate(lst, qry, NsConverter.addressEncode(afterId));
 
-		if (limit > 0) {
-			qry.limit();
-			lst.add(limit);
-		}
 		qry.orderById();
 
 		return multi(
@@ -193,13 +187,12 @@ public class Repository {
 	 * @param gpsx
 	 * @param gpsy
 	 * @param meters
-	 * @param limit
 	 * @param status
 	 * @param embed embed street, postal etc or not
 	 * @return 
 	 */
 	public Multi<Address> findByCoordinates(String afterId, double gpsx, double gpsy, int meters, 
-											String status, int limit, boolean embed) {
+											String status, boolean embed) {
 		ProjCoordinate l72 = CoordConverter.gpsToL72(gpsx, gpsy);
 		List lst = new ArrayList<>(7); 
 		lst.add(l72.x);
@@ -207,13 +200,9 @@ public class Repository {
 		lst.add(meters);
 
 		SqlGeo qry = new SqlGeo(embed);
-		paginate(lst, qry, NsConverter.addressEncode(afterId));
 		where(lst, qry, "a.status =", status);
+		paginate(lst, qry, NsConverter.addressEncode(afterId));
 
-		if (limit > 0) {
-			qry.limit();
-			lst.add(limit);
-		}
 		qry.orderById();
 
 		return multi(
@@ -395,19 +384,16 @@ public class Repository {
 	 * @param afterId search after ID (paginated results)
 	 * @param mIdentifier municipality ID
 	 * @param postalCode postal code
-	 * @param status
 	 * @return 
 	 */
-	public Multi<Street> findStreets(String afterId, String mIdentifier, String postalCode, String status) {
+	public Multi<Street> findStreets(String afterId, String mIdentifier, String postalCode) {
 		boolean joinPostal = ! (postalCode == null || postalCode.isEmpty());
 
-		List lst = new ArrayList(5);
+		List lst = new ArrayList(4);
 		SqlStreet qry = new SqlStreet(joinPostal);
 
-		paginate(lst, qry, NsConverter.addressEncode(afterId));
 		where(lst, qry, "m.identifier =", NsConverter.municipalityEncode(mIdentifier));
 		where(lst, qry, "ps.postalcode =", postalCode);
-		where(lst, qry, "s.status::text = ", status);
 		
 		paginate(lst, qry, NsConverter.streetEncode(afterId));
 		qry.orderById();

@@ -40,7 +40,7 @@ public abstract class Sql {
 	protected String where = "";
 	protected String order = "";
 	protected String limit = "";
-	int vars = 0;
+	protected int vars = 0;
 
 	/**
 	 * Add order by clause

@@ -344,10 +344,6 @@ public class LookupResource {
 						example = "100",
 						required = false)
 			@RestQuery int meters,
-			@Parameter(description = "Maximum numbers of results",
-						example = "200",
-						required = false)	
-			@RestQuery int limit,
 			@Parameter(description = "Embed referenced streets, municipalities ...",
 						example = "true",
 						required = false)
@@ -359,8 +355,8 @@ public class LookupResource {
 			UriInfo info) {
 		Multi<Address> addresses = (gpsx == 0 || gpsy == 0)
 			? repo.findAddresses(after, municipalityID, streetID, postalCode, postalID, houseNumber, boxNumber, 
-								status, limit, embed)
-			: repo.findByCoordinates(after, gpsx, gpsy, meters, status, limit, embed);
+								status, embed)
+			: repo.findByCoordinates(after, gpsx, gpsy, meters, status, embed);
 		return toJsonEmbeddable(info, addresses, embed);
 	}
 
@@ -531,15 +527,11 @@ public class LookupResource {
 						example = "1500",
 						required = false)
 			@RestQuery String postalCode,
-			@Parameter(description = "Status",
-						example = "current",
-						required = false)
-			@RestQuery String status,
 			@Parameter(description = "After street (used in pagination)", 
 				required = false)
 			@RestQuery String after,
 			UriInfo info) {
-		Multi<Street> streets = repo.findStreets(after, municipalityID, postalCode, status);
+		Multi<Street> streets = repo.findStreets(after, municipalityID, postalCode);
 		return toJson(info, streets);
 	}
 	
