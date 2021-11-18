@@ -333,17 +333,21 @@ public class LookupResource {
 						required = false)
 			@RestQuery String status,
 			@Parameter(description = "X coordinate",
-						example = "4.23",
-						required = false)
-			@RestQuery double gpsx,
+						example = "4.231")
+			@RestQuery double coordX,
 			@Parameter(description = "Y coordinate",
 						example = "50.699",
 						required = false)
-			@RestQuery double gpsy,
+			@RestQuery double coordY,
+			@Parameter(description = "Coordinate reference system",
+						example = "gps",
+						required = false,
+						schema = @Schema(type=SchemaType.STRING, enumeration={"L72","gps"}))
+			@RestQuery String crs,
 			@Parameter(description = "Maximum distance (in meters)",
 						example = "100",
 						required = false)
-			@RestQuery int meters,
+			@RestQuery int radius,
 			@Parameter(description = "Embed referenced streets, municipalities ...",
 						example = "true",
 						required = false)
@@ -353,10 +357,10 @@ public class LookupResource {
 						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
 			@RestQuery String after,
 			UriInfo info) {
-		Multi<Address> addresses = (gpsx == 0 || gpsy == 0)
+		Multi<Address> addresses = (coordX == 0 || coordY == 0)
 			? repo.findAddresses(after, municipalityID, streetID, postalCode, postalID, houseNumber, boxNumber, 
 								status, embed)
-			: repo.findByCoordinates(after, gpsx, gpsy, meters, status, embed);
+			: repo.findByCoordinates(after, coordX, coordY, crs, radius, status, embed);
 		return toJsonEmbeddable(info, addresses, embed);
 	}
 
@@ -453,7 +457,7 @@ public class LookupResource {
 	@Path(LookupResource.POSTAL + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Get a postal info by ID",
-			description = "The ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+			description = "Note: the ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
 	@Tag(name = "postals")
 	public RestResponse<JsonObject> getPostalById(
 			@Parameter(description = "Postal ID", 

@@ -181,19 +181,23 @@ public class Repository {
 	}
 
 	/**
-	 * Find addresses by GPS coordinates
+	 * Find addresses by coordinates
 	 * 
 	 * @param afterId search after ID (paginated results)
-	 * @param gpsx
-	 * @param gpsy
+	 * @param coordX X-coordinate
+	 * @param coordY Y-coordinate
+	 * @param crs coordinate reference system
 	 * @param meters
 	 * @param status
 	 * @param embed embed street, postal etc or not
 	 * @return 
 	 */
-	public Multi<Address> findByCoordinates(String afterId, double gpsx, double gpsy, int meters, 
+	public Multi<Address> findByCoordinates(String afterId, double coordX, double coordY, String crs, int meters, 
 											String status, boolean embed) {
-		ProjCoordinate l72 = CoordConverter.gpsToL72(gpsx, gpsy);
+		
+		ProjCoordinate l72 = (crs == null || crs.toLowerCase().equals("gps")) 
+									? CoordConverter.gpsToL72(coordX, coordY) 
+									: new ProjCoordinate(coordX, coordY);
 		List lst = new ArrayList<>(7); 
 		lst.add(l72.x);
 		lst.add(l72.y);

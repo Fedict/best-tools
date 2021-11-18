@@ -37,7 +37,7 @@ public class SqlGeo extends Sql {
 						" a.housenumber, a.boxnumber, a.validFrom, a.validTo, a.status::text, a.point::point";
 		this.from = "address";
 		this.alias = "a";
-		this.where = "ST_DWITHIN(a.point, ST_SetSRID(ST_MakePoint($1, $2), 31370), $3) = TRUE";
+		this.where = "ST_DWITHIN(a.point, ST_SetSRID(ST_Point($1, $2), 31370), $3) = TRUE";
 		this.vars = 3;
 		
 		if (embed) {
