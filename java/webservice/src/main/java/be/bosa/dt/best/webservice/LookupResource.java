@@ -316,6 +316,10 @@ public class LookupResource {
 			@Parameter(description = "Postal identifier", 
 						required = false)
 			@RestQuery String postalID,
+			@Parameter(description = "Postal code (assigned by bPost)",
+						example = "1500",
+						required = false)
+			@RestQuery String postalCode,
 			@Parameter(description = "House number",
 						example = "71",
 						required = false)
@@ -324,6 +328,10 @@ public class LookupResource {
 						example = "12",
 						required = false)
 			@RestQuery String boxNumber,
+			@Parameter(description = "Status",
+						example = "current",
+						required = false)
+			@RestQuery String status,
 			@Parameter(description = "X coordinate",
 						example = "4.23",
 						required = false)
@@ -350,8 +358,9 @@ public class LookupResource {
 			@RestQuery String after,
 			UriInfo info) {
 		Multi<Address> addresses = (gpsx == 0 || gpsy == 0)
-			? repo.findAddresses(after, municipalityID, streetID, postalID, houseNumber, boxNumber, limit, embed)
-			: repo.findByCoordinates(after, gpsx, gpsy, meters, limit, embed);
+			? repo.findAddresses(after, municipalityID, streetID, postalCode, postalID, houseNumber, boxNumber, 
+								status, limit, embed)
+			: repo.findByCoordinates(after, gpsx, gpsy, meters, status, limit, embed);
 		return toJsonEmbeddable(info, addresses, embed);
 	}
 
@@ -387,7 +396,7 @@ public class LookupResource {
 	@Path(LookupResource.MUNICIPALITIES)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Search for municipalities",
-			description = "This is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
+			description = "The ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
 	@Tag(name = "municipalities")
 	@APIResponse(
 		responseCode = "200",
@@ -405,14 +414,12 @@ public class LookupResource {
 						example = "1500",
 						required = false)
 			@RestQuery String postalcode,
+			@Parameter(description = "Status",
+						example = "current",
+						required = false)
+			@RestQuery String status,
 			UriInfo info) {
-		Multi<Municipality> municipalities = null;
-		if (niscode == null && postalcode == null) {
-			municipalities = repo.findMunicipalitiesAll();
-		} else {
-			municipalities = (niscode != null) ? repo.findMunicipalitiesByNis(niscode)
-												: repo.findMunicipalitiesByPostal(postalcode);
-		}
+		Multi<Municipality> municipalities = repo.findMunicipalities(niscode, postalcode, status);
 		return toJson(info, municipalities);
 	}
 
@@ -441,7 +448,6 @@ public class LookupResource {
 			@Parameter(description = "After municipality part (used in pagination)", 
 						required = false)
 			@RestQuery String after,
-			@RestQuery String embedded,
 			UriInfo info) {
 		Multi<MunicipalityPart> parts = repo.findMunicipalityParts(after);
 		return toJson(info, parts);
@@ -521,11 +527,19 @@ public class LookupResource {
 			@Parameter(description = "Municipality identifier", 
 				required = false)
 			@RestQuery String municipalityID,
+			@Parameter(description = "Postal code (assigned by bPost)",
+						example = "1500",
+						required = false)
+			@RestQuery String postalCode,
+			@Parameter(description = "Status",
+						example = "current",
+						required = false)
+			@RestQuery String status,
 			@Parameter(description = "After street (used in pagination)", 
 				required = false)
 			@RestQuery String after,
 			UriInfo info) {
-		Multi<Street> streets = repo.findStreets(after);
+		Multi<Street> streets = repo.findStreets(after, municipalityID, postalCode, status);
 		return toJson(info, streets);
 	}
 	

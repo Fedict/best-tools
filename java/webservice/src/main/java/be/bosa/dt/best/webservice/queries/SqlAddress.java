@@ -32,16 +32,25 @@ package be.bosa.dt.best.webservice.queries;
  */
 public class SqlAddress extends Sql {
 
-	public SqlAddress(boolean embed) {
+	/**
+	 * Constructor
+	 * 
+	 * @param joinStreet join with street table
+	 * @param joinPostal join with postalInfo table
+	 */
+	public SqlAddress(boolean joinStreet, boolean joinPostal) {
 		this.select = "a.identifier, a.mIdentifier, a.pIdentifier, a.mpIdentifier, a.sIdentifier, " +
 						" a.housenumber, a.boxnumber, a.validFrom, a.validTo, a.status::text, a.point::point";
 		this.from = "address";
 		this.alias = "a";
 
-		if (embed) {
+		if (joinStreet) {
 			this.select += ", s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, s.validFrom, s.validTo, " +
 							" s.streetnameType::text, s.status::text";
-			this.join = " INNER JOIN street s ON a.sIdentifier = s.identifier";	
+			this.join += " INNER JOIN street s ON a.sIdentifier = s.identifier";	
+		}
+		if (joinPostal) {
+			this.join += " INNER JOIN postalinfo p ON a.pIdentifier = p.identifier";	
 		}
 	}
 }

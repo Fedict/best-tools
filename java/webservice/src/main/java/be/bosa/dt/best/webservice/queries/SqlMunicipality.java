@@ -33,15 +33,16 @@ package be.bosa.dt.best.webservice.queries;
 public class SqlMunicipality extends Sql {
 
 	/**
+	 * Constructor
 	 * 
-	 * @param postal join with postal info
+	 * @param joinPostal join with postalInfo table
 	 */
-	public SqlMunicipality(boolean postal) {
+	public SqlMunicipality(boolean joinPostal) {
 		this.select = "m.identifier, m.refnisCode, m.nameNL, m.nameFR, m.nameDE";
 		this.alias = "m";
 		this.from = "municipality";
 		
-		if (postal) {
+		if (joinPostal) {
 			this.join = " INNER JOIN postalmunicipalities p ON m.identifier = p.mIdentifier";	
 		}
 	}
