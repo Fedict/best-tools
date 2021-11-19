@@ -41,6 +41,7 @@ public abstract class Sql {
 	protected String order = "";
 	protected String limit = "";
 	protected int vars = 0;
+	protected boolean rewriteHack = false;
 
 	/**
 	 * Add order by clause
@@ -106,20 +107,37 @@ public abstract class Sql {
 		this.limit = "ALL";
 	}
 
+	public void setRewriteHack() {
+		rewriteHack = true;
+	}
+
 	/**
 	 * Build the SQL select string
 	 * 
 	 * @return 
 	 */
 	public String build() {
-		String str = String.join(" ", "SELECT", select, "FROM", from, alias, join);
+		StringBuilder bld = new StringBuilder(1024);
+
+		bld.append("SELECT ").append(select)
+			.append(" FROM ").append(from).append(" ").append(alias)
+			.append(" ").append(join);
+
 		if (!where.isEmpty()) {
-			str = String.join(" ", str, "WHERE", where);
+			bld.append(" WHERE ").append(where);
 		}
 		if (!order.isEmpty()) {
-			str = String.join(" ", str, "ORDER BY", order, "LIMIT", limit);
+			bld.append(" ORDER BY ").append(order);
 		}
-		Log.debug(str);
-		return str;
+		if (!limit.isEmpty()) {
+			if (!rewriteHack) {
+				bld.append(" LIMIT ").append(limit);
+			} else {
+				bld.insert(0, "WITH q AS (");
+				bld.append(") SELECT * FROM q LIMIT ").append(limit);	
+		}
+		}
+		Log.debug(bld.toString());
+		return bld.toString();
 	}
 }

@@ -38,15 +38,17 @@ public class SqlAddress extends Sql {
 	 * @param joinStreet join with street table
 	 * @param joinPostal join with postalInfo table
 	 */
-	public SqlAddress(boolean joinStreet, boolean joinMunicipality, boolean joinPostal) {
+	public SqlAddress(boolean embed, boolean joinStreet, boolean joinMunicipality, boolean joinPostal) {
 		this.select = "a.identifier, a.mIdentifier, a.pIdentifier, a.mpIdentifier, a.sIdentifier, " +
 						" a.housenumber, a.boxnumber, a.validFrom, a.validTo, a.status::text, a.point::point";
 		this.from = "address";
 		this.alias = "a";
 
-		if (joinStreet) {
+		if (embed) {
 			this.select += ", s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, s.validFrom, s.validTo, " +
 							" s.streetnameType::text, s.status::text";
+		}
+		if (embed || joinStreet) {
 			this.join += " INNER JOIN street s ON a.sIdentifier = s.identifier";	
 		}
 		if (joinMunicipality) {

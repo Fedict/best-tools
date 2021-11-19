@@ -316,6 +316,9 @@ public class LookupResource {
 			@Parameter(description = "Street identifier", 
 						required = false)
 			@RestQuery String streetID,
+			@Parameter(description = "Street name", 
+						required = false)
+			@RestQuery String streetName,
 			@Parameter(description = "Postal identifier", 
 						required = false)
 			@RestQuery String postalID,
@@ -361,8 +364,9 @@ public class LookupResource {
 			@RestQuery String after,
 			UriInfo info) {
 		Multi<Address> addresses = (coordX == 0 || coordY == 0)
-			? repo.findAddresses(after, municipalityID, municipalityName, 
-								streetID, postalCode, postalID, houseNumber, boxNumber, 
+			? repo.findAddresses(after, 
+								municipalityID, municipalityName, streetID, streetName, 
+								postalCode, postalID, houseNumber, boxNumber, 
 								status, embed)
 			: repo.findByCoordinates(after, coordX, coordY, crs, radius, status, embed);
 		return toJsonEmbeddable(info, addresses, embed);

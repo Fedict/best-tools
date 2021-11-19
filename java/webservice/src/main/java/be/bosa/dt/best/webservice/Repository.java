@@ -66,7 +66,7 @@ import org.locationtech.proj4j.ProjCoordinate;
  */
 @ApplicationScoped
 public class Repository {
-	protected static int PAGE_LIMIT = 100;
+	protected static int PAGE_LIMIT = 250;
 
 	@Inject
 	PgPool pg;
@@ -109,6 +109,7 @@ public class Repository {
 			qry.limit();
 		}
 		lst.add(PAGE_LIMIT);
+		qry.orderById();
 	}
 
 	/**
@@ -136,6 +137,7 @@ public class Repository {
 		if (value != null && !value.isEmpty()) {
 			qry.whereNames(nl, fr, de);
 			lst.add(value);
+		//	qry.setRewriteHack();
 		}
 	}
 
@@ -148,7 +150,7 @@ public class Repository {
 	 */
 	public Uni<Address> findAddressById(String id, boolean embed) {
 		Tuple tuple = Tuple.of(NsConverter.addressEncode(id));
-		SqlAddress qry = new SqlAddress(embed, false, false);
+		SqlAddress qry = new SqlAddress(embed, false, false, false);
 		qry.where("a.identifier =");
 
 		return uni(
@@ -161,7 +163,9 @@ public class Repository {
 	 * 
 	 * @param afterId search after ID (paginated results)
 	 * @param mIdentifier municipality identifier
+	 * @param mName municipality name
 	 * @param sIdentifier street identifier
+	 * @param sName street name
 	 * @param postalCode postal code
 	 * @param pIdentifier postal identifier
 	 * @param houseNumber house number
@@ -171,25 +175,25 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<Address> findAddresses(String afterId, String mIdentifier, String mName,
-										String sIdentifier, 
+										String sIdentifier, String sName,
 										String postalCode, String pIdentifier,
 										String houseNumber, String boxNumber, String status, boolean embed) {
 		boolean joinMunicipality = !(mName == null || mName.isEmpty());
+		boolean joinStreet = !(sName == null || sName.isEmpty());
 		boolean joinPostal = !(postalCode == null || postalCode.isEmpty());
-		List lst = new ArrayList(10);
-		SqlAddress qry = new SqlAddress(embed, joinMunicipality, joinPostal);
+		List lst = new ArrayList(11);
+		SqlAddress qry = new SqlAddress(embed, joinStreet, joinMunicipality,  joinPostal);
 
 		where(lst, qry, "a.mIdentifier", NsConverter.municipalityEncode(mIdentifier));
 		whereNames(lst, qry, "m.nameNL", "m.nameFR", "m.nameDE", mName);
 		where(lst, qry, "a.sIdentifier", NsConverter.streetEncode(sIdentifier));
+		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", sName);
 		where(lst, qry, "p.postalCode", postalCode);
 		where(lst, qry, "a.pIdentifier", NsConverter.postalEncode(pIdentifier));
 		where(lst, qry, "a.houseNumber", houseNumber);
 		where(lst, qry, "a.boxNumber", boxNumber);
 		where(lst, qry, "a.status::text", status);
 		paginate(lst, qry, NsConverter.addressEncode(afterId));
-
-		qry.orderById();
 
 		return multi(
 			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
@@ -211,19 +215,17 @@ public class Repository {
 	public Multi<Address> findByCoordinates(String afterId, double coordX, double coordY, String crs, int meters, 
 											String status, boolean embed) {
 		
-		ProjCoordinate l72 = (crs == null || crs.toLowerCase().equals("gps")) 
+		ProjCoordinate coords = (crs == null || crs.toLowerCase().equals("gps")) 
 									? CoordConverter.gpsToL72(coordX, coordY) 
 									: new ProjCoordinate(coordX, coordY);
 		List lst = new ArrayList<>(7); 
-		lst.add(l72.x);
-		lst.add(l72.y);
+		lst.add(coords.x);
+		lst.add(coords.y);
 		lst.add(meters);
 
 		SqlGeo qry = new SqlGeo(embed);
 		where(lst, qry, "a.status", status);
 		paginate(lst, qry, NsConverter.addressEncode(afterId));
-
-		qry.orderById();
 
 		return multi(
 			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
@@ -362,7 +364,6 @@ public class Repository {
 		SqlPostalInfo qry = new SqlPostalInfo();
 
 		paginate(lst, qry, NsConverter.postalEncode(afterId));
-		qry.orderById();
 
 		return multi(
 			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
@@ -419,7 +420,6 @@ public class Repository {
 		where(lst, qry, "ps.postalcode", postalCode);
 		
 		paginate(lst, qry, NsConverter.streetEncode(afterId));
-		qry.orderById();
 
 		return multi(
 			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
