@@ -5,6 +5,7 @@ CREATE DATABASE best;
 CREATE EXTENSION postgis;
 CREATE EXTENSION fuzzystrmatch;
 CREATE EXTENSION pg_trgm;
+CREATE EXTENSION unaccent;
 
 CREATE USER best_reader WITH PASSWORD 'best_reader';
 GRANT CONNECT ON DATABASE best to best_reader;
@@ -165,18 +166,18 @@ CREATE INDEX idxAddressPoint ON Address
 
 /* Full text indexes on names */
 CREATE INDEX idxGinStreetNL ON Street
-	USING GIN(LOWER(nameNL) gin_trgm_ops);
+	USING GIN(LOWER(UNACCENT(nameNL)) gin_trgm_ops);
 CREATE INDEX idxGinStreetFR ON Street
-	USING GIN(LOWER(nameFR) gin_trgm_ops);
+	USING GIN(LOWER(UNACCENT(nameFR)) gin_trgm_ops);
 CREATE INDEX idxGinStreetDE ON Street
-	USING GIN(LOWER(nameDE) gin_trgm_ops);
+	USING GIN(LOWER(UNACCENT(nameDE)) gin_trgm_ops);
 
 CREATE INDEX idxGinMunicipalityNL ON Municipality 
-	USING GIN(LOWER(nameNL) gin_trgm_ops);
+	USING GIN(LOWER(UNACCENT(nameNL) gin_trgm_ops);
 CREATE INDEX idxGinMunicipalityFR ON Municipality
-	USING GIN(LOWER(nameFR) gin_trgm_ops);
+	USING GIN(LOWER(UNACCENT(nameFR)) gin_trgm_ops);
 CREATE INDEX idxGinMunicipalityDE ON Municipality
-	USING GIN(LOWER(nameDE) gin_trgm_ops);
+	USING GIN(LOWER(UNACCENT(nameDE)) gin_trgm_ops);
 
 /* Values for support / debugging */
 CREATE TABLE version(identifier VARCHAR(20) NOT NULL,
