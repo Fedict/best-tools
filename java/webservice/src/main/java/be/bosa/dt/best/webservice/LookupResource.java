@@ -310,20 +310,26 @@ public class LookupResource {
 			@Parameter(description = "Municipality identifier", 
 						required = false)
 			@RestQuery String municipalityID,
-			@Parameter(description = "Municipality name", 
+			@Parameter(description = "Municipality name",
+						example = "Bruxelles",
 						required = false)
 			@RestQuery String municipalityName,
 			@Parameter(description = "Street identifier", 
 						required = false)
 			@RestQuery String streetID,
-			@Parameter(description = "Street name", 
+			@Parameter(description = "Street name",
+						example = "Grote Markt",
 						required = false)
 			@RestQuery String streetName,
 			@Parameter(description = "Postal identifier", 
 						required = false)
 			@RestQuery String postalID,
+			@Parameter(description = "Postal name",
+						example = "Bruxelles",
+						required = false)
+			@RestQuery String postalName,
 			@Parameter(description = "Postal code (assigned by bPost)",
-						example = "1500",
+						example = "1000",
 						required = false)
 			@RestQuery String postalCode,
 			@Parameter(description = "House number",
@@ -366,7 +372,7 @@ public class LookupResource {
 		Multi<Address> addresses = (coordX == 0 || coordY == 0)
 			? repo.findAddresses(after, 
 								municipalityID, municipalityName, streetID, streetName, 
-								postalCode, postalID, houseNumber, boxNumber, 
+								postalID, postalCode, postalName, houseNumber, boxNumber, 
 								status, embed)
 			: repo.findByCoordinates(after, coordX, coordY, crs, radius, status, embed);
 		return toJsonEmbeddable(info, addresses, embed);
@@ -422,7 +428,7 @@ public class LookupResource {
 						example = "1500",
 						required = false)
 			@RestQuery String postalcode,
-			@Parameter(description = "(Part of) municipality name, searches in Dutch/French/German names", 
+			@Parameter(description = "Municipality name, searches in Dutch/French/German names", 
 				required = false)
 			@RestQuery String name,
 			UriInfo info) {
@@ -481,11 +487,19 @@ public class LookupResource {
 	@Operation(summary = "Search for postal info")
 	@Tag(name = "postals")
 	public JsonObject getPostalInfos(
+			@Parameter(description = "Postal code (assigned by bPost)",
+						example = "1000",
+						required = false)
+			@RestQuery String postalCode,
+			@Parameter(description = "Municipality name, searches in Dutch/French/German names", 
+						example = "Bruxelles",
+						required = false)
+			@RestQuery String name,
 			@Parameter(description = "After postal info (used in pagination)", 
 						required = false)
 			@RestQuery String after,
 			UriInfo info) {
-		Multi<PostalInfo> postals = repo.findPostalInfos(after);
+		Multi<PostalInfo> postals = repo.findPostalInfos(after, postalCode, name);
 		return toJson(info, postals);
 	}
 
@@ -538,8 +552,9 @@ public class LookupResource {
 						example = "1500",
 						required = false)
 			@RestQuery String postalCode,
-			@Parameter(description = "(Part of) street name, searches in Dutch/French/German names", 
-				required = false)
+			@Parameter(description = "(Part of) street name, searches in Dutch/French/German names",
+						example = "Halle",
+						required = false)
 			@RestQuery String name,
 			@Parameter(description = "After street (used in pagination)", 
 				required = false)

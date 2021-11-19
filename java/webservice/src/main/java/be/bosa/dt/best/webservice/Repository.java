@@ -66,6 +66,7 @@ import org.locationtech.proj4j.ProjCoordinate;
  */
 @ApplicationScoped
 public class Repository {
+	
 	protected static int PAGE_LIMIT = 250;
 
 	@Inject
@@ -167,6 +168,7 @@ public class Repository {
 	 * @param sIdentifier street identifier
 	 * @param sName street name
 	 * @param postalCode postal code
+	 * @param pName postal name
 	 * @param pIdentifier postal identifier
 	 * @param houseNumber house number
 	 * @param boxNumber box number
@@ -176,7 +178,7 @@ public class Repository {
 	 */
 	public Multi<Address> findAddresses(String afterId, String mIdentifier, String mName,
 										String sIdentifier, String sName,
-										String postalCode, String pIdentifier,
+										String pIdentifier, String postalCode, String pName,
 										String houseNumber, String boxNumber, String status, boolean embed) {
 		boolean joinMunicipality = !(mName == null || mName.isEmpty());
 		boolean joinStreet = !(sName == null || sName.isEmpty());
@@ -207,12 +209,12 @@ public class Repository {
 	 * @param coordX X-coordinate
 	 * @param coordY Y-coordinate
 	 * @param crs coordinate reference system
-	 * @param meters
+	 * @param radius in meters
 	 * @param status
 	 * @param embed embed street, postal etc or not
 	 * @return 
 	 */
-	public Multi<Address> findByCoordinates(String afterId, double coordX, double coordY, String crs, int meters, 
+	public Multi<Address> findByCoordinates(String afterId, double coordX, double coordY, String crs, int radius, 
 											String status, boolean embed) {
 		
 		ProjCoordinate coords = (crs == null || crs.toLowerCase().equals("gps")) 
@@ -221,7 +223,7 @@ public class Repository {
 		List lst = new ArrayList<>(7); 
 		lst.add(coords.x);
 		lst.add(coords.y);
-		lst.add(meters);
+		lst.add(radius);
 
 		SqlGeo qry = new SqlGeo(embed);
 		where(lst, qry, "a.status", status);
@@ -357,12 +359,17 @@ public class Repository {
 	 * Find postal info
 	 * 
 	 * @param afterId search after ID (paginated results)
+	 * @param postalCode postal code
+	 * @param name postal name
 	 * @return 
 	 */
-	public Multi<PostalInfo> findPostalInfos(String afterId) {
-		List lst = new ArrayList(2);
+	public Multi<PostalInfo> findPostalInfos(String afterId, String postalCode, String name) {
+		List lst = new ArrayList(4);
 		SqlPostalInfo qry = new SqlPostalInfo();
 
+		where(lst, qry, "p.postalcode", postalCode);
+		
+		whereNames(lst, qry, "p.nameNL", "p.nameFR", "p.nameDE", name);
 		paginate(lst, qry, NsConverter.postalEncode(afterId));
 
 		return multi(
@@ -418,6 +425,7 @@ public class Repository {
 
 		where(lst, qry, "m.identifier", NsConverter.municipalityEncode(mIdentifier));
 		where(lst, qry, "ps.postalcode", postalCode);
+		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", name);
 		
 		paginate(lst, qry, NsConverter.streetEncode(afterId));
 
