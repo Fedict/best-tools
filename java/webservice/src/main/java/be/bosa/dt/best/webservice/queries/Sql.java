@@ -54,6 +54,7 @@ public abstract class Sql {
 	public void orderById() {
 		order(alias + ".identifier");
 	}
+
 	/**
 	 * Add where clause with variable
 	 * 
@@ -64,6 +65,25 @@ public abstract class Sql {
 		this.where = (this.where.equals("")) ? tmp : this.where + " AND " + tmp;
 	}
 
+	/**
+	 * Add where clause, searching for names in three languages
+	 * 
+	 * @param nl Dutch field name
+	 * @param fr French field name
+	 * @param de German field name
+	 */
+	public void whereNames(String nl, String fr, String de) {
+		String v = "$" + ++vars;
+		
+		String tmp = "(" + 
+						"LOWER(IM_UNACCENT(" + nl + ")) = LOWER(IM_UNACCENT(" + v + ")) OR " +
+						"LOWER(IM_UNACCENT(" + fr + ")) = LOWER(IM_UNACCENT(" + v + ")) OR " +
+						"LOWER(IM_UNACCENT(" + de + ")) = LOWER(IM_UNACCENT(" + v + ")) " +
+					")";
+		this.where = (this.where.equals("")) ? tmp : this.where + " AND " + tmp;
+	}
+
+	
 	/**
 	 * Add pagination with start identifier (don't use OFFSET, that's more resource intensive)
 	 */

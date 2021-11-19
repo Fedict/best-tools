@@ -38,7 +38,7 @@ public class SqlAddress extends Sql {
 	 * @param joinStreet join with street table
 	 * @param joinPostal join with postalInfo table
 	 */
-	public SqlAddress(boolean joinStreet, boolean joinPostal) {
+	public SqlAddress(boolean joinStreet, boolean joinMunicipality, boolean joinPostal) {
 		this.select = "a.identifier, a.mIdentifier, a.pIdentifier, a.mpIdentifier, a.sIdentifier, " +
 						" a.housenumber, a.boxnumber, a.validFrom, a.validTo, a.status::text, a.point::point";
 		this.from = "address";
@@ -48,6 +48,9 @@ public class SqlAddress extends Sql {
 			this.select += ", s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, s.validFrom, s.validTo, " +
 							" s.streetnameType::text, s.status::text";
 			this.join += " INNER JOIN street s ON a.sIdentifier = s.identifier";	
+		}
+		if (joinMunicipality) {
+			this.join += " INNER JOIN municipality m ON a.mIdentifier = m.identifier";	
 		}
 		if (joinPostal) {
 			this.join += " INNER JOIN postalinfo p ON a.pIdentifier = p.identifier";	

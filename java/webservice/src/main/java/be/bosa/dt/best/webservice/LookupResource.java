@@ -310,6 +310,9 @@ public class LookupResource {
 			@Parameter(description = "Municipality identifier", 
 						required = false)
 			@RestQuery String municipalityID,
+			@Parameter(description = "Municipality name", 
+						required = false)
+			@RestQuery String municipalityName,
 			@Parameter(description = "Street identifier", 
 						required = false)
 			@RestQuery String streetID,
@@ -358,7 +361,8 @@ public class LookupResource {
 			@RestQuery String after,
 			UriInfo info) {
 		Multi<Address> addresses = (coordX == 0 || coordY == 0)
-			? repo.findAddresses(after, municipalityID, streetID, postalCode, postalID, houseNumber, boxNumber, 
+			? repo.findAddresses(after, municipalityID, municipalityName, 
+								streetID, postalCode, postalID, houseNumber, boxNumber, 
 								status, embed)
 			: repo.findByCoordinates(after, coordX, coordY, crs, radius, status, embed);
 		return toJsonEmbeddable(info, addresses, embed);
@@ -414,12 +418,11 @@ public class LookupResource {
 						example = "1500",
 						required = false)
 			@RestQuery String postalcode,
-			@Parameter(description = "Status",
-						example = "current",
-						required = false)
-			@RestQuery String status,
+			@Parameter(description = "(Part of) municipality name, searches in Dutch/French/German names", 
+				required = false)
+			@RestQuery String name,
 			UriInfo info) {
-		Multi<Municipality> municipalities = repo.findMunicipalities(niscode, postalcode, status);
+		Multi<Municipality> municipalities = repo.findMunicipalities(niscode, postalcode, name);
 		return toJson(info, municipalities);
 	}
 
@@ -531,11 +534,14 @@ public class LookupResource {
 						example = "1500",
 						required = false)
 			@RestQuery String postalCode,
+			@Parameter(description = "(Part of) street name, searches in Dutch/French/German names", 
+				required = false)
+			@RestQuery String name,
 			@Parameter(description = "After street (used in pagination)", 
 				required = false)
 			@RestQuery String after,
 			UriInfo info) {
-		Multi<Street> streets = repo.findStreets(after, municipalityID, postalCode);
+		Multi<Street> streets = repo.findStreets(after, municipalityID, postalCode, name);
 		return toJson(info, streets);
 	}
 	
