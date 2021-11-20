@@ -217,12 +217,12 @@ public class Repository {
 	public Multi<Address> findByCoordinates(String afterId, double coordX, double coordY, String crs, int radius, 
 											String status, boolean embed) {
 		
-		ProjCoordinate coords = (crs == null || crs.toLowerCase().equals("gps")) 
+		ProjCoordinate point = (crs == null || crs.toLowerCase().equals("gps")) 
 									? CoordConverter.gpsToL72(coordX, coordY) 
 									: new ProjCoordinate(coordX, coordY);
-		List lst = new ArrayList<>(7); 
-		lst.add(coords.x);
-		lst.add(coords.y);
+		List lst = new ArrayList(7); 
+		lst.add(point.x);
+		lst.add(point.y);
 		lst.add(radius);
 
 		SqlGeo qry = new SqlGeo(embed);
@@ -233,7 +233,45 @@ public class Repository {
 			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
 		).transform(Address::from);
 	}
-	
+
+	/**
+	 * Find addresses by polygon
+	 * 
+	 * @param afterId search after ID (paginated results)
+	 * @param polygon polygon points
+	 * @param crs coordinate reference system
+	 * @param status
+	 * @param embed embed street, postal etc or not
+	 * @return 
+	 */
+	public Multi<Address> findByPolygon(String afterId, String polygon, String crs, String status, boolean embed) {	
+		StringBuilder builder = new StringBuilder(80);
+		String[] points = polygon.split("~");
+		builder.append("'POLYGON((");
+		for (String p: points) {
+			String[] coords = p.split(",");
+			double coordX = Double.valueOf(coords[0]);
+			double coordY = Double.valueOf(coords[1]);
+			
+			ProjCoordinate point = (crs == null || crs.toLowerCase().equals("gps")) 
+									? CoordConverter.gpsToL72(coordX, coordY) 
+									: new ProjCoordinate(coordX, coordY);
+			builder.append(point.x).append(' ').append(point.y);
+		}
+		builder.append("))'");
+
+		List lst = new ArrayList(5); 
+		lst.add(builder.toString());
+
+		SqlGeo qry = new SqlGeo(embed);
+		where(lst, qry, "a.status", status);
+		paginate(lst, qry, NsConverter.addressEncode(afterId));
+
+		return multi(
+			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
+		).transform(Address::from);
+	}
+
 	/**
 	 * Find a municipality by ID
 	 * 

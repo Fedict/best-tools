@@ -351,6 +351,10 @@ public class LookupResource {
 						example = "50.699",
 						required = false)
 			@RestQuery double coordY,
+			@Parameter(description = "Polygon points, separated by '~'",
+						example = "4.231,50.699~4.107,50.528~4.300,50.812",
+						required = false)
+			@RestQuery String polygon,
 			@Parameter(description = "Coordinate reference system",
 						example = "gps",
 						required = false,
@@ -369,12 +373,17 @@ public class LookupResource {
 						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
 			@RestQuery String after,
 			UriInfo info) {
-		Multi<Address> addresses = (coordX == 0 || coordY == 0)
-			? repo.findAddresses(after, 
+		Multi<Address> addresses;
+		if (coordX != 0 && coordY == 0) {
+			addresses = repo.findByCoordinates(after, coordX, coordY, crs, radius, status, embed);
+		} else if (polygon != null && !polygon.isEmpty()) {
+			addresses = repo.findByPolygon(after, polygon, crs, status, embed);
+		} else {
+			addresses = repo.findAddresses(after, 
 								municipalityID, municipalityName, streetID, streetName, 
 								postalID, postalCode, postalName, houseNumber, boxNumber, 
-								status, embed)
-			: repo.findByCoordinates(after, coordX, coordY, crs, radius, status, embed);
+								status, embed);
+		}
 		return toJsonEmbeddable(info, addresses, embed);
 	}
 
