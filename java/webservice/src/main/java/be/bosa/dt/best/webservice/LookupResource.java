@@ -451,6 +451,19 @@ public class LookupResource {
 	@Operation(summary = "Get a municipality part by full ID",
 				description = "Note: currently only the Walloon Region provides info about municipality parts")
 	@Tag(name = "municipalities")
+	@APIResponses({
+		@APIResponse(
+		   responseCode = "200",
+			name = "ok",
+			description = "Requested municipality part",
+			content = @Content(
+				schema = @Schema(
+                type = SchemaType.OBJECT))),
+		@APIResponse(
+			responseCode = "404",
+			name = "not found",
+			description = "Municipality part not found")	
+	})
 	public RestResponse<JsonObject> getMunicipalityPartsById(
 			@Parameter(description = "Municipality part ID", 
 						required = true)
@@ -466,12 +479,23 @@ public class LookupResource {
 	@Operation(summary = "Search for municipality parts",
 			description = "Note: currently only the Walloon Region provides info about municipality parts")
 	@Tag(name = "municipalities")
-	public JsonObject getMunicipalityParts(
+	@APIResponse(
+		responseCode = "200",
+		name = "ok",
+		description = "A (possibly empty) list of municipality parts",
+		content = @Content(
+			schema = @Schema(
+				type = SchemaType.OBJECT)))
+	public JsonObject getMunicipalityParts(	
+			@Parameter(description = "Municipality part name",
+						example = "Bruxelles",
+						required = false)
+			@RestQuery String name,
 			@Parameter(description = "After municipality part (used in pagination)", 
 						required = false)
 			@RestQuery String after,
 			UriInfo info) {
-		Multi<MunicipalityPart> parts = repo.findMunicipalityParts(after);
+		Multi<MunicipalityPart> parts = repo.findMunicipalityParts(after, name);
 		return toJson(info, parts);
 	}
 
@@ -481,6 +505,19 @@ public class LookupResource {
 	@Operation(summary = "Get a postal info by ID",
 			description = "Note: the ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
 	@Tag(name = "postals")
+	@APIResponses({
+		@APIResponse(
+		   responseCode = "200",
+			name = "ok",
+			description = "Requested postal info",
+			content = @Content(
+				schema = @Schema(
+                type = SchemaType.OBJECT))),
+		@APIResponse(
+			responseCode = "404",
+			name = "not found",
+			description = "Postal info not found")	
+	})
 	public RestResponse<JsonObject> getPostalById(
 			@Parameter(description = "Postal ID", 
 						required = true)
@@ -562,7 +599,7 @@ public class LookupResource {
 						required = false)
 			@RestQuery String postalCode,
 			@Parameter(description = "(Part of) street name, searches in Dutch/French/German names",
-						example = "Halle",
+						example = "Grote Markt",
 						required = false)
 			@RestQuery String name,
 			@Parameter(description = "After street (used in pagination)", 

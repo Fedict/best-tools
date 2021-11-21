@@ -348,14 +348,15 @@ public class Repository {
 	 * Find municipality parts
 	 * 
 	 * @param afterId search after ID (paginated results)
+	 * @param name
 	 * @return 
 	 */
-	public Multi<MunicipalityPart> findMunicipalityParts(String afterId) {
-		List lst = new ArrayList(2);
+	public Multi<MunicipalityPart> findMunicipalityParts(String afterId, String name) {
+		List lst = new ArrayList(3);
 		SqlMunicipalityPart qry = new SqlMunicipalityPart();
 
+		whereNames(lst, qry, "mp.nameNL", "mp.nameFR", "mp.nameDE", name);
 		paginate(lst, qry, NsConverter.municipalityPartEncode(afterId));
-		qry.orderById();
 
 		return multi(
 			pg.preparedQuery(qry.build()).execute(Tuple.from(lst))
