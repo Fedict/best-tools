@@ -352,7 +352,7 @@ public class LookupResource {
 						required = false)
 			@RestQuery double coordY,
 			@Parameter(description = "Polygon points, separated by '~'",
-						example = "4.231,50.699~4.107,50.528~4.300,50.812",
+						example = "4.107,50.528~4.300,50.528~4.300,50.699~4.107,50.528",
 						required = false)
 			@RestQuery String polygon,
 			@Parameter(description = "Coordinate reference system",

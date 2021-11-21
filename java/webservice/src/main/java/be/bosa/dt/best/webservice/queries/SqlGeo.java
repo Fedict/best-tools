@@ -32,6 +32,12 @@ package be.bosa.dt.best.webservice.queries;
  */
 public class SqlGeo extends Sql {
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param embed embed streets etc or not
+	 * @param point geo query is a point (true) or a polygon (false)
+	 */
 	public SqlGeo(boolean embed, boolean point) {
 		this.select = "a.identifier, a.mIdentifier, a.pIdentifier, a.mpIdentifier, a.sIdentifier, " +
 						" a.housenumber, a.boxnumber, a.validFrom, a.validTo, a.status::text, a.point::point";
@@ -39,11 +45,11 @@ public class SqlGeo extends Sql {
 		this.alias = "a";
 
 		if (point) {
-			this.where = "ST_DWITHIN(a.point, ST_SetSRID(ST_Point($1, $2), 31370), $3) = TRUE";
+			this.where = "ST_DWITHIN(a.point, ST_SetSRID(ST_Point($1, $2), 31370), $3)";
 			this.vars = 3;
 		} else {
-			this.where = "ST_DWITHIN(a.point, ST_SetSRID(ST_MakePolygon(ST_GeomFromText($1), 31370)), $2) = TRUE";
-			this.vars = 2;
+			this.where = "ST_WITHIN(a.point, ST_SetSRID(ST_GeomFromText($1), 31370))";
+			this.vars = 1;
 		}
 
 		if (embed) {

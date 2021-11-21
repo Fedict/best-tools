@@ -138,7 +138,6 @@ public class Repository {
 		if (value != null && !value.isEmpty()) {
 			qry.whereNames(nl, fr, de);
 			lst.add(value);
-		//	qry.setRewriteHack();
 		}
 	}
 
@@ -225,7 +224,7 @@ public class Repository {
 		lst.add(point.y);
 		lst.add(radius);
 
-		SqlGeo qry = new SqlGeo(embed, false);
+		SqlGeo qry = new SqlGeo(embed, true);
 		where(lst, qry, "a.status", status);
 		paginate(lst, qry, NsConverter.addressEncode(afterId));
 
@@ -244,7 +243,7 @@ public class Repository {
 	 * @param embed embed street, postal etc or not
 	 * @return 
 	 */
-	public Multi<Address> findByPolygon(String afterId, String polygon, String crs, String status, boolean embed) {	
+	public Multi<Address> findByPolygon(String afterId, String polygon, String crs, String status, boolean embed) {
 		StringBuilder builder = new StringBuilder(80);
 		String[] points = polygon.split("~");
 		builder.append("'POLYGON((");
@@ -256,14 +255,15 @@ public class Repository {
 			ProjCoordinate point = (crs == null || crs.toLowerCase().equals("gps")) 
 									? CoordConverter.gpsToL72(coordX, coordY) 
 									: new ProjCoordinate(coordX, coordY);
-			builder.append(point.x).append(' ').append(point.y);
+			builder.append(point.x).append(' ').append(point.y).append(',');
 		}
-		builder.append("))'");
+		builder.deleteCharAt(builder.length()-1); // remove last ','
+		builder.append("'))");
 
 		List lst = new ArrayList(5); 
 		lst.add(builder.toString());
 
-		SqlGeo qry = new SqlGeo(embed, true);
+		SqlGeo qry = new SqlGeo(embed, false);
 		where(lst, qry, "a.status", status);
 		paginate(lst, qry, NsConverter.addressEncode(afterId));
 
