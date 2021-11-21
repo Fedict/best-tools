@@ -225,7 +225,7 @@ public class Repository {
 		lst.add(point.y);
 		lst.add(radius);
 
-		SqlGeo qry = new SqlGeo(embed);
+		SqlGeo qry = new SqlGeo(embed, false);
 		where(lst, qry, "a.status", status);
 		paginate(lst, qry, NsConverter.addressEncode(afterId));
 
@@ -263,7 +263,7 @@ public class Repository {
 		List lst = new ArrayList(5); 
 		lst.add(builder.toString());
 
-		SqlGeo qry = new SqlGeo(embed);
+		SqlGeo qry = new SqlGeo(embed, true);
 		where(lst, qry, "a.status", status);
 		paginate(lst, qry, NsConverter.addressEncode(afterId));
 

@@ -32,14 +32,20 @@ package be.bosa.dt.best.webservice.queries;
  */
 public class SqlGeo extends Sql {
 	
-	public SqlGeo(boolean embed) {
+	public SqlGeo(boolean embed, boolean point) {
 		this.select = "a.identifier, a.mIdentifier, a.pIdentifier, a.mpIdentifier, a.sIdentifier, " +
 						" a.housenumber, a.boxnumber, a.validFrom, a.validTo, a.status::text, a.point::point";
 		this.from = "address";
 		this.alias = "a";
-		this.where = "ST_DWITHIN(a.point, ST_SetSRID(ST_Point($1, $2), 31370), $3) = TRUE";
-		this.vars = 3;
-		
+
+		if (point) {
+			this.where = "ST_DWITHIN(a.point, ST_SetSRID(ST_Point($1, $2), 31370), $3) = TRUE";
+			this.vars = 3;
+		} else {
+			this.where = "ST_DWITHIN(a.point, ST_SetSRID(ST_MakePolygon(ST_GeomFromText($1), 31370)), $2) = TRUE";
+			this.vars = 2;
+		}
+
 		if (embed) {
 			this.select += ", s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, s.validFrom, s.validTo, s.status::text";
 			this.join = " INNER JOIN street s ON a.sIdentifier = s.identifier";			
