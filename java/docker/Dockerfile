@@ -5,7 +5,7 @@
 FROM maven:3-openjdk-17-slim as builder
 MAINTAINER bart.hanssens@bosa.fgov.be
 
-ARG version=1.2.8
+ARG version=1.2.9
 
 RUN apt-get update && \
   apt-get install -y wget git-core pwgen && \
