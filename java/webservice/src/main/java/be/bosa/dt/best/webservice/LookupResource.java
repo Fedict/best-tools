@@ -364,7 +364,8 @@ public class LookupResource {
 			@Parameter(description = "Coordinate reference system",
 						example = "gps",
 						required = false,
-						schema = @Schema(type=SchemaType.STRING, enumeration={"L72","gps"}))
+						schema = @Schema(type=SchemaType.STRING, defaultValue = Repository.CRS_GPS,
+							enumeration = { Repository.CRS_GPS, Repository.CRS_L72 }))
 			@RestQuery String crs,
 			@Parameter(description = "Maximum distance (in meters)",
 						example = "100",
@@ -450,7 +451,7 @@ public class LookupResource {
 			@RestQuery String name,
 			@Parameter(description = "Match type",
 				required = false,
-				schema = @Schema(type=SchemaType.STRING, 
+				schema = @Schema(type=SchemaType.STRING, defaultValue = Repository.SEARCH_EXACT,
 					enumeration={ Repository.SEARCH_EXACT, Repository.SEARCH_FUZZY, Repository.SEARCH_STARTWITH}))
 			@RestQuery String nameMatch,
 			UriInfo info) {
@@ -548,7 +549,8 @@ public class LookupResource {
 	public JsonObject getPostalInfos(
 			@Parameter(description = "Postal code (assigned by bPost)",
 						example = "1000",
-						required = false)
+						required = false,
+						schema = @Schema(type=SchemaType.STRING, minimum = "1000", maximum = "9999"))
 			@RestQuery String postalCode,
 			@Parameter(description = "Municipality name, searches in Dutch/French/German names", 
 						example = "Bruxelles",

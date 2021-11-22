@@ -199,9 +199,9 @@ public class Repository {
 		SqlAddress qry = new SqlAddress(embed, joinStreet, joinMunicipality,  joinPostal);
 
 		where(lst, qry, "a.mIdentifier", NsConverter.municipalityEncode(mIdentifier));
-		whereNames(lst, qry, "m.nameNL", "m.nameFR", "m.nameDE", mName, "exact");
+		whereNames(lst, qry, "m.nameNL", "m.nameFR", "m.nameDE", mName, Repository.SEARCH_EXACT);
 		where(lst, qry, "a.sIdentifier", NsConverter.streetEncode(sIdentifier));
-		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", sName, "exact");
+		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", sName, Repository.SEARCH_EXACT);
 		where(lst, qry, "p.postalCode", postalCode);
 		where(lst, qry, "a.pIdentifier", NsConverter.postalEncode(pIdentifier));
 		where(lst, qry, "a.houseNumber", houseNumber);
@@ -352,7 +352,7 @@ public class Repository {
 		List lst = new ArrayList(3);
 		SqlMunicipalityPart qry = new SqlMunicipalityPart();
 
-		whereNames(lst, qry, "mp.nameNL", "mp.nameFR", "mp.nameDE", name, "exact");
+		whereNames(lst, qry, "mp.nameNL", "mp.nameFR", "mp.nameDE", name, Repository.SEARCH_EXACT);
 		paginate(lst, qry, NsConverter.municipalityPartEncode(afterId));
 
 		return multi(
@@ -405,7 +405,7 @@ public class Repository {
 
 		where(lst, qry, "p.postalcode", postalCode);
 		
-		whereNames(lst, qry, "p.nameNL", "p.nameFR", "p.nameDE", name, "exact");
+		whereNames(lst, qry, "p.nameNL", "p.nameFR", "p.nameDE", name, Repository.SEARCH_EXACT);
 		paginate(lst, qry, NsConverter.postalEncode(afterId));
 
 		return multi(
@@ -461,7 +461,7 @@ public class Repository {
 
 		where(lst, qry, "m.identifier", NsConverter.municipalityEncode(mIdentifier));
 		where(lst, qry, "ps.postalcode", postalCode);
-		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", name, "exact");
+		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", name, Repository.SEARCH_EXACT);
 		
 		paginate(lst, qry, NsConverter.streetEncode(afterId));
 
