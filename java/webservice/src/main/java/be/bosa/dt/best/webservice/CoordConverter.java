@@ -84,5 +84,45 @@ public class CoordConverter {
 		ProjCoordinate src = new ProjCoordinate(x, y);
 		ProjCoordinate dest = new ProjCoordinate();
 		return L72toGPS.transform(src, dest);
-	}	
+	}
+
+/**
+	 * Build coordinates and convert to Lambert72
+	 * 
+	 * @param coordX X-coordinate
+	 * @param coordY Y-coordinate
+	 * @param crs gps or l72 coordinate reference system
+	 * @return 
+	 */
+	public static ProjCoordinate makeL72Coordinate(double coordX, double coordY, String crs) {
+		return (crs == null || crs.toLowerCase().equals("gps"))
+									? CoordConverter.gpsToL72(coordX, coordY) 
+									: new ProjCoordinate(coordX, coordY);
+	}
+
+	/**
+	 * Build "Well-Known Text" polygon from string
+	 * 
+	 * @param polygon polygon string
+	 * @param crs gps or l72 coordinate reference system
+	 * @return 
+	 */
+	public static String makeWktPolygon(String polygon, String crs) {
+		StringBuilder builder = new StringBuilder(80);
+		String[] points = polygon.split("~");
+		builder.append("'POLYGON((");
+
+		for (String p: points) {
+			String[] coords = p.split(",");
+			double coordX = Double.valueOf(coords[0]);
+			double coordY = Double.valueOf(coords[1]);
+
+			ProjCoordinate point = makeL72Coordinate(coordX, coordY, crs);
+			builder.append(point.x).append(' ').append(point.y).append(',');
+		}
+		builder.deleteCharAt(builder.length()-1); // remove last ','
+		builder.append("'))");
+		
+		return builder.toString();
+	}
 }

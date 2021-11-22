@@ -56,6 +56,7 @@ import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
 import org.locationtech.proj4j.ProjCoordinate;
 
 
@@ -214,11 +215,9 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<Address> findByCoordinates(String afterId, double coordX, double coordY, String crs, int radius, 
-											String status, boolean embed) {
-		
-		ProjCoordinate point = (crs == null || crs.toLowerCase().equals("gps")) 
-									? CoordConverter.gpsToL72(coordX, coordY) 
-									: new ProjCoordinate(coordX, coordY);
+											String status, boolean embed) {	
+		ProjCoordinate point = CoordConverter.makeL72Coordinate(coordX, coordY, crs);
+
 		List lst = new ArrayList(7); 
 		lst.add(point.x);
 		lst.add(point.y);
@@ -244,24 +243,10 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<Address> findByPolygon(String afterId, String polygon, String crs, String status, boolean embed) {
-		StringBuilder builder = new StringBuilder(80);
-		String[] points = polygon.split("~");
-		builder.append("'POLYGON((");
-		for (String p: points) {
-			String[] coords = p.split(",");
-			double coordX = Double.valueOf(coords[0]);
-			double coordY = Double.valueOf(coords[1]);
-			
-			ProjCoordinate point = (crs == null || crs.toLowerCase().equals("gps")) 
-									? CoordConverter.gpsToL72(coordX, coordY) 
-									: new ProjCoordinate(coordX, coordY);
-			builder.append(point.x).append(' ').append(point.y).append(',');
-		}
-		builder.deleteCharAt(builder.length()-1); // remove last ','
-		builder.append("'))");
-
-		List lst = new ArrayList(5); 
-		lst.add(builder.toString());
+		String coords = CoordConverter.makeWktPolygon(polygon, crs);
+		
+		List lst = new ArrayList(4); 
+		lst.add(coords);
 
 		SqlGeo qry = new SqlGeo(embed, false);
 		where(lst, qry, "a.status", status);
