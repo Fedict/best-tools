@@ -25,7 +25,7 @@
  */
 package be.bosa.dt.best.webservice.serializers;
 
-import be.bosa.dt.best.webservice.CoordConverter;
+import be.bosa.dt.best.webservice.util.CoordConverter;
 import be.bosa.dt.best.webservice.LookupResource;
 import be.bosa.dt.best.webservice.entities.Address;
 

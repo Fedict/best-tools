@@ -23,9 +23,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.webservice;
+package be.bosa.dt.best.webservice.util;
 
 
+import be.bosa.dt.best.webservice.Repository;
 import io.quarkus.logging.Log;
 
 import org.locationtech.proj4j.BasicCoordinateTransform;
@@ -95,7 +96,7 @@ public class CoordConverter {
 	 * @return 
 	 */
 	public static ProjCoordinate makeL72Coordinate(double coordX, double coordY, String crs) {
-		return (crs == null || crs.toLowerCase().equals("gps"))
+		return (crs == null || crs.toLowerCase().equals(Repository.CRS_GPS))
 									? CoordConverter.gpsToL72(coordX, coordY) 
 									: new ProjCoordinate(coordX, coordY);
 	}

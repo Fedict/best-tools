@@ -73,13 +73,14 @@ public abstract class Sql {
 	 * @param fr French field name
 	 * @param de German field name
 	 */
-	public void whereNames(String nl, String fr, String de) {
+	public void whereNames(String nl, String fr, String de, String matchType) {
 		String v = "$" + ++vars;
 		
+		String op = matchType.equals("exact") ? "=" : "%";
 		String tmp = "(" + 
-						"LOWER(IM_UNACCENT(" + nl + ")) = LOWER(IM_UNACCENT(" + v + ")) OR " +
-						"LOWER(IM_UNACCENT(" + fr + ")) = LOWER(IM_UNACCENT(" + v + ")) OR " +
-						"LOWER(IM_UNACCENT(" + de + ")) = LOWER(IM_UNACCENT(" + v + ")) " +
+						"LOWER(IM_UNACCENT(" + nl + "))" + op + "LOWER(IM_UNACCENT(" + v + ")) OR " +
+						"LOWER(IM_UNACCENT(" + fr + "))" + op + "LOWER(IM_UNACCENT(" + v + ")) OR " +
+						"LOWER(IM_UNACCENT(" + de + "))" + op + "LOWER(IM_UNACCENT(" + v + ")) " +
 					")";
 		this.where = (this.where.equals("")) ? tmp : this.where + " AND " + tmp;
 	}

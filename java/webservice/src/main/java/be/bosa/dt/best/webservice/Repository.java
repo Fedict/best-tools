@@ -25,6 +25,8 @@
  */
 package be.bosa.dt.best.webservice;
 
+import be.bosa.dt.best.webservice.util.NsConverter;
+import be.bosa.dt.best.webservice.util.CoordConverter;
 import be.bosa.dt.best.webservice.entities.Address;
 import be.bosa.dt.best.webservice.entities.Municipality;
 import be.bosa.dt.best.webservice.entities.MunicipalityPart;
@@ -67,11 +69,21 @@ import org.locationtech.proj4j.ProjCoordinate;
  */
 @ApplicationScoped
 public class Repository {
+	@Inject
+	PgPool pg;
 	
 	protected static int PAGE_LIMIT = 250;
 
-	@Inject
-	PgPool pg;
+	public static final String CRS_GPS = "gps";
+	public static final String CRS_L72 = "lambert72";
+
+	public static final String STATUS_RESERVED = "reserved";
+	public static final String STATUS_CURRENT = "current";
+	public static final String STATUS_RETIRED = "retired";
+
+	public static final String SEARCH_EXACT = "exact";
+	public static final String SEARCH_FUZZY = "fuzzy";
+	public static final String SEARCH_STARTWITH = "startwith";
 
 	/**
 	 * Convert rows to a multi result
@@ -135,9 +147,9 @@ public class Repository {
 	 * @param qry SQL query
 	 * @param value value
 	 */
-	private static void whereNames(List lst, Sql qry, String nl, String fr, String de, String value) {
+	private static void whereNames(List lst, Sql qry, String nl, String fr, String de, String value, String matchType) {
 		if (value != null && !value.isEmpty()) {
-			qry.whereNames(nl, fr, de);
+			qry.whereNames(nl, fr, de, matchType);
 			lst.add(value);
 		}
 	}
@@ -187,9 +199,9 @@ public class Repository {
 		SqlAddress qry = new SqlAddress(embed, joinStreet, joinMunicipality,  joinPostal);
 
 		where(lst, qry, "a.mIdentifier", NsConverter.municipalityEncode(mIdentifier));
-		whereNames(lst, qry, "m.nameNL", "m.nameFR", "m.nameDE", mName);
+		whereNames(lst, qry, "m.nameNL", "m.nameFR", "m.nameDE", mName, "exact");
 		where(lst, qry, "a.sIdentifier", NsConverter.streetEncode(sIdentifier));
-		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", sName);
+		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", sName, "exact");
 		where(lst, qry, "p.postalCode", postalCode);
 		where(lst, qry, "a.pIdentifier", NsConverter.postalEncode(pIdentifier));
 		where(lst, qry, "a.houseNumber", houseNumber);
@@ -281,14 +293,14 @@ public class Repository {
 	 * @param name
 	 * @return municipalities or null
 	 */
-	public Multi<Municipality> findMunicipalities(String nisCode, String postalCode, String name) {
+	public Multi<Municipality> findMunicipalities(String nisCode, String postalCode, String name, String nameMatch) {
 		boolean joinPostal = ! (postalCode == null || postalCode.isEmpty());
 		List lst = new ArrayList(4);
 		
 		SqlMunicipality qry = new SqlMunicipality(joinPostal);
 		where(lst, qry, "m.refniscode", nisCode);
 		where(lst, qry, "p.postalcode", postalCode);
-		whereNames(lst, qry, "m.nameNL", "m.nameFR", "m.nameDE", name);
+		whereNames(lst, qry, "m.nameNL", "m.nameFR", "m.nameDE", name, nameMatch);
 
 		qry.orderById();
 		qry.unlimited();
@@ -340,7 +352,7 @@ public class Repository {
 		List lst = new ArrayList(3);
 		SqlMunicipalityPart qry = new SqlMunicipalityPart();
 
-		whereNames(lst, qry, "mp.nameNL", "mp.nameFR", "mp.nameDE", name);
+		whereNames(lst, qry, "mp.nameNL", "mp.nameFR", "mp.nameDE", name, "exact");
 		paginate(lst, qry, NsConverter.municipalityPartEncode(afterId));
 
 		return multi(
@@ -393,7 +405,7 @@ public class Repository {
 
 		where(lst, qry, "p.postalcode", postalCode);
 		
-		whereNames(lst, qry, "p.nameNL", "p.nameFR", "p.nameDE", name);
+		whereNames(lst, qry, "p.nameNL", "p.nameFR", "p.nameDE", name, "exact");
 		paginate(lst, qry, NsConverter.postalEncode(afterId));
 
 		return multi(
@@ -449,7 +461,7 @@ public class Repository {
 
 		where(lst, qry, "m.identifier", NsConverter.municipalityEncode(mIdentifier));
 		where(lst, qry, "ps.postalcode", postalCode);
-		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", name);
+		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", name, "exact");
 		
 		paginate(lst, qry, NsConverter.streetEncode(afterId));
 

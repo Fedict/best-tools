@@ -25,7 +25,7 @@
  */
 package be.bosa.dt.best.webservice.entities;
 
-import be.bosa.dt.best.webservice.NsConverter;
+import be.bosa.dt.best.webservice.util.NsConverter;
 import be.bosa.dt.best.webservice.serializers.AddressSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

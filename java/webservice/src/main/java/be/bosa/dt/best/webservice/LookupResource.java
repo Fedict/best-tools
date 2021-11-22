@@ -60,6 +60,7 @@ import javax.ws.rs.core.UriInfo;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
@@ -314,7 +315,8 @@ public class LookupResource {
 						example = "Bruxelles",
 						required = false)
 			@RestQuery String municipalityName,
-			@Parameter(description = "Street identifier", 
+			@Parameter(description = "Street identifier",
+						example = "https://data.vlaanderen.be/id/straatnaam/1/2013-04-12T20:06:58.583",
 						required = false)
 			@RestQuery String streetID,
 			@Parameter(description = "Street name",
@@ -330,7 +332,8 @@ public class LookupResource {
 			@RestQuery String postalName,
 			@Parameter(description = "Postal code (assigned by bPost)",
 						example = "1000",
-						required = false)
+						required = false,
+						schema = @Schema(minimum = "1000", maximum = "9999")) 
 			@RestQuery String postalCode,
 			@Parameter(description = "House number",
 						example = "71",
@@ -342,13 +345,16 @@ public class LookupResource {
 			@RestQuery String boxNumber,
 			@Parameter(description = "Status",
 						example = "current",
-						required = false)
+						required = false,
+						schema = @Schema(
+							enumeration = { Repository.STATUS_RESERVED, Repository.STATUS_RESERVED, Repository.STATUS_RETIRED }))
 			@RestQuery String status,
-			@Parameter(description = "X coordinate",
-						example = "4.231")
+			@Parameter(description = "X coordinate, in WGS84/GPS or Lambert72",
+						examples = { @ExampleObject("4.231"), @ExampleObject("140268") },
+						required = false)
 			@RestQuery double coordX,
-			@Parameter(description = "Y coordinate",
-						example = "50.699",
+			@Parameter(description = "Y coordinate, in WGS84/GPS or Lambert72",
+						examples = { @ExampleObject("50.699"), @ExampleObject("154278") },
 						required = false)
 			@RestQuery double coordY,
 			@Parameter(description = "Polygon points, separated by '~'",
@@ -431,17 +437,24 @@ public class LookupResource {
 	public JsonObject getMunicipalities(
 			@Parameter(description = "REFNIS code (assigned by Statbel)",
 						example = "23027",
-						required = false)
+						required = false,
+						schema = @Schema(type=SchemaType.STRING, minimum = "11001", maximum = "93099")) 
 			@RestQuery String niscode,
 			@Parameter(description = "Postal code (assigned by bPost)",
 						example = "1500",
-						required = false)
+						required = false,
+						schema = @Schema(type=SchemaType.STRING, minimum = "1000", maximum = "9999")) 
 			@RestQuery String postalcode,
 			@Parameter(description = "Municipality name, searches in Dutch/French/German names", 
 				required = false)
 			@RestQuery String name,
+			@Parameter(description = "Match type",
+				required = false,
+				schema = @Schema(type=SchemaType.STRING, 
+					enumeration={ Repository.SEARCH_EXACT, Repository.SEARCH_FUZZY, Repository.SEARCH_STARTWITH}))
+			@RestQuery String nameMatch,
 			UriInfo info) {
-		Multi<Municipality> municipalities = repo.findMunicipalities(niscode, postalcode, name);
+		Multi<Municipality> municipalities = repo.findMunicipalities(niscode, postalcode, name, nameMatch);
 		return toJson(info, municipalities);
 	}
 
@@ -596,7 +609,8 @@ public class LookupResource {
 			@RestQuery String municipalityID,
 			@Parameter(description = "Postal code (assigned by bPost)",
 						example = "1500",
-						required = false)
+						required = false,
+						schema = @Schema(minimum = "1000", maximum = "9999"))
 			@RestQuery String postalCode,
 			@Parameter(description = "(Part of) street name, searches in Dutch/French/German names",
 						example = "Grote Markt",
