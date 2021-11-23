@@ -155,11 +155,6 @@ paths:
         schema:
           type: string
         example: Grote Markt
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UriInfo'
       responses:
         "200":
           description: A (possibly empty) list of addresses
@@ -187,11 +182,6 @@ paths:
         schema:
           type: boolean
         example: true
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UriInfo'
       responses:
         "200":
           description: Requested address
@@ -244,11 +234,6 @@ paths:
           minimum: 1000
           type: string
         example: 1500
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UriInfo'
       responses:
         "200":
           description: A (possibly empty) list of municipalities
@@ -269,11 +254,6 @@ paths:
         required: true
         schema:
           type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UriInfo'
       responses:
         "200":
           description: Requested municipality
@@ -304,11 +284,6 @@ paths:
         schema:
           type: string
         example: Bruxelles
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UriInfo'
       responses:
         "200":
           description: A (possibly empty) list of municipality parts
@@ -329,11 +304,6 @@ paths:
         required: true
         schema:
           type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UriInfo'
       responses:
         "200":
           description: Requested municipality part
@@ -371,18 +341,13 @@ paths:
           minimum: 1000
           type: string
         example: 1000
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UriInfo'
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JsonObject'
+                $ref: '#/components/schemas/PostalInfoCollection'
   /api/belgianAddress/v2/postal/{id}:
     get:
       tags:
@@ -396,18 +361,13 @@ paths:
         required: true
         schema:
           type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UriInfo'
       responses:
         "200":
           description: Requested postal info
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/PostalInfo'
         "404":
           description: Postal info not found
   /api/belgianAddress/v2/streets:
@@ -443,27 +403,13 @@ paths:
           maximum: 9999
           minimum: 1000
         example: 1500
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UriInfo'
       responses:
         "200":
           description: A (possibly empty) list of streets
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  self:
-                    description: Link to self
-                    type: string
-                  items:
-                    description: Array of results
-                    type: array
-                  id:
-                    type: string
+                $ref: '#/components/schemas/StreetCollection'
   /api/belgianAddress/v2/streets/{id}:
     get:
       tags:
@@ -477,11 +423,6 @@ paths:
         required: true
         schema:
           type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UriInfo'
       responses:
         "200":
           description: Requested street
@@ -522,58 +463,28 @@ paths:
                   $ref: '#/components/schemas/Version'
 components:
   schemas:
-    JsonObject:
-      type: array
-    MultivaluedMapStringString:
+    Street:
       type: object
-      additionalProperties:
-        type: array
+      required:
+       - id
+      properties:
+        self:
+          description: Link to self
+          type: string       
+    StreetCollection:
+      type: object
+      required:
+        - self
+        - items
+      properties:
+        self:
+          description: Link to self
+          type: string
+          example: "http://localhost:8080/api/belgianAddress/v2/streets/https:%2F%2Fdata.vlaanderen.be%2Fid%2Fstraatnaam%2F26117%2F2013-10-05T15:59:10.067"
         items:
-          type: string
-    PathSegment:
-      type: object
-      properties:
-        path:
-          type: string
-        matrixParameters:
-          $ref: '#/components/schemas/MultivaluedMapStringString'
-    UriBuilder:
-      type: object
-    UriInfo:
-      type: object
-      properties:
-        path:
-          type: string
-        pathSegments:
+          description: Array of results
           type: array
-          items:
-            $ref: '#/components/schemas/PathSegment'
-        requestUri:
-          format: uri
-          type: string
-        requestUriBuilder:
-          $ref: '#/components/schemas/UriBuilder'
-        absolutePath:
-          format: uri
-          type: string
-        absolutePathBuilder:
-          $ref: '#/components/schemas/UriBuilder'
-        baseUri:
-          format: uri
-          type: string
-        baseUriBuilder:
-          $ref: '#/components/schemas/UriBuilder'
-        pathParameters:
-          $ref: '#/components/schemas/MultivaluedMapStringString'
-        queryParameters:
-          $ref: '#/components/schemas/MultivaluedMapStringString'
-        matchedURIs:
-          type: array
-          items:
-            type: string
-        matchedResources:
-          type: array
-          items: {}
+          $ref: '#/components/schemas/Street'
     Version:
       type: object
       properties:

@@ -42,6 +42,7 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -56,7 +57,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-
 
 import org.jboss.resteasy.reactive.RestQuery;
 import org.jboss.resteasy.reactive.RestResponse;
@@ -253,39 +253,57 @@ public class LookupResource {
 		return ResponseBuilder.create(RestResponse.Status.NOT_FOUND, obj).build();
 	}
 
+	/**
+	 * Get address by ID
+	 * 
+	 * @param id
+	 * @param embed
+	 * @param info
+	 * @return address or error object
+	 */
 	@GET
 	@Path(LookupResource.ADDRESSES + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<JsonObject> getAddressById(
-			@RestQuery String id,
-			@RestQuery boolean embed,
-			UriInfo info) {
+	public RestResponse<JsonObject> getAddressById(String id, @RestQuery boolean embed, UriInfo info) {
 		Uni<Address> address = repo.findAddressById(id, embed);
 		return responseOrEmpty(toJson(info, address));
 	}
 
+	/**
+	 * Search for addresses
+	 * 
+	 * @param municipalityID
+	 * @param municipalityName
+	 * @param streetID
+	 * @param streetName
+	 * @param postalID
+	 * @param postalName
+	 * @param postalCode
+	 * @param houseNumber
+	 * @param boxNumber
+	 * @param status
+	 * @param coordX
+	 * @param coordY
+	 * @param radius
+	 * @param polygon
+	 * @param crs
+	 * @param embed
+	 * @param after
+	 * @param info
+	 * @return (possibly empty) list of addresses
+	 */
 	@GET
 	@Path(LookupResource.ADDRESSES)
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonObject getAddresses(
-			@RestQuery String municipalityID,
-			@RestQuery String municipalityName,
-			@RestQuery String streetID,
-			@RestQuery String streetName,
-			@RestQuery String postalID,
-			@RestQuery String postalName,
-			@RestQuery String postalCode,
-			@RestQuery String houseNumber,
-			@RestQuery String boxNumber,
+			@RestQuery String municipalityID, @RestQuery String municipalityName,
+			@RestQuery String streetID, @RestQuery String streetName,
+			@RestQuery String postalID, @RestQuery String postalName, @RestQuery String postalCode,
+			@RestQuery String houseNumber, @RestQuery String boxNumber,
 			@RestQuery String status,
-			@RestQuery double coordX,
-			@RestQuery double coordY,
-			@RestQuery String polygon,
-			@RestQuery String crs,
-			@RestQuery int radius,
-			@RestQuery boolean embed,
-			@RestQuery String after,
-			UriInfo info) {
+			@RestQuery double coordX, @RestQuery double coordY, @RestQuery int radius,
+			@RestQuery String polygon, @RestQuery String crs,
+			@RestQuery boolean embed, @RestQuery String after, UriInfo info) {
 		Multi<Address> addresses;
 		if (coordX != 0 && coordY == 0) {
 			addresses = repo.findByCoordinates(after, coordX, coordY, crs, radius, status, embed);
@@ -300,16 +318,31 @@ public class LookupResource {
 		return toJsonEmbeddable(info, addresses, embed);
 	}
 
+	/**
+	 * Get municipality by ID
+	 * 
+	 * @param id
+	 * @param info
+	 * @return municipality or error object
+	 */
 	@GET
 	@Path(LookupResource.MUNICIPALITIES +"/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<JsonObject> getMunicipalityById(
-			@RestQuery String id,
-			UriInfo info) {
+	public RestResponse<JsonObject> getMunicipalityById(String id, UriInfo info) {
 		Uni<Municipality> municipality = repo.findMunicipalityById(id);
 		return responseOrEmpty(toJson(info, municipality));
 	}
 
+	/**
+	 * Search for municipalities
+	 * 
+	 * @param niscode
+	 * @param postalcode
+	 * @param name
+	 * @param nameMatch
+	 * @param info
+	 * @return (possibly empty) list of municipalities
+	 */
 	@GET
 	@Path(LookupResource.MUNICIPALITIES)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -317,65 +350,104 @@ public class LookupResource {
 			@RestQuery String niscode,
 			@RestQuery String postalcode,
 			@RestQuery String name,
-			@RestQuery String nameMatch,
-			UriInfo info) {
+			@RestQuery String nameMatch, UriInfo info) {
 		Multi<Municipality> municipalities = repo.findMunicipalities(niscode, postalcode, name, nameMatch);
 		return toJson(info, municipalities);
 	}
 
+	/**
+	 * Get part of municipality by ID
+	 * 
+	 * @param id
+	 * @param info
+	 * @return 
+	 */
 	@GET
 	@Path(LookupResource.MUNICIPALITY_PARTS +"/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<JsonObject> getMunicipalityPartsById(
-			@RestQuery String id,
-			UriInfo info) {
+	public RestResponse<JsonObject> getMunicipalityPartsById(String id, UriInfo info) {
 		Uni<MunicipalityPart> part = repo.findMunicipalityPartById(id);
 		return responseOrEmpty(toJson(info, part));		
 	}
 
+	/**
+	 * Search for municipality parts
+	 * 
+	 * @param name
+	 * @param after
+	 * @param info
+	 * @return (possibly empty) list of municipality parts
+	 */
 	@GET
 	@Path(LookupResource.MUNICIPALITY_PARTS)
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonObject getMunicipalityParts(	
 			@RestQuery String name,
-			@RestQuery String after,
-			UriInfo info) {
+			@RestQuery String after, UriInfo info) {
 		Multi<MunicipalityPart> parts = repo.findMunicipalityParts(after, name);
 		return toJson(info, parts);
 	}
 
+	/**
+	 * Get postal info by ID
+	 * 
+	 * @param id
+	 * @param info
+	 * @return 
+	 */
 	@GET
 	@Path(LookupResource.POSTAL + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<JsonObject> getPostalById(
-			@RestQuery String id,
-			UriInfo info) {
+	public RestResponse<JsonObject> getPostalById(String id, UriInfo info) {
 		Uni<PostalInfo> postal = repo.findPostalInfoById(id);
 		return responseOrEmpty(toJson(info, postal));
 	}
 
+	/**
+	 * Search for postal info
+	 * 
+	 * @param postalCode
+	 * @param name
+	 * @param after
+	 * @param info
+	 * @return (possibly empty) list of postal infos
+	 */
 	@GET
 	@Path(LookupResource.POSTAL)
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonObject getPostalInfos(
 			@RestQuery String postalCode,
 			@RestQuery String name,
-			@RestQuery String after,
-			UriInfo info) {
+			@RestQuery String after, UriInfo info) {
 		Multi<PostalInfo> postals = repo.findPostalInfos(after, postalCode, name);
 		return toJson(info, postals);
 	}
 
+	/**
+	 * Get street by ID
+	 * 
+	 * @param id
+	 * @param info
+	 * @return 
+	 */
 	@GET
 	@Path(LookupResource.STREETS + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<JsonObject> getStreetById(
-			@RestQuery  String id,
-			UriInfo info) {
+	public RestResponse<JsonObject> getStreetById(String id, UriInfo info) {
 		Uni<Street> street = repo.findStreetById(id);
 		return responseOrEmpty(toJson(info, street));
 	}
 
+	/**
+	 * Search for streets
+	 * 
+	 * @param municipalityID
+	 * @param postalCode
+	 * @param name
+	 * @param after
+	 * @param info
+	 * @return 
+	 */
 	@GET
 	@Path(LookupResource.STREETS)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -383,12 +455,16 @@ public class LookupResource {
 			@RestQuery String municipalityID,
 			@RestQuery String postalCode,
 			@RestQuery String name,
-			@RestQuery String after,
-			UriInfo info) {
+			@RestQuery String after, UriInfo info) {
 		Multi<Street> streets = repo.findStreets(after, municipalityID, postalCode, name);
 		return toJson(info, streets);
 	}
-	
+
+	/**
+	 * Get version info
+	 * 
+	 * @return 
+	 */
 	@GET
 	@Path("version")
 	@Produces(MediaType.APPLICATION_JSON)
