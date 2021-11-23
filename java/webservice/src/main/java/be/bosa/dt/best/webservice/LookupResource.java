@@ -57,15 +57,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
-import org.eclipse.microprofile.openapi.annotations.media.Content;
-import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
-import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
-import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
-import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
-import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import org.jboss.resteasy.reactive.RestQuery;
 import org.jboss.resteasy.reactive.RestResponse;
@@ -232,7 +223,8 @@ public class LookupResource {
 		JsonArray arr = new JsonArray();
 		items.subscribe().asStream().forEach(a -> {
 			String href = self + "/" + a.id.replace("/", "%2F");
-			arr.add(JsonObject.mapFrom(a).put("href", href));
+			arr.add(JsonObject.mapFrom(a));
+				//.put("href", href));
 		});
 
 		JsonObject parentObj = new JsonObject();		
@@ -264,30 +256,8 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.ADDRESSES + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Get address by id",
-			description = "The ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
-	@Tag(name = "addresses")
-	@APIResponses({
-		@APIResponse(
-		   responseCode = "200",
-			name = "ok",
-			description = "Requested address",
-			content = @Content(
-				schema = @Schema(
-				type = SchemaType.OBJECT))),
-		@APIResponse(
-			responseCode = "404",
-			name = "not found",
-			description = "Address not found")	
-	})
 	public RestResponse<JsonObject> getAddressById(
-			@Parameter(description = "Address ID ('/' must be URL-encoded to '%2f')", 
-						required = true, 
-						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
-			String id,
-			@Parameter(description = "Embed referenced streets, municipalities ...",
-						example = "true",
-						required = false)
+			@RestQuery String id,
 			@RestQuery boolean embed,
 			UriInfo info) {
 		Uni<Address> address = repo.findAddressById(id, embed);
@@ -297,87 +267,23 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.ADDRESSES)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Search for addresses",
-			description = "A series of parameters can be used to search for addresses")
-	@Tag(name = "addresses")
-	@APIResponse(
-		responseCode = "200",
-		name = "ok",
-		description = "A (possibly empty) list of addresses",
-		content = @Content(
-			schema = @Schema(
-				type = SchemaType.OBJECT)))
 	public JsonObject getAddresses(
-			@Parameter(description = "Municipality identifier", 
-						required = false)
 			@RestQuery String municipalityID,
-			@Parameter(description = "Municipality name",
-						example = "Bruxelles",
-						required = false)
 			@RestQuery String municipalityName,
-			@Parameter(description = "Street identifier",
-						example = "https://data.vlaanderen.be/id/straatnaam/1/2013-04-12T20:06:58.583",
-						required = false)
 			@RestQuery String streetID,
-			@Parameter(description = "Street name",
-						example = "Grote Markt",
-						required = false)
 			@RestQuery String streetName,
-			@Parameter(description = "Postal identifier", 
-						required = false)
 			@RestQuery String postalID,
-			@Parameter(description = "Postal name",
-						example = "Bruxelles",
-						required = false)
 			@RestQuery String postalName,
-			@Parameter(description = "Postal code (assigned by bPost)",
-						example = "1000",
-						required = false,
-						schema = @Schema(minimum = "1000", maximum = "9999")) 
 			@RestQuery String postalCode,
-			@Parameter(description = "House number",
-						example = "71",
-						required = false)
 			@RestQuery String houseNumber,
-			@Parameter(description = "Box number",
-						example = "12",
-						required = false)
 			@RestQuery String boxNumber,
-			@Parameter(description = "Status",
-						example = "current",
-						required = false,
-						schema = @Schema(
-							enumeration = { Repository.STATUS_RESERVED, Repository.STATUS_RESERVED, Repository.STATUS_RETIRED }))
 			@RestQuery String status,
-			@Parameter(description = "X coordinate, in WGS84/GPS or Lambert72",
-						examples = { @ExampleObject("4.231"), @ExampleObject("140268") },
-						required = false)
 			@RestQuery double coordX,
-			@Parameter(description = "Y coordinate, in WGS84/GPS or Lambert72",
-						examples = { @ExampleObject("50.699"), @ExampleObject("154278") },
-						required = false)
 			@RestQuery double coordY,
-			@Parameter(description = "Polygon points, separated by '~'",
-						example = "4.107,50.528~4.300,50.528~4.300,50.699~4.107,50.528",
-						required = false)
 			@RestQuery String polygon,
-			@Parameter(description = "Coordinate reference system",
-						example = "gps",
-						required = false,
-						schema = @Schema(type=SchemaType.STRING, defaultValue = Repository.CRS_GPS,
-							enumeration = { Repository.CRS_GPS, Repository.CRS_L72 }))
 			@RestQuery String crs,
-			@Parameter(description = "Maximum distance (in meters)",
-						example = "100",
-						required = false)
 			@RestQuery int radius,
-			@Parameter(description = "Embed referenced streets, municipalities ...",
-						example = "true",
-						required = false)
 			@RestQuery boolean embed,
-			@Parameter(description = "After this address (used in pagination), ('/' must be URL-encoded to '%2f')", 
-						required = false, 
-						example = "https://data.vlaanderen.be/id/adres/205001/2014-03-19T16:59:54.467")
 			@RestQuery String after,
 			UriInfo info) {
 		Multi<Address> addresses;
@@ -397,26 +303,8 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.MUNICIPALITIES +"/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Get a municipality by ID",
-			description = "The ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
-	@Tag(name = "municipalities")
-	@APIResponses({
-		@APIResponse(
-		   responseCode = "200",
-			name = "ok",
-			description = "Requested municipality",
-			content = @Content(
-				schema = @Schema(
-                type = SchemaType.OBJECT))),
-		@APIResponse(
-			responseCode = "404",
-			name = "not found",
-			description = "Municipality not found")	
-	})
 	public RestResponse<JsonObject> getMunicipalityById(
-			@Parameter(description = "Municipality ID", 
-						required = true)
-			String id,
+			@RestQuery String id,
 			UriInfo info) {
 		Uni<Municipality> municipality = repo.findMunicipalityById(id);
 		return responseOrEmpty(toJson(info, municipality));
@@ -425,34 +313,10 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.MUNICIPALITIES)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Search for municipalities",
-			description = "The ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
-	@Tag(name = "municipalities")
-	@APIResponse(
-		responseCode = "200",
-		name = "ok",
-		description = "A (possibly empty) list of municipalities",
-		content = @Content(
-			schema = @Schema(
-				type = SchemaType.OBJECT)))
 	public JsonObject getMunicipalities(
-			@Parameter(description = "REFNIS code (assigned by Statbel)",
-						example = "23027",
-						required = false,
-						schema = @Schema(type=SchemaType.STRING, minimum = "11001", maximum = "93099")) 
 			@RestQuery String niscode,
-			@Parameter(description = "Postal code (assigned by bPost)",
-						example = "1500",
-						required = false,
-						schema = @Schema(type=SchemaType.STRING, minimum = "1000", maximum = "9999")) 
 			@RestQuery String postalcode,
-			@Parameter(description = "Municipality name, searches in Dutch/French/German names", 
-				required = false)
 			@RestQuery String name,
-			@Parameter(description = "Match type",
-				required = false,
-				schema = @Schema(type=SchemaType.STRING, defaultValue = Repository.SEARCH_EXACT,
-					enumeration={ Repository.SEARCH_EXACT, Repository.SEARCH_FUZZY, Repository.SEARCH_STARTWITH}))
 			@RestQuery String nameMatch,
 			UriInfo info) {
 		Multi<Municipality> municipalities = repo.findMunicipalities(niscode, postalcode, name, nameMatch);
@@ -462,26 +326,8 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.MUNICIPALITY_PARTS +"/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Get a municipality part by full ID",
-				description = "Note: currently only the Walloon Region provides info about municipality parts")
-	@Tag(name = "municipalities")
-	@APIResponses({
-		@APIResponse(
-		   responseCode = "200",
-			name = "ok",
-			description = "Requested municipality part",
-			content = @Content(
-				schema = @Schema(
-                type = SchemaType.OBJECT))),
-		@APIResponse(
-			responseCode = "404",
-			name = "not found",
-			description = "Municipality part not found")	
-	})
 	public RestResponse<JsonObject> getMunicipalityPartsById(
-			@Parameter(description = "Municipality part ID", 
-						required = true)
-			String id,
+			@RestQuery String id,
 			UriInfo info) {
 		Uni<MunicipalityPart> part = repo.findMunicipalityPartById(id);
 		return responseOrEmpty(toJson(info, part));		
@@ -490,23 +336,8 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.MUNICIPALITY_PARTS)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Search for municipality parts",
-			description = "Note: currently only the Walloon Region provides info about municipality parts")
-	@Tag(name = "municipalities")
-	@APIResponse(
-		responseCode = "200",
-		name = "ok",
-		description = "A (possibly empty) list of municipality parts",
-		content = @Content(
-			schema = @Schema(
-				type = SchemaType.OBJECT)))
 	public JsonObject getMunicipalityParts(	
-			@Parameter(description = "Municipality part name",
-						example = "Bruxelles",
-						required = false)
 			@RestQuery String name,
-			@Parameter(description = "After municipality part (used in pagination)", 
-						required = false)
 			@RestQuery String after,
 			UriInfo info) {
 		Multi<MunicipalityPart> parts = repo.findMunicipalityParts(after, name);
@@ -516,26 +347,8 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.POSTAL + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Get a postal info by ID",
-			description = "Note: the ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
-	@Tag(name = "postals")
-	@APIResponses({
-		@APIResponse(
-		   responseCode = "200",
-			name = "ok",
-			description = "Requested postal info",
-			content = @Content(
-				schema = @Schema(
-                type = SchemaType.OBJECT))),
-		@APIResponse(
-			responseCode = "404",
-			name = "not found",
-			description = "Postal info not found")	
-	})
 	public RestResponse<JsonObject> getPostalById(
-			@Parameter(description = "Postal ID", 
-						required = true)
-			String id,
+			@RestQuery String id,
 			UriInfo info) {
 		Uni<PostalInfo> postal = repo.findPostalInfoById(id);
 		return responseOrEmpty(toJson(info, postal));
@@ -544,20 +357,9 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.POSTAL)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Search for postal info")
-	@Tag(name = "postals")
 	public JsonObject getPostalInfos(
-			@Parameter(description = "Postal code (assigned by bPost)",
-						example = "1000",
-						required = false,
-						schema = @Schema(type=SchemaType.STRING, minimum = "1000", maximum = "9999"))
 			@RestQuery String postalCode,
-			@Parameter(description = "Municipality name, searches in Dutch/French/German names", 
-						example = "Bruxelles",
-						required = false)
 			@RestQuery String name,
-			@Parameter(description = "After postal info (used in pagination)", 
-						required = false)
 			@RestQuery String after,
 			UriInfo info) {
 		Multi<PostalInfo> postals = repo.findPostalInfos(after, postalCode, name);
@@ -567,27 +369,8 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.STREETS + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Get a street by ID",
-			description = "The ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier")
-	@Tag(name = "streets")
-	@APIResponses({
-		@APIResponse(
-		   responseCode = "200",
-			name = "ok",
-			description = "Requested street",
-			content = @Content(
-				schema = @Schema(
-                type = SchemaType.OBJECT))),
-		@APIResponse(
-			responseCode = "404",
-			name = "not found",
-			description = "Street not found")	
-	})
 	public RestResponse<JsonObject> getStreetById(
-			@Parameter(description = "Street ID", 
-						required = true,
-						example = "https://data.vlaanderen.be/id/straatnaam/1/2013-04-12T20:06:58.583'")
-			String id,
+			@RestQuery  String id,
 			UriInfo info) {
 		Uni<Street> street = repo.findStreetById(id);
 		return responseOrEmpty(toJson(info, street));
@@ -596,30 +379,10 @@ public class LookupResource {
 	@GET
 	@Path(LookupResource.STREETS)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Search for streets")
-	@Tag(name = "streets")
-	@APIResponse(
-	   responseCode = "200",
-		name = "ok",
-		description = "A (possibly empty) list of streets",
-		content = @Content(
-		schema = @Schema(
-			type = SchemaType.OBJECT)))
 	public JsonObject getStreets(
-			@Parameter(description = "Municipality identifier", 
-				required = false)
 			@RestQuery String municipalityID,
-			@Parameter(description = "Postal code (assigned by bPost)",
-						example = "1500",
-						required = false,
-						schema = @Schema(minimum = "1000", maximum = "9999"))
 			@RestQuery String postalCode,
-			@Parameter(description = "(Part of) street name, searches in Dutch/French/German names",
-						example = "Grote Markt",
-						required = false)
 			@RestQuery String name,
-			@Parameter(description = "After street (used in pagination)", 
-				required = false)
 			@RestQuery String after,
 			UriInfo info) {
 		Multi<Street> streets = repo.findStreets(after, municipalityID, postalCode, name);
@@ -629,8 +392,6 @@ public class LookupResource {
 	@GET
 	@Path("version")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Display version info",
-			description = "For debug / support purposes only, displays version info of source data and API")
 	public Multi<Version> getVersionInfo() {
 		return repo.findVersionInfo();
 	}
