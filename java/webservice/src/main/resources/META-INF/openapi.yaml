@@ -43,20 +43,28 @@ paths:
         example: 12
       - name: coordX
         in: query
-        description: "X coordinate, in WGS84/GPS or Lambert72"
+        description: "X coordinate (in WGS84/GPS or Lambert72)"
         required: false
         schema:
           format: double
           type: number
-        examples: { "4.107" }
+        examples:
+          gpsx:
+            value: 4.231
+          lambert72x:
+            value: 140373
       - name: coordY
         in: query
-        description: "Y coordinate, in WGS84/GPS or Lambert72"
+        description: "Y coordinate (in WGS84/GPS or Lambert72)"
         required: false
         schema:
           format: double
           type: number
-        examples: {"50.528" }
+        examples:
+          gpsy:
+            value: 51.210
+          lambert72y:
+            value: 211124
       - name: crs
         in: query
         description: Coordinate reference system
@@ -73,6 +81,7 @@ paths:
         description: "Embed referenced streets, municipalities ..."
         required: false
         schema:
+          default: false
           type: boolean
         example: true
       - name: houseNumber
@@ -128,6 +137,7 @@ paths:
         description: Maximum distance (in meters)
         required: false
         schema:
+          default: 100
           format: int32
           type: integer
         example: 100
@@ -137,7 +147,7 @@ paths:
         required: false
         schema:
           enum:
-          - reserved
+          - current
           - reserved
           - retired
         example: current
@@ -313,7 +323,7 @@ paths:
                 type: object
         "404":
           description: Municipality part not found
-  /api/belgianAddress/v2/postal:
+  /api/belgianAddress/v2/postalInfos:
     get:
       tags:
       - postals
@@ -331,7 +341,7 @@ paths:
         required: false
         schema:
           type: string
-        example: Bruxelles
+          example: Bruxelles
       - name: postalCode
         in: query
         description: Postal code (assigned by bPost)
@@ -340,7 +350,7 @@ paths:
           maximum: 9999
           minimum: 1000
           type: string
-        example: 1000
+          example: 1000
       responses:
         "200":
           description: OK
@@ -348,7 +358,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PostalInfoCollection'
-  /api/belgianAddress/v2/postal/{id}:
+  /api/belgianAddress/v2/postalInfos/{id}:
     get:
       tags:
       - postals
@@ -382,19 +392,21 @@ paths:
         required: false
         schema:
           type: string
+          example: "https://data.vlaanderen.be/id/straatnaam/26117/2013-10-05T15:59:10.067"
       - name: municipalityID
         in: query
         description: Municipality identifier
         required: false
         schema:
           type: string
+          example: 
       - name: name
         in: query
         description: "(Part of) street name, searches in Dutch/French/German names"
         required: false
         schema:
           type: string
-        example: Grote Markt
+          example: Grote Markt
       - name: postalCode
         in: query
         description: Postal code (assigned by bPost)
@@ -402,7 +414,7 @@ paths:
         schema:
           maximum: 9999
           minimum: 1000
-        example: 1500
+          example: 1500
       responses:
         "200":
           description: A (possibly empty) list of streets

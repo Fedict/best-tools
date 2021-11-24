@@ -75,7 +75,7 @@ public class LookupResource {
 	public final static String ADDRESSES = "/addresses";	
 	public final static String MUNICIPALITIES = "/municipalities";
 	public final static String MUNICIPALITY_PARTS = "/municipalityParts";
-	public final static String POSTAL = "/postal";
+	public final static String POSTAL = "/postalInfos";
 	public final static String STREETS = "/streets";
 
 	private final static Map<String,JsonObject> cache = new HashMap<>(5000);
@@ -129,7 +129,49 @@ public class LookupResource {
 		return JsonObject.mapFrom(entity).put("self", self);
 	}
 
+		/**
+	 * Convert uni of address, street, ... into JSON
+	 * 
+	 * @param <T>
+	 * @param info information about web request
+	 * @param item entity
+	 * @return JSON object or null when not found
+	 */
+	private static JsonObject toJsonEmbeddable(UriInfo info, Uni<Address> item, boolean embed) {
+		Address addr = item.await().indefinitely();
+		if (addr == null) {
+			return null;
+		}
+
+		JsonObject parentObj = JsonObject.mapFrom(addr);
+		String self = info.getAbsolutePath().toString();
 	
+		if (embed) {
+			JsonObject embObj = new JsonObject();
+	
+			Set<String> embedded = new HashSet<>();
+
+			embedded.add(addr.sIdentifier);
+			embedded.add(addr.mIdentifier);
+			if (addr.mpIdentifier != null) {
+				embedded.add(addr.mpIdentifier);
+			}
+			embedded.add(addr.pIdentifier);
+
+			embedded.forEach(e -> { 
+				JsonObject obj = cache.get(e);
+				if (obj == null) {
+					Log.errorf("%s not found in cache", e);
+				} else {
+					embObj.put(obj.getString("self"), obj);
+				}
+			});
+			parentObj.put("embedded", embObj);
+		}
+
+		return parentObj.put("self", self);
+	}
+
 	/**
 	 * Add pagination links to parent object
 	 * 
@@ -175,9 +217,7 @@ public class LookupResource {
 		JsonArray arr = new JsonArray();
 		items.subscribe().asStream().forEach(a -> {
 			String href = self + "/" + a.id.replace("/", "%2F");
-			if (a.street != null) {
-				streets.put(a.street.id, a.street);
-			}
+			streets.put(a.street.id, a.street);
 			embedded.add(a.mIdentifier);
 			if (a.mpIdentifier != null) {
 				embedded.add(a.mpIdentifier);
@@ -238,7 +278,7 @@ public class LookupResource {
 	 * Return single result or "not found" JSON object
 	 * 
 	 * @param json
-	 * @return response with single JSON result or a not found JSON object
+	 * @return response with single JSON result or addr not found JSON object
 	 */
 	private static RestResponse<JsonObject> responseOrEmpty(JsonObject json) {
 		if (json != null) { 
@@ -266,7 +306,7 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<JsonObject> getAddressById(String id, @RestQuery boolean embed, UriInfo info) {
 		Uni<Address> address = repo.findAddressById(id, embed);
-		return responseOrEmpty(toJson(info, address));
+		return responseOrEmpty(toJsonEmbeddable(info, address, embed));
 	}
 
 	/**
