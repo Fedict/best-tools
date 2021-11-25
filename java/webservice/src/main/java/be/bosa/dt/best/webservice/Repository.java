@@ -41,11 +41,14 @@ import be.bosa.dt.best.webservice.queries.SqlMunicipalityPart;
 import be.bosa.dt.best.webservice.queries.SqlPostalInfo;
 import be.bosa.dt.best.webservice.queries.SqlStreet;
 import be.bosa.dt.best.webservice.queries.SqlVersion;
+import io.quarkus.logging.Log;
+import io.quarkus.runtime.StartupEvent;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.groups.MultiOnItem;
 import io.smallrye.mutiny.groups.UniOnItem;
+import io.vertx.core.json.JsonObject;
 
 import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Row;
@@ -54,9 +57,12 @@ import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import org.locationtech.proj4j.ProjCoordinate;
@@ -84,6 +90,46 @@ public class Repository {
 	public static final String SEARCH_EXACT = "exact";
 	public static final String SEARCH_FUZZY = "fuzzy";
 	public static final String SEARCH_STARTWITH = "startwith";
+
+	private final static Map<String,JsonObject> cache = new HashMap<>(5000);
+
+	/**
+	 * Get municipality / street cache
+	 * 
+	 * @return cache as map
+	 */
+	public static Map<String,JsonObject> getCache() {
+		return cache;
+	}
+
+	/**
+	 * Cache the JSON rendering of all municipalities
+	 * 
+	 * @param ev 
+	 */
+	void onStart(@Observes StartupEvent ev) {               
+        Log.info("Caching");
+	
+		Multi<Municipality> municipalities = findMunicipalitiesAll();
+		municipalities.subscribe().asStream().forEach(m -> {
+			cache.put(m.id, JsonObject.mapFrom(m));
+		});
+		int size = cache.size();
+		Log.infof("%d municipalities", size);
+	
+		Multi<MunicipalityPart> parts = findMunicipalityPartsAll();
+		parts.subscribe().asStream().forEach(mp -> {
+			cache.put(mp.id, JsonObject.mapFrom(mp));
+		});
+		Log.infof("%d municipality parts", cache.size() - size);
+		size = cache.size();
+		
+		Multi<PostalInfo> postals = findPostalInfosAll();
+		postals.subscribe().asStream().forEach(p -> {			
+			cache.put(p.id, JsonObject.mapFrom(p));
+		});
+		Log.infof("%d postal info", cache.size() - size);
+    }
 
 	/**
 	 * Convert rows to a multi result

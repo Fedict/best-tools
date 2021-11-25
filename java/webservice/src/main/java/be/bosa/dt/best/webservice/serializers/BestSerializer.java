@@ -29,6 +29,8 @@ import be.bosa.dt.best.webservice.LookupResource;
 import be.bosa.dt.best.webservice.entities.BestEntity;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import io.smallrye.mutiny.Uni;
+import io.vertx.core.json.JsonObject;
 import java.io.IOException;
 import org.eclipse.microprofile.config.ConfigProvider;
 
@@ -69,6 +71,22 @@ public abstract class BestSerializer<T extends BestEntity> extends StdSerializer
 			jg.writeStringField("de", de);
 		}
 		jg.writeEndObject();
+	}
+
+/**
+	 * Convert uni of address, street, ... into JSON
+	 * 
+	 * @param <T>
+	 * @param self web request url
+	 * @param item entity
+	 * @return JSON object or null when not found
+	 */
+	public static <T extends BestEntity> JsonObject toJson(String self, Uni<T> item) {
+		BestEntity entity = item.await().indefinitely();
+		if (entity == null) {
+			return null;
+		}
+		return JsonObject.mapFrom(entity).put("self", self);
 	}
 
     public BestSerializer() {
