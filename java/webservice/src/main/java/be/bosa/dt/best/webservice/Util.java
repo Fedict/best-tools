@@ -36,8 +36,8 @@ import io.smallrye.mutiny.Uni;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-
 import java.util.HashMap;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -133,7 +133,9 @@ public class Util {
 		JsonArray arr = new JsonArray();
 		items.subscribe().asStream().forEach(a -> {
 			String href = self + "/" + a.id.replace("/", "%2F");
-			streets.put(a.street.id, a.street);
+			if (embed) {
+				streets.put(a.street.id, a.street);
+			}
 			embedded.add(a.mIdentifier);
 			if (a.mpIdentifier != null) {
 				embedded.add(a.mpIdentifier);
