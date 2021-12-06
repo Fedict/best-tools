@@ -132,7 +132,7 @@ public class Util {
 
 		JsonArray arr = new JsonArray();
 		items.subscribe().asStream().forEach(a -> {
-			String href = self + "/" + a.id.replace("/", "%2F");
+			//String href = self + "/" + a.id.replace("/", "%2F");
 			if (embed) {
 				streets.put(a.street.id, a.street);
 			}
@@ -141,7 +141,7 @@ public class Util {
 				embedded.add(a.mpIdentifier);
 			}
 			embedded.add(a.pIdentifier);
-			arr.add(JsonObject.mapFrom(a).put("href", href));
+			arr.add(JsonObject.mapFrom(a));
 		});
 
 		JsonObject parentObj = new JsonObject();		

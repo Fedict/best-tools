@@ -53,50 +53,36 @@
 							}
 						},
 						"required": ["id", "href"]
-					},
-					"housenumber": {
-						"type": "string"
-					},
-					"status": {
-						"type": "string"
-					},
-					"validFrom": {
-						"type": "string"
-					},
-					"lambert72": {
-						"type": "object",
-						"properties": {
-							"x": {
-								"type": "number"
-							},
-							"y": {
-								"type": "number"
-							}
-						},
-						"required": ["x", "y"]
-					},
-					"gps": {
-						"type": "object",
-						"properties": {
-							"x": {
-								"type": "number"
-							},
-							"y": {
-								"type": "number"
-							}
-						},
-						"required": ["x", "y"]
 					}
+				},
+				"housenumber": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				},
+				"validFrom" : {
+					"type": "date"
+				},
+				"lambert72": {
+					"type": "object",
+					"properties": {
+						"x": { "type": "double" },
+						"y": { "type": "double" }
+					},
+					"required": ["x", "y"]
+				},
+				"gps": {
+					"type": "object",
+					"properties": {
+						"x": { "type": "double" },
+						"y": { "type": "double" }
+					},
+					"required": ["x", "y"]
 				},
 				"required": ["id", "self", "street", "municipality", "postal", "housenumber", "status", "validFrom"]
 			}
-		},
-		"pageSize": {
-			"type": "integer"		
-		},
-		"first": {
-			"type": "string"
 		}
 	},
-	"required": ["self", "items", "pageSize", "first"]
+	"required": ["self", "items"]
 }
