@@ -25,22 +25,22 @@
  */
 package be.bosa.dt.best.webservice;
 
-import static io.restassured.RestAssured.when;
-import io.restassured.http.ContentType;
-import io.restassured.response.ValidatableResponse;
+import io.quarkus.test.junit.QuarkusTest;
+import org.junit.jupiter.api.Test;
 
 /**
  *
  * @author Bart Hanssens
  */
-public abstract class LookupResourceTest {
-	protected ValidatableResponse testFound(String part) {
-		return when().get(LookupResource.API + part)
-			.then().statusCode(200).contentType(ContentType.JSON);
-	}
-
-	protected ValidatableResponse testNotFound(String part) {
-		return when().get(LookupResource.API + part + "/foobar")
-			.then().statusCode(404).contentType(ContentType.JSON);
-	}
+@QuarkusTest
+public class LookupResourceMunicipalityTest extends LookupResourceTest {
+	@Test
+    public void testMunicipalityEndpoint() {
+		testFound(LookupResource.MUNICIPALITIES);
+    }
+	
+	@Test
+    public void testMunicipalityNotFound() {
+		testNotFound(LookupResource.MUNICIPALITIES);
+    }
 }

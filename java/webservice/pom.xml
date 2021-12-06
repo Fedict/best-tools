@@ -11,8 +11,8 @@
 	<packaging>jar</packaging>
 	<properties>
 		<maven.compiler.parameters>true</maven.compiler.parameters>
-		<maven.compiler.source>16</maven.compiler.source>
-		<maven.compiler.target>16</maven.compiler.target>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 	</properties>
 	<name>BeSt webservice</name>
     <version>1.2.9</version>
@@ -22,7 +22,7 @@
 			<dependency>
 				<groupId>io.quarkus</groupId>
 				<artifactId>quarkus-bom</artifactId>
-				<version>2.5.0.Final</version>
+				<version>2.5.1.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -75,6 +75,11 @@
 			<artifactId>postgresql</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>json-schema-validator</artifactId>
+			<scope>test</scope>		
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -89,7 +94,7 @@
 			<plugin>
 				<groupId>io.quarkus</groupId>
 				<artifactId>quarkus-maven-plugin</artifactId>
-				<version>2.5.0.Final</version>
+				<version>2.5.1.Final</version>
 				<executions>
 					<execution>
 						<goals>

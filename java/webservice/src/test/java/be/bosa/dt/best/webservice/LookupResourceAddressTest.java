@@ -25,22 +25,36 @@
  */
 package be.bosa.dt.best.webservice;
 
-import static io.restassured.RestAssured.when;
-import io.restassured.http.ContentType;
-import io.restassured.response.ValidatableResponse;
+import io.quarkus.test.junit.QuarkusTest;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import org.junit.jupiter.api.Test;
 
 /**
  *
  * @author Bart Hanssens
  */
-public abstract class LookupResourceTest {
-	protected ValidatableResponse testFound(String part) {
-		return when().get(LookupResource.API + part)
-			.then().statusCode(200).contentType(ContentType.JSON);
+@QuarkusTest
+public class LookupResourceAddressTest extends LookupResourceTest {
+	@Test
+    public void testAddressEndpoint() {
+		testFound(LookupResource.ADDRESSES)
+			.and().body(matchesJsonSchemaInClasspath("address-collection-schema.json"));
+    }
+	
+	@Test
+    public void testAddressNotFound() {
+		testNotFound(LookupResource.ADDRESSES);
+    }
+
+
+    public void testAddressEmbedded() {
+		testFound(LookupResource.ADDRESSES + "?embed=true").body("embed", notNullValue());
 	}
 
-	protected ValidatableResponse testNotFound(String part) {
-		return when().get(LookupResource.API + part + "/foobar")
-			.then().statusCode(404).contentType(ContentType.JSON);
-	}
+	@Test
+    public void testAddressNotEmbedded() {
+		testNotFound(LookupResource.ADDRESSES);
+    }
+	
 }
