@@ -25,6 +25,7 @@
  */
 package be.bosa.dt.best.webservice;
 
+import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.Test;
  * @author Bart Hanssens
  */
 @QuarkusTest
+@QuarkusTestResource(PostgisServer.class)
 public class LookupResourceMunicipalityTest extends LookupResourceTest {
 	@Test
     public void testMunicipalityEndpoint() {

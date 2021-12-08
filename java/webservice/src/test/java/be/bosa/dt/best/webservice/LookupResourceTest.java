@@ -28,30 +28,12 @@ package be.bosa.dt.best.webservice;
 import static io.restassured.RestAssured.when;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
-import org.junit.BeforeClass;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 /**
  *
  * @author Bart Hanssens
  */
-@Testcontainers
-public abstract class LookupResourceTest {
-	@Container
-	public PostgreSQLContainer pgContainer = 
-		new PostgreSQLContainer(
-				DockerImageName.parse("postgis/postgis:14-3.1").asCompatibleSubstituteFor("postgres"))
-			.withDatabaseName("best")
-            .withUsername("sa");
-
-	@BeforeClass
-	public void runBefore() {
-		pgContainer.withInitScript("postgis.sql");
-	}
-
+public abstract class LookupResourceTest  {
 	protected ValidatableResponse testFound(String part) {
 		return when().get(LookupResource.API + part)
 			.then().statusCode(200).contentType(ContentType.JSON);

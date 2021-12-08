@@ -1,9 +1,5 @@
-CREATE DATABASE best;
-
-\c best;
-
-CREATE EXTENSION postgis;
-CREATE EXTENSION fuzzystrmatch;
+/*CREATE EXTENSION postgis; */
+/* CREATE EXTENSION fuzzystrmatch; */
 CREATE EXTENSION pg_trgm;
 CREATE EXTENSION unaccent;
 
@@ -93,28 +89,12 @@ CREATE UNLOGGED TABLE Street(
     endLifeSpanVersion TIMESTAMPTZ);
 
 /* Load data into tables */
-\COPY Address FROM 'addresses.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
-\COPY Municipality FROM 'municipalities.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
-\COPY PartOfMunicipality FROM 'municipalityparts.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
-\COPY Postalinfo FROM 'postals.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
-\COPY Street FROM 'streets.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
+COPY Address FROM '/tmp/addresses.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
+COPY Municipality FROM '/tmp/municipalities.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
+COPY PartOfMunicipality FROM '/tmp/municipalityparts.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
+COPY Postalinfo FROM '/tmp/postals.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
+COPY Street FROM '/tmp/streets.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
 
-/* Remove addresses that would violate constraints, shouldn't happen but ... it sometimes does */
-DELETE FROM Address a 
-WHERE NOT EXISTS 
-	(SELECT 1 FROM Municipality m 
-	WHERE a.midentifier = m.identifier);
-
-DELETE FROM Address a 
-WHERE NOT EXISTS 
-	(SELECT 1 FROM Postalinfo p 
-	WHERE a.pidentifier = p.identifier);
- 
-DELETE FROM Address a 
-WHERE NOT EXISTS 
-	(SELECT 1 FROM Street s 
-	WHERE a.sidentifier = s.identifier);
- 
 /* Add primary keys */
 ALTER TABLE Address 
     ADD CONSTRAINT pkAddress PRIMARY KEY(identifier, minorVersionIdentifier);
@@ -190,7 +170,7 @@ CREATE INDEX idxGinMunicipalityDE ON Municipality
 CREATE TABLE version(identifier VARCHAR(20) NOT NULL,
 					valuestr VARCHAR(20) NOT NULL);
 INSERT INTO version(identifier, valuestr) 
-	VALUES ('api verson', :'apiversion');
+	VALUES ('api version', 'apiversion');
 INSERT INTO version(identifier, valuestr) 
 	VALUES ('build date', TO_CHAR(CURRENT_TIMESTAMP, 'YYYY-MM-DD'));
 
