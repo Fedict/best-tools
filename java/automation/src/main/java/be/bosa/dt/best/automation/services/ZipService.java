@@ -25,6 +25,7 @@
  */
 package be.bosa.dt.best.automation.services;
 
+import io.quarkus.logging.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -41,7 +42,6 @@ import java.util.zip.ZipOutputStream;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import org.jboss.logging.Logger;
 
 
 /**
@@ -51,8 +51,6 @@ import org.jboss.logging.Logger;
  */
 @ApplicationScoped
 public class ZipService {
-	private static final Logger LOG = Logger.getLogger(ZipService.class);
-
 	/**
 	 * Get (non-recursive) list of files in a zip
 	 * 
@@ -78,7 +76,7 @@ public class ZipService {
 			for (ZipEntry f: zip.stream().toArray(ZipEntry[]::new)) {
 				String name = f.getName();
 				Path p = Paths.get(pout.toString(), name);
-				LOG.infof("Unzipping %s", p);
+				Log.infof("Unzipping %s", p);
 				
 				try (InputStream is = zip.getInputStream(f)) {
 					Files.copy(is, p);
@@ -100,21 +98,21 @@ public class ZipService {
 	public boolean unzip(String infile, String outdir) {
 		Path pin = Paths.get(infile);
 		if (! (Files.exists(pin) && Files.isRegularFile(pin))) {
-			LOG.errorf("Could not find input file %s", pin);
+			Log.errorf("Could not find input file %s", pin);
 			return false;
 		}
 		
 		Path pout = Paths.get(outdir);
 		if (! (Files.exists(pout) && Files.isDirectory(pout))) {
-			LOG.errorf("Could not find output directory %s", pout);
+			Log.errorf("Could not find output directory %s", pout);
 			return false;
 		}
 		
 		try {
-			LOG.infof("Zip file %s", infile);
+			Log.infof("Zip file %s", infile);
 			unzip(pin, pout);
 		} catch (IOException ioe) {
-			LOG.error("Error unzipping", ioe);
+			Log.error("Error unzipping", ioe);
 			return false;
 		}
 		return true;
@@ -131,7 +129,7 @@ public class ZipService {
 		ZipEntry zipEntry = new ZipEntry(pin.getFileName().toString());
 		
 		try(InputStream fis = Files.newInputStream(pin)) {
-			LOG.infof("Zipping %s", pin);
+			Log.infof("Zipping %s", pin);
 			zos.putNextEntry(zipEntry);
 					
 			byte[] buffer = new byte[32*1024];
@@ -153,12 +151,12 @@ public class ZipService {
 	public boolean zip(String indir, String outfile, Predicate<? super Path> filter) {
 		Path pin = Paths.get(indir);
 		if (! (Files.exists(pin) && Files.isDirectory(pin))) {
-			LOG.errorf("Could not find input directory %s", pin);
+			Log.errorf("Could not find input directory %s", pin);
 			return false;
 		}
 
 		Path pout = Paths.get(outfile);
-		LOG.infof("New zipfile %s", pout);
+		Log.infof("New zipfile %s", pout);
 		try (OutputStream os = Files.newOutputStream(pout);
 			ZipOutputStream zos = new ZipOutputStream(os)) {
 	
@@ -167,7 +165,7 @@ public class ZipService {
 				zip(f, zos);
 			}
 		} catch (IOException ioe) {
-			LOG.error("Could not zip files", ioe);
+			Log.error("Could not zip files", ioe);
 			return false;
 		}
 

@@ -25,6 +25,7 @@
  */
 package be.bosa.dt.best.automation.services;
 
+import io.quarkus.logging.Log;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -33,7 +34,6 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.jboss.logging.Logger;
 
 
 
@@ -44,8 +44,6 @@ import org.jboss.logging.Logger;
  */
 @ApplicationScoped
 public class VerifyService {
-	private static final Logger LOG = Logger.getLogger(ZipService.class);
-
 	@ConfigProperty(name = "copier.mft.minsize")
 	long minSize;
 
@@ -66,7 +64,7 @@ public class VerifyService {
 		if (fileSize < minSize) {
 			throw new IOException("File too small: " + fileSize);
 		}
-		LOG.infof("File size %s OK", fileSize);
+		Log.infof("File size %s OK", fileSize);
 
 		List<String> files = zip.listFiles(Paths.get(file));
 		if (files.size() != expected.size()) {
@@ -80,7 +78,7 @@ public class VerifyService {
 			if (count > 1) {
 				throw new IOException("Expected found multiple times: " + e);
 			}
-			LOG.infof("Expected %s OK", e);			
+			Log.infof("Expected %s OK", e);			
 		}
 	}
 }

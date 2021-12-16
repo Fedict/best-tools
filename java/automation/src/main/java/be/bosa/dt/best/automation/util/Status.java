@@ -25,10 +25,10 @@
  */
 package be.bosa.dt.best.automation.util;
 
+import io.quarkus.logging.Log;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import org.jboss.logging.Logger;
 
 
 /**
@@ -38,8 +38,6 @@ import org.jboss.logging.Logger;
  */
 
 public class Status {
-	private static final Logger LOG = Logger.getLogger(Status.class);
-
 	private String status = "";
 	private final List<String> history = new ArrayList<>();
 
@@ -67,7 +65,7 @@ public class Status {
 	 * @param status 
 	 */
 	public void set(String status) {
-		LOG.info(status);
+		Log.info(status);
 		this.status = status;
 		history.add(Instant.now().toString() + " : " + status);
 	}

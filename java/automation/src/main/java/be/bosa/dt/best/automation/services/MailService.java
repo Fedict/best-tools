@@ -26,12 +26,12 @@
 package be.bosa.dt.best.automation.services;
 
 
+import io.quarkus.logging.Log;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import org.jboss.logging.Logger;
 
 
 /**
@@ -41,8 +41,6 @@ import org.jboss.logging.Logger;
  */
 @ApplicationScoped
 public class MailService {
-	private static final Logger LOG = Logger.getLogger(MailService.class);
-
 	@Inject
 	Mailer mailer;
 
@@ -54,9 +52,9 @@ public class MailService {
 	public void sendMail(Mail mail) {
 		try {
 			mailer.send(mail);
-			LOG.info("Mail sent");
+			Log.info("Mail sent");
 		} catch (Exception e) {
-			LOG.error("Sending mail failed", e);
+			Log.error("Sending mail failed", e);
 		}
 	}	
 }

@@ -25,16 +25,15 @@
  */
 package be.bosa.dt.best.automation.util;
 
+import io.quarkus.logging.Log;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 
-import org.jboss.logging.Logger;
 
 /**
  * Copies zipfile from BeST MFT to public web server via SFTP
@@ -42,18 +41,16 @@ import org.jboss.logging.Logger;
  * @author Bart Hanssens
  */
 public class Utils {
-	private static final Logger LOG = Logger.getLogger(Utils.class);
-
 	/**
 	 * Construct file name based on previous data
 	 * 
 	 * @param str file pattern
-	 * @return %Y%m%d replaced by date of yesterday
+	 * @return %Y%m%d replaced by date of today
 	 */
 	public static String getFileName(String str) {
-		LocalDate yesterday = LocalDate.now().minus(1, ChronoUnit.DAYS);
+		LocalDate today = LocalDate.now();
 		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd");
-		return str.replace("%Y%m%d", fmt.format(yesterday));
+		return str.replace("%Y%m%d", fmt.format(today));
 	}
 
 	/**
@@ -67,7 +64,7 @@ public class Utils {
 			return true;
 		}
 
-		LOG.infof("Delete directory %s", p);
+		Log.infof("Delete directory %s", p);
 
 		try {
 			Files.walk(p).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
