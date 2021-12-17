@@ -32,12 +32,13 @@ import be.bosa.dt.best.webservice.entities.PostalInfo;
 import be.bosa.dt.best.webservice.entities.Street;
 import be.bosa.dt.best.webservice.entities.Version;
 
-
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
 import io.vertx.core.json.JsonObject;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import java.util.Map;
 
@@ -85,7 +86,8 @@ public class LookupResource {
 	@Path(LookupResource.ADDRESSES + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<JsonObject> getAddressById(String id, @RestQuery boolean embed, UriInfo info) {
-		Uni<Address> address = repo.findAddressById(id, embed);
+		String s = URLDecoder.decode(id, StandardCharsets.UTF_8);
+		Uni<Address> address = repo.findAddressById(s, embed);
 		return Util.responseOrEmpty(Util.toJson(info, address, embed, cache));
 	}
 
@@ -149,7 +151,8 @@ public class LookupResource {
 	@Path(LookupResource.MUNICIPALITIES +"/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<JsonObject> getMunicipalityById(String id, UriInfo info) {
-		Uni<Municipality> municipality = repo.findMunicipalityById(id);
+		String s = URLDecoder.decode(id, StandardCharsets.UTF_8);
+		Uni<Municipality> municipality = repo.findMunicipalityById(s);
 		return Util.responseOrEmpty(Util.toJson(info, municipality));
 	}
 
@@ -186,7 +189,8 @@ public class LookupResource {
 	@Path(LookupResource.MUNICIPALITY_PARTS +"/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<JsonObject> getMunicipalityPartsById(String id, UriInfo info) {
-		Uni<MunicipalityPart> part = repo.findMunicipalityPartById(id);
+		String s = URLDecoder.decode(id, StandardCharsets.UTF_8);
+		Uni<MunicipalityPart> part = repo.findMunicipalityPartById(s);
 		return Util.responseOrEmpty(Util.toJson(info, part));		
 	}
 
@@ -219,7 +223,8 @@ public class LookupResource {
 	@Path(LookupResource.POSTAL + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<JsonObject> getPostalById(String id, UriInfo info) {
-		Uni<PostalInfo> postal = repo.findPostalInfoById(id);
+		String s = URLDecoder.decode(id, StandardCharsets.UTF_8);
+		Uni<PostalInfo> postal = repo.findPostalInfoById(s);
 		return Util.responseOrEmpty(Util.toJson(info, postal));
 	}
 
@@ -254,7 +259,8 @@ public class LookupResource {
 	@Path(LookupResource.STREETS + "/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<JsonObject> getStreetById(String id, UriInfo info) {
-		Uni<Street> street = repo.findStreetById(id);
+		String s = URLDecoder.decode(id, StandardCharsets.UTF_8);
+		Uni<Street> street = repo.findStreetById(s);
 		return Util.responseOrEmpty(Util.toJson(info, street));
 	}
 

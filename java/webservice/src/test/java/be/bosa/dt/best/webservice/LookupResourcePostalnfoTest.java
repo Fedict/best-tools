@@ -25,53 +25,45 @@
  */
 package be.bosa.dt.best.webservice;
 
-import static io.restassured.RestAssured.when;
-import io.restassured.http.ContentType;
-import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
-import io.restassured.response.ValidatableResponse;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.junit.QuarkusTest;
+import static org.hamcrest.CoreMatchers.equalTo;
+import org.junit.jupiter.api.Test;
 
 /**
- * Helper class
- * 
+ *
  * @author Bart Hanssens
  */
-public abstract class LookupResourceTest  {
-	/**
-	 * Test which should return at least one result
-	 * 
-	 * @param part
-	 * @return 
-	 */
-	public ValidatableResponse testFound(String part) {
-		return when().get(LookupResource.API + part)
-			.then().statusCode(200).contentType(ContentType.JSON);
+@QuarkusTest
+@QuarkusTestResource(PostgisServer.class)
+public class LookupResourcePostalnfoTest extends LookupResourceTest {
+	@Test
+    public void testPostalinfoEndpoint() {
+		testFound(LookupResource.POSTAL);
+    }
+
+	@Test
+    public void testPostalinfoNotFound() {
+		testNotFound(LookupResource.POSTAL);
+    }
+
+	@Test
+	public void testPostalinfoFindIDBxl() {
+		String bxl = "BE.BRUSSELS.BRIC.ADM.PZ/1000/2";
+		testFindByID(LookupResource.POSTAL, bxl, "postal-schema.json")
+			.body("name.nl", equalTo("Brussel (Centrum)"));
 	}
 
-	/**
-	 * Test for something that's definitively not in the database
-	 * 
-	 * @param part
-	 * @return 
-	 */
-	public ValidatableResponse testNotFound(String part) {
-		return when().get(LookupResource.API + part + "/foobar")
-			.then().statusCode(404).contentType(ContentType.JSON);
+	@Test
+	public void testPostalinfoFindIDVl() {
+		String vl = "https://data.vlaanderen.be/id/postinfo/2323/2002-08-13T16:37:33";
+		testFindByID(LookupResource.POSTAL, vl, "postal-schema.json")
+			.body("name.nl", equalTo("Wortel"));
 	}
-	
-	/**
-	 * Test which should return one result
-	 * 
-	 * @param part
-	 * @param id  ID
-	 * @param schema
-	 * @return 
-	 */
-	public ValidatableResponse testFindByID(String part, String id, String schema) {
-		return when().get(LookupResource.API + part + "/" + URLEncoder.encode(id, StandardCharsets.UTF_8))
-			.then().statusCode(200).contentType(ContentType.JSON)
-					.body(matchesJsonSchemaInClasspath(schema));
+
+	@Test
+	public void testPostalinfoFindIDWal() {
+		String wal = "geodata.wallonie.be/id/PostalInfo/7973/1";
+		testFindByID(LookupResource.POSTAL, wal, "postal-schema.json");
 	}
 }
