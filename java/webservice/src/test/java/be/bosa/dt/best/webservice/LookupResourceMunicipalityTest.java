@@ -27,6 +27,7 @@ package be.bosa.dt.best.webservice;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
+import static org.hamcrest.CoreMatchers.equalTo;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -45,4 +46,29 @@ public class LookupResourceMunicipalityTest extends LookupResourceTest {
     public void testMunicipalityNotFound() {
 		testNotFound(LookupResource.MUNICIPALITIES);
     }
+
+	@Test
+	public void testMunicipalityFindIDBxl() {
+		String bxl = "BE.BRUSSELS.BRIC.ADM.MUNICIPALITY/21002/6";
+		testFindByID(LookupResource.MUNICIPALITIES, bxl, "municipality-schema.json")
+			.body("name.nl", equalTo("Oudergem"),
+					"name.fr", equalTo("Auderghem"));
+	}
+
+	@Test
+	public void testMunicipalityFindIDVl() {
+		String vl = "https://data.vlaanderen.be/id/gemeente/71034/2002-08-13T17:32:32";
+		testFindByID(LookupResource.MUNICIPALITIES, vl, "municipality-schema.json")
+			.body("name.nl", equalTo("Leopoldsburg"),
+					"name.fr", equalTo("Bourg-Léopold"),
+					"name.de", equalTo("Leopoldsburg"));
+	}
+
+	@Test
+	public void testMunicipalityFindIDWal() {
+		String wal = "geodata.wallonie.be/id/Municipality/63067/4";
+		testFindByID(LookupResource.MUNICIPALITIES, wal, "municipality-schema.json")
+			.body("name.fr", equalTo("Saint-Vith"),
+					"name.de", equalTo("Sankt Vith"));
+	}
 }
