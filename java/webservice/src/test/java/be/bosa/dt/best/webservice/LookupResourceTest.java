@@ -74,4 +74,19 @@ public abstract class LookupResourceTest  {
 			.then().statusCode(200).contentType(ContentType.JSON)
 					.body(matchesJsonSchemaInClasspath(schema));
 	}
+	
+	/**
+	 * Test which should return one ore more result
+	 * 
+	 * @param part
+	 * @param param
+	 * @param value
+	 * @param schema
+	 * @return 
+	 */
+	public ValidatableResponse testFindByParam(String part, String param, String value, String schema) {
+		return when().get(LookupResource.API + part + "?" + param + "=" + value)
+			.then().statusCode(200).contentType(ContentType.JSON)
+					.body(matchesJsonSchemaInClasspath(schema));
+	}
 }

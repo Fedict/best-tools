@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "Postal info collection schema",
+    "title": "Street collection schema",
 	"type": "object",
 	"properties": {
 		"self": {
@@ -18,9 +18,6 @@
 					"self": {
 						"type": "string"
 					},
-					"postalCode": {
-						"type": "string"
-					},
 					"name": {
 						"type": "object",
 						"properties": {
@@ -34,9 +31,12 @@
 								"type": "string"
 							}
 						}
+					},
+					"status": {
+						"type": "string"
 					}
 				},
-				"required": ["id", "self", "postalCode"]
+				"required": ["id", "self", "name", "status"]
 			}
 		},
 		"pageSize": {

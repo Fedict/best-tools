@@ -28,6 +28,8 @@ package be.bosa.dt.best.webservice;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.Matchers.hasEntry;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -65,5 +67,11 @@ public class LookupResourcePostalnfoTest extends LookupResourceTest {
 	public void testPostalinfoFindIDWal() {
 		String wal = "geodata.wallonie.be/id/PostalInfo/7973/1";
 		testFindByID(LookupResource.POSTAL, wal, "postal-schema.json");
+	}
+
+	@Test
+	public void testPostalinfoFindParamPostalcode() {
+		testFindByParam(LookupResource.POSTAL, "postalCode", "1000", "postal-collection-schema.json")
+			.body("items", hasItem(hasEntry("name.nl", equalTo("Brussel (Centrum)"))));
 	}
 }

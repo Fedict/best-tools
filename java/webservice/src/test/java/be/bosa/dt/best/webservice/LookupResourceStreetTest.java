@@ -27,6 +27,7 @@ package be.bosa.dt.best.webservice;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
+import static org.hamcrest.CoreMatchers.equalTo;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -45,4 +46,29 @@ public class LookupResourceStreetTest extends LookupResourceTest {
     public void testStreetNotFound() {
 		testNotFound(LookupResource.STREETS);
     }
+
+	@Test
+	public void testStreetFindIDBxl() {
+		String bxl = "BE.BRUSSELS.BRIC.ADM.STR/3974/2";
+		testFindByID(LookupResource.STREETS, bxl, "street-schema.json")
+			.body("name.nl", equalTo("Masuistraat"),
+					"name.fr", equalTo("Rue Masui"),
+					"status", "current");
+	}
+
+	@Test
+	public void testStreetFindIDVl() {
+		String vl = "https://data.vlaanderen.be/id/straatnaam/26089/2013-10-05T15:59:10.067";
+		testFindByID(LookupResource.STREETS, vl, "street-schema.json")
+			.body("name.nl", equalTo("Elbeekstraat"),
+					"status", "current");
+	}
+
+	@Test
+	public void testStreetFindIDWal() {
+		String wal = "geodata.wallonie.be/id/Streetname/7737097/1 ";
+		testFindByID(LookupResource.STREETS, wal, "street-schema.json")
+			.body("name.fr", equalTo("Sur les Roches"),
+					"status", "current");
+	}
 }
