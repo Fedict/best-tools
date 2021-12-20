@@ -62,7 +62,7 @@ docker run -p8080:8080 \
    -d  your-tagged-image
 ```
 
-The `be.bosa.dt.best.webservice.url` is the base URL of your server
+The `be.bosa.dt.best.webservice.url` is the base URL of your server.
 
 The API will be available on `your-server` port 8080 , 
 the Swagger/OpenAPI interface on `http://your-server.example.com:8080/q/swagger-ui`
