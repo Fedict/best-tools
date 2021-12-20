@@ -497,19 +497,26 @@ public class Repository {
 	 * 
 	 * @param afterId search after ID (paginated results)
 	 * @param mIdentifier municipality ID
+	 * @param nisCode REFNIS code
+	 * @param pIdentifier postalinfo ID
 	 * @param postalCode postal code
 	 * @param name (part of) municipality name, searches in NL/FR/DE
+	 * @param status
 	 * @return 
 	 */
-	public Multi<Street> findStreets(String afterId, String mIdentifier, String postalCode, String name) {
+	public Multi<Street> findStreets(String afterId, String mIdentifier, String nisCode, 
+									String pIdentifier, String postalCode, String name, String status) {
 		boolean joinPostal = ! (postalCode == null || postalCode.isEmpty());
 
-		List lst = new ArrayList(5);
+		List lst = new ArrayList(9);
 		SqlStreet qry = new SqlStreet(joinPostal);
 
 		where(lst, qry, "m.identifier", NsConverter.municipalityEncode(mIdentifier));
+		where(lst, qry, "m.niscode", nisCode);
+		where(lst, qry, "ps.identifier", NsConverter.postalEncode(pIdentifier));
 		where(lst, qry, "ps.postalcode", postalCode);
 		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", name, Repository.SEARCH_EXACT);
+		where(lst, qry, "s.status", status);
 		
 		paginate(lst, qry, NsConverter.streetEncode(afterId));
 

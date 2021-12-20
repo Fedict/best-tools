@@ -29,6 +29,7 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import java.util.Map;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -54,7 +55,7 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 		testFindByID(LookupResource.STREETS, bxl, "street-schema.json")
 			.body("name.nl", equalTo("Masuistraat"),
 					"name.fr", equalTo("Rue Masui"),
-					"status", "current");
+					"status", equalTo("current"));
 	}
 
 	@Test
@@ -62,32 +63,65 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 		String vl = "https://data.vlaanderen.be/id/straatnaam/26089/2013-10-05T15:59:10.067";
 		testFindByID(LookupResource.STREETS, vl, "street-schema.json")
 			.body("name.nl", equalTo("Elbeekstraat"),
-					"status", "current");
+					"status", equalTo("current"));
 	}
 
 	@Test
 	public void testStreetFindIDWal() {
-		String wal = "geodata.wallonie.be/id/Streetname/7737097/1 ";
+		String wal = "geodata.wallonie.be/id/Streetname/7737097/1";
 		testFindByID(LookupResource.STREETS, wal, "street-schema.json")
 			.body("name.fr", equalTo("Sur les Roches"),
-					"status", "current");
+					"status", equalTo("current"));
 	}
 	
 	@Test
-	public void testPostalinfoFindNameBXLNoAccent() {
-		testFindByParams(LookupResource.POSTAL, Map.of("name", "Parlement Europeen"), "postal-collection-schema.json")
+	public void testStreetNameAccent() {
+		testFindByParams(LookupResource.STREETS, Map.of("name", "Rue de l'aerodrome"), "street-collection-schema.json")
 			.body("items.size()", equalTo(1),
-					"items[1].name.fr", equalTo("Parlement Européen"));
+					"items[0].name.fr", equalTo("Rue de l'Aérodrome"));
 	}
 
 	@Test
-	public void testPostalinfoFindNameVLLower() {
-		testFindByParams(LookupResource.POSTAL, Map.of("name", "antwerpen"), "postal-collection-schema.json")
-			.body("items.size()", equalTo(6),
-					"items[0].name.nl", equalTo("Antwerpen"));
+	public void testStreetNameLower() {
+		testFindByParams(LookupResource.STREETS, Map.of("name", "abdijstraat"), "street-collection-schema.json")
+			.body("items.size()", equalTo(1),
+					"items[0].name.nl", equalTo("Abdijstraat"));
 	}
 
-	public void testPostalinfoFindNameWal() {
-		// Walloon Region does not provide names
+	@Test
+	public void testStreetNameMultiple() {
+		testFindByParams(LookupResource.STREETS, Map.of("name", "Rue de la Chapelle"), "street-collection-schema.json")
+			.body("items.size()", equalTo(2),
+					"items[0].name.fr", equalTo("Rue de la Chapelle"));
+	}
+	
+	@Test
+	public void testStreetStatusRetired() {
+		testFindByParams(LookupResource.STREETS, Map.of("status", "retired"), "street-collection-schema.json")
+			.body("items.size()", equalTo(10));
+	}
+
+	@Test
+	public void testStreetPostalID() {
+		testFindByParams(LookupResource.STREETS, 
+				Map.of("postalID", "https://data.vlaanderen.be/id/postinfo/23027/2002-08-13T17:32:32"), 
+				"street-collection-schema.json")
+			.body("items.size()", equalTo(250));
+	}
+
+	@Test
+	public void testStreetPostalcode() {
+		testFindByParams(LookupResource.STREETS, Map.of("postalCode", "1500"), "street-collection-schema.json")
+			.body("items.size()", equalTo(250),
+					"first", notNullValue(),
+					"next", notNullValue());
+	}
+
+	@Test
+	public void testStreetNisCode() {
+		testFindByParams(LookupResource.STREETS, Map.of("nisCode", "23027"), "street-collection-schema.json")
+			.body("items.size()", equalTo(250),
+					"first", notNullValue(),
+					"next", notNullValue());
 	}
 }

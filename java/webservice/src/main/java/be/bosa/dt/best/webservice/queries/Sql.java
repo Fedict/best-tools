@@ -77,7 +77,7 @@ public abstract class Sql {
 	public void whereNames(String nl, String fr, String de, String matchType) {
 		String v = "$" + ++vars;
 		
-		String op = matchType.equals("exact") ? "=" : "%";
+		String op = (matchType == null || matchType.equals("exact")) ? "=" : "%";
 		String tmp = "(" + 
 						"LOWER(IM_UNACCENT(" + nl + "))" + op + "LOWER(IM_UNACCENT(" + v + ")) OR " +
 						"LOWER(IM_UNACCENT(" + fr + "))" + op + "LOWER(IM_UNACCENT(" + v + ")) OR " +

@@ -32,6 +32,12 @@
 							}
 						}
 					},
+					"validFrom": {
+						"type": "string"
+					},
+					"validTill": {
+						"type": "string"
+					},
 					"status": {
 						"type": "string"
 					}

@@ -37,12 +37,12 @@ import org.junit.jupiter.api.Test;
 @QuarkusTestResource(PostgisServer.class)
 public class LookupResourceMunicipalitypartTest extends LookupResourceTest {
 	@Test
-    public void testMunicipalityEndpoint() {
+    public void testPartOfMunicipalityEndpoint() {
 		testFound(LookupResource.MUNICIPALITY_PARTS);
     }
 	
 	@Test
-    public void testMunicipalityNotFound() {
+    public void testParOfMunicipalityNotFound() {
 		testNotFound(LookupResource.MUNICIPALITY_PARTS);
     }
 }

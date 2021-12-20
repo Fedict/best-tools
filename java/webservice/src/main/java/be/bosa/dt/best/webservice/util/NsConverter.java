@@ -126,10 +126,10 @@ public class NsConverter {
 	 * @return municipality part ID with short namespace
 	 */
 	public static String municipalityPartEncode(String id) {
-		if (id.startsWith(WMP)) {
-			return id.replace(WMP, "WMP");
+		if (id == null || id.isBlank()) {
+			return id;
 		}
-		return id;
+		return id.replace(WMP, "WMP");
 	}
 
 	/**

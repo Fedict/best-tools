@@ -78,14 +78,14 @@ public class LookupResourcePostalnfoTest extends LookupResourceTest {
 	}
 
 	@Test
-	public void testPostalinfoFindNameBXLNoAccent() {
+	public void testPostalinfoFindNameAccent() {
 		testFindByParams(LookupResource.POSTAL, Map.of("name", "Parlement Europeen"), "postal-collection-schema.json")
 			.body("items.size()", equalTo(1),
-					"items[1].name.fr", equalTo("Parlement Européen"));
+					"items[0].name.fr", equalTo("Parlement Européen"));
 	}
 
 	@Test
-	public void testPostalinfoFindNameVLLower() {
+	public void testPostalinfoFindNameLower() {
 		testFindByParams(LookupResource.POSTAL, Map.of("name", "antwerpen"), "postal-collection-schema.json")
 			.body("items.size()", equalTo(6),
 					"items[0].name.nl", equalTo("Antwerpen"));
