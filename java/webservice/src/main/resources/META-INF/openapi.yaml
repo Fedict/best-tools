@@ -226,7 +226,7 @@ paths:
           - fuzzy
           - startwith
           type: string
-      - name: niscode
+      - name: nisCode
         in: query
         description: REFNIS code (assigned by Statbel)
         required: false
@@ -234,7 +234,7 @@ paths:
           maximum: 93099
           minimum: 11001
           type: string
-        example: 23027
+          example: 23027
       - name: postalcode
         in: query
         description: Postal code (assigned by bPost)
@@ -371,6 +371,7 @@ paths:
         required: true
         schema:
           type: string
+          example: https://data.vlaanderen.be/id/postinfo/2323/2002-08-13T16:37:33
       responses:
         "200":
           description: Requested postal info
@@ -400,6 +401,30 @@ paths:
         schema:
           type: string
           example: 
+      - name: nisCode
+        in: query
+        description: REFNIS code (assigned by Statbel)
+        required: false
+        schema:
+          maximum: 93099
+          minimum: 11001
+          type: string
+          example: 23027
+      - name: postalinfoID
+        in: path
+        required: true
+        schema:
+          type: string
+          example: https://data.vlaanderen.be/id/postinfo/2323/2002-08-13T16:37:33
+      - name: postalCode
+        in: query
+        description: Postal code (assigned by bPost)
+        required: false
+        schema:
+          maximum: 9999
+          minimum: 1000
+          type: string
+          example: 1000
       - name: name
         in: query
         description: "(Part of) street name, searches in Dutch/French/German names"
@@ -475,14 +500,36 @@ paths:
                   $ref: '#/components/schemas/Version'
 components:
   schemas:
+    Name:
+      type: object
+      properties:
+        nl:
+          description: Name in Dutch
+          type: string
+        fr:
+          description: Name in French
+          type: string
+        de:
+          description: Name in German
+          type: string
     Street:
       type: object
       required:
        - id
+       - name
       properties:
+        id:
+          description: Identifier
+          type: string
         self:
           description: Link to self
-          type: string       
+          type: string
+        name:
+          type: object
+          $ref: '#/components/schema/Name'
+        status:
+          description: Status
+          type: string
     StreetCollection:
       type: object
       required:

@@ -27,6 +27,7 @@ package be.bosa.dt.best.webservice;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
+import java.util.Map;
 import static org.hamcrest.CoreMatchers.equalTo;
 import org.junit.jupiter.api.Test;
 
@@ -70,5 +71,20 @@ public class LookupResourceMunicipalityTest extends LookupResourceTest {
 		testFindByID(LookupResource.MUNICIPALITIES, wal, "municipality-schema.json")
 			.body("name.fr", equalTo("Saint-Vith"),
 					"name.de", equalTo("Sankt Vith"));
+	}
+
+	
+	@Test
+	public void testMunicipalityNameAccent() {
+		testFindByParams(LookupResource.MUNICIPALITIES, Map.of("name", "Chievres"), "municipality-collection-schema.json")
+			.body("items.size()", equalTo(1),
+					"items[0].name.fr", equalTo("Chièvres"));
+	}
+
+	@Test
+	public void testMunicipalityNameLower() {
+		testFindByParams(LookupResource.MUNICIPALITIES, Map.of("name", "sankt vith"), "municipality-collection-schema.json")
+			.body("items.size()", equalTo(1),
+					"items[0].name.de", equalTo("Sankt Vith"));
 	}
 }

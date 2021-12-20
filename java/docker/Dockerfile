@@ -28,7 +28,7 @@ RUN cd /home/best && \
 FROM debian:11-slim 
 MAINTAINER bart.hanssens@bosa.fgov.be
 
-ARG version=1.2.8
+ARG version=1.2.9
 
 ENV LANGUAGE=en_US.UTF-8
 ENV LANG=en_US.UTF-8

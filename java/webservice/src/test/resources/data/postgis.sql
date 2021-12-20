@@ -138,14 +138,16 @@ AS a2
 
 /* Create some auxiliary tables to speed up queries */
 CREATE UNLOGGED TABLE PostalMunicipalities AS (
-	SELECT DISTINCT a.mIdentifier, p.postalCode
-	FROM Address a, PostalInfo p
-	WHERE a.pIdentifier = p.identifier);
+	SELECT DISTINCT m.identifier, m.nisCode, p.postalCode
+	FROM Address a, Municipality m, PostalInfo p
+	WHERE a.pIdentifier = p.identifier
+	AND a.mIdentifier = m.identifier);
 
 CREATE UNLOGGED TABLE PostalStreets AS (
-	SELECT DISTINCT a.sIdentifier, p.postalCode
-	FROM Address a, PostalInfo p
-	WHERE a.pIdentifier = p.identifier);
+	SELECT DISTINCT a.sIdentifier, m.nisCode, p.postalCode
+	FROM Address a, Municipality m, PostalInfo p
+	WHERE a.pIdentifier = p.identifier
+	AND a.mIdentifier = m.identifier);
 
 /* Geo index */
 CREATE INDEX idxAddressPoint ON Address

@@ -158,14 +158,16 @@ AS a2
 
 /* Create some auxiliary tables to speed up queries */
 CREATE UNLOGGED TABLE PostalMunicipalities AS (
-	SELECT DISTINCT a.mIdentifier, p.postalCode
-	FROM Address a, PostalInfo p
-	WHERE a.pIdentifier = p.identifier);
+	SELECT DISTINCT a.mIdentifier, m.nisCode, p.postalCode
+	FROM Address a, Municipality m, PostalInfo p
+	WHERE a.pIdentifier = p.identifier
+	AND a.mIdentifier = m.identifier);
 
 CREATE UNLOGGED TABLE PostalStreets AS (
-	SELECT DISTINCT a.sIdentifier, p.postalCode
-	FROM Address a, PostalInfo p
-	WHERE a.pIdentifier = p.identifier);
+	SELECT DISTINCT a.sIdentifier, m.nisCode, p.postalCode
+	FROM Address a, Municipality m, PostalInfo p
+	WHERE a.pIdentifier = p.identifier
+	AND a.mIdentifier = m.identifier);
 
 /* Geo index */
 CREATE INDEX idxAddressPoint ON Address
@@ -179,11 +181,11 @@ CREATE INDEX idxGinMunicipalityFR ON Municipality
 CREATE INDEX idxGinMunicipalityDE ON Municipality
 	USING GIN(LOWER(IM_UNACCENT(nameDE)) gin_trgm_ops);
 
-CREATE INDEX idxGinMunicipalitypartNL ON Municipalitypart
+CREATE INDEX idxGinPartOfMunicipalityNL ON PartOfMunicipality
 	USING GIN(LOWER(IM_UNACCENT(nameNL)) gin_trgm_ops);
-CREATE INDEX idxGinMunicipalitypartFR ON Municipalitypart
+CREATE INDEX idxGinPartOfMunicipalityFR ON PartOfMunicipality
 	USING GIN(LOWER(IM_UNACCENT(nameFR)) gin_trgm_ops);
-CREATE INDEX idxGinMunicipalitypartDE ON Municipalitypart
+CREATE INDEX idxGinPartOfMunicipalityDE ON PartOfMunicipality
 	USING GIN(LOWER(IM_UNACCENT(nameDE)) gin_trgm_ops);
 
 CREATE INDEX idxGinPostalinfoNL ON Postalinfo

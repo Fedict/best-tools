@@ -506,13 +506,14 @@ public class Repository {
 	 */
 	public Multi<Street> findStreets(String afterId, String mIdentifier, String nisCode, 
 									String pIdentifier, String postalCode, String name, String status) {
-		boolean joinPostal = ! (postalCode == null || postalCode.isEmpty());
+		boolean joinPostal = ! (postalCode == null || postalCode.isEmpty() || 
+								pIdentifier == null || pIdentifier.isEmpty() );
 
 		List lst = new ArrayList(9);
 		SqlStreet qry = new SqlStreet(joinPostal);
 
-		where(lst, qry, "m.identifier", NsConverter.municipalityEncode(mIdentifier));
-		where(lst, qry, "m.niscode", nisCode);
+		where(lst, qry, "s.mIdentifier", NsConverter.municipalityEncode(mIdentifier));
+		where(lst, qry, "ps.niscode", nisCode);
 		where(lst, qry, "ps.identifier", NsConverter.postalEncode(pIdentifier));
 		where(lst, qry, "ps.postalcode", postalCode);
 		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", name, Repository.SEARCH_EXACT);
