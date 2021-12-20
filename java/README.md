@@ -1,48 +1,27 @@
 # Overview
 
-## Building the java tools
+Developed and tested with Java JDK 11, using Netbeans / Maven.
+Build the parent project to create all the tools.
 
-Developed and tested with Java JDK8, using Netbeans / Maven: build the parent pom to create the unzip and convert tools.
+Building without tests
 
-Note that unzipping the file and converting the XMLs to CSV/SHP may take a few minutes, and that a minimum of 15 GB free disk space is recommended.
+`mvn clean install -DskipTests`
 
-
-## Unzip tool
-
-Recursively unzip the BeST-zip file.
-The BeST ZIP [full download file](https://opendata.bosa.be/) (+/- 340 MB) contains another set of ZIP files, unzipping all of them requires +/- 13 GB disk space. The output directory will be created if it does not exist.
+# Testing
 
 
-Usage:
-`java -jar unzip.jar -i <best-latest.zip> -o <output_directory>`
+## Tools
 
-## Converter tool
+- [Unzip tool](unzip/README.md): recursively unzip the BeST-zip file.
+- [Converter tool](converter/README.md): convert XML files to CSV
+- [DBLoader](dbloader/README.md): loads (unzipped) prepare XML files for database
+- [Automation tool](automation/README.md) (internal use only)
 
-After unzipping the BeST-file, this tool can be used to convert the XML to CSV-files or SHP.
-It is possible to select one or more regions: B(russels), F(landers) or W(alloon).
+## Helper modules
 
-Usage:
-`java -jar converter.jar -i <directory_unzipped_xml> -B -F -W`
+- [DAO](dao/README.md)
+- [XmlReader](xmlreader/README.md)
 
-## DbLoader tool
+## Dockerized service
 
-Loads (unzipped) BeST XML files into a [PostGIS](https://postgis.net),
-the user has to have admin rights to create the PostGIS extensions
-
-Usage:
-`java -jar dbloader.jar -x <directory_unzipped_xml> -d jdbc:postgresql://localhost/best?user=foo&password=bar`
-
-Alternatively, the data can be written to a few CSV table files that can be loaded e.g. by Postgres' psql COPY command
-
-Usage:
-`java -jar dbloader.jar -x <directory_unzipped_xml> -c <directory_output_csv>`
-
-### Helper modules
-
-## DAO
-
-Helper module containing data objects to be used in other projects
-
-## XmlReader
-
-Helper module containing readers to load XML files into DAO
+- [Webservice](webservice/README.md): REST front-end
