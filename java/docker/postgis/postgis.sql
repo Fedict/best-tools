@@ -172,6 +172,20 @@ CREATE INDEX idxAddressPoint ON Address
 	USING GIST(point);
 
 /* Full text indexes on names */
+CREATE INDEX idxGinMunicipalityNL ON Municipality 
+	USING GIN(LOWER(IM_UNACCENT(nameNL)) gin_trgm_ops);
+CREATE INDEX idxGinMunicipalityFR ON Municipality
+	USING GIN(LOWER(IM_UNACCENT(nameFR)) gin_trgm_ops);
+CREATE INDEX idxGinMunicipalityDE ON Municipality
+	USING GIN(LOWER(IM_UNACCENT(nameDE)) gin_trgm_ops);
+
+CREATE INDEX idxGinPostalinfoNL ON Postalinfo
+	USING GIN(LOWER(IM_UNACCENT(nameNL)) gin_trgm_ops);
+CREATE INDEX idxGinPostalinfoFR ON Postalinfo
+	USING GIN(LOWER(IM_UNACCENT(nameFR)) gin_trgm_ops);
+CREATE INDEX idxGinPostalinfoDE ON Postalinfo
+	USING GIN(LOWER(IM_UNACCENT(nameDE)) gin_trgm_ops);
+
 CREATE INDEX idxGinStreetNL ON Street
 	USING GIN(LOWER(IM_UNACCENT(nameNL)) gin_trgm_ops);
 CREATE INDEX idxGinStreetFR ON Street
@@ -179,12 +193,6 @@ CREATE INDEX idxGinStreetFR ON Street
 CREATE INDEX idxGinStreetDE ON Street
 	USING GIN(LOWER(IM_UNACCENT(nameDE)) gin_trgm_ops);
 
-CREATE INDEX idxGinMunicipalityNL ON Municipality 
-	USING GIN(LOWER(IM_UNACCENT(nameNL)) gin_trgm_ops);
-CREATE INDEX idxGinMunicipalityFR ON Municipality
-	USING GIN(LOWER(IM_UNACCENT(nameFR)) gin_trgm_ops);
-CREATE INDEX idxGinMunicipalityDE ON Municipality
-	USING GIN(LOWER(IM_UNACCENT(nameDE)) gin_trgm_ops);
 
 /* Values for support / debugging */
 CREATE TABLE version(identifier VARCHAR(20) NOT NULL,

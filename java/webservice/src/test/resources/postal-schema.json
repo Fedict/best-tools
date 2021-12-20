@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "Municipality schema",
+    "title": "Postal info schema",
 	"type": "object",
 	"properties": {
 		"id": {
@@ -9,7 +9,7 @@
 		"self": {
 			"type": "string"
 		},
-		"nisCode": {
+		"postalCode": {
 			"type": "string"
 		},
 		"name": {
@@ -27,5 +27,5 @@
 			}
 		}
 	},
-	"required": ["id", "self", "nisCode", "name"]
+	"required": ["id", "self", "postalCode"]
 }

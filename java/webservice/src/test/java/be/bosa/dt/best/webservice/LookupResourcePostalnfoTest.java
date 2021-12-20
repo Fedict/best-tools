@@ -27,9 +27,8 @@ package be.bosa.dt.best.webservice;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
+
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.Matchers.hasEntry;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -53,7 +52,8 @@ public class LookupResourcePostalnfoTest extends LookupResourceTest {
 	public void testPostalinfoFindIDBxl() {
 		String bxl = "BE.BRUSSELS.BRIC.ADM.PZ/1000/2";
 		testFindByID(LookupResource.POSTAL, bxl, "postal-schema.json")
-			.body("name.nl", equalTo("Brussel (Centrum)"));
+			.body("name.nl", equalTo("Brussel (Centrum)"),
+					"name.fr", equalTo("Bruxelles (Centre)"));
 	}
 
 	@Test
@@ -71,7 +71,27 @@ public class LookupResourcePostalnfoTest extends LookupResourceTest {
 
 	@Test
 	public void testPostalinfoFindParamPostalcode() {
-		testFindByParam(LookupResource.POSTAL, "postalCode", "1000", "postal-collection-schema.json")
-			.body("items", hasItem(hasEntry("name.nl", equalTo("Brussel (Centrum)"))));
+		testFindByParam(LookupResource.POSTAL, "postalCode", "2000", "postal-collection-schema.json")
+			.body("items.size()", equalTo(1),
+					"items[0].name.nl", equalTo("Antwerpen"));
 	}
+
+	@Test
+	public void testPostalinfoFindParamNameBXLNoAccent() {
+		testFindByParam(LookupResource.POSTAL, "name", "Parlement Europeen", "postal-collection-schema.json")
+			.body("items.size()", equalTo(1),
+					"items[1].name.fr", equalTo("Parlement Européen"));
+	}
+
+	@Test
+	public void testPostalinfoFindParamNameVLLower() {
+		testFindByParam(LookupResource.POSTAL, "name", "antwerpen", "postal-collection-schema.json")
+			.body("items.size()", equalTo(6),
+					"items[0].name.nl", equalTo("Antwerpen"));
+	}
+
+	public void testPostalinfoFindParamNameWal() {
+		// Walloon Region does not provide names
+	}
+
 }
