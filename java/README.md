@@ -9,19 +9,20 @@ Building without tests
 
 # Testing
 
+Webservice testing requires a docker instance and 20 GB of disk space
 
 ## Tools
 
-- [Unzip tool](unzip/README.md): recursively unzip the BeST-zip file.
-- [Converter tool](converter/README.md): convert XML files to CSV
-- [DBLoader](dbloader/README.md): loads (unzipped) prepare XML files for database
-- [Automation tool](automation/README.md) (internal use only)
+- [Unzip tool](unzip): recursively unzip the BeST-zip file.
+- [Converter tool](converter): convert XML files to CSV
+- [DBLoader](dbloader): loads (unzipped) prepare XML files for database
+- [Automation tool](automation) (internal use only)
 
 ## Helper modules
 
-- [DAO](dao/README.md)
-- [XmlReader](xmlreader/README.md)
+- [DAO](dao)
+- [XmlReader](xmlreader)
 
 ## Dockerized service
 
-- [Webservice](webservice/README.md): REST front-end
+- [Webservice](webservice): REST front-end
