@@ -29,6 +29,7 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import java.util.Map;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import org.junit.jupiter.api.Test;
 
@@ -106,19 +107,29 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 		testFindByParams(LookupResource.STREETS, 
 				Map.of("postalID", "https://data.vlaanderen.be/id/postinfo/23027/2002-08-13T17:32:32"), 
 				"street-collection-schema.json")
-			.body("items.size()", equalTo(250));
+			.body("items.size()", equalTo(250),
+					"items.name.nl", hasItem("Acacialaan"),
+					"items.name.fr.size()", equalTo(0));
 	}
 
 	@Test
 	public void testStreetPostalcode() {
 		testFindByParams(LookupResource.STREETS, Map.of("postalCode", "1500"), "street-collection-schema.json")
 			.body("items.size()", equalTo(250),
-					"first", notNullValue(),
-					"next", notNullValue());
+					"items.name.nl", hasItem("Acacialaan"),
+					"items.name.fr.size()", equalTo(0));
 	}
 
 	@Test
-	public void testStreetNisCode() {
+	public void testStreetNiscode() {
+		testFindByParams(LookupResource.STREETS, Map.of("nisCode", "23027"), "street-collection-schema.json")
+			.body("items.size()", equalTo(250),
+					"items.name.nl", hasItem("Acacialaan"),
+					"items.name.fr.size()", equalTo(0));
+	}
+
+	@Test
+	public void testStreetNiscodePagination() {
 		testFindByParams(LookupResource.STREETS, Map.of("nisCode", "23027"), "street-collection-schema.json")
 			.body("items.size()", equalTo(250),
 					"first", notNullValue(),

@@ -158,13 +158,13 @@ AS a2
 
 /* Create some auxiliary tables to speed up queries */
 CREATE UNLOGGED TABLE PostalMunicipalities AS (
-	SELECT DISTINCT a.mIdentifier, m.nisCode, p.postalCode
+	SELECT DISTINCT a.mIdentifier, m.refnisCode, p.postalCode
 	FROM Address a, Municipality m, PostalInfo p
 	WHERE a.pIdentifier = p.identifier
 	AND a.mIdentifier = m.identifier);
 
 CREATE UNLOGGED TABLE PostalStreets AS (
-	SELECT DISTINCT a.sIdentifier, m.nisCode, p.postalCode
+	SELECT DISTINCT a.sIdentifier, m.refnisCode, p.postalCode
 	FROM Address a, Municipality m, PostalInfo p
 	WHERE a.pIdentifier = p.identifier
 	AND a.mIdentifier = m.identifier);
