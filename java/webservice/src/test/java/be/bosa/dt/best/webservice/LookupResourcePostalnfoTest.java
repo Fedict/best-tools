@@ -27,6 +27,7 @@ package be.bosa.dt.best.webservice;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import org.junit.jupiter.api.Test;
@@ -70,27 +71,27 @@ public class LookupResourcePostalnfoTest extends LookupResourceTest {
 	}
 
 	@Test
-	public void testPostalinfoFindParamPostalcode() {
-		testFindByParam(LookupResource.POSTAL, "postalCode", "2000", "postal-collection-schema.json")
+	public void testPostalinfoFindPostalcode() {
+		testFindByParams(LookupResource.POSTAL, Map.of("postalCode", "2000"), "postal-collection-schema.json")
 			.body("items.size()", equalTo(1),
 					"items[0].name.nl", equalTo("Antwerpen"));
 	}
 
 	@Test
-	public void testPostalinfoFindParamNameBXLNoAccent() {
-		testFindByParam(LookupResource.POSTAL, "name", "Parlement Europeen", "postal-collection-schema.json")
+	public void testPostalinfoFindNameBXLNoAccent() {
+		testFindByParams(LookupResource.POSTAL, Map.of("name", "Parlement Europeen"), "postal-collection-schema.json")
 			.body("items.size()", equalTo(1),
 					"items[1].name.fr", equalTo("Parlement Européen"));
 	}
 
 	@Test
-	public void testPostalinfoFindParamNameVLLower() {
-		testFindByParam(LookupResource.POSTAL, "name", "antwerpen", "postal-collection-schema.json")
+	public void testPostalinfoFindNameVLLower() {
+		testFindByParams(LookupResource.POSTAL, Map.of("name", "antwerpen"), "postal-collection-schema.json")
 			.body("items.size()", equalTo(6),
 					"items[0].name.nl", equalTo("Antwerpen"));
 	}
 
-	public void testPostalinfoFindParamNameWal() {
+	public void testPostalinfoFindNameWal() {
 		// Walloon Region does not provide names
 	}
 

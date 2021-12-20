@@ -27,6 +27,7 @@ package be.bosa.dt.best.webservice;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
+import java.util.Map;
 import static org.hamcrest.CoreMatchers.equalTo;
 import org.junit.jupiter.api.Test;
 
@@ -70,5 +71,23 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 		testFindByID(LookupResource.STREETS, wal, "street-schema.json")
 			.body("name.fr", equalTo("Sur les Roches"),
 					"status", "current");
+	}
+	
+	@Test
+	public void testPostalinfoFindNameBXLNoAccent() {
+		testFindByParams(LookupResource.POSTAL, Map.of("name", "Parlement Europeen"), "postal-collection-schema.json")
+			.body("items.size()", equalTo(1),
+					"items[1].name.fr", equalTo("Parlement Européen"));
+	}
+
+	@Test
+	public void testPostalinfoFindNameVLLower() {
+		testFindByParams(LookupResource.POSTAL, Map.of("name", "antwerpen"), "postal-collection-schema.json")
+			.body("items.size()", equalTo(6),
+					"items[0].name.nl", equalTo("Antwerpen"));
+	}
+
+	public void testPostalinfoFindNameWal() {
+		// Walloon Region does not provide names
 	}
 }

@@ -32,6 +32,8 @@ import io.restassured.response.ValidatableResponse;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Helper class
@@ -47,7 +49,7 @@ public abstract class LookupResourceTest  {
 	 */
 	public ValidatableResponse testFound(String part) {
 		return when().get(LookupResource.API + part)
-			.then().statusCode(200).contentType(ContentType.JSON);
+				.then().statusCode(200).contentType(ContentType.JSON);
 	}
 
 	/**
@@ -58,7 +60,7 @@ public abstract class LookupResourceTest  {
 	 */
 	public ValidatableResponse testNotFound(String part) {
 		return when().get(LookupResource.API + part + "/foobar")
-			.then().statusCode(404).contentType(ContentType.JSON);
+				.then().statusCode(404).contentType(ContentType.JSON);
 	}
 	
 	/**
@@ -71,7 +73,7 @@ public abstract class LookupResourceTest  {
 	 */
 	public ValidatableResponse testFindByID(String part, String id, String schema) {
 		return when().get(LookupResource.API + part + "/" + URLEncoder.encode(id, StandardCharsets.UTF_8))
-			.then().statusCode(200).contentType(ContentType.JSON)
+				.then().statusCode(200).contentType(ContentType.JSON)
 					.body(matchesJsonSchemaInClasspath(schema));
 	}
 	
@@ -84,9 +86,13 @@ public abstract class LookupResourceTest  {
 	 * @param schema
 	 * @return 
 	 */
-	public ValidatableResponse testFindByParam(String part, String param, String value, String schema) {
-		return when().get(LookupResource.API + part + "?" + param + "=" + value)
-			.then().statusCode(200).contentType(ContentType.JSON)
+	public ValidatableResponse testFindByParams(String part, Map<String,String> paramValues, String schema) {
+		String q = "";
+		for(Entry e: paramValues.entrySet()) {
+			q += e.getKey() + "=" + e.getValue();
+		}
+		return when().get(LookupResource.API + part + "?" + q)
+				.then().statusCode(200).contentType(ContentType.JSON)
 					.body(matchesJsonSchemaInClasspath(schema));
 	}
 }
