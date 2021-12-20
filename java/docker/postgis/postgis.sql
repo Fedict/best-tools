@@ -179,6 +179,13 @@ CREATE INDEX idxGinMunicipalityFR ON Municipality
 CREATE INDEX idxGinMunicipalityDE ON Municipality
 	USING GIN(LOWER(IM_UNACCENT(nameDE)) gin_trgm_ops);
 
+CREATE INDEX idxGinMunicipalitypartNL ON Municipalitypart
+	USING GIN(LOWER(IM_UNACCENT(nameNL)) gin_trgm_ops);
+CREATE INDEX idxGinMunicipalitypartFR ON Municipalitypart
+	USING GIN(LOWER(IM_UNACCENT(nameFR)) gin_trgm_ops);
+CREATE INDEX idxGinMunicipalitypartDE ON Municipalitypart
+	USING GIN(LOWER(IM_UNACCENT(nameDE)) gin_trgm_ops);
+
 CREATE INDEX idxGinPostalinfoNL ON Postalinfo
 	USING GIN(LOWER(IM_UNACCENT(nameNL)) gin_trgm_ops);
 CREATE INDEX idxGinPostalinfoFR ON Postalinfo

@@ -234,6 +234,7 @@ public class LookupResource {
 	 * @param postalCode
 	 * @param name
 	 * @param after
+	 * @param nameMatch
 	 * @param info
 	 * @return (possibly empty) list of postal infos
 	 */
@@ -243,8 +244,9 @@ public class LookupResource {
 	public JsonObject getPostalInfos(
 			@RestQuery String postalCode,
 			@RestQuery String name,
-			@RestQuery String after, UriInfo info) {
-		Multi<PostalInfo> postals = repo.findPostalInfos(after, postalCode, name);
+			@RestQuery String after, 
+			@RestQuery String nameMatch, UriInfo info) {
+		Multi<PostalInfo> postals = repo.findPostalInfos(after, postalCode, name, nameMatch);
 		return Util.toJson(info, postals);
 	}
 

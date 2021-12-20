@@ -1,0 +1,47 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Part of municipality schema",
+	"type": "object",
+	"properties": {
+		"self": {
+			"type": "string"
+		},
+		"items": {
+			"type": "array",
+			"minItems": 1,
+			"items": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"self": {
+						"type": "string"
+					},
+					"name": {
+						"type": "object",
+						"properties": {
+							"nl": {
+								"type": "string"
+							},
+							"fr": {
+								"type": "string"
+							},
+							"de": {
+								"type": "string"
+							}
+						}
+					}
+				},
+				"required": ["id", "self", "name"]
+			}
+		},
+		"pageSize": {
+			"type": "integer"		
+		},
+		"first": {
+			"type": "string"
+		}
+	},
+	"required": ["self", "items"]
+}

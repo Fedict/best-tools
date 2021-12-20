@@ -186,7 +186,7 @@ public class Repository {
 		}
 	}
 	
-		/**
+	/**
 	 * Add non-empty fields to SQL where clause
 	 * 
 	 * @param lst list of SQL parameter values
@@ -337,6 +337,7 @@ public class Repository {
 	 * @param nisCode
 	 * @param postalCode
 	 * @param name
+	 * @param nameMatch
 	 * @return municipalities or null
 	 */
 	public Multi<Municipality> findMunicipalities(String nisCode, String postalCode, String name, String nameMatch) {
@@ -443,15 +444,16 @@ public class Repository {
 	 * @param afterId search after ID (paginated results)
 	 * @param postalCode postal code
 	 * @param name postal name
+	 * @param nameMatch
 	 * @return 
 	 */
-	public Multi<PostalInfo> findPostalInfos(String afterId, String postalCode, String name) {
+	public Multi<PostalInfo> findPostalInfos(String afterId, String postalCode, String name, String nameMatch) {
 		List lst = new ArrayList(4);
 		SqlPostalInfo qry = new SqlPostalInfo();
 
 		where(lst, qry, "p.postalcode", postalCode);
 		
-		whereNames(lst, qry, "p.nameNL", "p.nameFR", "p.nameDE", name, Repository.SEARCH_EXACT);
+		whereNames(lst, qry, "p.nameNL", "p.nameFR", "p.nameDE", name, nameMatch);
 		paginate(lst, qry, NsConverter.postalEncode(afterId));
 
 		return multi(

@@ -72,6 +72,7 @@ public abstract class Sql {
 	 * @param nl Dutch field name
 	 * @param fr French field name
 	 * @param de German field name
+	 * @param matchType
 	 */
 	public void whereNames(String nl, String fr, String de, String matchType) {
 		String v = "$" + ++vars;
