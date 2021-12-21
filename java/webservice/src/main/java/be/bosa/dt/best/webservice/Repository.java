@@ -222,6 +222,7 @@ public class Repository {
 	 * 
 	 * @param afterId search after ID (paginated results)
 	 * @param mIdentifier municipality identifier
+	 * @param nisCode
 	 * @param mName municipality name
 	 * @param sIdentifier street identifier
 	 * @param sName street name
@@ -234,17 +235,18 @@ public class Repository {
 	 * @param embed embed street, postal etc or not
 	 * @return 
 	 */
-	public Multi<Address> findAddresses(String afterId, String mIdentifier, String mName,
+	public Multi<Address> findAddresses(String afterId, String mIdentifier, String nisCode, String mName,
 										String sIdentifier, String sName,
 										String pIdentifier, String postalCode, String pName,
 										String houseNumber, String boxNumber, String status, boolean embed) {
-		boolean joinMunicipality = !(mName == null || mName.isEmpty());
-		boolean joinStreet = !(sName == null || sName.isEmpty());
-		boolean joinPostal = !(postalCode == null || postalCode.isEmpty());
-		List lst = new ArrayList(11);
+		boolean joinMunicipality = (mName != null && !mName.isEmpty()) || (nisCode != null && !nisCode.isEmpty());
+		boolean joinStreet = (sName != null && !sName.isEmpty());
+		boolean joinPostal = (postalCode != null && !postalCode.isEmpty());
+		List lst = new ArrayList(12);
 		SqlAddress qry = new SqlAddress(embed, joinStreet, joinMunicipality,  joinPostal);
 
 		where(lst, qry, "a.mIdentifier", NsConverter.municipalityEncode(mIdentifier));
+		where(lst, qry, "m.refnisCode", nisCode);
 		whereNames(lst, qry, "m.nameNL", "m.nameFR", "m.nameDE", mName, Repository.SEARCH_EXACT);
 		where(lst, qry, "a.sIdentifier", NsConverter.streetEncode(sIdentifier));
 		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", sName, Repository.SEARCH_EXACT);

@@ -97,6 +97,15 @@ paths:
         required: false
         schema:
           type: string
+      - name: nisCode
+        in: query
+        description: REFNIS code (assigned by Statbel)
+        required: false
+        schema:
+          maximum: 93099
+          minimum: 11001
+          type: string
+          example: 23027
       - name: municipalityName
         in: query
         description: Municipality name
@@ -235,7 +244,7 @@ paths:
           minimum: 11001
           type: string
           example: 23027
-      - name: postalcode
+      - name: postalCode
         in: query
         description: Postal code (assigned by bPost)
         required: false

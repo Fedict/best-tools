@@ -78,9 +78,72 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 
 	@Test
 	public void testAddressMunicipalityWal() {
-		String wal = "geodata.wallonie.be/id/Municipality/7736971/1";
+		String wal = "geodata.wallonie.be/id/Municipality/63049/4";
 		testFindByParams(LookupResource.ADDRESSES, Map.of("municipalityID", wal), "address-collection-schema.json")
 			.body("items.municipality.id", everyItem(equalTo(wal)));
+	}
+
+	@Test
+	public void testAddressNisCodeBxl() {
+		String bxl = "BE.BRUSSELS.BRIC.ADM.MUNICIPALITY/21004/7";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("nisCode", "21004"), "address-collection-schema.json")
+			.body("items.municipality.id", everyItem(equalTo(bxl)));
+	}
+
+	@Test
+	public void testAddressNisCodeVl() {
+		String vl = "https://data.vlaanderen.be/id/gemeente/23027/2002-08-13T17:32:32";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("nisCode", "23027"), "address-collection-schema.json")
+			.body("items.municipality.id", everyItem(equalTo(vl)));
+	}
+
+	@Test
+	public void testAddressNisCodeWal() {
+		String wal = "geodata.wallonie.be/id/Municipality/63049/4";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("nisCode", "63049"), "address-collection-schema.json")
+			.body("items.municipality.id", everyItem(equalTo(wal)));
+	}
+
+	@Test
+	public void testAddressPostalinfoBxl() {
+		String bxl = "BE.BRUSSELS.BRIC.ADM.PZ/1130/2";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("postalinfoID", bxl), "address-collection-schema.json")
+			.body("items.postalinfo.id", everyItem(equalTo(bxl)));
+	}
+
+	@Test
+	public void testAddressPostalinfoVl() {
+		String vl = "https://data.vlaanderen.be/id/postinfo/1502/2002-08-13T16:37:33";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("postalinfoID", vl), "address-collection-schema.json")
+			.body("items.postalinfo.id", everyItem(equalTo(vl)));
+	}
+
+	@Test
+	public void testAddresPostalinfoWal() {
+		String wal = "geodata.wallonie.be/id/PostalInfo/4960/1";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("postalinfoID", wal), "address-collection-schema.json")
+			.body("items.postalinfo.id", everyItem(equalTo(wal)));
+	}
+
+	@Test
+	public void testAddressPostalCodeBxl() {
+		String bxl = "BE.BRUSSELS.BRIC.ADM.PZ/1130/2";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("postalCode", "1130"), "address-collection-schema.json")
+			.body("items.postalinfo.id", everyItem(equalTo(bxl)));
+	}
+
+	@Test
+	public void testAddressPostalCodeVl() {
+		String vl = "https://data.vlaanderen.be/id/postinfo/1502/2002-08-13T16:37:33";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("postalinfoID", "1502"), "address-collection-schema.json")
+			.body("items.postalinfo.id", everyItem(equalTo(vl)));
+	}
+
+	@Test
+	public void testAddresPostalCodeWal() {
+		String wal = "geodata.wallonie.be/id/PostalInfo/4960/1";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("postalinfoID", "4960"), "address-collection-schema.json")
+			.body("items.postalinfo.id", everyItem(equalTo(wal)));
 	}
 
 	@Test
@@ -117,5 +180,25 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 			.body("items.size()", equalTo(11),
 					"items.street.id", everyItem(equalTo(wal)),
 					"items.street.href", everyItem(notNullValue()));
+	}
+	
+	@Test
+	public void testAddressStreetHousenumber() {
+		String vl = "https://data.vlaanderen.be/id/straatnaam/26057/2013-10-05T15:59:10.067";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("streetID", vl, "houseNumber", "2"), "address-collection-schema.json")
+			.body("items.size()", equalTo(1),
+					"items.street.id", everyItem(equalTo(vl)),
+					"items.street.href", everyItem(notNullValue()),
+					"items.housenumber", equalTo("1"));
+	}
+	
+	@Test
+	public void testAddressStreetnameHousenumber() {
+		String vl = "https://data.vlaanderen.be/id/straatnaam/26057/2013-10-05T15:59:10.067";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("name", "Claesplein", "houseNumber", "2"), "address-collection-schema.json")
+			.body("items.size()", equalTo(1),
+					"items.street.id", everyItem(equalTo(vl)),
+					"items.street.href", everyItem(notNullValue()),
+					"items.housenumber", equalTo("2"));
 	}
 }

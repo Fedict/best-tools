@@ -96,6 +96,7 @@ public class LookupResource {
 	 * 
 	 * @param municipalityID
 	 * @param municipalityName
+	 * @param nisCode
 	 * @param streetID
 	 * @param streetName
 	 * @param postalID
@@ -118,7 +119,7 @@ public class LookupResource {
 	@Path(LookupResource.ADDRESSES)
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonObject getAddresses(
-			@RestQuery String municipalityID, @RestQuery String municipalityName,
+			@RestQuery String municipalityID, @RestQuery String municipalityName, @RestQuery String nisCode,
 			@RestQuery String streetID, @RestQuery String streetName,
 			@RestQuery String postalID, @RestQuery String postalName, @RestQuery String postalCode,
 			@RestQuery String houseNumber, @RestQuery String boxNumber,
@@ -133,7 +134,7 @@ public class LookupResource {
 			addresses = repo.findByPolygon(after, polygon, crs, status, embed);
 		} else {
 			addresses = repo.findAddresses(after, 
-								municipalityID, municipalityName, streetID, streetName, 
+								municipalityID, nisCode, municipalityName, streetID, streetName, 
 								postalID, postalCode, postalName, houseNumber, boxNumber, 
 								status, embed);
 		}
