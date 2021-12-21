@@ -80,7 +80,7 @@
 					},
 					"required": ["x", "y"]
 				},
-				"required": ["id", "self", "street", "municipality", "postal", "housenumber", "status", "validFrom"]
+				"required": ["id", "self", "street", "municipality", "postal", "housenumber", "status"]
 			}
 		}
 	},

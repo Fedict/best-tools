@@ -137,8 +137,9 @@ public abstract class Sql {
 			} else {
 				bld.insert(0, "WITH q AS (");
 				bld.append(") SELECT * FROM q LIMIT ").append(limit);	
+			}
 		}
-		}
+		System.err.println(bld.toString());
 		Log.debug(bld.toString());
 		return bld.toString();
 	}

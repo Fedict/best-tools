@@ -27,7 +27,6 @@ package be.bosa.dt.best.webservice;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.response.ValidatableResponse;
 import java.util.Map;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -105,34 +104,30 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 
 	@Test
 	public void testStreetPostalID() {
-		ValidatableResponse body = testFindByParams(LookupResource.STREETS, 
-			Map.of("postalID", "https://data.vlaanderen.be/id/postinfo/23027/2002-08-13T17:32:32"),
-			"street-collection-schema.json");
-	//		.body("items.size()", equalTo(250),
-	//			"items.name.nl", hasItem("Claesplein"),
-	//			"items.name.fr.size()", equalTo(0));
-		System.err.println(body.extract().asPrettyString());
+		testFindByParams(LookupResource.STREETS, 
+			Map.of("postalinfoID", "https://data.vlaanderen.be/id/postinfo/23027/2002-08-13T17:32:32"),
+			"street-collection-schema.json")
+			.body("items.size()", equalTo(250),
+				"items.name.nl", hasItem("Claesplein"));
 	}
 
 	@Test
 	public void testStreetPostalcode() {
 		testFindByParams(LookupResource.STREETS, Map.of("postalCode", "1502"), "street-collection-schema.json")
 			.body("items.size()", equalTo(72),
-					"items.name.nl", hasItem("Claesplein"),
-					"items.name.fr.size()", equalTo(0));
+					"items.name.nl", hasItem("Claesplein"));
 	}
 
 	@Test
 	public void testStreetNiscode() {
 		testFindByParams(LookupResource.STREETS, Map.of("nisCode", "21004"), "street-collection-schema.json")
-			.body("items.size()", equalTo(72),
-					"items.name.fr", hasItem("Rue de Namur"),
-					"items.name.fr.size()", equalTo(72));
+			.body("items.size()", equalTo(250),
+					"items.name.fr", hasItem("Rue de Namur"));
 	}
 
 	@Test
-	public void testStreetNiscodePagination() {
-		testFindByParams(LookupResource.STREETS, Map.of("nisCode", "21004"), "street-collection-schema.json")
+	public void testStreetPagination() {
+		testFound(LookupResource.STREETS)
 			.body("items.size()", equalTo(250),
 					"first", notNullValue(),
 					"next", notNullValue());

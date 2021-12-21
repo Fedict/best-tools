@@ -81,17 +81,17 @@ public abstract class LookupResourceTest  {
 	 * Test which should return one ore more result
 	 * 
 	 * @param part
-	 * @param param
-	 * @param value
+	 * @param paramValues
 	 * @param schema
 	 * @return 
 	 */
 	public ValidatableResponse testFindByParams(String part, Map<String,String> paramValues, String schema) {
 		String q = "";
 		for(Entry e: paramValues.entrySet()) {
-			q += e.getKey() + "=" + e.getValue();
+			q += "&" + e.getKey() + "=" + e.getValue();
 		}
-		return when().get(LookupResource.API + part + "?" + q)
+
+		return when().get(LookupResource.API + part + "?" + q.substring(1))
 				.then().statusCode(200).contentType(ContentType.JSON)
 					.body(matchesJsonSchemaInClasspath(schema));
 	}

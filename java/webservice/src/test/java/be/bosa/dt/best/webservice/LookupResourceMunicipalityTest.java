@@ -72,7 +72,6 @@ public class LookupResourceMunicipalityTest extends LookupResourceTest {
 			.body("name.fr", equalTo("Saint-Vith"),
 					"name.de", equalTo("Sankt Vith"));
 	}
-
 	
 	@Test
 	public void testMunicipalityNameAccent() {

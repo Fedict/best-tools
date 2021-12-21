@@ -178,7 +178,7 @@ public class Util {
 	 */
 	protected static <T extends BestEntity> JsonObject toJson(UriInfo info, Multi<T> items) {
 		String self = info.getAbsolutePath().toString();
-	
+		System.err.println(info.getRequestUri().toString());
 		JsonArray arr = new JsonArray();
 		items.subscribe().asStream().forEach(a -> {
 			//String href = self + "/" + a.id.replace("/", "%2F");

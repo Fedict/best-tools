@@ -55,8 +55,7 @@ public class PostgisServer implements QuarkusTestResourceLifecycleManager  {
 		String host = pgContainer.getHost();
 		int port = pgContainer.getFirstMappedPort();
 		String dbName = pgContainer.getDatabaseName();
-		
-		System.err.println("datasource" + new String("postgresql://" + host + ":" + port + "/" + dbName));
+
 		return Map.of("quarkus.datasource.reactive.url", "postgresql://" + host + ":" + port + "/" + dbName);
 	}
 

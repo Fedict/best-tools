@@ -28,6 +28,9 @@ package be.bosa.dt.best.webservice;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import java.util.Map;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import org.junit.jupiter.api.Test;
 
@@ -58,5 +61,61 @@ public class LookupResourceAddressTest extends LookupResourceTest {
     public void testAddressNotEmbedded() {
 		testNotFound(LookupResource.ADDRESSES);
     }
+
+	@Test
+	public void testAddressMunicipalityBxl() {
+		String bxl = "BE.BRUSSELS.BRIC.ADM.MUNICIPALITY/21004/7";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("municipalityID", bxl), "address-collection-schema.json")
+			.body("items.municipality.id", everyItem(equalTo(bxl)));
+	}
+
+	@Test
+	public void testAddressMunicipalityVl() {
+		String vl = "https://data.vlaanderen.be/id/gemeente/23027/2002-08-13T17:32:32";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("municipalityID", vl), "address-collection-schema.json")
+			.body("items.municipality.id", everyItem(equalTo(vl)));
+	}
+
+	@Test
+	public void testAddressMunicipalityWal() {
+		String wal = "geodata.wallonie.be/id/Municipality/7736971/1";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("municipalityID", wal), "address-collection-schema.json")
+			.body("items.municipality.id", everyItem(equalTo(wal)));
+	}
+
+	@Test
+	public void testAddressStreetIDBxl() {
+		String bxl = "BE.BRUSSELS.BRIC.ADM.STR/4003/2";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("streetID", bxl), "address-collection-schema.json")
+			.body("items.size()", equalTo(119),
+					"items.street.id", everyItem(equalTo(bxl)),
+					"items.street.href", everyItem(notNullValue()));
+	}
 	
+	@Test
+	public void testAddressStreetIDBxlEmbed() {
+		String bxl = "BE.BRUSSELS.BRIC.ADM.STR/4003/2";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("streetID", bxl, "embed", "true"), "address-collection-schema.json")
+			.body("items.size()", equalTo(119),
+					"items.street.href", everyItem(notNullValue()),
+					"embedded", notNullValue());
+	}
+
+	@Test
+	public void testAddressStreetIDVl() {
+		String vl = "https://data.vlaanderen.be/id/straatnaam/26089/2013-10-05T15:59:10.067";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("streetID", vl), "address-collection-schema.json")
+			.body("items.size()", equalTo(50),
+					"items.street.id", everyItem(equalTo(vl)),
+					"items.street.href", everyItem(notNullValue()));
+	}
+
+	@Test
+	public void testAddressStreetIDWal() {
+		String wal = "geodata.wallonie.be/id/Streetname/7737097/1";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("streetID", wal), "address-collection-schema.json")
+			.body("items.size()", equalTo(11),
+					"items.street.id", everyItem(equalTo(wal)),
+					"items.street.href", everyItem(notNullValue()));
+	}
 }

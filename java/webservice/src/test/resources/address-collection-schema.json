@@ -88,7 +88,7 @@
 						"required": ["x", "y"]
 					}
 				},
-				"required": ["id", "self", "street", "municipality", "postal", "housenumber", "status", "validFrom"]
+				"required": ["id", "self", "street", "municipality", "postal", "housenumber", "status"]
 			}
 		},
 		"pageSize": {
@@ -98,5 +98,5 @@
 			"type": "string"
 		}
 	},
-	"required": ["self", "items", "pageSize", "first"]
+	"required": ["self", "items"]
 }

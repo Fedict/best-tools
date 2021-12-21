@@ -515,7 +515,7 @@ public class Repository {
 
 		where(lst, qry, "s.mIdentifier", NsConverter.municipalityEncode(mIdentifier));
 		where(lst, qry, "ps.refniscode", nisCode);
-		where(lst, qry, "ps.identifier", NsConverter.postalEncode(pIdentifier));
+		where(lst, qry, "ps.pidentifier", NsConverter.postalEncode(pIdentifier));
 		where(lst, qry, "ps.postalcode", postalCode);
 		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", name, Repository.SEARCH_EXACT);
 		where(lst, qry, "s.status", status);
