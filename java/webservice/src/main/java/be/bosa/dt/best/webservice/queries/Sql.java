@@ -139,8 +139,8 @@ public abstract class Sql {
 				bld.append(") SELECT * FROM q LIMIT ").append(limit);	
 			}
 		}
-		System.err.println(bld.toString());
-		Log.debug(bld.toString());
+
+		Log.debugf("Query: %s", bld);
 		return bld.toString();
 	}
 }

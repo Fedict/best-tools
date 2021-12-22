@@ -61,6 +61,7 @@ import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import org.eclipse.microprofile.config.ConfigProvider;
 
 import org.locationtech.proj4j.ProjCoordinate;
 
@@ -74,8 +75,11 @@ import org.locationtech.proj4j.ProjCoordinate;
 public class Repository {
 	@Inject
 	PgPool pg;
-	
-	protected static int PAGE_LIMIT = 250;
+
+	// can't use ConfigProperty annotation here
+	protected final static int PAGE_LIMIT = 
+			ConfigProvider.getConfig()
+				.getOptionalValue("be.bosa.dt.best.webservice.page_limit", Integer.class).orElse(250);
 
 	public static final String CRS_GPS = "gps";
 	public static final String CRS_L72 = "lambert72";

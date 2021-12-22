@@ -86,21 +86,21 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 	@Test
 	public void testAddressMunicipalityNameBxl() {
 		String bxl = "BE.BRUSSELS.BRIC.ADM.MUNICIPALITY/21004/7";
-		testFindByParams(LookupResource.ADDRESSES, Map.of("name", "Saint-Josse-ten-Noode"), "address-collection-schema.json")
+		testFindByParams(LookupResource.ADDRESSES, Map.of("municipalityName", "Bruxelles"), "address-collection-schema.json")
 			.body("items.municipality.id", everyItem(equalTo(bxl)));
 	}
 
 	@Test
 	public void testAddressMunicipalityNameVl() {
 		String vl = "https://data.vlaanderen.be/id/gemeente/23027/2002-08-13T17:32:32";
-		testFindByParams(LookupResource.ADDRESSES, Map.of("name", "Halle"), "address-collection-schema.json")
+		testFindByParams(LookupResource.ADDRESSES, Map.of("municipalityName", "Halle"), "address-collection-schema.json")
 			.body("items.municipality.id", everyItem(equalTo(vl)));
 	}
 
 	@Test
 	public void testAddressMunicipalityNameWal() {
 		String wal = "geodata.wallonie.be/id/Municipality/63049/4";
-		testFindByParams(LookupResource.ADDRESSES, Map.of("name", "Malmedy"), "address-collection-schema.json")
+		testFindByParams(LookupResource.ADDRESSES, Map.of("municipalityName", "Malmedy"), "address-collection-schema.json")
 			.body("items.municipality.id", everyItem(equalTo(wal)));
 	}
 
@@ -187,9 +187,9 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 
 	@Test
 	public void testAddressStreetIDVl() {
-		String vl = "https://data.vlaanderen.be/id/straatnaam/26089/2013-10-05T15:59:10.067";
+		String vl = "https://data.vlaanderen.be/id/straatnaam/26081/2013-10-05T15:59:10.067";
 		testFindByParams(LookupResource.ADDRESSES, Map.of("streetID", vl), "address-collection-schema.json")
-			.body("items.size()", equalTo(50),
+			.body("items.size()", equalTo(242),
 					"items.street.id", everyItem(equalTo(vl)),
 					"items.street.href", everyItem(notNullValue()));
 	}
@@ -210,16 +210,16 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 			.body("items.size()", equalTo(1),
 					"items.street.id", everyItem(equalTo(vl)),
 					"items.street.href", everyItem(notNullValue()),
-					"items.housenumber", equalTo("2"));
+					"items.housenumber[0]", equalTo("2"));
 	}
 	
 	@Test
 	public void testAddressStreetnameHousenumber() {
 		String vl = "https://data.vlaanderen.be/id/straatnaam/26057/2013-10-05T15:59:10.067";
-		testFindByParams(LookupResource.ADDRESSES, Map.of("name", "Claesplein", "houseNumber", "2"), "address-collection-schema.json")
+		testFindByParams(LookupResource.ADDRESSES, Map.of("streetName", "Claesplein", "houseNumber", "2"), "address-collection-schema.json")
 			.body("items.size()", equalTo(1),
 					"items.street.id", everyItem(equalTo(vl)),
 					"items.street.href", everyItem(notNullValue()),
-					"items.housenumber", equalTo("2"));
+					"items.housenumber[0]", equalTo("2"));
 	}
 }

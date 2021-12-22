@@ -71,22 +71,6 @@ public abstract class BestSerializer<T extends BestEntity> extends StdSerializer
 		jg.writeEndObject();
 	}
 
-/**
-	 * Convert uni of address, street, ... into JSON
-	 * 
-	 * @param <T>
-	 * @param self web request url
-	 * @param item entity
-	 * @return JSON object or null when not found
-	 */
-	/*public static <T extends BestEntity> JsonObject toJson(String self, Uni<T> item) {
-		BestEntity entity = item.await().indefinitely();
-		if (entity == null) {
-			return null;
-		}
-		return JsonObject.mapFrom(entity).put("self", self);
-	}*/
-
     public BestSerializer() {
         this(null);
     }

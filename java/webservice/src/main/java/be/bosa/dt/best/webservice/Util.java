@@ -53,7 +53,7 @@ import org.jboss.resteasy.reactive.RestResponse.ResponseBuilder;
  * 
  * @author Bart Hanssens
  */
-public class Util {
+public class Util {	
 	/**
 	 * Convert uni of address, street, ... into JSON
 	 * 
@@ -177,7 +177,7 @@ public class Util {
 	 * @return JSON object
 	 */
 	protected static <T extends BestEntity> JsonObject toJson(UriInfo info, Multi<T> items) {
-		String self = info.getAbsolutePath().toString();
+		String self = info.getRequestUriBuilder().toString();
 		System.err.println(info.getRequestUri().toString());
 		JsonArray arr = new JsonArray();
 		items.subscribe().asStream().forEach(a -> {
