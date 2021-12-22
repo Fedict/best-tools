@@ -51,7 +51,7 @@ public class LookupResourceStreetTest extends LookupResourceTest {
     }
 
 	@Test
-	public void testStreetFindIDBxl() {
+	public void testStreetIDBxl() {
 		String bxl = "BE.BRUSSELS.BRIC.ADM.STR/3974/2";
 		testFindByID(LookupResource.STREETS, bxl, "street-schema.json")
 			.body("name.nl", equalTo("Masuistraat"),
@@ -60,7 +60,7 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 	}
 
 	@Test
-	public void testStreetFindIDVl() {
+	public void testStreetIDVl() {
 		String vl = "https://data.vlaanderen.be/id/straatnaam/26089/2013-10-05T15:59:10.067";
 		testFindByID(LookupResource.STREETS, vl, "street-schema.json")
 			.body("name.nl", equalTo("Elbeekstraat"),
@@ -68,7 +68,7 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 	}
 
 	@Test
-	public void testStreetFindIDWal() {
+	public void testStreetIDWal() {
 		String wal = "geodata.wallonie.be/id/Streetname/7737097/1";
 		testFindByID(LookupResource.STREETS, wal, "street-schema.json")
 			.body("name.fr", equalTo("Sur les Roches"),
@@ -114,6 +114,13 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 	@Test
 	public void testStreetPostalcode() {
 		testFindByParams(LookupResource.STREETS, Map.of("postalCode", "1502"), "street-collection-schema.json")
+			.body("items.size()", equalTo(72),
+					"items.name.nl", hasItem("Claesplein"));
+	}
+
+	@Test
+	public void testStreetPostalName() {
+		testFindByParams(LookupResource.STREETS, Map.of("postalName", "Lembeek"), "street-collection-schema.json")
 			.body("items.size()", equalTo(72),
 					"items.name.nl", hasItem("Claesplein"));
 	}

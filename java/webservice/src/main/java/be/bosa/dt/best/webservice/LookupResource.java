@@ -41,8 +41,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
 import java.util.Map;
-
 import javax.enterprise.context.ApplicationScoped;
+
 import javax.inject.Inject;
 
 import javax.ws.rs.GET;
@@ -306,5 +306,4 @@ public class LookupResource {
 	public Multi<Version> getVersionInfo() {
 		return repo.findVersionInfo();
 	}
-
 }

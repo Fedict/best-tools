@@ -50,7 +50,7 @@ public class LookupResourcePostalnfoTest extends LookupResourceTest {
     }
 
 	@Test
-	public void testPostalinfoFindIDBxl() {
+	public void testPostalinfoIDBxl() {
 		String bxl = "BE.BRUSSELS.BRIC.ADM.PZ/1000/2";
 		testFindByID(LookupResource.POSTAL, bxl, "postal-schema.json")
 			.body("name.nl", equalTo("Brussel (Centrum)"),
@@ -58,34 +58,34 @@ public class LookupResourcePostalnfoTest extends LookupResourceTest {
 	}
 
 	@Test
-	public void testPostalinfoFindIDVl() {
+	public void testPostalinfoIDVl() {
 		String vl = "https://data.vlaanderen.be/id/postinfo/2323/2002-08-13T16:37:33";
 		testFindByID(LookupResource.POSTAL, vl, "postal-schema.json")
 			.body("name.nl", equalTo("Wortel"));
 	}
 
 	@Test
-	public void testPostalinfoFindIDWal() {
+	public void testPostalinfoIDWal() {
 		String wal = "geodata.wallonie.be/id/PostalInfo/7973/1";
 		testFindByID(LookupResource.POSTAL, wal, "postal-schema.json");
 	}
 
 	@Test
-	public void testPostalinfoFindPostalcode() {
+	public void testPostalinfoPostalcode() {
 		testFindByParams(LookupResource.POSTAL, Map.of("postalCode", "2000"), "postal-collection-schema.json")
 			.body("items.size()", equalTo(1),
 					"items[0].name.nl", equalTo("Antwerpen"));
 	}
 
 	@Test
-	public void testPostalinfoFindNameAccent() {
+	public void testPostalinfoNameAccent() {
 		testFindByParams(LookupResource.POSTAL, Map.of("name", "Parlement Europeen"), "postal-collection-schema.json")
 			.body("items.size()", equalTo(1),
 					"items[0].name.fr", equalTo("Parlement Européen"));
 	}
 
 	@Test
-	public void testPostalinfoFindNameLower() {
+	public void testPostalinfoNameLower() {
 		testFindByParams(LookupResource.POSTAL, Map.of("name", "antwerpen"), "postal-collection-schema.json")
 			.body("items.size()", equalTo(6),
 					"items[0].name.nl", equalTo("Antwerpen"));

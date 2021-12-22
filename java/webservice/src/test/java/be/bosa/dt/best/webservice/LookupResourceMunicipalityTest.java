@@ -49,7 +49,7 @@ public class LookupResourceMunicipalityTest extends LookupResourceTest {
     }
 
 	@Test
-	public void testMunicipalityFindIDBxl() {
+	public void testMunicipalityIDBxl() {
 		String bxl = "BE.BRUSSELS.BRIC.ADM.MUNICIPALITY/21002/6";
 		testFindByID(LookupResource.MUNICIPALITIES, bxl, "municipality-schema.json")
 			.body("name.nl", equalTo("Oudergem"),
@@ -57,7 +57,7 @@ public class LookupResourceMunicipalityTest extends LookupResourceTest {
 	}
 
 	@Test
-	public void testMunicipalityFindIDVl() {
+	public void testMunicipalityIDVl() {
 		String vl = "https://data.vlaanderen.be/id/gemeente/71034/2002-08-13T17:32:32";
 		testFindByID(LookupResource.MUNICIPALITIES, vl, "municipality-schema.json")
 			.body("name.nl", equalTo("Leopoldsburg"),
@@ -66,7 +66,7 @@ public class LookupResourceMunicipalityTest extends LookupResourceTest {
 	}
 
 	@Test
-	public void testMunicipalityFindIDWal() {
+	public void testMunicipalityIDWal() {
 		String wal = "geodata.wallonie.be/id/Municipality/63067/4";
 		testFindByID(LookupResource.MUNICIPALITIES, wal, "municipality-schema.json")
 			.body("name.fr", equalTo("Saint-Vith"),

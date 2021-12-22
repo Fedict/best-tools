@@ -82,6 +82,27 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 		testFindByParams(LookupResource.ADDRESSES, Map.of("municipalityID", wal), "address-collection-schema.json")
 			.body("items.municipality.id", everyItem(equalTo(wal)));
 	}
+	
+	@Test
+	public void testAddressMunicipalityNameBxl() {
+		String bxl = "BE.BRUSSELS.BRIC.ADM.MUNICIPALITY/21004/7";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("name", "Saint-Josse-ten-Noode"), "address-collection-schema.json")
+			.body("items.municipality.id", everyItem(equalTo(bxl)));
+	}
+
+	@Test
+	public void testAddressMunicipalityNameVl() {
+		String vl = "https://data.vlaanderen.be/id/gemeente/23027/2002-08-13T17:32:32";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("name", "Halle"), "address-collection-schema.json")
+			.body("items.municipality.id", everyItem(equalTo(vl)));
+	}
+
+	@Test
+	public void testAddressMunicipalityNameWal() {
+		String wal = "geodata.wallonie.be/id/Municipality/63049/4";
+		testFindByParams(LookupResource.ADDRESSES, Map.of("name", "Malmedy"), "address-collection-schema.json")
+			.body("items.municipality.id", everyItem(equalTo(wal)));
+	}
 
 	@Test
 	public void testAddressNisCodeBxl() {
@@ -189,7 +210,7 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 			.body("items.size()", equalTo(1),
 					"items.street.id", everyItem(equalTo(vl)),
 					"items.street.href", everyItem(notNullValue()),
-					"items.housenumber", equalTo("1"));
+					"items.housenumber", equalTo("2"));
 	}
 	
 	@Test
