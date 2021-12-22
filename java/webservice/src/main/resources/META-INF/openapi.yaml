@@ -304,12 +304,12 @@ paths:
           type: string
         example: Bruxelles
       responses:
-        "200":
+        200:
           description: A (possibly empty) list of municipality parts
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/MunicipalityPartCollection'
   /api/belgianAddress/v2/municipalityParts/{id}:
     get:
       tags:
@@ -324,13 +324,13 @@ paths:
         schema:
           type: string
       responses:
-        "200":
+        200:
           description: Requested municipality part
           content:
             application/json:
               schema:
-                type: object
-        "404":
+                $ref: '#/components/schemas/MunicipalityPart'
+        404:
           description: Municipality part not found
   /api/belgianAddress/v2/postalInfos:
     get:
@@ -361,7 +361,7 @@ paths:
           type: string
           example: 1000
       responses:
-        "200":
+        200:
           description: OK
           content:
             application/json:
@@ -382,13 +382,13 @@ paths:
           type: string
           example: https://data.vlaanderen.be/id/postinfo/2323/2002-08-13T16:37:33
       responses:
-        "200":
+        200:
           description: Requested postal info
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PostalInfo'
-        "404":
+        404:
           description: Postal info not found
   /api/belgianAddress/v2/streets:
     get:
@@ -450,7 +450,7 @@ paths:
           minimum: 1000
           example: 1500
       responses:
-        "200":
+        200:
           description: A (possibly empty) list of streets
           content:
             application/json:
@@ -470,26 +470,13 @@ paths:
         schema:
           type: string
       responses:
-        "200":
+        200:
           description: Requested street
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    description: Unique identifier
-                    type: string
-                  self:
-                    description: Link to self
-                    type: string
-                  name:
-                    description: Array of results
-                    type: object
-                  streetnameType:
-                    description: Array of results
-                    type: string
-        "404":
+                $ref: '#/components/schemas/Street'
+        404:
           description: Street not found
   /api/belgianAddress/v2/version:
     get:
@@ -521,11 +508,70 @@ components:
         de:
           description: Name in German
           type: string
+    Municipality:
+      type: object
+      properties:
+        id:
+          description: Identifier
+          type: string
+        self:
+          description: Link to self
+          type: string
+        refnisCode:
+          description: REFNIS code (assigned by Statbel)
+          type: string
+        name:
+          $ref: '#/components/schemas/Name'
+    MunicipalityCollection:
+      type: object
+      properties:
+        self:
+          description: Link to self
+          type: string
+        items:
+          description: Array of results
+          type: array
+          items:
+            $ref: '#/components/schemas/Municipality'
+    MunicipalityPart:
+      type: object
+      properties:
+        id:
+          description: Identifier
+          type: string
+        self:
+          description: Link to self
+          type: string
+        refnisCode:
+          description: REFNIS code (assigned by Statbel)
+          type: string
+    PostalInfo:
+      type: object
+      properties:
+        id:
+          description: Identifier
+          type: string
+        self:
+          description: Link to self
+          type: string
+        postalCode:
+          description: Postal code (assigned by bPost)
+          type: string
+        name:
+          $ref: '#/components/schemas/Name'
+    PostalInfoCollection:
+      type: object
+      properties:
+        self:
+          description: Link to self
+          type: string
+        items:
+          description: Array of results
+          type: array
+          items:
+            $ref: '#/components/schemas/PostalInfo'
     Street:
       type: object
-      required:
-       - id
-       - name
       properties:
         id:
           description: Identifier
@@ -534,16 +580,12 @@ components:
           description: Link to self
           type: string
         name:
-          type: object
-          $ref: '#/components/schema/Name'
+          $ref: '#/components/schemas/Name'
         status:
           description: Status
           type: string
     StreetCollection:
       type: object
-      required:
-        - self
-        - items
       properties:
         self:
           description: Link to self
@@ -552,11 +594,16 @@ components:
         items:
           description: Array of results
           type: array
-          $ref: '#/components/schemas/Street'
+          items:
+            $ref: '#/components/schemas/Street'
     Version:
       type: object
       properties:
         key:
+          description: Key
           type: string
+          example: key
         value:
+          description: Value
           type: string
+          example: value
