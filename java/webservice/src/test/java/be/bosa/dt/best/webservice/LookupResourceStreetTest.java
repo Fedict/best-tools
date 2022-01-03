@@ -142,9 +142,9 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 
 	@Test
 	public void testStreetMunicipalityName() {
-		testFindByParams(LookupResource.STREETS, Map.of("municipalityName", "Halle"), "street-collection-schema.json")
+		testFindByParams(LookupResource.STREETS, Map.of("municipalityName", "Brussel"), "street-collection-schema.json")
 			.body("items.size()", equalTo(250),
-					"items.name.nl", hasItem("Claesplein"));
+					"items.name.fr", hasItem("Rue du Camp"));
 	}
 	@Test
 	public void testStreetPagination() {
