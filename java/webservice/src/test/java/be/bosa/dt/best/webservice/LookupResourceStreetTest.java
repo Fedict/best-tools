@@ -128,8 +128,8 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 	@Test
 	public void testStreetNiscode() {
 		testFindByParams(LookupResource.STREETS, Map.of("nisCode", "21004"), "street-collection-schema.json")
-			.body("items.size()", equalTo(250),
-					"items.name.fr", hasItem("Rue de Namur"));
+			.body("items.size()", equalTo(54),
+					"items.name.fr", hasItem("Rue du Camp"));
 	}
 
 	@Test
