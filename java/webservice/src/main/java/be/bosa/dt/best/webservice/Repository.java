@@ -519,10 +519,10 @@ public class Repository {
 		List lst = new ArrayList(15);
 		SqlStreet qry = new SqlStreet(joinPostal, joinMunicipality);
 
-		where(lst, qry, "s.mIdentifier", NsConverter.municipalityEncode(mIdentifier));
-		where(lst, qry, "ps.refniscode", nisCode);
+		where(lst, qry, "pm.mIdentifier", NsConverter.municipalityEncode(mIdentifier));
+		where(lst, qry, "m.refniscode", nisCode);
 		where(lst, qry, "ps.pidentifier", NsConverter.postalEncode(pIdentifier));
-		where(lst, qry, "ps.postalcode", postalCode);
+		where(lst, qry, "p.postalcode", postalCode);
 		whereNames(lst, qry, "m.nameNL", "m.nameFR", "m.nameDE", municipalityName, Repository.SEARCH_EXACT);
 		whereNames(lst, qry, "p.nameNL", "p.nameFR", "p.nameDE", postalName, Repository.SEARCH_EXACT);
 		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", name, Repository.SEARCH_EXACT);

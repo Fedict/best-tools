@@ -50,7 +50,7 @@ public class SqlStreet extends Sql {
 		}
 		if (joinMunicipality) {
 			this.join += " INNER JOIN postalMunicipalities pm ON pm.mIdentifier = s.mIdentifier " +
-						" INNER JOIN municipalty m ON m.identifier = pm.mIdentifier";
+						" INNER JOIN municipality m ON m.identifier = pm.mIdentifier";
 		}
 	}
 }
