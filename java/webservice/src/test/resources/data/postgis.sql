@@ -27,15 +27,10 @@ CREATE TYPE enumPositionSpecificationValueType
 /* Create tables, don't write to WAL since it will be a read-only source anyway */
 CREATE UNLOGGED TABLE Address(
     identifier VARCHAR(100) NOT NULL,
-    minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1,
     mIdentifier VARCHAR(100) NOT NULL,
-    mMinorVersionIdentifier SMALLINT,
     mpIdentifier VARCHAR(100),
-    mpMinorVersionIdentifier SMALLINT,
     sIdentifier VARCHAR(100) NOT NULL,
-    sMinorVersionIdentifier SMALLINT,
     pIdentifier VARCHAR(100) NOT NULL,
-    pMinorVersionIdentifier SMALLINT,
     housenumber VARCHAR(15),
     boxnumber VARCHAR(35),
     officiallyAssigned BOOLEAN,
@@ -51,7 +46,6 @@ CREATE UNLOGGED TABLE Address(
 
 CREATE UNLOGGED TABLE Municipality(
     identifier VARCHAR(100) NOT NULL,
-    minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1,
     refnisCode VARCHAR(5) NOT NULL,
     nameNL VARCHAR(100),
     nameFR VARCHAR(100),
@@ -59,14 +53,12 @@ CREATE UNLOGGED TABLE Municipality(
 
 CREATE UNLOGGED TABLE PartOfMunicipality(
     identifier VARCHAR(100) NOT NULL, 
-    minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1,
     nameNL VARCHAR(100),
     nameFR VARCHAR(100),
     nameDE VARCHAR(100));
 
 CREATE UNLOGGED TABLE PostalInfo(
     identifier VARCHAR(100) NOT NULL,
-    minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1,
     postalCode VARCHAR(4) NOT NULL,
     nameNL VARCHAR(240),
     nameFR VARCHAR(240),
@@ -74,9 +66,7 @@ CREATE UNLOGGED TABLE PostalInfo(
 	
 CREATE UNLOGGED TABLE Street(
     identifier VARCHAR(100) NOT NULL,
-    minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1,
     mIdentifier VARCHAR(100) NOT NULL,
-    mMinorVersionIdentifier SMALLINT,
     nameNL VARCHAR(100),
     nameFR VARCHAR(100),
     nameDE VARCHAR(100),
@@ -97,28 +87,28 @@ COPY Street FROM '/tmp/streets.csv' WITH DELIMITER ';' NULL as '' QUOTE '"' csv;
 
 /* Add primary keys */
 ALTER TABLE Address 
-    ADD CONSTRAINT pkAddress PRIMARY KEY(identifier, minorVersionIdentifier);
+    ADD CONSTRAINT pkAddress PRIMARY KEY(identifier);
 ALTER TABLE Municipality
-    ADD CONSTRAINT pkMunicipality PRIMARY KEY(identifier, minorVersionIdentifier);
+    ADD CONSTRAINT pkMunicipality PRIMARY KEY(identifier);
 ALTER TABLE PartOfMunicipality
-    ADD CONSTRAINT pkPartOfMunicipality PRIMARY KEY(identifier, minorVersionIdentifier);
+    ADD CONSTRAINT pkPartOfMunicipality PRIMARY KEY(identifier);
 ALTER TABLE PostalInfo
-    ADD CONSTRAINT pkPostalInfo PRIMARY KEY(identifier, minorVersionIdentifier);
+    ADD CONSTRAINT pkPostalInfo PRIMARY KEY(identifier);
 ALTER TABLE Street
-    ADD CONSTRAINT pkStreet PRIMARY KEY(identifier, minorVersionIdentifier);
+    ADD CONSTRAINT pkStreet PRIMARY KEY(identifier);
 
 ALTER TABLE Address ADD CONSTRAINT fkAddressMunicipality
-    FOREIGN KEY (mIdentifier, mMinorVersionIdentifier)
-    REFERENCES Municipality(identifier, minorVersionIdentifier);
+    FOREIGN KEY (mIdentifier)
+    REFERENCES Municipality(identifier);
 ALTER TABLE Address ADD CONSTRAINT fkAddressPartOfMunicipality
-    FOREIGN KEY (mpIdentifier, mpMinorVersionIdentifier)
-    REFERENCES PartOfMunicipality(identifier, minorVersionIdentifier);
+    FOREIGN KEY (mpIdentifier)
+    REFERENCES PartOfMunicipality(identifier);
 ALTER TABLE Address ADD CONSTRAINT fkAddressPostalInfo
-    FOREIGN KEY (pIdentifier, pMinorVersionIdentifier)
-    REFERENCES PostalInfo(identifier, minorVersionIdentifier);
+    FOREIGN KEY (pIdentifier)
+    REFERENCES PostalInfo(identifier);
 ALTER TABLE Address ADD CONSTRAINT fkAddressStreet
-    FOREIGN KEY (sIdentifier, sMinorVersionIdentifier)
-    REFERENCES Street(identifier, minorVersionIdentifier);
+    FOREIGN KEY (sIdentifier)
+    REFERENCES Street(identifier);
 
 /* Set FK-indexes */
 CREATE INDEX idxAddressMunicipality ON Address(mIdentifier);

@@ -16,7 +16,7 @@ USER best
 RUN cd /home/best && \
   git clone https://github.com/fedict/best-tools && \
   cd /home/best/best-tools/java && \
-  mvn clean install && \
+  mvn clean install -DskipTests && \
   wget -q https://opendata.bosa.be/download/best/best-full-latest.zip -O /tmp/best.zip && \
   mkdir -p /tmp/best/data/xml && mkdir -p /tmp/best/data/csv && \ 
   java -jar unzip/target/unzip-${version}.jar -i /tmp/best.zip -o /tmp/best/data/xml && \

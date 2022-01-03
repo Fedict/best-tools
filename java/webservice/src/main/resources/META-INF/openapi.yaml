@@ -254,12 +254,12 @@ paths:
           type: string
         example: 1500
       responses:
-        "200":
+        200:
           description: A (possibly empty) list of municipalities
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/MunicipalityCollection'
   /api/belgianAddress/v2/municipalities/{id}:
     get:
       tags:
@@ -274,13 +274,13 @@ paths:
         schema:
           type: string
       responses:
-        "200":
+        200:
           description: Requested municipality
           content:
             application/json:
               schema:
-                type: object
-        "404":
+                $ref: '#/components/schemas/Municipality'
+        404:
           description: Municipality not found
   /api/belgianAddress/v2/municipalityParts:
     get:

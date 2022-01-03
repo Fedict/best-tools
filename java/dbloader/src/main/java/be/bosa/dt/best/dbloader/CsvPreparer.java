@@ -84,7 +84,7 @@ public class CsvPreparer {
 
 				while (iter.hasNext()) {
 					Postal a = iter.next();
-					w.writeRow(NsConverter.postalEncode(a.getIDVersion()), "1", a.getId(),
+					w.writeRow(NsConverter.postalEncode(a.getIDVersion()), a.getId(),
 								a.getName("nl"), a.getName("fr"), a.getName("de"));
 					if (++cnt % 10_000 == 0) {
 						LOG.log(Level.INFO, "Wrote {0}", cnt);
@@ -114,7 +114,7 @@ public class CsvPreparer {
 
 				while (iter.hasNext()) {
 					Municipality a = iter.next();
-					w.writeRow( NsConverter.municipalityEncode(a.getIDVersion()), "1", a.getId(), 
+					w.writeRow( NsConverter.municipalityEncode(a.getIDVersion()),  a.getId(), 
 								a.getName("nl"), a.getName("fr"), a.getName("de"));
 					if (++cnt % 10_000 == 0) {
 						LOG.log(Level.INFO, "Wrote {0}", cnt);
@@ -144,7 +144,7 @@ public class CsvPreparer {
 
 				while (iter.hasNext()) {
 					Municipality a = iter.next();
-					w.writeRow(NsConverter.municipalityPartEncode(a.getIDVersion()), "1", 
+					w.writeRow(NsConverter.municipalityPartEncode(a.getIDVersion()), 
 								a.getName("nl"), a.getName("fr"), a.getName("de"));
 					if (++cnt % 10_000 == 0) {
 						LOG.log(Level.INFO, "Wrote {0}", cnt);
@@ -176,9 +176,7 @@ public class CsvPreparer {
 				while (iter.hasNext()) {
 					Street a = iter.next();
 					w.writeRow(NsConverter.streetEncode(a.getIDVersion()),
-								"1",
 								NsConverter.municipalityEncode(a.getCity().getIDVersion()), 
-								"1",
 								a.getName("nl"), a.getName("fr"), a.getName("de"), 
 								"", a.getStreetType(), a.getStatus(),
 								(a.getFromDate() != null) ? a.getFromDate().toString() : "", 
@@ -227,15 +225,10 @@ public class CsvPreparer {
 
 					// calculate geom afterwards, using separate UPDATE statement
 					w.writeRow(NsConverter.addressEncode(a.getIDVersion()), 
-						"1",
 						NsConverter.municipalityEncode(a.getCity().getIDVersion()),
-						"1",
 						NsConverter.municipalityPartEncode(a.getCityPart().getIDVersion()),
-						"1",
 						NsConverter.streetEncode(a.getStreet().getIDVersion()),
-						"1",
 						NsConverter.postalEncode(a.getPostal().getIDVersion()),
-						"1",
 						a.getNumber(), a.getBox(), "", 
 						a.getStatus(), 
 						(a.getFromDate() != null) ? a.getFromDate().toString() : "", 

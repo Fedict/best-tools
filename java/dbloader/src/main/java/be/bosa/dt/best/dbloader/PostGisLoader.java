@@ -149,15 +149,10 @@ public class PostGisLoader {
 
 			stmt.execute("CREATE TABLE Address(" +
 					"	identifier VARCHAR(100) NOT NULL, " +
-					"	minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1, " +
 					"	mIdentifier VARCHAR(100) NOT NULL, " +
-					"	mMinorVersionIdentifier SMALLINT, " +
 					"	mpIdentifier VARCHAR(100), " +
-					"	mpMinorVersionIdentifier SMALLINT, " +
 					"	sIdentifier VARCHAR(100) NOT NULL, " +
-					"	sMinorVersionIdentifier SMALLINT, " +
 					"	pIdentifier VARCHAR(100) NOT NULL, " +
-					"	pMinorVersionIdentifier SMALLINT, " +
 					"	housenumber VARCHAR(15), " +
 					"	boxnumber VARCHAR(35), " +
 					"	officiallyAssigned BOOLEAN, " +
@@ -173,7 +168,6 @@ public class PostGisLoader {
 
 			stmt.execute("CREATE TABLE Municipality(" +
 					"	identifier VARCHAR(100) NOT NULL, " +
-					"	minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1, " +
 					"	refnisCode VARCHAR(5) NOT NULL, " +
 					"	nameNL VARCHAR(100), " +
 					"	nameFR VARCHAR(100), " +
@@ -181,14 +175,12 @@ public class PostGisLoader {
 
 			stmt.execute("CREATE TABLE PartOfMunicipality(" +
 					"	identifier VARCHAR(100) NOT NULL, " +
-					"	minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1, " +
 					"	nameNL VARCHAR(100), " +
 					"	nameFR VARCHAR(100), " +
 					"	nameDE VARCHAR(100));");
 
 			stmt.execute("CREATE TABLE PostalInfo( " +
 					"	identifier VARCHAR(100) NOT NULL, " +
-					"	minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1, " +
 					"	postalCode VARCHAR(4) NOT NULL, " +
 					"	nameNL VARCHAR(240), " +
 					"	nameFR VARCHAR(240), " +
@@ -196,9 +188,7 @@ public class PostGisLoader {
 	
 			stmt.execute("CREATE TABLE Street(" +
 					"	identifier VARCHAR(100) NOT NULL, " +
-					"	minorVersionIdentifier SMALLINT NOT NULL DEFAULT 1, " +
 					"	mIdentifier VARCHAR(100) NOT NULL, " +
-					"	mMinorVersionIdentifier SMALLINT, " +
 					"	nameNL VARCHAR(100), " +
 					"	nameFR VARCHAR(100), " +
 					"	nameDE VARCHAR(100), " +
@@ -224,31 +214,31 @@ public class PostGisLoader {
 
 			LOG.info("Set primary keys");
 			stmt.execute("ALTER TABLE Address " +
-				" ADD CONSTRAINT pkAddress PRIMARY KEY(identifier, minorVersionIdentifier)");
+				" ADD CONSTRAINT pkAddress PRIMARY KEY(identifier)");
 			stmt.execute("ALTER TABLE Municipality " +
-				" ADD CONSTRAINT pkMunicipality PRIMARY KEY(identifier, minorVersionIdentifier)");
+				" ADD CONSTRAINT pkMunicipality PRIMARY KEY(identifier)");
 			stmt.execute("ALTER TABLE PartOfMunicipality " +
-				" ADD CONSTRAINT pkPartOfMunicipality PRIMARY KEY(identifier, minorVersionIdentifier)");
+				" ADD CONSTRAINT pkPartOfMunicipality PRIMARY KEY(identifier)");
 			stmt.execute("ALTER TABLE PostalInfo " +
-				" ADD CONSTRAINT pkPostalInfo PRIMARY KEY(identifier, minorVersionIdentifier)");
+				" ADD CONSTRAINT pkPostalInfo PRIMARY KEY(identifier)");
 			stmt.execute("ALTER TABLE Street " +
-				" ADD CONSTRAINT pkStreet PRIMARY KEY(identifier, minorVersionIdentifier)");
+				" ADD CONSTRAINT pkStreet PRIMARY KEY(identifier)");
 			//stmt.execute("ALTER TABLE Event " +
 			//	" ADD CONSTRAINT pkEvent PRIMARY KEY(eventIdentifier)");
 
 			LOG.info("Set foreign keys");
 			stmt.execute("ALTER TABLE Address ADD CONSTRAINT fkAddressMunicipality "+
-				" FOREIGN KEY (mIdentifier, mMinorVersionIdentifier) "+
-				" REFERENCES Municipality(identifier, minorVersionIdentifier)");
+				" FOREIGN KEY (mIdentifier) "+
+				" REFERENCES Municipality(identifier)");
 			stmt.execute("ALTER TABLE Address ADD CONSTRAINT fkAddressPartOfMunicipality " +
-				" FOREIGN KEY (mpIdentifier, mpMinorVersionIdentifier) "+
-				" REFERENCES PartOfMunicipality(identifier, minorVersionIdentifier)");
+				" FOREIGN KEY (mpIdentifier) "+
+				" REFERENCES PartOfMunicipality(identifier)");
 			stmt.execute("ALTER TABLE Address ADD CONSTRAINT fkAddressPostalInfo " +
-				" FOREIGN KEY (pIdentifier, pMinorVersionIdentifier) " +
-				" REFERENCES PostalInfo(identifier, minorVersionIdentifier)");
+				" FOREIGN KEY (pIdentifier) " +
+				" REFERENCES PostalInfo(identifier)");
 			stmt.execute("ALTER TABLE Address ADD CONSTRAINT fkAddressStreet " +
-				" FOREIGN KEY (sIdentifier, sMinorVersionIdentifier) "+
-				" REFERENCES Street(identifier, minorVersionIdentifier)");
+				" FOREIGN KEY (sIdentifier) "+
+				" REFERENCES Street(identifier)");
 		}
 	}
 	
