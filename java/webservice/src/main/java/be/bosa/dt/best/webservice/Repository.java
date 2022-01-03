@@ -41,6 +41,8 @@ import be.bosa.dt.best.webservice.queries.SqlMunicipalityPart;
 import be.bosa.dt.best.webservice.queries.SqlPostalInfo;
 import be.bosa.dt.best.webservice.queries.SqlStreet;
 import be.bosa.dt.best.webservice.queries.SqlVersion;
+import io.quarkus.logging.Log;
+import io.quarkus.runtime.StartupEvent;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -60,6 +62,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import org.eclipse.microprofile.config.ConfigProvider;
 
@@ -108,7 +111,7 @@ public class Repository {
 	 * 
 	 * @param ev 
 	 */
-/*	void onStart(@Observes StartupEvent ev) {               
+	void onStart(@Observes StartupEvent ev) {               
         Log.info("Caching");
 	
 		Multi<Municipality> municipalities = findMunicipalitiesAll();
@@ -131,7 +134,7 @@ public class Repository {
 		});
 		Log.infof("%d postal info", cache.size() - size);
     }
-¨*/
+
 	/**
 	 * Convert rows to a multi result
 	 * 
