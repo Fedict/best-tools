@@ -128,16 +128,23 @@ AS a2
 
 /* Create some auxiliary tables to speed up queries */
 CREATE UNLOGGED TABLE PostalMunicipalities AS (
-	SELECT DISTINCT m.identifier, m.refnisCode, a.pidentifier, p.postalCode
+	SELECT DISTINCT a.mIdentifier, a.pidentifier
 	FROM Address a, Municipality m, PostalInfo p
 	WHERE a.pIdentifier = p.identifier
 	AND a.mIdentifier = m.identifier);
 
+CREATE INDEX idxPostalMunicipalitiesMunicipality ON PostalMunicipalities(mIdentifier);
+CREATE INDEX idxPostalMunicipalitiesPostal ON PostalMunicipalities(pIdentifier);
+
 CREATE UNLOGGED TABLE PostalStreets AS (
-	SELECT DISTINCT a.sIdentifier, m.refnisCode, a.pidentifier, p.postalCode
+	SELECT DISTINCT a.sIdentifier, a.pIdentifier
 	FROM Address a, Municipality m, PostalInfo p
 	WHERE a.pIdentifier = p.identifier
 	AND a.mIdentifier = m.identifier);
+
+CREATE INDEX idxPostalStreetsStreet ON PostalStreets(sIdentifier);
+CREATE INDEX idxPostalStreetsPostal ON PostalStreets(pIdentifier);
+
 
 /* Geo index */
 CREATE INDEX idxAddressPoint ON Address

@@ -239,4 +239,19 @@ public class Util {
 
 		return ResponseBuilder.create(RestResponse.Status.NOT_FOUND, obj).build();
 	}
+
+	/**
+	 * Check if at least one value is not null and not empty
+	 * 
+	 * @param values
+	 * @return true if at least one value os not empty
+	 */
+	protected static boolean oneNotEmpty(String... values) {
+		for (String s: values) {
+			if (s != null && !s.isEmpty()) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

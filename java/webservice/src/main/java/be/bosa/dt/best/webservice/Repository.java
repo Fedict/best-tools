@@ -240,9 +240,10 @@ public class Repository {
 										String sIdentifier, String sName,
 										String pIdentifier, String postalCode, String pName,
 										String houseNumber, String boxNumber, String status, boolean embed) {
-		boolean joinMunicipality = (mName != null && !mName.isEmpty()) || (nisCode != null && !nisCode.isEmpty());
-		boolean joinStreet = (sName != null && !sName.isEmpty());
-		boolean joinPostal = (postalCode != null && !postalCode.isEmpty());
+		boolean joinMunicipality = Util.oneNotEmpty(mName, nisCode);
+		boolean joinStreet = Util.oneNotEmpty(sName);
+		boolean joinPostal = Util.oneNotEmpty(postalCode);
+
 		List lst = new ArrayList(12);
 		SqlAddress qry = new SqlAddress(embed, joinStreet, joinMunicipality,  joinPostal);
 
@@ -344,7 +345,7 @@ public class Repository {
 	 * @return municipalities or null
 	 */
 	public Multi<Municipality> findMunicipalities(String nisCode, String postalCode, String name, String nameMatch) {
-		boolean joinPostal = ! (postalCode == null || postalCode.isEmpty());
+		boolean joinPostal = Util.oneNotEmpty(postalCode);
 		List lst = new ArrayList(4);
 		
 		SqlMunicipality qry = new SqlMunicipality(joinPostal);
@@ -487,7 +488,7 @@ public class Repository {
 	 */
 	public Uni<Street> findStreetById(String id) {
 		Tuple tuple = Tuple.of(NsConverter.streetEncode(id));
-		SqlStreet qry = new SqlStreet(false);
+		SqlStreet qry = new SqlStreet(false, false);
 		qry.where("s.identifier =");
 
 		return uni(
@@ -501,28 +502,33 @@ public class Repository {
 	 * @param afterId search after ID (paginated results)
 	 * @param mIdentifier municipality ID
 	 * @param nisCode REFNIS code
+	 * @param municipalityName
 	 * @param pIdentifier postalinfo ID
 	 * @param postalCode postal code
+	 * @param postalName
 	 * @param name (part of) municipality name, searches in NL/FR/DE
 	 * @param status
 	 * @return 
 	 */
-	public Multi<Street> findStreets(String afterId, String mIdentifier, String nisCode, 
-									String pIdentifier, String postalCode, String name, String status) {
-		boolean joinPostal = (nisCode != null && !nisCode.isEmpty()) ||
-								(postalCode != null && !postalCode.isEmpty()) || 
-								(pIdentifier!= null && !pIdentifier.isEmpty());
+	public Multi<Street> findStreets(String afterId, String mIdentifier, String nisCode, String municipalityName,
+									String pIdentifier, String postalCode, String postalName,
+									String name, String status) {
+		boolean joinPostal = Util.oneNotEmpty(postalCode, pIdentifier, postalName);
+		boolean joinMunicipality = Util.oneNotEmpty(nisCode, mIdentifier, municipalityName);
 
-		List lst = new ArrayList(9);
-		SqlStreet qry = new SqlStreet(joinPostal);
+		List lst = new ArrayList(15);
+		SqlStreet qry = new SqlStreet(joinPostal, joinMunicipality);
 
 		where(lst, qry, "s.mIdentifier", NsConverter.municipalityEncode(mIdentifier));
 		where(lst, qry, "ps.refniscode", nisCode);
 		where(lst, qry, "ps.pidentifier", NsConverter.postalEncode(pIdentifier));
 		where(lst, qry, "ps.postalcode", postalCode);
+		whereNames(lst, qry, "m.nameNL", "m.nameFR", "m.nameDE", municipalityName, Repository.SEARCH_EXACT);
+		whereNames(lst, qry, "p.nameNL", "p.nameFR", "p.nameDE", postalName, Repository.SEARCH_EXACT);
 		whereNames(lst, qry, "s.nameNL", "s.nameFR", "s.nameDE", name, Repository.SEARCH_EXACT);
+
 		where(lst, qry, "s.status", status);
-		
+
 		paginate(lst, qry, NsConverter.streetEncode(afterId));
 
 		return multi(

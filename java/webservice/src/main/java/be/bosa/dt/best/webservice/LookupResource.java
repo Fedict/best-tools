@@ -272,8 +272,10 @@ public class LookupResource {
 	 * 
 	 * @param municipalityID
 	 * @param nisCode
+	 * @param municipalityName
 	 * @param postalinfoID
 	 * @param postalCode
+	 * @param postalName
 	 * @param name
 	 * @param status
 	 * @param after
@@ -286,12 +288,15 @@ public class LookupResource {
 	public JsonObject getStreets(
 			@RestQuery String municipalityID,
 			@RestQuery String nisCode,
+			@RestQuery String municipalityName,
 			@RestQuery String postalinfoID,
 			@RestQuery String postalCode,
+			@RestQuery String postalName,
 			@RestQuery String name,
 			@RestQuery String status,
 			@RestQuery String after, UriInfo info) {
-		Multi<Street> streets = repo.findStreets(after, municipalityID, nisCode, postalinfoID, postalCode, name, status);
+		Multi<Street> streets = repo.findStreets(after, municipalityID, nisCode, municipalityName, 
+			postalinfoID, postalCode, postalName, name, status);
 		return Util.toJson(info, streets);
 	}
 

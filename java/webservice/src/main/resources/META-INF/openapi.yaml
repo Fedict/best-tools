@@ -419,6 +419,13 @@ paths:
           minimum: 11001
           type: string
           example: 23027
+      - name: municipalityName
+        in: query
+        description: "(Part of) municipality name, searches in Dutch/French/German names"
+        required: false
+        schema:
+          type: string
+          example: Halle
       - name: postalinfoID
         in: path
         required: true
@@ -434,6 +441,13 @@ paths:
           minimum: 1000
           type: string
           example: 1000
+      - name: postalName
+        in: query
+        description: "(Part of) postal name, searches in Dutch/French/German names"
+        required: false
+        schema:
+          type: string
+          example: Lembeek
       - name: name
         in: query
         description: "(Part of) street name, searches in Dutch/French/German names"

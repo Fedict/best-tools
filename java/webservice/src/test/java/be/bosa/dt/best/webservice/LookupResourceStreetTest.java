@@ -105,14 +105,14 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 	@Test
 	public void testStreetPostalID() {
 		testFindByParams(LookupResource.STREETS, 
-			Map.of("postalinfoID", "https://data.vlaanderen.be/id/postinfo/23027/2002-08-13T17:32:32"),
+			Map.of("postalinfoID", "https://data.vlaanderen.be/id/postinfo/1502/2002-08-13T16:37:33"),
 			"street-collection-schema.json")
 			.body("items.size()", equalTo(250),
 				"items.name.nl", hasItem("Claesplein"));
 	}
 
 	@Test
-	public void testStreetPostalcode() {
+	public void testStreetPostalCode() {
 		testFindByParams(LookupResource.STREETS, Map.of("postalCode", "1502"), "street-collection-schema.json")
 			.body("items.size()", equalTo(72),
 					"items.name.nl", hasItem("Claesplein"));
@@ -121,8 +121,16 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 	@Test
 	public void testStreetPostalName() {
 		testFindByParams(LookupResource.STREETS, Map.of("postalName", "Lembeek"), "street-collection-schema.json")
-			.body("items.size()", equalTo(72),
+			.body("items.size()", equalTo(250),
 					"items.name.nl", hasItem("Claesplein"));
+	}
+
+	@Test
+	public void testStreetMunicipalityID() {
+		testFindByParams(LookupResource.STREETS, Map.of("municipalityID", 
+			"https://data.vlaanderen.be/id/gemeente/26307/2013-10-05T15:59:10.067"), "street-collection-schema.json")
+			.body("items.size()", equalTo(54),
+					"items.name.nl", hasItem("Renauxwijk"));
 	}
 
 	@Test
@@ -132,6 +140,12 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 					"items.name.fr", hasItem("Rue du Camp"));
 	}
 
+	@Test
+	public void testStreetMunicipalityName() {
+		testFindByParams(LookupResource.STREETS, Map.of("municipalityName", "Halle"), "street-collection-schema.json")
+			.body("items.size()", equalTo(250),
+					"items.name.nl", hasItem("Claesplein"));
+	}
 	@Test
 	public void testStreetPagination() {
 		testFound(LookupResource.STREETS)

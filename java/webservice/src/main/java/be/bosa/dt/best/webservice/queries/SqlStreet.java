@@ -36,15 +36,21 @@ public class SqlStreet extends Sql {
 	 * Constructor
 	 * 
 	 * @param joinPostal join with postalInfo table
+	 * @param joinMunicipality
 	 */
-	public SqlStreet(boolean joinPostal) {
+	public SqlStreet(boolean joinPostal, boolean joinMunicipality) {
 		this.select = "s.identifier, s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, " +
 						"s.validFrom, s.validTo, s.streetnameType::text, s.status::text";
 		this.alias = "s";
 		this.from = "street";
 		
 		if (joinPostal) {
-			this.join += " INNER JOIN postalStreets ps ON ps.sIdentifier = s.identifier";	
+			this.join += " INNER JOIN postalStreets ps ON ps.sIdentifier = s.identifier " +
+						" INNER JOIN postalInfo p ON p.identifier = ps.pIdentifier";
+		}
+		if (joinMunicipality) {
+			this.join += " INNER JOIN postalMunicipalities pm ON pm.mIdentifier = s.mIdentifier " +
+						" INNER JOIN municipalty m ON m.identifier = pm.mIdentifier";
 		}
 	}
 }
