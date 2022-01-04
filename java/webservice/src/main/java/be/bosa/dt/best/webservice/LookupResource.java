@@ -105,11 +105,11 @@ public class LookupResource {
 	 * @param houseNumber
 	 * @param boxNumber
 	 * @param status
-	 * @param coordX
-	 * @param coordY
-	 * @param radius
+	 * @param coordX x-coordinate
+	 * @param coordY y-coordinate
+	 * @param radius max radius in meters
 	 * @param polygon
-	 * @param crs
+	 * @param crs coordinate reference system: gps or lambert72
 	 * @param embed
 	 * @param after
 	 * @param info
@@ -128,7 +128,7 @@ public class LookupResource {
 			@RestQuery String polygon, @RestQuery String crs,
 			@RestQuery boolean embed, @RestQuery String after, UriInfo info) {
 		Multi<Address> addresses;
-		if (coordX != 0 && coordY == 0) {
+		if (coordX > 0 && coordY > 0) {
 			addresses = repo.findByCoordinates(after, coordX, coordY, crs, radius, status, embed);
 		} else if (polygon != null && !polygon.isEmpty()) {
 			addresses = repo.findByPolygon(after, polygon, crs, status, embed);

@@ -67,7 +67,7 @@ public class Util {
 		if (entity == null) {
 			return null;
 		}
-		String self = info.getAbsolutePath().toString();
+		String self = info.getRequestUri().toString();
 		return JsonObject.mapFrom(entity).put("self", self);
 	}
 
@@ -87,7 +87,7 @@ public class Util {
 		}
 
 		JsonObject parentObj = JsonObject.mapFrom(addr);
-		String self = info.getAbsolutePath().toString();
+		String self = info.getRequestUri().toString();
 	
 		if (embed) {
 			JsonObject embObj = new JsonObject();
@@ -177,8 +177,8 @@ public class Util {
 	 * @return JSON object
 	 */
 	protected static <T extends BestEntity> JsonObject toJson(UriInfo info, Multi<T> items) {
-		String self = info.getRequestUriBuilder().toString();
-		System.err.println(info.getRequestUri().toString());
+		String self = info.getRequestUri().toString();
+
 		JsonArray arr = new JsonArray();
 		items.subscribe().asStream().forEach(a -> {
 			//String href = self + "/" + a.id.replace("/", "%2F");

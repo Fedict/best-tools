@@ -41,7 +41,6 @@ public abstract class Sql {
 	protected String order = "";
 	protected String limit = "";
 	protected int vars = 0;
-	protected boolean rewriteHack = false;
 
 	/**
 	 * Add order by clause
@@ -52,6 +51,9 @@ public abstract class Sql {
 		this.order = str;
 	}
 	
+	/**
+	 * Order by identifier column
+	 */
 	public void orderById() {
 		order(alias + ".identifier");
 	}
@@ -88,7 +90,8 @@ public abstract class Sql {
 
 	
 	/**
-	 * Add pagination with start identifier (don't use OFFSET, that's more resource intensive)
+	 * Add pagination with start identifier.
+	 * Don't use OFFSET, since it's resource intensive for large offsets.
 	 */
 	public void paginate() {
 		where(alias + ".identifier > ");
@@ -103,14 +106,10 @@ public abstract class Sql {
 	}
 
 	/**
-	 * Add limit clause
+	 * Add limit clause which is actually unlimited
 	 */
 	public void unlimited(){
 		this.limit = "ALL";
-	}
-
-	public void setRewriteHack() {
-		rewriteHack = true;
 	}
 
 	/**
@@ -132,15 +131,10 @@ public abstract class Sql {
 			bld.append(" ORDER BY ").append(order);
 		}
 		if (!limit.isEmpty()) {
-			if (!rewriteHack) {
-				bld.append(" LIMIT ").append(limit);
-			} else {
-				bld.insert(0, "WITH q AS (");
-				bld.append(") SELECT * FROM q LIMIT ").append(limit);	
-			}
+			bld.append(" LIMIT ").append(limit);
 		}
 
-		Log.debugf("Query: %s", bld);
+		Log.debugf("Query: %s", bld.toString());
 		return bld.toString();
 	}
 }

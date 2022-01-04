@@ -34,6 +34,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Map.Entry;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 /**
  * Helper class
@@ -94,5 +95,23 @@ public abstract class LookupResourceTest  {
 		return when().get(LookupResource.API + part + "?" + q.substring(1))
 				.then().statusCode(200).contentType(ContentType.JSON)
 					.body(matchesJsonSchemaInClasspath(schema));
+	}
+	
+	/**
+	 * Test which should return an empty collection
+	 * Note that G-Cloud REST guidelines require an HTTP 200 response even when empty set is returned.
+	 * 
+	 * @param part
+	 * @param paramValues
+	 * @return 
+	 */
+	public ValidatableResponse testNotFoundByParams(String part, Map<String,String> paramValues) {
+		String q = "";
+		for(Entry e: paramValues.entrySet()) {
+			q += "&" + e.getKey() + "=" + e.getValue();
+		}
+
+		return when().get(LookupResource.API + part + "?" + q.substring(1))
+				.then().statusCode(200).contentType(ContentType.JSON).body("items.size()", equalTo(0));
 	}
 }

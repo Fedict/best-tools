@@ -134,10 +134,20 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 	}
 
 	@Test
+	public void testStreetMunicipalityIDNotFound() {
+		testNotFoundByParams(LookupResource.STREETS, Map.of("municipalityID", "https://data.vlaanderen.be/id/gemeente/99999"));
+	}
+
+	@Test
 	public void testStreetNiscode() {
 		testFindByParams(LookupResource.STREETS, Map.of("nisCode", "21004"), "street-collection-schema.json")
 			.body("items.size()", equalTo(250),
 					"items.name.fr", hasItem("Rue du Camp"));
+	}
+	
+	@Test
+	public void testStreetNiscodeNotFound() {
+		testNotFoundByParams(LookupResource.STREETS, Map.of("nisCode", "9999"));
 	}
 
 	@Test
@@ -146,6 +156,20 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 			.body("items.size()", equalTo(250),
 					"items.name.fr", hasItem("Rue du Camp"));
 	}
+	
+	@Test
+	public void testStreetMunicipalityNameNotFound() {
+		testNotFoundByParams(LookupResource.STREETS, Map.of("municipalityName", "Washington"));
+	}
+
+	@Test
+	public void testStreetNameMunicipalityName() {
+		testFindByParams(LookupResource.STREETS, Map.of("municipalityName", "Brussel", "name", "Rue du Camp"), 
+			"street-collection-schema.json")
+			.body("items.size()", equalTo(1),
+					"items.name.fr", hasItem("Rue du Camp"));
+	}
+
 	@Test
 	public void testStreetPagination() {
 		testFound(LookupResource.STREETS)

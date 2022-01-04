@@ -41,6 +41,7 @@ import be.bosa.dt.best.webservice.queries.SqlMunicipalityPart;
 import be.bosa.dt.best.webservice.queries.SqlPostalInfo;
 import be.bosa.dt.best.webservice.queries.SqlStreet;
 import be.bosa.dt.best.webservice.queries.SqlVersion;
+
 import io.quarkus.logging.Log;
 import io.quarkus.runtime.StartupEvent;
 
@@ -48,8 +49,8 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.groups.MultiOnItem;
 import io.smallrye.mutiny.groups.UniOnItem;
-import io.vertx.core.json.JsonObject;
 
+import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowIterator;
@@ -64,6 +65,7 @@ import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+
 import org.eclipse.microprofile.config.ConfigProvider;
 
 import org.locationtech.proj4j.ProjCoordinate;
