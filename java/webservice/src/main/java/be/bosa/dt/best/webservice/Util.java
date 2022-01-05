@@ -36,8 +36,8 @@ import io.smallrye.mutiny.Uni;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import java.util.HashMap;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -150,11 +150,11 @@ public class Util {
 
 		if (embed) {
 			JsonObject embObj = new JsonObject();
-/*			streets.forEach((k,v) -> {
+			streets.forEach((k,v) -> {
 				JsonObject obj = JsonObject.mapFrom(v);
 				embObj.put(obj.getString("self"), obj);
 			});
-*/
+
 			embedded.forEach(e -> { 
 				JsonObject obj = cache.get(e);
 				if (obj == null) {
