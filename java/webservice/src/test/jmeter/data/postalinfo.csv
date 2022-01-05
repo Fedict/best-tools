@@ -1,0 +1,562 @@
+1020;Brussel (Laken)
+1011;Vlaamse Raad - Vlaams Parlement
+1083;Ganshoren
+1190;Vorst
+1009;Belgische Senaat
+1041;International Press Center
+1047;Europees Parlement
+1031;Christelijke Sociale Organisaties
+1105;SOC
+1040;Etterbeek + Brussel (Europa)
+1120;Brussel (Neder-Over-Hembeek)
+1140;Evere
+1160;Oudergem
+1007;Raad van de Franstalige Gemeenschapcommissie
+1049;Europese Unie - Commissie
+1180;Ukkel
+1100;Postcheque
+1030;Schaarbeek + Brussel (Van Praet, Teichmann Brug)
+1070;Anderlecht + Brussel (Dauwstraat)
+1081;Koekelberg
+1130;Brussel (Haren)
+1200;Sint-Lambrechts-Woluwe
+1005;Brusselse Hoofdstedelijke Raad
+1044;RTBF
+1201;RTL-TVI
+1035;CCN
+1000;Brussel (Centrum)
+1050;Elsene + Brussel (Louiza-Roosevelt)
+1010;Rijksadministratief Centrum
+1043;VRT
+1045;D.I.V. (uitsluitend roze formulieren)
+1082;Sint-Agatha-Berchem
+1150;Sint-Pieters-Woluwe
+1008;Kamer van Volksvertegenwoordigers
+1048;Europese Unie - Raad
+1012;Parlement van Franse Gemeenschap
+1090;Jette
+1006;Raad van de Vlaamse Gemeenschapcommissie
+1110;NATO - OTAN - NAVO
+1060;Sint-Gillis
+1170;Watermaal-Bosvoorde
+1210;Sint-Joost-ten-Node
+1080;Sint-Jans-Molenbeek
+1500;Halle
+1501;Buizingen
+1502;Lembeek
+1540;Herfelingen/Herne
+1541;Sint-Pieters-Kapelle (Bt.)
+1547;Bever
+1560;Hoeilaart
+1570;Galmaarden/Tollembeek/Vollezele
+1600;Oudenaken/Sint-Laureins-Berchem/Sint-Pieters-Leeuw
+1601;Ruisbroek (Bt.)
+1602;Vlezenbeek
+1620;Drogenbos
+1630;Linkebeek
+1640;Sint-Genesius-Rode
+1650;Beersel
+1651;Lot
+1652;Alsemberg
+1653;Dworp
+1654;Huizingen
+1670;Bogaarden/Heikruis/Pepingen
+1671;Elingen
+1673;Beert
+1674;Bellingen
+1700;Dilbeek/Sint-Martens-Bodegem/Sint-Ulriks-Kapelle
+1701;Itterbeek
+1702;Groot-Bijgaarden
+1703;Schepdaal
+1730;Asse/Bekkerzeel/Kobbegem/Mollem
+1731;Relegem/Zellik
+1740;Ternat
+1741;Wambeek
+1742;Sint-Katherina-Lombeek
+1745;Mazenzele/Opwijk
+1750;Gaasbeek/Lennik/Sint-Kwintens-Lennik/Sint-Martens-Lennik
+1755;Gooik/Kester/Leerbeek/Oetingen
+1760;Onze-Lieve-Vrouw-Lombeek/Pamel/Roosdaal/Strijtem
+1761;Borchtlombeek
+1770;Liedekerke
+1780;Wemmel
+1785;Brussegem/Hamme (Bt.)/Merchtem
+1790;Affligem/Essene/Hekelgem/Teralfene
+1800;Peutie/Vilvoorde
+1820;Melsbroek/Perk/Steenokkerzeel
+1830;Machelen (Bt.)
+1831;Diegem
+1840;Londerzeel/Malderen/Steenhuffel
+1850;Grimbergen
+1851;Humbeek
+1852;Beigem
+1853;Strombeek-Bever
+1860;Meise
+1861;Wolvertem
+1880;Kapelle-op-den-Bos/Nieuwenrode/Ramsdonk
+1910;Berg (Bt.)/Buken/Kampenhout/Nederokkerzeel
+1930;Nossegem/Zaventem
+1932;Sint-Stevens-Woluwe
+1933;Sterrebeek
+1950;Kraainem
+1970;Wezembeek-Oppem
+1980;Eppegem/Zemst
+1981;Hofstade (Bt.)
+1982;Elewijt/Weerde
+2000;Antwerpen
+2018;Antwerpen
+2020;Antwerpen
+2030;Antwerpen
+2040;Antwerpen/Berendrecht/Lillo/Zandvliet
+2050;Antwerpen
+2060;Antwerpen
+2070;Burcht/Zwijndrecht
+2100;Deurne (Antwerpen)
+2110;Wijnegem
+2140;Borgerhout (Antwerpen)
+2150;Borsbeek (Antw.)
+2160;Wommelgem
+2170;Merksem (Antwerpen)
+2180;» Antwerpen «/Ekeren (Antwerpen)
+2200;Herentals/Morkhoven/Noorderwijk
+2220;Hallaar/Heist-op-den-Berg
+2221;Booischot
+2222;Itegem/Wiekevorst
+2223;Schriek
+2230;Herselt/Ramsel
+2235;Houtvenne/Hulshout/Westmeerbeek
+2240;Massenhoven/Viersel/Zandhoven
+2242;Pulderbos
+2243;Pulle
+2250;Olen
+2260;Oevel/Tongerlo (Antw.)/Westerlo/Zoerle-Parwijs
+2270;Herenthout
+2275;Gierle/Lille/Poederlee/Wechelderzande
+2280;Grobbendonk
+2288;Bouwel
+2290;Vorselaar
+2300;Turnhout
+2310;Rijkevorsel
+2320;Hoogstraten
+2321;Meer
+2322;Minderhout
+2323;Wortel
+2328;Meerle
+2330;Merksplas
+2340;Beerse/Vlimmeren
+2350;Vosselaar
+2360;Oud-Turnhout
+2370;Arendonk
+2380;Ravels
+2381;Weelde
+2382;Poppel
+2387;Baarle-Hertog
+2390;Malle/Oostmalle/Westmalle
+2400;Mol
+2430;Eindhout/Laakdal/Vorst (Kempen)
+2431;Varendonk/Veerle
+2440;Geel
+2450;Meerhout
+2460;Kasterlee/Lichtaart/Tielen
+2470;Retie
+2480;Dessel
+2490;Balen
+2491;Olmen
+2500;Koningshooikt/Lier
+2520;Broechem/Emblem/Oelegem/Ranst
+2530;Boechout
+2531;Vremde
+2540;Hove
+2547;Lint
+2550;Kontich/Waarloos
+2560;Bevel/Kessel/Nijlen
+2570;Duffel
+2580;Beerzel/Putte
+2590;Berlaar/Gestel
+2600;Berchem (Antwerpen)
+2610;Wilrijk (Antwerpen)
+2620;Hemiksem/» Wilrijk (Antwerpen) «
+2627;Schelle
+2630;Aartselaar
+2640;Mortsel
+2650;Edegem
+2660;Hoboken (Antwerpen)
+2800;Mechelen/Walem
+2801;Heffen
+2811;Hombeek/Leest
+2812;Muizen (Mechelen)
+2820;Bonheiden/Rijmenam
+2830;Blaasveld/Heindonk/Tisselt/Willebroek
+2840;Reet/Rumst/Terhagen
+2845;Niel
+2850;Boom
+2860;Sint-Katelijne-Waver
+2861;Onze-Lieve-Vrouw-Waver
+2870;Breendonk/Liezele/Puurs/Ruisbroek (Antw.)
+2880;Bornem/Hingene/Mariekerke (Bornem)/Weert
+2890;Lippelo/Oppuurs/Sint-Amands
+2900;Schoten
+2910;Essen
+2920;Kalmthout
+2930;Brasschaat
+2940;Hoevenen/Stabroek
+2950;Kapellen (Antw.)
+2960;Brecht/Sint-Job-in-'t-Goor/Sint-Lenaarts
+2970;s Gravenwezel/Schilde
+2980;Halle (Kempen)/Zoersel
+2990;» Brecht «/Loenhout/Wuustwezel
+3000;Leuven
+3001;Heverlee
+3010;Kessel-Lo (Leuven)
+3012;Wilsele
+3018;Wijgmaal (Brabant)
+3020;Herent/Veltem-Beisem/Winksele
+3040;Huldenberg/Loonbeek/Neerijse/Ottenburg/Sint-Agatha-Rode
+3050;Oud-Heverlee
+3051;Sint-Joris-Weert
+3052;Blanden
+3053;Haasrode
+3054;Vaalbeek
+3060;Bertem/Korbeek-Dijle
+3061;Leefdaal
+3070;Kortenberg
+3071;Erps-Kwerps
+3078;Everberg/Meerbeek
+3080;Duisburg/Tervuren/Vossem
+3090;Overijse
+3110;Rotselaar
+3111;Wezemaal
+3118;Werchter
+3120;Tremelo
+3128;Baal
+3130;Begijnendijk/Betekom
+3140;Keerbergen
+3150;Haacht/Tildonk/Wespelaar
+3190;Boortmeerbeek
+3191;Hever
+3200;Aarschot/Gelrode
+3201;Langdorp
+3202;Rillaar
+3210;Linden/Lubbeek
+3211;Binkom
+3212;Pellenberg
+3220;Holsbeek/Kortrijk-Dutsel/Sint-Pieters-Rode
+3221;Nieuwrode
+3270;Scherpenheuvel/Scherpenheuvel-Zichem
+3271;Averbode/Zichem
+3272;Messelbroek/Testelt
+3290;Deurne (Bt.)/Diest/Schaffen/Webbekom
+3293;Kaggevinne
+3294;Molenstede
+3300;Bost/Goetsenhoven/Hakendover/Kumtich/Oorbeek/Oplinter/Sint-Margriete-Houtem (Tienen)/Tienen/Vissenaken
+3320;Hoegaarden/Meldert (Bt.)
+3321;Outgaarden
+3350;Drieslinter/Linter/Melkwezer/Neerhespen/Neerlinter/Orsmaal-Gussenhoven/Overhespen/Wommersom
+3360;Bierbeek/Korbeek-Lo/Lovenjoel/Opvelp
+3370;Boutersem/Kerkom/Neervelp/Roosbeek/Vertrijk/Willebringen
+3380;Bunsbeek/Glabbeek-Zuurbemde
+3381;Kapellen (Bt.)
+3384;Attenrode
+3390;Houwaart/Sint-Joris-Winge/Tielt (Bt.)/Tielt-Winge
+3391;Meensel-Kiezegem
+3400;Eliksem/Ezemaal/Laar/Landen/Neerwinden/Overwinden/Rumsdorp/Wange
+3401;Waasmont/Walsbets/Walshoutem/Wezeren
+3404;Attenhoven/Neerlanden
+3440;Budingen/Dormaal/Halle-Booienhoven/Helen-Bos/Zoutleeuw
+3450;Geetbets/Grazen
+3454;Rummen
+3460;Assent/Bekkevoort
+3461;Molenbeek-Wersbeek
+3470;Kortenaken/Ransberg
+3471;Hoeleden
+3472;Kersbeek-Miskom
+3473;Waanrode
+3500;Hasselt/Sint-Lambrechts-Herk
+3501;Wimmertingen
+3510;Kermt (Hasselt)/Spalbeek
+3511;Kuringen/Stokrooie
+3512;Stevoort
+3520;Zonhoven
+3530;Helchteren/Houthalen/Houthalen-Helchteren
+3540;Berbroek/Donk/Herk-de-Stad/Schulen
+3545;Halen/Loksbergen/Zelem
+3550;Heusden (Limb.)/Heusden-Zolder/Zolder
+3560;Linkhout/Lummen/Meldert (Limb.)
+3570;Alken
+3580;Beringen
+3581;Beverlo
+3582;Koersel
+3583;Paal
+3590;Diepenbeek
+3600;Genk
+3620;Gellik/Lanaken/Neerharen/Veldwezelt
+3621;Rekem
+3630;Eisden/Leut/Maasmechelen/Mechelen-aan-de-Maas/Meeswijk/Opgrimbie/Vucht
+3631;Boorsem/Uikhoven
+3640;Kessenich/Kinrooi/Molenbeersel/Ophoven
+3650;Dilsen-Stokkem/Elen/Lanklaar/Rotem/Stokkem
+3660;» Meeuwen-Gruitrode «/Opglabbeek
+3665;As
+3668;Niel-bij-As
+3670;Ellikom/Gruitrode/Meeuwen/Meeuwen-Gruitrode/Neerglabbeek/Wijshagen
+3680;Maaseik/Neeroeteren/Opoeteren
+3690;Zutendaal
+3700;Berg (Limb.)/Diets-Heur/Haren (Tongeren)/Henis/Kolmont (Tongeren)/Koninksem/Lauw/Mal/Neerrepen/Nerem/Overrepen (Kolmont)/Piringen (Haren)/Riksingen/Rutten/'s Herenelderen/Sluizen/Tongeren/Vreren/Widooie (Haren)
+3717;Herstappe
+3720;Kortessem
+3721;Vliermaalroot
+3722;Wintershoven
+3723;Guigoven
+3724;Vliermaal
+3730;Hoeselt/Romershoven/Sint-Huibrechts-Hern/Werm
+3732;Schalkhoven
+3740;Beverst/Bilzen/Eigenbilzen/Grote-Spouwen/Hees/Kleine-Spouwen/Mopertingen/Munsterbilzen/Rijkhoven/Rosmeer/Spouwen/Waltwilder
+3742;Martenslinde
+3746;Hoelbeek
+3770;Genoelselderen/Herderen/Kanne/Membruggen/Millen/Riemst/Val-Meer/Vlijtingen/Vroenhoven/Zichen-Zussen-Bolder
+3790;Moelingen/Sint-Martens-Voeren/Voeren
+3791;Remersdaal
+3792;Sint-Pieters-Voeren
+3793;Teuven
+3798;s Gravenvoeren
+3800;Aalst (Limb.)/Brustem/Engelmanshoven/Gelinden/Groot-Gelmen/Halmaal/Kerkom-bij-Sint-Truiden/Ordingen/Sint-Truiden/Zepperen
+3803;Duras/Gorsem/Runkelen/Wilderen
+3806;Velm
+3830;Berlingen/Wellen
+3831;Herten
+3832;Ulbeek
+3840;Bommershoven (Haren)/Borgloon/Broekom/Gors-Opleeuw/Gotem/Groot-Loon/Haren (Borgloon)/Hendrieken/Hoepertingen/Jesseren (Kolmont)/Kerniel/Kolmont (Borgloon)/Kuttekoven/Rijkel/Voort
+3850;Binderveld/Kozen/Nieuwerkerken (Limb.)/Wijer
+3870;Batsheers/Bovelingen/Gutschoven/Heers/Heks/Horpmaal/Klein-Gelmen/Mechelen-Bovelingen/Mettekoven/Opheers/Rukkelingen-Loon/Vechmaal/Veulen
+3890;Boekhout/Gingelom/Jeuk/Kortijs/Montenaken/Niel-bij-Sint-Truiden/Vorsen
+3891;Borlo/Buvingen/Mielen-Boven-Aalst/Muizen (Limb.)
+3900;Overpelt
+3910;Neerpelt/Sint-Huibrechts-Lille
+3920;Lommel
+3930;Achel/Hamont/Hamont-Achel
+3940;Hechtel/Hechtel-Eksel
+3941;Eksel
+3945;Ham/Kwaadmechelen/Oostham
+3950;Bocholt/Kaulille/Reppel
+3960;Beek/Bree/Gerdingen/Opitter/Tongerlo (Limb.)
+3970;Leopoldsburg
+3971;Heppen
+3980;Tessenderlo
+3990;Grote-Brogel/Kleine-Brogel/Peer/Wijchmaal
+8000;Brugge/Koolkerke
+8020;Hertsberge/Oostkamp/Ruddervoorde/Waardamme
+8200;Sint-Andries/Sint-Michiels
+8210;Loppem/Veldegem/Zedelgem
+8211;Aartrijke
+8300;Knokke/Knokke-Heist/Westkapelle
+8301;Heist-aan-Zee/Ramskapelle (Knokke-Heist)
+8310;Assebroek/Sint-Kruis (Brugge)
+8340;Damme/Hoeke/Lapscheure/Moerkerke/Oostkerke (Damme)/Sijsele
+8370;Blankenberge/Uitkerke
+8377;Houtave/Meetkerke/Nieuwmunster/Zuienkerke
+8380;Dudzele/Lissewege/Zeebrugge (Brugge)
+8400;Oostende/Stene/Zandvoorde (Oostende)
+8420;De Haan/Klemskerke/Wenduine
+8421;Vlissegem
+8430;Middelkerke
+8431;Wilskerke
+8432;Leffinge
+8433;Mannekensvere/Schore/Sint-Pieters-Kapelle (W.-Vl.)/Slijpe/Spermalie
+8434;Lombardsijde/Westende
+8450;Bredene
+8460;Ettelgem/Oudenburg/Roksem/Westkerke
+8470;Gistel/Moere/Snaaskerke/Zevekote
+8480;Bekegem/Eernegem/Ichtegem
+8490;Jabbeke/Snellegem/Stalhille/Varsenare/Zerkegem
+8500;Kortrijk
+8501;Bissegem/Heule
+8510;Bellegem/Kooigem/Marke (Kortrijk)/Rollegem
+8511;Aalbeke
+8520;Kuurne
+8530;Harelbeke
+8531;Bavikhove/Hulste
+8540;Deerlijk
+8550;Zwevegem
+8551;Heestert
+8552;Moen
+8553;Otegem
+8554;Sint-Denijs
+8560;Gullegem/Moorsele/Wevelgem
+8570;Anzegem/Gijzelbrechtegem/Ingooigem/Vichte/» Wortegem-Petegem «
+8572;Kaster
+8573;Tiegem
+8580;Avelgem
+8581;Kerkhove/Waarmaarde
+8582;Outrijve
+8583;Bossuit
+8587;Helkijn/Spiere/Spiere-Helkijn
+8600;Beerst/Diksmuide/Driekapellen/Esen/Kaaskerke/Keiem/Lampernisse/Leke/Nieuwkapelle/Oostkerke (Diksmuide)/Oudekapelle/Pervijze/Sint-Jacobs-Kapelle/Stuivekenskerke/Vladslo/Woumen
+8610;Handzame/Kortemark/Werken/Zarren
+8620;Nieuwpoort/Ramskapelle (Nieuwpoort)/Sint-Joris (Nieuwpoort)
+8630;Avekapelle/Beauvoorde/Booitshoeke/Bulskamp/De Moeren/Eggewaartskapelle/Houtem (W.-Vl.)/Steenkerke (W.-Vl.)/Veurne/Vinkem/Wulveringem/Zoutenaaie
+8640;Oostvleteren/Vleteren/Westvleteren/Woesten
+8647;Lo/Lo-Reninge/Noordschote/Pollinkhove/Reninge
+8650;Houthulst/Klerken/Merkem
+8660;Adinkerke/De Panne
+8670;Koksijde/Oostduinkerke/Wulpen
+8680;Bovekerke/Koekelare/Zande
+8690;Alveringem/Hoogstade/Oeren/Sint-Rijkers
+8691;Beveren-aan-den-Ijzer/Gijverinkhove/Izenberge/Leisele/Stavele
+8700;Aarsele/Kanegem/Schuiferskapelle/Tielt
+8710;Ooigem/Sint-Baafs-Vijve/Wielsbeke
+8720;Dentergem/Markegem/Oeselgem/Wakken
+8730;Beernem/Oedelem/Sint-Joris (Beernem)
+8740;Egem/Pittem
+8750;Wingene/Zwevezele
+8755;Ruiselede
+8760;Meulebeke
+8770;Ingelmunster
+8780;Oostrozebeke
+8790;Waregem
+8791;Beveren (Leie)
+8792;Desselgem
+8793;Sint-Eloois-Vijve
+8800;Beveren (Roeselare)/Oekene/Roeselare/Rumbeke
+8810;Lichtervelde
+8820;Torhout
+8830;Gits/Hooglede
+8840;Oostnieuwkerke/Staden/Westrozebeke
+8850;Ardooie
+8851;Koolskamp
+8860;Lendelede
+8870;Emelgem/Izegem/Kachtem
+8880;Ledegem/Rollegem-Kapelle/Sint-Eloois-Winkel
+8890;Dadizele/Moorslede
+8900;Brielen/Dikkebus/Ieper/Sint-Jan
+8902;Hollebeke/Voormezele/Zillebeke
+8904;Boezinge/Zuidschote
+8906;Elverdinge
+8908;Vlamertinge
+8920;Bikschote/Langemark/Langemark-Poelkapelle/Poelkapelle
+8930;Lauwe/Menen/Rekkem
+8940;Geluwe/Wervik
+8950;Heuvelland/Nieuwkerke
+8951;Dranouter
+8952;Wulvergem
+8953;Wijtschate
+8954;Westouter
+8956;Kemmel
+8957;Mesen
+8958;Loker
+8970;Poperinge/Reningelst
+8972;Krombeke/Proven/Roesbrugge-Haringe
+8978;Watou
+8980;Beselare/Geluveld/Passendale/Zandvoorde (Zonnebeke)/Zonnebeke
+9000;Gent
+9030;Mariakerke (Gent)
+9031;Drongen
+9032;Wondelgem
+9040;Sint-Amandsberg (Gent)
+9041;Oostakker
+9042;Desteldonk/Mendonk/Sint-Kruis-Winkel
+9050;Gentbrugge/Ledeberg (Gent)
+9051;Afsnee/Sint-Denijs-Westrem
+9052;Zwijnaarde
+9060;Zelzate
+9070;Destelbergen/Heusden (O.-Vl.)
+9080;Beervelde/Lochristi/Zaffelare/Zeveneken
+9090;Gontrode/Melle
+9100;Nieuwkerken-Waas/Sint-Niklaas
+9111;Belsele (Sint-Niklaas)
+9112;Sinaai-Waas
+9120;Beveren-Waas/Haasdonk/Kallo (Beveren-Waas)/Melsele/Vrasene
+9130;Doel/Kallo (Kieldrecht)/Kieldrecht (Beveren)/Verrebroek
+9140;Elversele/Steendorp/Temse/Tielrode
+9150;Bazel/Kruibeke/Rupelmonde
+9160;Daknam/Eksaarde/Lokeren
+9170;De Klinge/Meerdonk/Sint-Gillis-Waas/Sint-Pauwels
+9180;Moerbeke-Waas
+9185;Wachtebeke
+9190;Kemzeke/Stekene
+9200;Appels/Baasrode/Dendermonde/Grembergen/Mespelare/Oudegem/Schoonaarde/Sint-Gillis-bij-Dendermonde
+9220;Hamme (O.-Vl.)/Moerzeke
+9230;Massemen/Westrem/Wetteren
+9240;Zele
+9250;Waasmunster
+9255;Buggenhout/Opdorp
+9260;Schellebelle/Serskamp/Wichelen
+9270;Kalken/Laarne
+9280;Denderbelle/Lebbeke/Wieze
+9290;Berlare/Overmere/Uitbergen
+9300;Aalst
+9308;Gijzegem/Hofstade (O.-Vl.)
+9310;Baardegem/Herdersem/Meldert (O.-Vl.)/Moorsel
+9320;Erembodegem (Aalst)/Nieuwerkerken (Aalst)
+9340;Impe/Lede/Oordegem/Smetlede/Wanzele
+9400;Appelterre-Eichem/Denderwindeke/Lieferinge/Nederhasselt/Ninove/Okegem/Voorde
+9401;Pollare
+9402;Meerbeke
+9403;Neigem
+9404;Aspelare
+9406;Outer
+9420;Aaigem/Bambrugge/Burst/Erondegem/Erpe/Erpe-Mere/Mere/Ottergem/Vlekkem
+9450;Denderhoutem/Haaltert/Heldergem
+9451;Kerksken
+9470;Denderleeuw
+9472;Iddergem
+9473;Welle
+9500;Geraardsbergen/Goeferdinge/Moerbeke/Nederboelare/Onkerzele/Ophasselt/Overboelare/Viane/Zarlardinge
+9506;Grimminge/Idegem/Nieuwenhove/Schendelbeke/Smeerebbe-Vloerzegem/Waarbeke/Zandbergen
+9520;Bavegem/Sint-Lievens-Houtem/Vlierzele/Zonnegem
+9521;Letterhoutem
+9550;Herzele/Hillegem/Sint-Antelinks/Sint-Lievens-Esse/Steenhuize-Wijnhuize/Woubrechtegem
+9551;Ressegem
+9552;Borsbeke
+9570;Deftinge/Lierde/Sint-Maria-Lierde
+9571;Hemelveerdegem
+9572;Sint-Martens-Lierde
+9600;Ronse
+9620;Elene/Erwetegem/Godveerdegem/Grotenberge/Leeuwergem/Oombergen (Zottegem)/Sint-Goriks-Oudenhove/Sint-Maria-Oudenhove (Zottegem)/Strijpen/Velzeke-Ruddershove/Zottegem
+9630;Beerlegem/Dikkele/Hundelgem/Meilegem/Munkzwalm/Paulatem/Roborst/Rozebeke/Sint-Blasius-Boekel/Sint-Denijs-Boekel/Sint-Maria-Latem/Zwalm
+9636;Nederzwalm-Hermelgem
+9660;Brakel/Elst/Everbeek/Michelbeke/Nederbrakel/Opbrakel/Zegelsem
+9661;Parike
+9667;Horebeke/Sint-Kornelis-Horebeke/Sint-Maria-Horebeke
+9680;Etikhove/Maarkedal/Maarke-Kerkem
+9681;Nukerke
+9688;Schorisse
+9690;Berchem (O.-Vl.)/Kluisbergen/Kwaremont/Ruien/Zulzeke
+9700;Bevere/Edelare/Eine/Ename/Heurne/Leupegem/Mater/Melden/Mullem/Nederename/Oudenaarde/Volkegem/Welden
+9750;Huise/Ouwegem/Zingem
+9770;Kruishoutem
+9771;Nokere
+9772;Wannegem-Lede
+9790;Elsegem/Moregem/Ooike (Wortegem-Petegem)/Petegem-aan-de-Schelde/Wortegem/Wortegem-Petegem
+9800;Astene/Bachte-Maria-Leerne/Deinze/Gottem/Grammene/Meigem/Petegem-aan-de-Leie/Sint-Martens-Leerne/Vinkt/Wontergem/Zeveren
+9810;Eke/Nazareth
+9820;Bottelare/Lemberge/Melsen/Merelbeke/Munte/Schelderode
+9830;Sint-Martens-Latem
+9831;Deurle
+9840;De Pinte/Zevergem
+9850;Hansbeke/Landegem/Merendree/Nevele/Poesele/Vosselare
+9860;Balegem/Gijzenzele/Landskouter/Moortsele/Oosterzele/Scheldewindeke
+9870;Machelen (O.-Vl.)/Olsene/Zulte
+9880;Aalter/Lotenhulle/Poeke
+9881;Bellem
+9890;Asper/Baaigem/Dikkelvenne/Gavere/Semmerzake/Vurste
+9900;Eeklo
+9910;Knesselare/Ursel
+9920;Lovendegem
+9921;Vinderhoute
+9930;Zomergem
+9931;Oostwinkel
+9932;Ronsele
+9940;Ertvelde/Evergem/Kluizen/Sleidinge
+9950;Waarschoot
+9960;Assenede
+9961;Boekhoute
+9968;Bassevelde/Oosteeklo
+9970;Kaprijke
+9971;Lembeke
+9980;Sint-Laureins
+9981;Sint-Margriete
+9982;Sint-Jan-in-Eremo
+9988;Waterland-Oudeman/Watervliet
+9990;Maldegem
+9991;Adegem
+9992;Middelburg
