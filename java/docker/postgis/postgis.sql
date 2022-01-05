@@ -130,6 +130,11 @@ ALTER TABLE Address ADD CONSTRAINT fkAddressStreet
     FOREIGN KEY (sIdentifier)
     REFERENCES Street(identifier);
 
+/* Indexes */
+CREATE INDEX idxMunicipalityRefniscode on Municipality(refnisCode);
+
+CREATE INDEX idxPostalinfoPostalcode on PostalInfo(postalCode);
+
 /* Set FK-indexes */
 CREATE INDEX idxAddressMunicipality ON Address(mIdentifier);
 CREATE INDEX idxAddressPostal ON Address(pIdentifier);
