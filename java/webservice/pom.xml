@@ -13,6 +13,11 @@
 		<maven.compiler.parameters>true</maven.compiler.parameters>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
+		<jmeter.proto>http</jmeter.proto>
+		<jmeter.port>8080</jmeter.port>
+		<jmeter.loops>100</jmeter.loops>
+		<jmeter.threads>100</jmeter.threads>
+		<jmeter.duration>60</jmeter.duration>
 	</properties>
 	<name>BeSt webservice</name>
     <version>1.2.9</version>
@@ -138,7 +143,15 @@
 					</execution>
 				</executions>
 				<configuration>
-					<generateReports>true</generateReports>                       
+					<generateReports>true</generateReports>
+					<propertiesUser> 
+						<proto>${jmeter.proto}</proto>
+						<host>${jmeter.host}</host>
+						<port>${jmeter.port}</port>
+						<loops>${jmeter.loops}</loops>
+						<threads>${jmeter.threads}</threads>
+						<duration>${jmeter.duration}</duration>
+					</propertiesUser>
 				</configuration>
 			</plugin>
 		</plugins>
