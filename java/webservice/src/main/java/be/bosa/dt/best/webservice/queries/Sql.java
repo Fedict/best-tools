@@ -88,7 +88,6 @@ public abstract class Sql {
 		this.where = (this.where.equals("")) ? tmp : this.where + " AND " + tmp;
 	}
 
-	
 	/**
 	 * Add pagination with start identifier.
 	 * Don't use OFFSET, since it's resource intensive for large offsets.

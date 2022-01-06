@@ -180,7 +180,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/AddressCollection'
   /api/belgianAddress/v2/addresses/{id}:
     get:
       tags:
@@ -206,7 +206,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/Address'
         404:
           description: Address not found
   /api/belgianAddress/v2/municipalities:

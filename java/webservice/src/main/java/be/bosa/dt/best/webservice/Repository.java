@@ -115,7 +115,7 @@ public class Repository {
 	 */
 	void onStart(@Observes StartupEvent ev) {               
         Log.info("Caching");
-	
+		if (ev != null) return;
 		Multi<Municipality> municipalities = findMunicipalitiesAll();
 		municipalities.subscribe().asStream().forEach(m -> {
 			cache.put(m.id, JsonObject.mapFrom(m));

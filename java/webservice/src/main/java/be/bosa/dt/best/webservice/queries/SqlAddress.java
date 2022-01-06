@@ -31,7 +31,6 @@ package be.bosa.dt.best.webservice.queries;
  * @author Bart Hanssens
  */
 public class SqlAddress extends Sql {
-
 	/**
 	 * Constructor
 	 * 
