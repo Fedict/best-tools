@@ -87,9 +87,7 @@ public class Util {
 		JsonObject parentObj = JsonObject.mapFrom(addr);
 		String self = info.getRequestUri().toString();
 	
-		if (embed) {
-			JsonObject embObj = new JsonObject();
-	
+		if (embed) {	
 			Set<String> embedded = new HashSet<>();
 
 			embedded.add(addr.sIdentifier);
@@ -99,6 +97,7 @@ public class Util {
 			}
 			embedded.add(addr.pIdentifier);
 
+			JsonObject embObj = new JsonObject();
 			embedded.forEach(e -> { 
 				JsonObject obj = cache.get(e);
 				if (obj == null) {
