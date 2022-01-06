@@ -87,7 +87,7 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<JsonObject> getAddressById(String id, @RestQuery boolean embed, UriInfo info) {
 		String s = URLDecoder.decode(id, StandardCharsets.UTF_8);
-		Uni<Address> address = repo.findAddressById(s, embed);
+		Uni<Address> address = repo.findAddressById(s);
 		return Util.responseOrEmpty(Util.toJson(info, address, embed, cache));
 	}
 
@@ -129,14 +129,14 @@ public class LookupResource {
 			@RestQuery boolean embed, @RestQuery String after, UriInfo info) {
 		Multi<Address> addresses;
 		if (coordX > 0 && coordY > 0) {
-			addresses = repo.findByCoordinates(after, coordX, coordY, crs, radius, status, embed);
+			addresses = repo.findByCoordinates(after, coordX, coordY, crs, radius, status);
 		} else if (polygon != null && !polygon.isEmpty()) {
-			addresses = repo.findByPolygon(after, polygon, crs, status, embed);
+			addresses = repo.findByPolygon(after, polygon, crs, status);
 		} else {
 			addresses = repo.findAddresses(after, 
 								municipalityID, nisCode, municipalityName, streetID, streetName, 
 								postalID, postalCode, postalName, houseNumber, boxNumber, 
-								status, embed);
+								status);
 		}
 		return Util.toJson(info, addresses, embed, cache);
 	}

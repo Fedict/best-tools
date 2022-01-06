@@ -217,12 +217,11 @@ public class Repository {
 	 * Find an address by ID
 	 * 
 	 * @param id full address id
-	 * @param embed embed street, postal etc or not
 	 * @return address or null
 	 */
-	public Uni<Address> findAddressById(String id, boolean embed) {
+	public Uni<Address> findAddressById(String id) {
 		Tuple tuple = Tuple.of(NsConverter.addressEncode(id));
-		SqlAddress qry = new SqlAddress(embed, false, false, false);
+		SqlAddress qry = new SqlAddress(false, false, false);
 		qry.where("a.identifier =");
 
 		return uni(
@@ -245,19 +244,18 @@ public class Repository {
 	 * @param houseNumber house number
 	 * @param boxNumber box number
 	 * @param status status
-	 * @param embed embed street, postal etc or not
 	 * @return 
 	 */
 	public Multi<Address> findAddresses(String afterId, String mIdentifier, String nisCode, String mName,
 										String sIdentifier, String sName,
 										String pIdentifier, String postalCode, String pName,
-										String houseNumber, String boxNumber, String status, boolean embed) {
+										String houseNumber, String boxNumber, String status) {
 		boolean joinMunicipality = Util.oneNotEmpty(mName, nisCode);
 		boolean joinStreet = Util.oneNotEmpty(sName);
 		boolean joinPostal = Util.oneNotEmpty(postalCode);
 
 		List lst = new ArrayList(12);
-		SqlAddress qry = new SqlAddress(embed, joinStreet, joinMunicipality,  joinPostal);
+		SqlAddress qry = new SqlAddress(joinStreet, joinMunicipality,  joinPostal);
 
 		where(lst, qry, "a.mIdentifier", NsConverter.municipalityEncode(mIdentifier));
 		where(lst, qry, "m.refnisCode", nisCode);
@@ -289,7 +287,7 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<Address> findByCoordinates(String afterId, double coordX, double coordY, String crs, int radius, 
-											String status, boolean embed) {	
+											String status) {	
 		ProjCoordinate point = CoordConverter.makeL72Coordinate(coordX, coordY, crs);
 
 		List lst = new ArrayList(7); 
@@ -297,7 +295,7 @@ public class Repository {
 		lst.add(point.y);
 		lst.add(radius);
 
-		SqlGeo qry = new SqlGeo(embed, true);
+		SqlGeo qry = new SqlGeo(true);
 		where(lst, qry, "a.status", status);
 		paginate(lst, qry, NsConverter.addressEncode(afterId));
 
@@ -313,16 +311,15 @@ public class Repository {
 	 * @param polygon polygon points
 	 * @param crs coordinate reference system
 	 * @param status
-	 * @param embed embed street, postal etc or not
 	 * @return 
 	 */
-	public Multi<Address> findByPolygon(String afterId, String polygon, String crs, String status, boolean embed) {
+	public Multi<Address> findByPolygon(String afterId, String polygon, String crs, String status) {
 		String coords = CoordConverter.makeWktPolygon(polygon, crs);
 		
 		List lst = new ArrayList(4); 
 		lst.add(coords);
 
-		SqlGeo qry = new SqlGeo(embed, false);
+		SqlGeo qry = new SqlGeo(false);
 		where(lst, qry, "a.status", status);
 		paginate(lst, qry, NsConverter.addressEncode(afterId));
 

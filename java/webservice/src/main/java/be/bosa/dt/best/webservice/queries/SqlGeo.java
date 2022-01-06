@@ -35,10 +35,9 @@ public class SqlGeo extends Sql {
 	/**
 	 * Constructor
 	 * 
-	 * @param embed embed streets etc or not
 	 * @param point geo query is a point (true) or a polygon (false)
 	 */
-	public SqlGeo(boolean embed, boolean point) {
+	public SqlGeo(boolean point) {
 		this.select = "a.identifier, a.mIdentifier, a.pIdentifier, a.mpIdentifier, a.sIdentifier, " +
 						" a.housenumber, a.boxnumber, a.validFrom, a.validTo, a.status::text, a.point::point";
 		this.from = "address";
@@ -51,11 +50,5 @@ public class SqlGeo extends Sql {
 			this.where = "ST_WITHIN(a.point, ST_SetSRID(ST_GeomFromText($1), 31370))";
 			this.vars = 1;
 		}
-/*
-		if (embed) {
-			this.select += ", s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, s.validFrom, s.validTo, " +
-							" s.streetnameType::text, s.status::text";
-			this.join = " INNER JOIN street s ON a.sIdentifier = s.identifier";			
-		}*/
 	}
 }

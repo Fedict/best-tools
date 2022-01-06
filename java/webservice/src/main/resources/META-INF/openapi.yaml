@@ -29,7 +29,7 @@ paths:
       parameters:
       - name: after
         in: query
-        description: "After this address (used in pagination), ('/' must be URL-encoded to '%2f')"
+        description: After this address (used in pagination), the '/' must be URL-encoded to '%2f'
         required: false
         schema:
           type: string
@@ -175,7 +175,7 @@ paths:
           type: string
         example: Grote Markt
       responses:
-        "200":
+        200:
           description: A (possibly empty) list of addresses
           content:
             application/json:
@@ -186,8 +186,7 @@ paths:
       tags:
       - addresses
       summary: Get address by id
-      description: "The ID is a concatenation of the address namespace, objectIdentifier,\
-        \ and versionIdentifier"
+      description: The ID is a concatenation of the address namespace, objectIdentifier and versionIdentifier
       parameters:
       - name: id
         in: path
@@ -196,31 +195,30 @@ paths:
           type: string
       - name: embed
         in: query
-        description: "Embed referenced streets, municipalities ..."
+        description: Embed referenced streets, municipalities ...
         required: false
         schema:
           type: boolean
         example: true
       responses:
-        "200":
+        200:
           description: Requested address
           content:
             application/json:
               schema:
                 type: object
-        "404":
+        404:
           description: Address not found
   /api/belgianAddress/v2/municipalities:
     get:
       tags:
       - municipalities
       summary: Search for municipalities
-      description: "The ID is a concatenation of the address namespace, objectIdentifier,\
-        \ and versionIdentifier"
+      description: The ID is a concatenation of the address namespace, objectIdentifier and versionIdentifier
       parameters:
       - name: name
         in: query
-        description: "Municipality name, searches in Dutch/French/German names"
+        description: Municipality name, searches in Dutch/French/German names
         required: false
         schema:
           type: string
@@ -265,8 +263,7 @@ paths:
       tags:
       - municipalities
       summary: Get a municipality by ID
-      description: "The ID is a concatenation of the address namespace, objectIdentifier,\
-        \ and versionIdentifier"
+      description: The ID is a concatenation of the address namespace, objectIdentifier, and versionIdentifier
       parameters:
       - name: id
         in: path
@@ -287,8 +284,7 @@ paths:
       tags:
       - municipalities
       summary: Search for municipality parts
-      description: "Note: currently only the Walloon Region provides info about municipality\
-        \ parts"
+      description: Currently only the Walloon Region provides info about municipality parts
       parameters:
       - name: after
         in: query
@@ -315,8 +311,7 @@ paths:
       tags:
       - municipalities
       summary: Get a municipality part by full ID
-      description: "Note: currently only the Walloon Region provides info about municipality\
-        \ parts"
+      description: Currently only the Walloon Region provides info about municipality parts
       parameters:
       - name: id
         in: path
@@ -346,7 +341,7 @@ paths:
           type: string
       - name: name
         in: query
-        description: "Municipality name, searches in Dutch/French/German names"
+        description: Municipality name, searches in Dutch/French/German names
         required: false
         schema:
           type: string
@@ -372,8 +367,7 @@ paths:
       tags:
       - postals
       summary: Get a postal info by ID
-      description: "Note: the ID is a concatenation of the address namespace, objectIdentifier,\
-        \ and versionIdentifier"
+      description: The ID is a concatenation of the address namespace, objectIdentifier and versionIdentifier
       parameters:
       - name: id
         in: path
@@ -421,13 +415,13 @@ paths:
           example: 23027
       - name: municipalityName
         in: query
-        description: "(Part of) municipality name, searches in Dutch/French/German names"
+        description: (Part of) municipality name, searches in Dutch/French/German names
         required: false
         schema:
           type: string
           example: Halle
       - name: postalinfoID
-        in: path
+        in: query
         required: true
         schema:
           type: string
@@ -443,26 +437,18 @@ paths:
           example: 1000
       - name: postalName
         in: query
-        description: "(Part of) postal name, searches in Dutch/French/German names"
+        description: (Part of) postal name, searches in Dutch/French/German names
         required: false
         schema:
           type: string
           example: Lembeek
       - name: name
         in: query
-        description: "(Part of) street name, searches in Dutch/French/German names"
+        description: (Part of) street name, searches in Dutch/French/German names
         required: false
         schema:
           type: string
           example: Grote Markt
-      - name: postalCode
-        in: query
-        description: Postal code (assigned by bPost)
-        required: false
-        schema:
-          maximum: 9999
-          minimum: 1000
-          example: 1500
       responses:
         200:
           description: A (possibly empty) list of streets
@@ -475,8 +461,7 @@ paths:
       tags:
       - streets
       summary: Get a street by ID
-      description: "The ID is a concatenation of the address namespace, objectIdentifier,\
-        \ and versionIdentifier"
+      description: The ID is a concatenation of the address namespace, objectIdentifier and versionIdentifier
       parameters:
       - name: id
         in: path
@@ -497,10 +482,9 @@ paths:
       tags:
       - Lookup Resource
       summary: Display version info
-      description: "For debug / support purposes only, displays version info of source\
-        \ data and API"
+      description: For debug / support purposes only, displays version info of source data and API
       responses:
-        "200":
+        200:
           description: OK
           content:
             application/json:
@@ -522,6 +506,56 @@ components:
         de:
           description: Name in German
           type: string
+    ObjectReference:
+      type: object
+      properties:
+        id:
+          description: Identifier
+          type: string
+        href:
+          description: hyperlink to object
+          type: string
+    Address:
+      type: object
+      properties:
+        id:
+          description: Identifier
+          type: string
+        self:
+          description: Link to self
+          type: string
+        street:
+          description: reference to street
+          $ref: '#/components/schemas/ObjectReference'
+        municipality:
+          description: reference to municipality
+          $ref: '#/components/schemas/ObjectReference'
+        municipalityPart:
+          description: reference to part of municipality
+          $ref: '#/components/schemas/ObjectReference'
+        postal:
+          description: reference to postal info
+          $ref: '#/components/schemas/ObjectReference'
+        houseNumber:
+          description: house number
+          type: string
+        boxNumber:
+          description: box number
+          type: string
+        status:
+          description: Status
+          type: string
+    AddressCollection:
+      type: object
+      properties:
+        self:
+          description: Link to self
+          type: string
+        items:
+          description: Array of results
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
     Municipality:
       type: object
       properties:
@@ -556,9 +590,19 @@ components:
         self:
           description: Link to self
           type: string
-        refnisCode:
-          description: REFNIS code (assigned by Statbel)
+        name:
+          $ref: '#/components/schemas/Name'
+    MunicipalityPartCollection:
+      type: object
+      properties:
+        self:
+          description: Link to self
           type: string
+        items:
+          description: Array of results
+          type: array
+          items:
+            $ref: '#/components/schemas/MunicipalityPart'
     PostalInfo:
       type: object
       properties:
