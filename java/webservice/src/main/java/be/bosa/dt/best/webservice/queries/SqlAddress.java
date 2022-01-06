@@ -44,11 +44,11 @@ public class SqlAddress extends Sql {
 		this.from = "address";
 		this.alias = "a";
 
-		if (embed) {
+	/*	if (embed) {
 			this.select += ", s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, s.validFrom, s.validTo, " +
 							" s.streetnameType::text, s.status::text";
-		}
-		if (embed || joinStreet) {
+		}*/
+		if (joinStreet) {
 			this.join += " INNER JOIN street s ON a.sIdentifier = s.identifier";	
 		}
 		if (joinMunicipality) {
