@@ -134,13 +134,14 @@ public class Util {
 		items.subscribe().asStream().forEach(a -> {
 			//String href = self + "/" + a.id.replace("/", "%2F");
 			if (embed) {
-				streets.put(a.street.id, a.street);
-			}
-			embedded.add(a.mIdentifier);
-			if (a.mpIdentifier != null) {
-				embedded.add(a.mpIdentifier);
-			}
+				//streets.put(a.street.id, a.street);
+				embedded.add(a.sIdentifier);
+				embedded.add(a.mIdentifier);
+				if (a.mpIdentifier != null) {
+					embedded.add(a.mpIdentifier);
+				}
 			embedded.add(a.pIdentifier);
+			}
 			arr.add(JsonObject.mapFrom(a));
 		});
 
@@ -150,11 +151,11 @@ public class Util {
 
 		if (embed) {
 			JsonObject embObj = new JsonObject();
-			streets.forEach((k,v) -> {
+/*			streets.forEach((k,v) -> {
 				JsonObject obj = JsonObject.mapFrom(v);
 				embObj.put(obj.getString("self"), obj);
 			});
-
+*/
 			embedded.forEach(e -> { 
 				JsonObject obj = cache.get(e);
 				if (obj == null) {

@@ -97,7 +97,7 @@ public class Repository {
 	public static final String SEARCH_FUZZY = "fuzzy";
 	public static final String SEARCH_STARTWITH = "startwith";
 
-	private final static Map<String,JsonObject> cache = new HashMap<>(5000);
+	private final static Map<String,JsonObject> cache = new HashMap<>(225000);
 
 	/**
 	 * Get municipality / street cache
@@ -135,6 +135,12 @@ public class Repository {
 			cache.put(p.id, JsonObject.mapFrom(p));
 		});
 		Log.infof("%d postal info", cache.size() - size);
+		
+		Multi<Street> streets = findStreetsAll();
+		streets.subscribe().asStream().forEach(p -> {			
+			cache.put(p.id, JsonObject.mapFrom(p));
+		});
+		Log.infof("%d streets", cache.size() - size);
     }
 
 	/**
@@ -541,6 +547,20 @@ public class Repository {
 		).transform(Street::from);
 	}
 
+	/**
+	 * Get all streets
+	 * 
+	 * @return 
+	 */
+	public Multi<Street> findStreetsAll() {
+		SqlStreet qry = new SqlStreet(false, false);
+		qry.orderById();
+		qry.unlimited();
+
+		return multi(
+			pg.preparedQuery(qry.build()).execute()
+		).transform(Street::from);
+	}
 	/**
 	 * Find version info
 	 * 
