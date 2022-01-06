@@ -129,7 +129,7 @@ public class Repository {
 		});
 		Log.infof("%d municipality parts", cache.size() - size);
 		size = cache.size();
-		
+
 		Multi<PostalInfo> postals = findPostalInfosAll();
 		postals.subscribe().asStream().forEach(p -> {			
 			cache.put(p.id, JsonObject.mapFrom(p));

@@ -103,7 +103,7 @@ public class Address extends BestEntity {
 		this.mIdentifier = NsConverter.municipalityDecode(mIdentifier);
 		this.sIdentifier = NsConverter.streetDecode(sIdentifier);
 		this.pIdentifier = NsConverter.postalDecode(pIdentifier);
-		this.mpIdentifier = mpIdentifier;
+		this.mpIdentifier = NsConverter.municipalityPartDecode(mpIdentifier);
 		this.housenumber = housenumber;
 		this.boxnumber = boxnumber;
 		this.validFrom = validFrom;

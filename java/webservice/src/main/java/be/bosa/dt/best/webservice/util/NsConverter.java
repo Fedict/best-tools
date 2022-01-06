@@ -139,7 +139,7 @@ public class NsConverter {
 	 * @return full municipality part ID
 	 */
 	public static String municipalityPartDecode(String id) {
-		if (id.startsWith("WMP")) {
+		if (id != null && id.startsWith("WMP")) {
 			return id.replace("WMP", WMP);
 		}
 		return id;
