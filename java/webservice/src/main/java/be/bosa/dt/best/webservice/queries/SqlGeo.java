@@ -51,11 +51,11 @@ public class SqlGeo extends Sql {
 			this.where = "ST_WITHIN(a.point, ST_SetSRID(ST_GeomFromText($1), 31370))";
 			this.vars = 1;
 		}
-
+/*
 		if (embed) {
 			this.select += ", s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, s.validFrom, s.validTo, " +
 							" s.streetnameType::text, s.status::text";
 			this.join = " INNER JOIN street s ON a.sIdentifier = s.identifier";			
-		}
+		}*/
 	}
 }
