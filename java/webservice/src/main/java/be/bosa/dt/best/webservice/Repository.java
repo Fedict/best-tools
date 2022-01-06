@@ -135,10 +135,11 @@ public class Repository {
 			cache.put(p.id, JsonObject.mapFrom(p));
 		});
 		Log.infof("%d postal info", cache.size() - size);
+		size = cache.size();
 		
 		Multi<Street> streets = findStreetsAll();
-		streets.subscribe().asStream().forEach(p -> {			
-			cache.put(p.id, JsonObject.mapFrom(p));
+		streets.subscribe().asStream().forEach(s -> {			
+			cache.put(s.id, JsonObject.mapFrom(s));
 		});
 		Log.infof("%d streets", cache.size() - size);
     }

@@ -27,7 +27,6 @@ package be.bosa.dt.best.webservice;
 
 import be.bosa.dt.best.webservice.entities.Address;
 import be.bosa.dt.best.webservice.entities.BestEntity;
-import be.bosa.dt.best.webservice.entities.Street;
 
 import io.quarkus.logging.Log;
 
@@ -37,7 +36,6 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -127,7 +125,7 @@ public class Util {
 	protected static JsonObject toJson(UriInfo info, Multi<Address> items, boolean embed, Map<String,JsonObject> cache) {
 		String self = info.getAbsolutePath().toString();
 	
-		Map<String,Street> streets = new HashMap<>();
+		//Map<String,Street> streets = new HashMap<>();
 		Set<String> embedded = new HashSet<>();
 
 		JsonArray arr = new JsonArray();
@@ -140,14 +138,13 @@ public class Util {
 				if (a.mpIdentifier != null) {
 					embedded.add(a.mpIdentifier);
 				}
-			embedded.add(a.pIdentifier);
+				embedded.add(a.pIdentifier);
 			}
 			arr.add(JsonObject.mapFrom(a));
 		});
 
 		JsonObject parentObj = new JsonObject();		
 		parentObj.put("self", self);
-		parentObj.put("items", arr); 
 
 		if (embed) {
 			JsonObject embObj = new JsonObject();
@@ -189,7 +186,6 @@ public class Util {
 
 		JsonObject parentObj = new JsonObject();		
 		parentObj.put("self", self);
-		parentObj.put("items", arr); 
 
 		return paginate(info, parentObj, arr);
 	}
@@ -203,6 +199,8 @@ public class Util {
 	 * @return JSON object with pagination
 	 */
 	private static JsonObject paginate(UriInfo info, JsonObject parentObj, JsonArray arr) {
+		parentObj.put("items", arr);
+		
 		//pagination
 		int size = arr.size();
 		if (size >= Repository.PAGE_LIMIT) {

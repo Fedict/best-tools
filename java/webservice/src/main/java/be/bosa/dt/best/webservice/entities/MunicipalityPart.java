@@ -33,15 +33,12 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.vertx.mutiny.sqlclient.Row;
 
 /**
- * Municipality entity.
- * Note that each municipality has a unique REFNIS code, which is NOT a postal code.
- * Municipalities may have multiple postal codes and postal codes can be shared by different municipalities 
+ * Municipality part entity.
  * 
  * @author Bart Hanssens
  */
 @JsonSerialize(using = MunicipalityPartSerializer.class)
 public class MunicipalityPart extends BestEntity {
-	public String niscode;
 	public String name_nl;
 	public String name_fr;
 	public String name_de;
