@@ -35,7 +35,6 @@ import be.bosa.dt.best.webservice.entities.Street;
 import be.bosa.dt.best.webservice.entities.Version;
 import be.bosa.dt.best.webservice.queries.Sql;
 import be.bosa.dt.best.webservice.queries.SqlAddress;
-import be.bosa.dt.best.webservice.queries.SqlGeo;
 import be.bosa.dt.best.webservice.queries.SqlMunicipality;
 import be.bosa.dt.best.webservice.queries.SqlMunicipalityPart;
 import be.bosa.dt.best.webservice.queries.SqlPostalInfo;
@@ -97,6 +96,7 @@ public class Repository {
 	public static final String SEARCH_FUZZY = "fuzzy";
 	public static final String SEARCH_STARTWITH = "startwith";
 
+	// cache for everything except addresses, used instead of DB joins
 	private final static Map<String,JsonObject> cache = new HashMap<>(225000);
 
 	/**
@@ -109,7 +109,7 @@ public class Repository {
 	}
 
 	/**
-	 * Cache the JSON rendering of all municipalities
+	 * Cache the JSON rendering of all municipalities and streets
 	 * 
 	 * @param ev 
 	 */
@@ -221,7 +221,7 @@ public class Repository {
 	 */
 	public Uni<Address> findAddressById(String id) {
 		Tuple tuple = Tuple.of(NsConverter.addressEncode(id));
-		SqlAddress qry = new SqlAddress(false, false, false);
+		SqlAddress qry = new SqlAddress();
 		qry.where("a.identifier =");
 
 		return uni(
@@ -250,12 +250,18 @@ public class Repository {
 										String sIdentifier, String sName,
 										String pIdentifier, String postalCode, String pName,
 										String houseNumber, String boxNumber, String status) {
-		boolean joinMunicipality = Util.oneNotEmpty(mName, nisCode);
-		boolean joinStreet = Util.oneNotEmpty(sName);
-		boolean joinPostal = Util.oneNotEmpty(postalCode);
-
 		List lst = new ArrayList(12);
-		SqlAddress qry = new SqlAddress(joinStreet, joinMunicipality,  joinPostal);
+		SqlAddress qry = new SqlAddress();
+
+		if (Util.oneNotEmpty(sName)) {
+			qry.joinStreet();
+		}
+		if (Util.oneNotEmpty(mName, nisCode)) {
+			qry.joinMunicipality();
+		}
+		if (Util.oneNotEmpty(pName, postalCode)) {
+			qry.joinPostal();
+		}
 
 		where(lst, qry, "a.mIdentifier", NsConverter.municipalityEncode(mIdentifier));
 		where(lst, qry, "m.refnisCode", nisCode);
@@ -283,7 +289,6 @@ public class Repository {
 	 * @param crs coordinate reference system
 	 * @param radius in meters
 	 * @param status
-	 * @param embed embed street, postal etc or not
 	 * @return 
 	 */
 	public Multi<Address> findByCoordinates(String afterId, double coordX, double coordY, String crs, int radius, 
@@ -295,7 +300,8 @@ public class Repository {
 		lst.add(point.y);
 		lst.add(radius);
 
-		SqlGeo qry = new SqlGeo(true);
+		SqlAddress qry = new SqlAddress();
+		qry.point();
 		where(lst, qry, "a.status", status);
 		paginate(lst, qry, NsConverter.addressEncode(afterId));
 
@@ -314,12 +320,12 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<Address> findByPolygon(String afterId, String polygon, String crs, String status) {
-		String coords = CoordConverter.makeWktPolygon(polygon, crs);
+		SqlAddress qry = new SqlAddress();
+		qry.polygon();
 		
 		List lst = new ArrayList(4); 
-		lst.add(coords);
+		lst.add(CoordConverter.makeWktPolygon(polygon, crs));
 
-		SqlGeo qry = new SqlGeo(false);
 		where(lst, qry, "a.status", status);
 		paginate(lst, qry, NsConverter.addressEncode(afterId));
 
@@ -336,7 +342,7 @@ public class Repository {
 	 */
 	public Uni<Municipality> findMunicipalityById(String id) {
 		Tuple tuple = Tuple.of(NsConverter.municipalityEncode(id));
-		SqlMunicipality qry = new SqlMunicipality(false);
+		SqlMunicipality qry = new SqlMunicipality();
 		qry.where("m.identifier =");
 
 		return uni(
@@ -354,10 +360,12 @@ public class Repository {
 	 * @return municipalities or null
 	 */
 	public Multi<Municipality> findMunicipalities(String nisCode, String postalCode, String name, String nameMatch) {
-		boolean joinPostal = Util.oneNotEmpty(postalCode);
-		List lst = new ArrayList(4);
-		
-		SqlMunicipality qry = new SqlMunicipality(joinPostal);
+		SqlMunicipality qry = new SqlMunicipality();
+		if (Util.oneNotEmpty(postalCode)) {
+			qry.joinPostal();
+		}
+
+		List lst = new ArrayList(6);
 		where(lst, qry, "m.refniscode", nisCode);
 		where(lst, qry, "p.postalcode", postalCode);
 		whereNames(lst, qry, "m.nameNL", "m.nameFR", "m.nameDE", name, nameMatch);
@@ -376,7 +384,7 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<Municipality> findMunicipalitiesAll() {
-		SqlMunicipality qry = new SqlMunicipality(false);
+		SqlMunicipality qry = new SqlMunicipality();
 		qry.orderById();
 		qry.unlimited();
 
@@ -409,9 +417,9 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<MunicipalityPart> findMunicipalityParts(String afterId, String name) {
-		List lst = new ArrayList(3);
 		SqlMunicipalityPart qry = new SqlMunicipalityPart();
 
+		List lst = new ArrayList(3);
 		whereNames(lst, qry, "mp.nameNL", "mp.nameFR", "mp.nameDE", name, Repository.SEARCH_EXACT);
 		paginate(lst, qry, NsConverter.municipalityPartEncode(afterId));
 
@@ -461,9 +469,9 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<PostalInfo> findPostalInfos(String afterId, String postalCode, String name, String nameMatch) {
-		List lst = new ArrayList(4);
 		SqlPostalInfo qry = new SqlPostalInfo();
 
+		List lst = new ArrayList(4);
 		where(lst, qry, "p.postalcode", postalCode);
 		
 		whereNames(lst, qry, "p.nameNL", "p.nameFR", "p.nameDE", name, nameMatch);
@@ -497,7 +505,7 @@ public class Repository {
 	 */
 	public Uni<Street> findStreetById(String id) {
 		Tuple tuple = Tuple.of(NsConverter.streetEncode(id));
-		SqlStreet qry = new SqlStreet(false, false);
+		SqlStreet qry = new SqlStreet();
 		qry.where("s.identifier =");
 
 		return uni(
@@ -522,12 +530,15 @@ public class Repository {
 	public Multi<Street> findStreets(String afterId, String mIdentifier, String nisCode, String municipalityName,
 									String pIdentifier, String postalCode, String postalName,
 									String name, String status) {
-		boolean joinPostal = Util.oneNotEmpty(postalCode, pIdentifier, postalName);
-		boolean joinMunicipality = Util.oneNotEmpty(nisCode, mIdentifier, municipalityName);
+		SqlStreet qry = new SqlStreet();
+		if (Util.oneNotEmpty(postalCode, pIdentifier, postalName)) {
+			qry.joinPostal();
+		}
+		if (Util.oneNotEmpty(nisCode, mIdentifier, municipalityName)) {
+			qry.joinMunicipality();
+		}
 
 		List lst = new ArrayList(15);
-		SqlStreet qry = new SqlStreet(joinPostal, joinMunicipality);
-
 		where(lst, qry, "pm.mIdentifier", NsConverter.municipalityEncode(mIdentifier));
 		where(lst, qry, "m.refniscode", nisCode);
 		where(lst, qry, "ps.pidentifier", NsConverter.postalEncode(pIdentifier));
@@ -551,7 +562,7 @@ public class Repository {
 	 * @return 
 	 */
 	public Multi<Street> findStreetsAll() {
-		SqlStreet qry = new SqlStreet(false, false);
+		SqlStreet qry = new SqlStreet();
 		qry.orderById();
 		qry.unlimited();
 

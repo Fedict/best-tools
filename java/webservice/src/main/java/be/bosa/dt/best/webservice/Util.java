@@ -144,6 +144,7 @@ public class Util {
 
 		JsonObject parentObj = new JsonObject();		
 		parentObj.put("self", self);
+		parentObj.put("items", arr);
 
 		if (embed) {
 			JsonObject embObj = new JsonObject();
@@ -183,8 +184,9 @@ public class Util {
 				//.put("href", href));
 		});
 
-		JsonObject parentObj = new JsonObject();		
+		JsonObject parentObj = new JsonObject();
 		parentObj.put("self", self);
+		parentObj.put("items", arr);
 
 		return paginate(info, parentObj, arr);
 	}
@@ -198,8 +200,6 @@ public class Util {
 	 * @return JSON object with pagination
 	 */
 	private static JsonObject paginate(UriInfo info, JsonObject parentObj, JsonArray arr) {
-		parentObj.put("items", arr);
-		
 		//pagination
 		int size = arr.size();
 		if (size >= Repository.PAGE_LIMIT) {

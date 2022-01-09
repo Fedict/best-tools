@@ -31,19 +31,19 @@ package be.bosa.dt.best.webservice.queries;
  * @author Bart Hanssens
  */
 public class SqlMunicipality extends Sql {
-
+	/**
+	 * Join with postal municipalities auxiliary table
+	 */
+	public void joinPostal() {
+		this.join = " INNER JOIN postalmunicipalities p ON m.identifier = p.mIdentifier";	
+	}
+	
 	/**
 	 * Constructor
-	 * 
-	 * @param joinPostal join with postalInfo table
 	 */
-	public SqlMunicipality(boolean joinPostal) {
+	public SqlMunicipality() {
 		this.select = "m.identifier, m.refnisCode, m.nameNL, m.nameFR, m.nameDE";
 		this.alias = "m";
 		this.from = "municipality";
-		
-		if (joinPostal) {
-			this.join = " INNER JOIN postalmunicipalities p ON m.identifier = p.mIdentifier";	
-		}
 	}
 }

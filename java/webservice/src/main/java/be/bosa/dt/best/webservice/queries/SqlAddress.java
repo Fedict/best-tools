@@ -32,26 +32,49 @@ package be.bosa.dt.best.webservice.queries;
  */
 public class SqlAddress extends Sql {
 	/**
-	 * Constructor
-	 * 
-	 * @param joinStreet join with street table
-	 * @param joinMunicipality
-	 * @param joinPostal join with postalInfo table
+	 * Join with street table
 	 */
-	public SqlAddress(boolean joinStreet, boolean joinMunicipality, boolean joinPostal) {
+	public void joinStreet() {
+		this.join += " INNER JOIN street s ON a.sIdentifier = s.identifier";
+	}
+	
+	/**
+	 * Join with municipality table
+	 */
+	public void joinMunicipality() {
+		this.join += " INNER JOIN municipality m ON a.mIdentifier = m.identifier";
+	}
+
+	/**
+	 * Join with postal info table
+	 */
+	public void joinPostal() {
+		this.join += " INNER JOIN postalinfo p ON a.pIdentifier = p.identifier";
+	}
+
+	/**
+	 * Adapt query to search in a radius from a specific point
+	 */
+	public void point() {
+		this.where = "ST_DWITHIN(a.point, ST_SetSRID(ST_Point($1, $2), 31370), $3)";
+		this.vars = 3;	
+	}
+
+	/**
+	 * Adapt query to search within a polygon
+	 */
+	public void polygon() {
+		this.where = "ST_WITHIN(a.point, ST_SetSRID(ST_GeomFromText($1), 31370))";
+		this.vars = 1;	
+	}
+
+	/**
+	 * Constructor
+	 */
+	public SqlAddress() {
 		this.select = "a.identifier, a.mIdentifier, a.pIdentifier, a.mpIdentifier, a.sIdentifier, " +
 						" a.housenumber, a.boxnumber, a.validFrom, a.validTo, a.status::text, a.point::point";
 		this.from = "address";
 		this.alias = "a";
-
-		if (joinStreet) {
-			this.join += " INNER JOIN street s ON a.sIdentifier = s.identifier";	
-		}
-		if (joinMunicipality) {
-			this.join += " INNER JOIN municipality m ON a.mIdentifier = m.identifier";	
-		}
-		if (joinPostal) {
-			this.join += " INNER JOIN postalinfo p ON a.pIdentifier = p.identifier";	
-		}
 	}
 }

@@ -55,7 +55,7 @@ import org.jboss.resteasy.reactive.RestQuery;
 import org.jboss.resteasy.reactive.RestResponse;
 
 /**
- * End points for web service
+ * Declare REST end points for web service
  * 
  * @author Bart Hanssens
  */

@@ -31,26 +31,24 @@ package be.bosa.dt.best.webservice.queries;
  * @author Bart Hanssens
  */
 public class SqlStreet extends Sql {
+	public void joinPostal() {
+		this.join += " INNER JOIN postalStreets ps ON ps.sIdentifier = s.identifier " +
+					" INNER JOIN postalInfo p ON p.identifier = ps.pIdentifier";
+	}
+
+	public void joinMunicipality() {
+		this.join += " INNER JOIN postalMunicipalities pm ON pm.mIdentifier = s.mIdentifier " +
+					" INNER JOIN municipality m ON m.identifier = pm.mIdentifier";
+	}
 
 	/**
 	 * Constructor
-	 * 
-	 * @param joinPostal join with postalInfo table
-	 * @param joinMunicipality
+	 *
 	 */
-	public SqlStreet(boolean joinPostal, boolean joinMunicipality) {
+	public SqlStreet() {
 		this.select = "s.identifier, s.mIdentifier, s.nameNL, s.nameFR, s.nameDE, " +
 						"s.validFrom, s.validTo, s.streetnameType::text, s.status::text";
 		this.alias = "s";
 		this.from = "street";
-		
-		if (joinPostal) {
-			this.join += " INNER JOIN postalStreets ps ON ps.sIdentifier = s.identifier " +
-						" INNER JOIN postalInfo p ON p.identifier = ps.pIdentifier";
-		}
-		if (joinMunicipality) {
-			this.join += " INNER JOIN postalMunicipalities pm ON pm.mIdentifier = s.mIdentifier " +
-						" INNER JOIN municipality m ON m.identifier = pm.mIdentifier";
-		}
 	}
 }
