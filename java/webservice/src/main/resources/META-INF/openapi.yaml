@@ -81,6 +81,7 @@ paths:
         in: query
         description: Embed referenced streets, municipalities ...
         required: false
+        default: false
         schema:
           default: false
           type: boolean
@@ -564,6 +565,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Address'
+        embedded:
+          type: array
+          items:
+            anyOf:
+             - $ref: '#/components/schemas/Municipality'
+             - $ref: '#/components/schemas/MunicipalityPart'
+             - $ref: '#/components/schemas/PostalInfo'
+             - $ref: '#/components/schemas/Street'
     Municipality:
       type: object
       properties:
