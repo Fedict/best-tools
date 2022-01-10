@@ -4,7 +4,7 @@ Front-end for a PostGIS RDBMS containing BeST-address data.
 
 ## Running the unit tests with a local or remote docker
 
-The unit tests for the webservice loads a subset of address data into a dockerized PostGIS,
+The unit tests for the webservice load a subset of address data into a dockerized PostGIS,
 using [TestContainers](https://testcontainers.org).
 
 If a local docker engine is not available,
@@ -28,7 +28,7 @@ docker.cert.path=C\:\\Data\\docker
 A stand-alone webservice containing both a REST API and a database with the data can be built using
 the multi-stage Dockerfile
 
-This (obviously) a docker engine and about 20 GB of disk space.
+This (obviously) a docker engine and about 20 GB of disk space + access to the internet to download the latest data.
 
 ### First stage
 
@@ -66,3 +66,36 @@ The `be.bosa.dt.best.webservice.url` is the base URL of your server.
 
 The API will be available on `your-server` port 8080 , 
 the Swagger/OpenAPI interface on `http://your-server.example.com:8080/q/swagger-ui`
+
+## Example queries
+
+   JSON results are ordered by ID and [paginated](https://www.gcloud.belgium.be/rest/#pagination) (cursor-based, max.250 resuls per page).
+Next page can be retrieved via the link in the `next` property.
+
+### Search address by GPS position using a 100m radius, and include street and municipality info
+
+The municipality, street etc objects are embedded according to the [G-Cloud REST guidelines](https://www.gcloud.belgium.be/rest/#embedding)
+
+`http://your-server.example.com:8080/api/belgianAddress/v2/addresses?coordx=4.23&coordy=50.7&radius=100&embed=true`
+
+### Search address by street ID and house number
+
+`http://your-server.example.com:8080/api/belgianAddress/v2/addresses?streetId=BE.BRUSSELS.BRIC.ADM.STR/3048/2&houseNumber=84&embed=true`
+
+### Search municipality by name
+
+Search in Dutch, French and German municipality names. Case-insensitive, accents are ignored.
+
+`http://your-server.example.com:8080/api/belgianAddress/v2/municipalities?name=Halle`
+
+### Search street by postal code
+
+`http://your-server.example.com:8080/api/belgianAddress/v2/streets?postalCode=1000`
+
+## Known issues
+
+- Flemish Region does not provide "part of municipality" data (since a "part of municipality" is not a legal entity anymore), but does provide names of postal zones.
+- Walloon Region does provide "part of municipality", but does not provide names of postal zones (since they should be more or less the same as part of municipality name)
+- GPS coordinates are calculated using the open source Proj4j, which may be off by (at most) 1.2m compared to the exact coordinates calculated by National Geographic Institute
+- Ordering (e.g. by street name etc) is not implemented for performance reasons, it should be implemented on the client side
+
