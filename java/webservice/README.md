@@ -92,5 +92,10 @@ Search in Dutch, French and German municipality names. Case-insensitive, accents
 
 `http://your-server.example.com:8080/api/belgianAddress/v2/streets?postalCode=1000`
 
+## Known issues
 
+- Flemish Region does not provide "part of municipality" data (since a "part of municipality" is not a legal entity anymore), but does provide names of postal zones.
+- Walloon Region does provide "part of municipality", but does not provide names of postal zones (since they should be more or less the same as part of municipality name)
+- GPS coordinates are calculated using the open source Proj4j, which may be off by (at most) 1.2m compared to the exact coordinates calculated by National Geographic Institute
+- 
 
