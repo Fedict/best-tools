@@ -2,6 +2,8 @@
 
 Front-end for a PostGIS RDBMS containing BeST-address data.
 
+![Architecture drawing](best-webservice.png)
+
 ## Running the unit tests with a local or remote docker
 
 The unit tests for the webservice load a subset of address data into a dockerized PostGIS,
