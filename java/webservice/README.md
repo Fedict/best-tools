@@ -66,3 +66,31 @@ The `be.bosa.dt.best.webservice.url` is the base URL of your server.
 
 The API will be available on `your-server` port 8080 , 
 the Swagger/OpenAPI interface on `http://your-server.example.com:8080/q/swagger-ui`
+
+## Example queries
+
+JSON results are ordered by ID and [https://www.gcloud.belgium.be/rest/#pagination](paginated) (cursor-based, max.250 resuls per page).
+Next page can be retrieved via the link in the `next` property.
+
+### Search address by GPS position using a 100m radius, and include street and municipality info
+
+The municipality, street etc objects are embedded according to the [https://www.gcloud.belgium.be/rest/#embedding](G-Cloud REST guidelines)
+
+`http://your-server.example.com:8080/api/belgianAddress/v2/addresses?coordx=4.23&coordy=50.7&radius=100&embed=true`
+
+### Search address by street ID and house number
+
+`http://your-server.example.com:8080/api/belgianAddress/v2/addresses?streetId=BE.BRUSSELS.BRIC.ADM.STR/3048/2&houseNumber=84&embed=true`
+
+### Search municipality by name
+
+Search in Dutch, French and German municipality names. Case-insensitive, accents are ignored.
+
+`http://your-server.example.com:8080/api/belgianAddress/v2/municipalities?name=Halle`
+
+### Search street by postal code
+
+ http://your-server.example.com:8080/api/belgianAddress/v2/streets?postalCode=1000`
+
+
+
