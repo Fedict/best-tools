@@ -69,12 +69,12 @@ the Swagger/OpenAPI interface on `http://your-server.example.com:8080/q/swagger-
 
 ## Example queries
 
-JSON results are ordered by ID and [https://www.gcloud.belgium.be/rest/#pagination](paginated) (cursor-based, max.250 resuls per page).
+   JSON results are ordered by ID and [paginated](https://www.gcloud.belgium.be/rest/#pagination) (cursor-based, max.250 resuls per page).
 Next page can be retrieved via the link in the `next` property.
 
 ### Search address by GPS position using a 100m radius, and include street and municipality info
 
-The municipality, street etc objects are embedded according to the [https://www.gcloud.belgium.be/rest/#embedding](G-Cloud REST guidelines)
+The municipality, street etc objects are embedded according to the [G-Cloud REST guidelines](https://www.gcloud.belgium.be/rest/#embedding)
 
 `http://your-server.example.com:8080/api/belgianAddress/v2/addresses?coordx=4.23&coordy=50.7&radius=100&embed=true`
 
@@ -90,7 +90,7 @@ Search in Dutch, French and German municipality names. Case-insensitive, accents
 
 ### Search street by postal code
 
- http://your-server.example.com:8080/api/belgianAddress/v2/streets?postalCode=1000`
+`http://your-server.example.com:8080/api/belgianAddress/v2/streets?postalCode=1000`
 
 
 
