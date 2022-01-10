@@ -28,7 +28,7 @@ docker.cert.path=C\:\\Data\\docker
 A stand-alone webservice containing both a REST API and a database with the data can be built using
 the multi-stage Dockerfile
 
-This (obviously) a docker engine and about 20 GB of disk space.
+This (obviously) a docker engine and about 20 GB of disk space + access to the internet to download the latest data.
 
 ### First stage
 
