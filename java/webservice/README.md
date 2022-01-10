@@ -4,7 +4,7 @@ Front-end for a PostGIS RDBMS containing BeST-address data.
 
 ## Running the unit tests with a local or remote docker
 
-The unit tests for the webservice loads a subset of address data into a dockerized PostGIS,
+The unit tests for the webservice load a subset of address data into a dockerized PostGIS,
 using [TestContainers](https://testcontainers.org).
 
 If a local docker engine is not available,
