@@ -66,7 +66,8 @@ public class AboutResource {
 		if (about.isEmpty()) {
 			about = getResource("licenses/about.html");
 			// replace placeholders by respective licenses
-			String[] files = { "openjdk-gplv2ce", "postgis-gplv2", "postgres", "proj4j-apache", "quarkus-apache" };
+			String[] files = { "bosa-bsd", 
+				"openjdk-gplv2ce", "postgis-gplv2", "postgres", "proj4j-apache", "quarkus-apache" };
 			for (String f: files) {
 				String license = getResource("licenses/" + f + ".txt");
 				about = about.replaceFirst("\\{" + f + "\\}", license);

@@ -25,8 +25,11 @@
 	<body>
 		<main>
 		<h1>About BeST</h1>
+		<p>The BeST-project contains the location of all current address points in Belgium, 
+			using the XML-export files provided by the 3 Regions.</p>
 		<h2>Software</h2>
-		<p>This service uses several open source components:</p>
+		<p>The REST API service is licensed under (<a href="#lic-bosa-bsd">BSD-2 clause</a> license)</p>
+		<p>This service uses several other open source components, including:</p>
 		<ul>
 			<li><a href="https://adoptium.net">Eclipse Temurin OpenJDK</a> 
 				(<a href="#lic-openjdk">license</a>)</li>
@@ -43,10 +46,23 @@
 			The <a href="https://github.com/fedict/best-tools">source code</a> for this application is available as well.
 		</p>
 		<h2>Data</h2>
-		<p>
-			<a href="https://opendata.bosa.be/">BeST address data</a> from the 3 Regions in Belgium.
-		</p>
+		<p>This service uses address data obtained from the 3 Regions in Belgium:</p>
+		<ul>
+			<li>Brussels Capital Region (<a href="https://bric.brussels/en">BRIC</a>): 
+				<a href="https://cirb.brussels/fr/nos-solutions/urbis-solutions/licence-open-data-urbis">UrbiS open license</a></li>
+			<li>Flemish Region (<a href="https://www.vlaanderen.be/digitaal-vlaanderen">Digitaal Vlaanderen</a>): 
+				<a href="https://overheid.vlaanderen.be/modellicentie-gratis-hergebruik">Modellicentie gratis hergebruik</a></li>
+			<li>Walloon Region (<a href="https://spw.wallonie.be">SPW</a>):
+				<a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution</a>
+		</ul>
 		<h2>Licenses</h2>
+		<a id="lic-bosa-bsd" name="lic-bosa-bsd"></a>
+		<details>
+			<summary>BEST API Simplified BSD</summary>
+			<pre>
+			{bosa-bsd}
+			</pre>
+		</details>		
 		<a id="lic-openjdk" name="lic-openjdk"></a>
 		<details>
 			<summary>Temurin OpenJDK GPLv2 with Classpath Exception</summary>
