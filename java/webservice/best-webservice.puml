@@ -1,0 +1,58 @@
+@startuml
+
+cloud "Open Data BOSA" {
+folder "Downloads" as f1 {
+	file "BeST Full Download (ZIP)"
+}
+}
+
+rectangle "Local system" {
+component "Unzip tool" as c1 {
+}
+
+folder XML as f2 {
+	file "Brussels"
+	file "Flanders"
+	file "Wallonia"
+}
+
+component "Convert tool" as c2 {
+  component XMLReader
+}
+
+folder CSV as f3 {
+	file "Address"
+	file "Municipality"
+	file "Street"
+	file "PostalInfo"
+}
+
+package "Docker image" as p1 {
+  database PostGIS as d1 
+  component "REST API" as c3
+}
+}
+
+cloud "Hub Docker" {
+package "Docker image" as p2 {
+}
+}
+
+cloud "Data center" {
+package "Docker container" as p3 {
+}
+}
+
+actor User as a1
+
+f1 -right-> c1
+c1 -down-> f2 
+f2 -up-> c2
+c2 -down-> f3
+f3 -up-> d1
+d1 -right- c3
+p1 -right-> p2
+p2 -down-> p3
+a1 -> p3
+
+@enduml
