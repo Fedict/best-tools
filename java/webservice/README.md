@@ -97,5 +97,5 @@ Search in Dutch, French and German municipality names. Case-insensitive, accents
 - Flemish Region does not provide "part of municipality" data (since a "part of municipality" is not a legal entity anymore), but does provide names of postal zones.
 - Walloon Region does provide "part of municipality", but does not provide names of postal zones (since they should be more or less the same as part of municipality name)
 - GPS coordinates are calculated using the open source Proj4j, which may be off by (at most) 1.2m compared to the exact coordinates calculated by National Geographic Institute
-- 
+- Ordering (e.g. by street name etc) is not implemented for performance reasons, it should be implemented on the client side
 
