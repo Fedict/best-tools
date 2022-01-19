@@ -35,6 +35,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -157,10 +158,13 @@ public class ZipService {
 
 		Path pout = Paths.get(outfile);
 		Log.infof("New zipfile %s", pout);
+		
+		Path[] files;
 		try (OutputStream os = Files.newOutputStream(pout);
-			ZipOutputStream zos = new ZipOutputStream(os)) {
+			ZipOutputStream zos = new ZipOutputStream(os);
+			Stream<Path> listing = Files.walk(pin)) {
 	
-			Path[] files = Files.walk(pin).filter(f -> f.toFile().isFile()).filter(filter).toArray(Path[]::new);
+			files = listing.filter(f -> f.toFile().isFile()).filter(filter).toArray(Path[]::new);
 			for (Path f: files) {
 				zip(f, zos);
 			}

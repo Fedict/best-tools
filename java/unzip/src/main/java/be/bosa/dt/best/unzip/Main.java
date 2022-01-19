@@ -25,7 +25,6 @@
  */
 package be.bosa.dt.best.unzip;
 
-import java.util.logging.Logger;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -39,8 +38,6 @@ import org.apache.commons.cli.ParseException;
  * @author Bart Hanssens
  */
 public class Main {
-	private final static Logger LOG = Logger.getLogger(Main.class.getName());
-
 	private final static Options OPTS = new Options()
 		.addRequiredOption("i", "infile", true, "zipped file")
 		.addRequiredOption("o", "outdir", true, "output directory");

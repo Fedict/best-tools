@@ -124,9 +124,6 @@ public class AddressReader extends AbstractXMLReader<Address> {
 						} catch (NumberFormatException nfe) {
 							LOG.log(Level.WARNING, "Error geoposition {0} for {1} ", new Object[]{ nfe, obj.getId()});
 						}
-					} else if (el.equals(STATUS)) {
-						String txt = reader.getElementText();
-						obj.setStatus(txt);
 					} else if (el.equals(VALID_FROM)) {
 						String txt = reader.getElementText();
 						obj.setFromDate(txt);

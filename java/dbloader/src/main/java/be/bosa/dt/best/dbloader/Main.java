@@ -171,7 +171,7 @@ public class Main {
 			ok = writeCSV(csvstr, xmlPath, gps);
 		}
 
-		if (ok == false) {
+		if (!ok) {
 			System.exit(-30);
 		}
 

@@ -86,8 +86,8 @@ public class PostGisLoader {
 	public void dropTables() throws SQLException {
 		LOG.info("Drop tables");
 
-		try(Connection conn = getConnection()) {
-			Statement stmt = conn.createStatement();
+		try(Connection conn = getConnection();
+			Statement stmt = conn.createStatement()) {
 			stmt.execute("DROP TABLE IF EXISTS Address CASCADE");			
 			stmt.execute("DROP TABLE IF EXISTS PostalInfo CASCADE");
 			stmt.execute("DROP TABLE IF EXISTS Street CASCADE");
@@ -104,8 +104,8 @@ public class PostGisLoader {
 	private void dropEnums() throws SQLException {
 		LOG.info("Drop enums");
 
-		try(Connection conn = getConnection()) {
-			Statement stmt = conn.createStatement();
+		try(Connection conn = getConnection();
+			Statement stmt = conn.createStatement()) {
 			
 			stmt.execute("DROP TYPE IF EXISTS enumStatus");
 			stmt.execute("DROP TYPE IF EXISTS enumStreetnameType");
@@ -122,8 +122,8 @@ public class PostGisLoader {
 	private void createEnums() throws SQLException {
 		LOG.info("Create enums");
 
-		try(Connection conn = getConnection()) {
-			Statement stmt = conn.createStatement();
+		try(Connection conn = getConnection();
+			Statement stmt = conn.createStatement()) {
 			
 			stmt.execute("CREATE TYPE enumStatus " +
 				" AS ENUM('current', 'proposed', 'retired', 'reserved')");
@@ -144,8 +144,8 @@ public class PostGisLoader {
 	private void createTables() throws SQLException {
 		LOG.info("Create tables");
 
-		try(Connection conn = getConnection()) {
-			Statement stmt = conn.createStatement();
+		try(Connection conn = getConnection();
+			Statement stmt = conn.createStatement()){
 
 			stmt.execute("CREATE TABLE Address(" +
 					"	identifier VARCHAR(100) NOT NULL, " +
@@ -209,8 +209,8 @@ public class PostGisLoader {
 	 */
 	private void addConstraints() throws SQLException {
 		// add primary keys, indices and constraints after loading data, for performance
-		try(Connection conn = getConnection()) {
-			Statement stmt = conn.createStatement();
+		try(Connection conn = getConnection();
+			Statement stmt = conn.createStatement()) {
 
 			LOG.info("Set primary keys");
 			stmt.execute("ALTER TABLE Address " +
@@ -248,8 +248,8 @@ public class PostGisLoader {
 	 * @throws SQLException 
 	 */
 	private void createIndex() throws SQLException {
-		try(Connection conn = getConnection()) {
-			Statement stmt = conn.createStatement();
+		try(Connection conn = getConnection();
+			Statement stmt = conn.createStatement()) {
 
 			LOG.info("Set spatial index");			
 			stmt.execute("CREATE INDEX idxAddressPoint ON Address USING GIST(point)");
@@ -546,7 +546,7 @@ public class PostGisLoader {
 	private void setFirstAddress() throws SQLException {
 		LOG.log(Level.INFO, "Setting first address flag");
 
-		try(Connection conn = getConnection()) {
+		try(Connection conn = getConnection(); 
 			PreparedStatement prep = conn.prepareStatement(
 				"UPDATE address a1 SET firstaddress = true FROM "+
 				"(SELECT midentifier, sidentifier, housenumber, MIN(COALESCE(boxnumber,'0')) AS minboxnumber " + 
@@ -554,7 +554,7 @@ public class PostGisLoader {
 					"GROUP BY midentifier, sidentifier, housenumber" +
 				") AS a2 " +
 				"WHERE a1.midentifier = a2.midentifier AND a1.sidentifier = a2.sidentifier " +
-				" AND a1.housenumber = a2.housenumber AND COALESCE(a1.boxnumber,'0') = minboxnumber");
+				" AND a1.housenumber = a2.housenumber AND COALESCE(a1.boxnumber,'0') = minboxnumber")) {
 
 			prep.execute();
 		}

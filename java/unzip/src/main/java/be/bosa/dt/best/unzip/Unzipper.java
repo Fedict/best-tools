@@ -34,6 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -109,9 +110,10 @@ public class Unzipper {
 				return false;
 			}
 		}
-		
-		try {
-			Path[] files = Files.walk(pout).filter(f -> !f.equals(pout)).toArray(Path[]::new);
+
+		Path[] files;		
+		try (Stream<Path> listing = Files.walk(pout)) {
+			files = listing.filter(f -> !f.equals(pout)).toArray(Path[]::new);
 			for (Path f: files) {
 				LOG.log(Level.INFO, "Deleting {}", f);
 				Files.delete(f);

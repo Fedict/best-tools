@@ -33,6 +33,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
+import java.util.stream.Stream;
 
 
 /**
@@ -66,8 +67,8 @@ public class Utils {
 
 		Log.infof("Delete directory %s", p);
 
-		try {
-			Files.walk(p).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+		try(Stream<Path> files = Files.walk(p)) {
+			files.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
 		} catch(IOException ioe) {
 			return false;
 		}

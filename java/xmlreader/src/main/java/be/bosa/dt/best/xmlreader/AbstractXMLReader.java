@@ -80,13 +80,15 @@ public abstract class AbstractXMLReader<T> implements BestReader {
 	protected Path checkFile(Path indir, BestRegion region, BestType type, String ext) throws IOException {
 		String start = (region.getName() + type.getName()).toLowerCase();
 		
-		Path xml = Files.list(indir).filter(p -> {
-			String name = p.getFileName().toString().toLowerCase();
-			return name.startsWith(start) && name.endsWith(ext);
-		}).findFirst().orElseThrow(() -> new IOException("No file starting with " + start + " found"));
+		try(Stream<Path> files = Files.list(indir)) {
+			Path xml = files.filter(p -> {
+				String name = p.getFileName().toString().toLowerCase();
+				return name.startsWith(start) && name.endsWith(ext);
+			}).findFirst().orElseThrow(() -> new IOException("No file starting with " + start + " found"));
 
-		if (Files.isRegularFile(xml) && Files.isReadable(xml)) {
-			return xml;
+			if (Files.isRegularFile(xml) && Files.isReadable(xml)) {
+				return xml;
+			}
 		}
 		throw new IOException("File not readable");
 	}

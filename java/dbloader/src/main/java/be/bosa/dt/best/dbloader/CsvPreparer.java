@@ -219,8 +219,6 @@ public class CsvPreparer {
 					Coordinate coordl72 = geoCoder.toCoords(p.getX(), p.getY(), false);
 					Coordinate coordgps = geoCoder.toCoords(p.getX(), p.getY(), true);
 					
-					String x = String.valueOf(gps ? coordl72.x : coordgps.x);
-					String y = String.valueOf(gps ? coordl72.y : coordgps.y);
 					String c = geoCoder.toWkb(gps ? coordgps : coordl72);
 
 					// calculate geom afterwards, using separate UPDATE statement
