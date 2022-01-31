@@ -32,13 +32,13 @@ package be.bosa.dt.best.webservice.util;
  * @author Bart Hanssens
  */
 public class NsConverter {
-	private final static String BA = "BE.BRUSSELS.BRIC.ADM.ADDR";
+	private final static String BA = "https://databrussels.be/id/address";
 	private final static String VA = "https://data.vlaanderen.be/id/adres";
 	private final static String WA = "geodata.wallonie.be/id/Address";
 	private final static String[][] ENC_A = { { BA, "BA" }, { VA, "VA" }, { WA, "WA" } };
 	private final static String[][] DEC_A = { { "BA", BA }, { "VA", VA }, { "WA", WA } };
 
-	private final static String BM = "BE.BRUSSELS.BRIC.ADM.MUNICIPALITY";
+	private final static String BM = "https://databrussels.be/id/municipality";
 	private final static String VM = "https://data.vlaanderen.be/id/gemeente";
 	private final static String WM = "geodata.wallonie.be/id/Municipality";
 	private final static String[][] ENC_M = { { BM, "BM" }, { VM, "VM" }, { WM, "WM" } };
@@ -46,13 +46,13 @@ public class NsConverter {
 
 	private final static String WMP = "geodata.wallonie.be/id/PartOfMunicipality";
 	
-	private final static String BP = "BE.BRUSSELS.BRIC.ADM.PZ";
+	private final static String BP = "https://databrussels.be/id/postalinfo";
 	private final static String VP = "https://data.vlaanderen.be/id/postinfo";
 	private final static String WP = "geodata.wallonie.be/id/PostalInfo";
 	private final static String[][] ENC_P = { { BP, "BP" }, { VP, "VP" }, { WP, "WP" } };
 	private final static String[][] DEC_P = { { "BP", BP }, { "VP", VP }, { "WP", WP } };
 	
-	private final static String BS = "BE.BRUSSELS.BRIC.ADM.STR";
+	private final static String BS = "https://databrussels.be/id/streetname";
 	private final static String VS = "https://data.vlaanderen.be/id/straatnaam";
 	private final static String WS = "geodata.wallonie.be/id/Streetname";
 	private final static String[][] ENC_S = { { BS, "BS" }, { VS, "VS" }, { WS, "WS" } };
