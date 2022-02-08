@@ -69,21 +69,24 @@ public class Main implements QuarkusApplication {
 	@ConfigProperty(name = "automation.upload.path")
 	String uploadPath;
 
+	@ConfigProperty(name = "automation.tempdata.path")
+	Path tempData;
+	
 	@ConfigProperty(name = "automation.web.bestfull.file")
-	String dataFile;
+	String fullFile;
 
 	@ConfigProperty(name = "automation.web.postalstreets.file")
-	String dataFilePs;
+	String postalstreetFile;
 
 	@ConfigProperty(name = "automation.web.emptystreets.file")
-	String dataFileEs;
+	String emptystreetFile;
 
 	@ConfigProperty(name = "automation.web.oa.vlg.file")
-	String dataFileOAVLG;
+	String oaVlgFile;
 	@ConfigProperty(name = "automation.web.oa.bru.file")
-	String dataFileOABRU;
+	String oaBruFile;
 	@ConfigProperty(name = "automation.web.oa.wal.file")
-	String dataFileOAWAL;
+	String oaWalFile;
 
 	/**
 	 * Convert BeST XML into CSV files per Region.
@@ -95,8 +98,8 @@ public class Main implements QuarkusApplication {
 		Path xmlPath = null;
 		Path csvPath = null;
 		try {
-			xmlPath = Files.createTempDirectory("region-in");
-			csvPath = Files.createTempDirectory("region-out");
+			xmlPath = Files.createTempDirectory(tempData, "region-in");
+			csvPath = Files.createTempDirectory(tempData, "region-out");
 			zip.unzip(file, xmlPath.toString());
 
 			BestRegionWriter brw = new BestRegionWriter();
@@ -120,8 +123,8 @@ public class Main implements QuarkusApplication {
 		Path xmlPath = null;
 		Path csvPath = null;
 		try {
-			xmlPath = Files.createTempDirectory("oa-in");
-			csvPath = Files.createTempDirectory("oa-out");
+			xmlPath = Files.createTempDirectory(tempData, "oa-in");
+			csvPath = Files.createTempDirectory(tempData, "oa-out");
 			zip.unzip(file, xmlPath.toString());
 
 			BestRegionWriter brw = new BestRegionWriter();
@@ -147,8 +150,8 @@ public class Main implements QuarkusApplication {
 		Path xmlPath = null;
 		Path csvPath = null;
 		try {
-			xmlPath = Files.createTempDirectory("emptystreets-in");
-			csvPath = Files.createTempDirectory("emptystreets-out");
+			xmlPath = Files.createTempDirectory(tempData, "emptystreets-in");
+			csvPath = Files.createTempDirectory(tempData, "emptystreets-out");
 			zip.unzip(file, xmlPath.toString());
 
 			BestRegionWriter brw = new BestRegionWriter();
@@ -176,7 +179,7 @@ public class Main implements QuarkusApplication {
 		Log.info("Start");
 
 		try {
-			tempFile = Files.createTempFile("best", "local");
+			tempFile = Files.createTempFile(tempData, "bestfull", "local");
 			String localFile = tempFile.toAbsolutePath().toString();
 			String fileName = Utils.getFileName(downloadFile);
 
@@ -185,37 +188,37 @@ public class Main implements QuarkusApplication {
 			
 			verifier.verify(localFile);
 
-			zipFileOAVLG = Files.createTempFile("best", "oavlg");			
-			zipFileOABRU = Files.createTempFile("best", "oabru");
-			zipFileOAWAL = Files.createTempFile("best", "oawal");
-			Log.info("Converting open addresses");
+			zipFileOAVLG = Files.createTempFile(tempData, "oa", "vlg");			
+			zipFileOABRU = Files.createTempFile(tempData, "oa", "bru");
+			zipFileOAWAL = Files.createTempFile(tempData, "oa", "wal");
+			Log.info("Converting to OpenAddresses format");
 			convertOA(localFile, zipFileOAVLG.toString(), zipFileOABRU.toString(), zipFileOAWAL.toString());
 			
-			zipFilePs = Files.createTempFile("best", "postal");			
+			zipFilePs = Files.createTempFile(tempData, "street", "postal");			
 			Log.info("Converting postal streets");
 			convertRegion(localFile, zipFilePs.toString());
 					
-			zipFileEs = Files.createTempFile("best", "empty");			
+			zipFileEs = Files.createTempFile(tempData, "street", "empty");			
 			Log.info("Converting empty streets");
 			convertEmptyStreets(localFile, zipFileEs.toString());
+			
+			Log.info("Uploading BeST Full XML");
+			sftp.upload(uploadPath + fullFile, localFile);
 
-			Log.info("Uploading open addresses VLG");
-			sftp.upload(uploadPath + dataFileOAVLG, zipFileOAVLG.toString());
-			Log.info("Uploading open addresses BRU");
-			sftp.upload(uploadPath + dataFileOABRU, zipFileOABRU.toString());
-			Log.info("Uploading open addresses WAL");
-			sftp.upload(uploadPath + dataFileOAWAL, zipFileOAWAL.toString());
+			Log.info("Uploading OpenAddresses VLG");
+			sftp.upload(uploadPath + oaVlgFile, zipFileOAVLG.toString());
+			Log.info("Uploading OpenAddresses BRU");
+			sftp.upload(uploadPath + oaBruFile, zipFileOABRU.toString());
+			Log.info("Uploading OpenAddresses WAL");
+			sftp.upload(uploadPath + oaWalFile, zipFileOAWAL.toString());
 
 			Log.info("Uploading postal streets");
-			sftp.upload(uploadPath + dataFilePs, zipFilePs.toString());
+			sftp.upload(uploadPath + postalstreetFile, zipFilePs.toString());
 	
 			Log.info("Uploading empty streets");
-			sftp.upload(uploadPath + dataFileEs, zipFileEs.toString());
+			sftp.upload(uploadPath + emptystreetFile, zipFileEs.toString());
 			
-			Log.info("Uploading BeST Full");
-			sftp.upload(uploadPath + dataFile, localFile);
-			
-			Log.info("Done (OK) " + fileName);
+			Log.infof("Done (OK) %s", fileName);
 		} catch (IOException ioe) {
 			exitCode = -1;
 			Log.error("Failed", ioe);	
