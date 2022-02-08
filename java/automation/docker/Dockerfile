@@ -15,7 +15,7 @@ USER best
 
 RUN cd /home/best && \
   git clone https://github.com/fedict/best-tools && \
-  cd /home/best/best-tools/java && \
+  cd /home/best/best-tools/java/automation && \
   mvn clean install -DskipTests
 
 # The actual docker with the API + pre-loaded PostGIS database
@@ -23,14 +23,8 @@ RUN cd /home/best && \
 FROM gcr.io/distroless/java17-debian11
 MAINTAINER bart.hanssens@bosa.fgov.be
 
-ARG version=1.2.9
+COPY --from=0 /home/best/best-tools/java/automation/target/automation-*-runner.jar /automation.jar
 
-RUN useradd -m best
+USER nonroot
 
-COPY --from=0 /home/best/best-tools/java/automation/target/webservice-${version}-runner.jar /home/best/runner.jar
-
-USER best
-
-WORKDIR /home/best
-
-CMD ["/home/best/runner.jar"]
+CMD ["/automation.jar"]
