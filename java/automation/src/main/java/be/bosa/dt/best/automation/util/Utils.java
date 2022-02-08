@@ -37,7 +37,7 @@ import java.util.stream.Stream;
 
 
 /**
- * Copies zipfile from BeST MFT to public web server via SFTP
+ * Some utility methods
  * 
  * @author Bart Hanssens
  */
@@ -73,5 +73,12 @@ public class Utils {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Avoid calling the constructor accidentally 
+	 */
+	private Utils() {
+		throw new IllegalStateException("Utility class");
 	}
 }

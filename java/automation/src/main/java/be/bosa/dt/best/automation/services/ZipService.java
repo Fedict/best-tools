@@ -26,6 +26,7 @@
 package be.bosa.dt.best.automation.services;
 
 import io.quarkus.logging.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,13 +37,11 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import javax.enterprise.context.ApplicationScoped;
-
 
 
 /**

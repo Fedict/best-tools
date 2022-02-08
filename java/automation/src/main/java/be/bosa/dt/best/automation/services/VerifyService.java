@@ -35,10 +35,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-
-
 /**
- * Verify BeST zip file
+ * Perform some basic verification on BeST zip file
  * 
  * @author Bart Hanssens
  */

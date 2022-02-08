@@ -23,30 +23,26 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.bosa.dt.best.automation.beans;
+package be.bosa.dt.best.automation;
 
 import be.bosa.dt.best.automation.util.Utils;
-import be.bosa.dt.best.automation.util.Status;
-import be.bosa.dt.best.automation.services.MailService;
 import be.bosa.dt.best.automation.services.TransferService;
 import be.bosa.dt.best.automation.services.VerifyService;
 import be.bosa.dt.best.automation.services.ZipService;
-import be.bosa.dt.best.automation.util.StatusHistory;
 import be.bosa.dt.best.converter.writer.BestRegionWriter;
 import be.bosa.dt.best.converter.writer.BestWriterCSV;
 import be.bosa.dt.best.converter.writer.BestWriterCSVEmptyStreets;
 import be.bosa.dt.best.converter.writer.BestWriterCSVOpenAddresses;
 import be.bosa.dt.best.dao.BestRegion;
 
-import io.quarkus.mailer.Mail;
-import io.quarkus.scheduler.Scheduled;
+import io.quarkus.logging.Log;
+import io.quarkus.runtime.QuarkusApplication;
+import io.quarkus.runtime.annotations.QuarkusMain;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -56,16 +52,13 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
  * 
  * @author Bart Hanssens
  */
-@ApplicationScoped
-public class ConverterBean implements StatusHistory {
+@QuarkusMain
+public class Main implements QuarkusApplication {
 	@Inject
 	TransferService sftp;
 	
 	@Inject
 	ZipService zip;
-
-	@Inject
-	MailService mailer;
 
 	@Inject
 	VerifyService verifier;
@@ -92,11 +85,6 @@ public class ConverterBean implements StatusHistory {
 	@ConfigProperty(name = "openaddresses.wal.data.file")
 	String dataFileOAWAL;
 
-	@ConfigProperty(name = "copier.mailto")
-	String mailTo;
-
-	private final Status status = new Status();
-
 	/**
 	 * Convert BeST XML into CSV files per Region.
 	 * Streets per postal code
@@ -121,6 +109,7 @@ public class ConverterBean implements StatusHistory {
 			Utils.recursiveDelete(csvPath);
 		}
 	}
+
 	/**
 	 * Convert BeST XML into CSV files per Region.
 	 * OpenAddresses.io files
@@ -173,9 +162,9 @@ public class ConverterBean implements StatusHistory {
 		}
 	}
 
-	@Scheduled(cron = "{converter.cron.expr}")
-	public void scheduledConverter() {
-		Mail mail;
+	@Override
+	public int run(String[] args) throws Exception {
+		int exitCode = 0;
 
 		Path tempFile = null;
 		Path zipFileOAVLG = null;
@@ -184,14 +173,14 @@ public class ConverterBean implements StatusHistory {
 		Path zipFilePs = null;
 		Path zipFileEs = null;
 
-		status.clear();
+		Log.info("Start");
 
 		try {
 			tempFile = Files.createTempFile("best", "local");
 			String localFile = tempFile.toAbsolutePath().toString();
 			String fileName = Utils.getFileName(mftFile);
 
-			status.set("Downloading " + fileName);
+			Log.infof("Downloading %s", fileName);
 			sftp.download(fileName, localFile);
 			
 			verifier.verify(localFile);
@@ -199,38 +188,37 @@ public class ConverterBean implements StatusHistory {
 			zipFileOAVLG = Files.createTempFile("best", "oavlg");			
 			zipFileOABRU = Files.createTempFile("best", "oabru");
 			zipFileOAWAL = Files.createTempFile("best", "oawal");
-			status.set("Converting open addresses");
+			Log.info("Converting open addresses");
 			convertOA(localFile, zipFileOAVLG.toString(), zipFileOABRU.toString(), zipFileOAWAL.toString());
 			
 			zipFilePs = Files.createTempFile("best", "postal");			
-			status.set("Converting postal streets");
+			Log.info("Converting postal streets");
 			convertRegion(localFile, zipFilePs.toString());
 					
 			zipFileEs = Files.createTempFile("best", "empty");			
-			status.set("Converting empty streets");
+			Log.info("Converting empty streets");
 			convertEmptyStreets(localFile, zipFileEs.toString());
 
-			status.set("Uploading open addresses VLG");
+			Log.info("Uploading open addresses VLG");
 			sftp.upload(dataPath + dataFileOAVLG, zipFileOAVLG.toString());
-			status.set("Uploading open addresses BRU");
+			Log.info("Uploading open addresses BRU");
 			sftp.upload(dataPath + dataFileOABRU, zipFileOABRU.toString());
-			status.set("Uploading open addresses WAL");
+			Log.info("Uploading open addresses WAL");
 			sftp.upload(dataPath + dataFileOAWAL, zipFileOAWAL.toString());
 
-			status.set("Uploading postal streets");
+			Log.info("Uploading postal streets");
 			sftp.upload(dataPath + dataFilePs, zipFilePs.toString());
 	
-			status.set("Uploading empty streets");
+			Log.info("Uploading empty streets");
 			sftp.upload(dataPath + dataFileEs, zipFileEs.toString());
 			
-			status.set("Uploading BeST Full");
+			Log.info("Uploading BeST Full");
 			sftp.upload(dataPath + dataFile, localFile);
 			
-			status.set("Done (OK) " + fileName);
-			mail = Mail.withText(mailTo, "Conversion ok", "File used: " + fileName);
+			Log.info("Done (OK) " + fileName);
 		} catch (IOException ioe) {
-			status.set("Failed " + ioe.getMessage());
-			mail = Mail.withText(mailTo, "Conversion failed", ioe.getMessage());		
+			exitCode = -1;
+			Log.error("Failed", ioe);	
 		} finally {
 			for(Path p: new Path[]{ tempFile, zipFileOAVLG, zipFileOABRU, zipFileOAWAL, zipFilePs, zipFileEs}) {
 				if (p != null) {
@@ -238,11 +226,6 @@ public class ConverterBean implements StatusHistory {
 				}
 			}
 		}
-		mailer.sendMail(mail);
-	}
-
-	@Override
-	public List<String> getStatusHistory() {
-		return status.getHistory();
+		return exitCode;
 	}
 }
