@@ -45,30 +45,30 @@ import org.eclipse.microprofile.faulttolerance.Retry;
 @ApplicationScoped
 public class TransferService {
 	// from
-	@ConfigProperty(name = "copier.mft.server")
-	String mftServer;
+	@ConfigProperty(name = "automation.download.server")
+	String downloadServer;
 
-	@ConfigProperty(name = "copier.mft.port", defaultValue = "22")
-	int mftPort;
+	@ConfigProperty(name = "automation.download.port", defaultValue = "22")
+	int downloadPort;
 
-	@ConfigProperty(name = "copier.mft.user")
-	String mftUser;
+	@ConfigProperty(name = "automation.download.user")
+	String downloadUser;
 	
-	@ConfigProperty(name = "copier.mft.pass")
-	String mftPass;
+	@ConfigProperty(name = "automation.download.pass")
+	String downloadPass;
 
 	// to
-	@ConfigProperty(name = "copier.data.server")
-	String dataServer;
+	@ConfigProperty(name = "automation.upload.server")
+	String uploadServer;
 
-	@ConfigProperty(name = "copier.data.port", defaultValue = "22")
-	int dataPort;
+	@ConfigProperty(name = "automation.upload.port", defaultValue = "22")
+	int uploadPort;
 	
-	@ConfigProperty(name = "copier.data.user")
-	String dataUser;
+	@ConfigProperty(name = "automation.upload.user")
+	String uploadUser;
 	
-	@ConfigProperty(name = "copier.data.pass")
-	String dataPass;
+	@ConfigProperty(name = "automation.upload.pass")
+	String uploadPass;
 
 	/**
 	 * Download data file via SFTP (typically from BOSA "Managed File Transfer" service) and save it to a local file.
@@ -81,8 +81,8 @@ public class TransferService {
 	public void download(String remote, String local) throws IOException {
 		SSHClient client = new SSHClient();
 		client.addHostKeyVerifier(new PromiscuousVerifier());
-		client.connect(mftServer, mftPort);
-		client.authPassword(mftUser, mftPass);
+		client.connect(downloadServer, downloadPort);
+		client.authPassword(downloadUser, downloadPass);
 
 		try (SFTPClient sftp = client.newSFTPClient()) {
 			sftp.get(remote, local);
@@ -102,8 +102,8 @@ public class TransferService {
 	public void upload(String remote, String local) throws IOException {
 		SSHClient client = new SSHClient();
 		client.addHostKeyVerifier(new PromiscuousVerifier());
-		client.connect(dataServer, dataPort);
-		client.authPassword(dataUser, dataPass);
+		client.connect(uploadServer, uploadPort);
+		client.authPassword(uploadUser, uploadPass);
 
 		try (SFTPClient sftp = client.newSFTPClient()) {
 			sftp.put(local, remote);

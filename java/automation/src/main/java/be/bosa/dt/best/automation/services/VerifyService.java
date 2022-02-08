@@ -42,10 +42,10 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
  */
 @ApplicationScoped
 public class VerifyService {
-	@ConfigProperty(name = "copier.mft.minsize")
+	@ConfigProperty(name = "automation.zip.minsize")
 	long minSize;
 
-	@ConfigProperty(name = "copier.mft.files")
+	@ConfigProperty(name = "automation.zip.files")
 	List<String> expected;
 
 	@Inject
