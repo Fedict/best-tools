@@ -48,7 +48,7 @@ import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**
- * Converts BeST XML files to CSV and upload to public site via SFTP.
+ * Download BeST XML full download via SFTP, convert, and upload XML and CSV files to public website
  * 
  * @author Bart Hanssens
  */
@@ -94,7 +94,7 @@ public class Main implements QuarkusApplication {
 	 * 
 	 * @param file 
 	 */
-	private void convertRegion(String file, String zipfile) throws IOException {
+	private void convertStreets(String file, String zipfile) throws IOException {
 		Path xmlPath = null;
 		Path csvPath = null;
 		try {
@@ -142,7 +142,7 @@ public class Main implements QuarkusApplication {
 
 	/**
 	 * Convert BeST XML into CSV files per Region.
-	 * Empty streets i.e. streets without any address.
+	 * Empty streets i.e. streets without any house number like country roads, forest tracks... 
 	 * 
 	 * @param file 
 	 */
@@ -196,7 +196,7 @@ public class Main implements QuarkusApplication {
 			
 			zipFilePs = Files.createTempFile(tempData, "street", "postal");			
 			Log.info("Converting postal streets");
-			convertRegion(localFile, zipFilePs.toString());
+			convertStreets(localFile, zipFilePs.toString());
 					
 			zipFileEs = Files.createTempFile(tempData, "street", "empty");			
 			Log.info("Converting empty streets");
