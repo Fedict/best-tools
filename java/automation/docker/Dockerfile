@@ -15,7 +15,7 @@ USER best
 
 RUN cd /home/best && \
   git clone https://github.com/fedict/best-tools && \
-  cd /home/best/best-tools/java/automation && \
+  cd /home/best/best-tools/java && \
   mvn clean install -DskipTests
 
 # The actual docker with the API + pre-loaded PostGIS database
