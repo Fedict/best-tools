@@ -26,6 +26,7 @@
 package be.bosa.dt.best.automation.services;
 
 
+import io.quarkus.logging.Log;
 import java.io.IOException;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -85,6 +86,7 @@ public class TransferService {
 		client.authPassword(downloadUser, downloadPass);
 
 		try (SFTPClient sftp = client.newSFTPClient()) {
+			Log.infof("Downloading %s from %s (port %d) to %s", remote, downloadServer, downloadPort, local);
 			sftp.get(remote, local);
 		} finally {
 			client.disconnect();
@@ -94,18 +96,19 @@ public class TransferService {
 	/**
 	 * Upload file to a server via SFTP
 	 * 
+	 * @param local local file
 	 * @param remote remote location of the file
-	 * @param local local zip file
 	 * @throws IOException 
 	 */
 	@Retry(retryOn = Exception.class, maxRetries = 5, delay = 3000)
-	public void upload(String remote, String local) throws IOException {
+	public void upload(String local, String remote) throws IOException {
 		SSHClient client = new SSHClient();
 		client.addHostKeyVerifier(new PromiscuousVerifier());
 		client.connect(uploadServer, uploadPort);
 		client.authPassword(uploadUser, uploadPass);
 
 		try (SFTPClient sftp = client.newSFTPClient()) {
+			Log.infof("Uploading %s to %s (port %d) to %s", local, uploadServer, uploadPort, remote);
 			sftp.put(local, remote);
 		} finally {
 			client.disconnect();

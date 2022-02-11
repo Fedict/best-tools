@@ -188,7 +188,6 @@ public class Main implements QuarkusApplication {
 			String localFile = tempFile.toAbsolutePath().toString();
 			String fileName = Utils.getFileName(downloadFile);
 
-			Log.infof("Downloading %s", fileName);
 			sftp.download(fileName, localFile);
 			
 			verifier.verify(localFile);
@@ -208,20 +207,20 @@ public class Main implements QuarkusApplication {
 			convertEmptyStreets(localFile, zipFileEs.toString());
 			
 			Log.info("Uploading BeST Full XML");
-			sftp.upload(uploadPath + fullFile, localFile);
+			sftp.upload(localFile, uploadPath + fullFile);
 
 			Log.info("Uploading OpenAddresses VLG");
-			sftp.upload(uploadPath + oaVlgFile, zipFileOAVLG.toString());
+			sftp.upload(zipFileOAVLG.toString(), uploadPath + oaVlgFile);
 			Log.info("Uploading OpenAddresses BRU");
-			sftp.upload(uploadPath + oaBruFile, zipFileOABRU.toString());
+			sftp.upload(zipFileOABRU.toString(), uploadPath + oaBruFile);
 			Log.info("Uploading OpenAddresses WAL");
-			sftp.upload(uploadPath + oaWalFile, zipFileOAWAL.toString());
+			sftp.upload( zipFileOAWAL.toString(), uploadPath + oaWalFile);
 
 			Log.info("Uploading postal streets");
-			sftp.upload(uploadPath + postalstreetFile, zipFilePs.toString());
+			sftp.upload(zipFilePs.toString(), uploadPath + postalstreetFile);
 	
 			Log.info("Uploading empty streets");
-			sftp.upload(uploadPath + emptystreetFile, zipFileEs.toString());
+			sftp.upload(zipFileEs.toString(), uploadPath + emptystreetFile);
 			
 			Log.infof("Done (OK) %s", fileName);
 		} catch (IOException ioe) {
