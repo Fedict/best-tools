@@ -179,6 +179,11 @@ public class Main implements QuarkusApplication {
 		Log.info("Start");
 
 		try {
+			if (!tempData.toFile().exists()) {
+				Log.infof("Creating directory %s", tempData);
+				Files.createDirectory(tempData);
+			}
+
 			tempFile = Files.createTempFile(tempData, "bestfull", "local");
 			String localFile = tempFile.toAbsolutePath().toString();
 			String fileName = Utils.getFileName(downloadFile);
