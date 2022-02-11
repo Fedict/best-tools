@@ -80,13 +80,14 @@ public class TransferService {
 	 */
 	@Retry(retryOn = Exception.class, maxRetries = 3, delay = 2000)
 	public void download(String remote, String local) throws IOException {
+		Log.infof("Downloading %s from %s (port %d) to %s", remote, downloadServer, downloadPort, local);
+
 		SSHClient client = new SSHClient();
 		client.addHostKeyVerifier(new PromiscuousVerifier());
 		client.connect(downloadServer, downloadPort);
 		client.authPassword(downloadUser, downloadPass);
 
 		try (SFTPClient sftp = client.newSFTPClient()) {
-			Log.infof("Downloading %s from %s (port %d) to %s", remote, downloadServer, downloadPort, local);
 			sftp.get(remote, local);
 		} finally {
 			client.disconnect();
@@ -102,13 +103,14 @@ public class TransferService {
 	 */
 	@Retry(retryOn = Exception.class, maxRetries = 5, delay = 3000)
 	public void upload(String local, String remote) throws IOException {
+		Log.infof("Uploading %s to %s (port %d) to %s", local, uploadServer, uploadPort, remote);
+
 		SSHClient client = new SSHClient();
 		client.addHostKeyVerifier(new PromiscuousVerifier());
 		client.connect(uploadServer, uploadPort);
 		client.authPassword(uploadUser, uploadPass);
 
 		try (SFTPClient sftp = client.newSFTPClient()) {
-			Log.infof("Uploading %s to %s (port %d) to %s", local, uploadServer, uploadPort, remote);
 			sftp.put(local, remote);
 		} finally {
 			client.disconnect();
