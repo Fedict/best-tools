@@ -77,7 +77,7 @@ WORKDIR /home/best
 
 EXPOSE 8080 
 
-VOLUME /var/lib/postgresql/14/main
+#VOLUME /var/lib/postgresql/14/main
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["bash", "-c", "pg_ctl start -o '-c config_file=/etc/postgresql/14/main/postgresql.conf' && java -Djava.net.preferIPv4Stack=true -Xmx2G -jar runner.jar"]
