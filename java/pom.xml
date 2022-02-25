@@ -17,4 +17,21 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <url>https://opendata.bosa.be</url>
+    <licenses>
+	<license>
+		<name>BSD-2-Clause</name>
+		<url>https://opensource.org/licenses/BSD-2-Clause</url>
+		<distribution>repo</distribution>
+	</license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Bart Hanssens</name>
+            <email>opendata@belgium.be</email>
+            <organization>FPS BOSA DG DT</organization>
+            <organizationUrl>https://dt.bosa.be/</organizationUrl>
+            <timezone>Europe/Brussels</timezone>
+        </developer>
+    </developers>
 </project>
