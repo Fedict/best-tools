@@ -179,10 +179,12 @@ public class Main implements QuarkusApplication {
 		Log.info("Start");
 
 		try {
-			if (!tempData.toFile().exists()) {
-				Log.infof("Creating directory %s", tempData);
-				Files.createDirectory(tempData);
+			if (tempData.toFile().exists()) {
+				Utils.recursiveDelete(tempData);
+				Log.infof("Deleting directory %s", tempData);
 			}
+			Log.infof("Creating directory %s", tempData);
+			Files.createDirectory(tempData);
 
 			tempFile = Files.createTempFile(tempData, "bestfull", "local");
 			String localFile = tempFile.toAbsolutePath().toString();
@@ -227,11 +229,7 @@ public class Main implements QuarkusApplication {
 			exitCode = -1;
 			Log.error("Failed", ioe);	
 		} finally {
-			for(Path p: new Path[]{ tempFile, zipFileOAVLG, zipFileOABRU, zipFileOAWAL, zipFilePs, zipFileEs}) {
-				if (p != null) {
-					p.toFile().delete();
-				}
-			}
+			Utils.recursiveDelete(tempData);
 		}
 		return exitCode;
 	}

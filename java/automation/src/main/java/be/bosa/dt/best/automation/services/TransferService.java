@@ -33,7 +33,7 @@ import javax.enterprise.context.ApplicationScoped;
 
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;
-import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
+import net.schmizz.sshj.transport.verification.FingerprintVerifier;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import org.eclipse.microprofile.faulttolerance.Retry;
@@ -58,6 +58,9 @@ public class TransferService {
 	@ConfigProperty(name = "automation.download.pass")
 	String downloadPass;
 
+	@ConfigProperty(name = "automation.download.fingerprint")
+	String downloadFingerprint;
+
 	// to
 	@ConfigProperty(name = "automation.upload.server")
 	String uploadServer;
@@ -71,6 +74,9 @@ public class TransferService {
 	@ConfigProperty(name = "automation.upload.pass")
 	String uploadPass;
 
+	@ConfigProperty(name = "automation.upload.fingerprint")
+	String uploadFingerprint;
+
 	/**
 	 * Download data file via SFTP (typically from BOSA "Managed File Transfer" service) and save it to a local file.
 	 *
@@ -83,7 +89,7 @@ public class TransferService {
 		Log.infof("Downloading %s from %s (port %d) to %s", remote, downloadServer, downloadPort, local);
 
 		SSHClient client = new SSHClient();
-		client.addHostKeyVerifier(new PromiscuousVerifier());
+		client.addHostKeyVerifier(FingerprintVerifier.getInstance(downloadFingerprint));
 		client.connect(downloadServer, downloadPort);
 		client.authPassword(downloadUser, downloadPass);
 
@@ -106,7 +112,7 @@ public class TransferService {
 		Log.infof("Uploading %s to %s (port %d) to %s", local, uploadServer, uploadPort, remote);
 
 		SSHClient client = new SSHClient();
-		client.addHostKeyVerifier(new PromiscuousVerifier());
+		client.addHostKeyVerifier(FingerprintVerifier.getInstance(uploadFingerprint));
 		client.connect(uploadServer, uploadPort);
 		client.authPassword(uploadUser, uploadPass);
 
