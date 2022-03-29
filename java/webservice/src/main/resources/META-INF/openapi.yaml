@@ -662,6 +662,10 @@ components:
           description: Status
           type: string
           example: current
+        startDate:
+          description: Valid from
+        endDate:
+          description: Valid till
     StreetCollection:
       type: object
       properties:

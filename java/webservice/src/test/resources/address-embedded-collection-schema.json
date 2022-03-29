@@ -64,6 +64,9 @@
 				"startDate" : {
 					"type": "date"
 				},
+				"endDate": {
+					"type": "string"
+				},
 				"lambert72": {
 					"type": "object",
 					"properties": {
