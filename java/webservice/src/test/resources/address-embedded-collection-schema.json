@@ -42,7 +42,7 @@
 						},
 						"required": ["id", "href"]
 					},
-					"postal": {
+					"postalInfo": {
 						"type": "object",
 						"properties": {
 							"id": {
@@ -61,7 +61,7 @@
 				"addressStatus": {
 					"type": "string"
 				},
-				"beginDate" : {
+				"startDate" : {
 					"type": "date"
 				},
 				"lambert72": {

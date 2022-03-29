@@ -42,7 +42,7 @@
 						},
 						"required": ["id", "href"]
 					},
-					"postal": {
+					"postalInfo": {
 						"type": "object",
 						"properties": {
 							"id": {
@@ -60,7 +60,7 @@
 					"status": {
 						"type": "string"
 					},
-					"validFrom": {
+					"startDate": {
 						"type": "string"
 					},
 					"lambert72": {
@@ -88,7 +88,7 @@
 						"required": ["x", "y"]
 					}
 				},
-				"required": ["id", "self", "street", "municipality", "postal", "housenumber", "status"]
+				"required": ["id", "self", "street", "municipality", "postalInfo", "houseNumber", "addressStatus"]
 			}
 		},
 		"pageSize": {

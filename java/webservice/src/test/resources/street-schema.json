@@ -23,7 +23,7 @@
 				}
 			}
 		},
-		"beginDate": {
+		"startDate": {
 			"type": "string"
 		},
 		"endDate": {
