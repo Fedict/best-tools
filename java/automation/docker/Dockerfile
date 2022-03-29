@@ -8,7 +8,7 @@ MAINTAINER bart.hanssens@bosa.fgov.be
 ARG version=1.2.9
 
 RUN apt-get update && \
-  apt-get install -y wget git-core pwgen && \
+  apt-get install -y git-core && \
   useradd -m best
 
 USER best
@@ -18,7 +18,7 @@ RUN cd /home/best && \
   cd /home/best/best-tools/java && \
   mvn clean install -DskipTests
 
-# The actual docker with the API + pre-loaded PostGIS database
+# The actual docker image with the CLI conversion tool
 
 FROM gcr.io/distroless/java17-debian11
 MAINTAINER bart.hanssens@bosa.fgov.be
