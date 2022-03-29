@@ -554,6 +554,10 @@ components:
           description: Status
           type: string
           example: current
+        startDate:
+          description: Valid from
+        endDate:
+          description: Valid till
     AddressCollection:
       type: object
       properties:
