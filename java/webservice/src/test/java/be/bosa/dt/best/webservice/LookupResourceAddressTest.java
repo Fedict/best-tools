@@ -175,7 +175,7 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 			.body("items.size()", equalTo(1),
 					"items.street.id", everyItem(equalTo(vl)),
 					"items.street.href", everyItem(notNullValue()),
-					"items.housenumber[0]", equalTo("2"));
+					"items.houseNumber[0]", equalTo("2"));
 	}
 	
 	@Test
@@ -221,7 +221,7 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 			.body("items.size()", equalTo(1),
 					"items.street.id", everyItem(equalTo(vl)),
 					"items.street.href", everyItem(notNullValue()),
-					"items.housenumber[0]", equalTo("2"));
+					"items.houseNumber[0]", equalTo("2"));
 	}
 	
 	@Test
@@ -231,6 +231,6 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 			.body("items.size()", equalTo(1),
 					"items.street.id", everyItem(equalTo(vl)),
 					"items.street.href", everyItem(notNullValue()),
-					"items.housenumber[0]", equalTo("2"));
+					"items.houseNumber[0]", equalTo("2"));
 	}
 }
