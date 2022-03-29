@@ -52,7 +52,7 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 
 	@Test
 	public void testStreetIDBxl() {
-		String bxl = "•	https://databrussels.be/id/streetname/3974/2";
+		String bxl = "https://databrussels.be/id/streetname/3974/2";
 		testFindByID(LookupResource.STREETS, bxl, "street-schema.json")
 			.body("streetName.nl", equalTo("Masuistraat"),
 					"streetName.fr", equalTo("Rue Masui"),
@@ -164,7 +164,8 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 
 	@Test
 	public void testStreetNameMunicipalityName() {
-		testFindByParams(LookupResource.STREETS, Map.of("municipalityName", "Brussel", "name", "Rue du Camp"), 
+		testFindByParams(LookupResource.STREETS, Map.of("municipalityName", "Brussel", 
+														"streetName", "Rue du Camp"), 
 			"street-collection-schema.json")
 			.body("items.size()", equalTo(1),
 					"items.streetName.fr", hasItem("Rue du Camp"));

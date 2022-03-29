@@ -51,7 +51,7 @@ public class LookupResourcePostalnfoTest extends LookupResourceTest {
 
 	@Test
 	public void testPostalinfoIDBxl() {
-		String bxl = "•	https://databrussels.be/id/postalinfo/1000/2";
+		String bxl = "https://databrussels.be/id/postalinfo/1000/2";
 		testFindByID(LookupResource.POSTAL, bxl, "postal-schema.json")
 			.body("postalName.nl", equalTo("Brussel (Centrum)"),
 					"postalName.fr", equalTo("Bruxelles (Centre)"));
