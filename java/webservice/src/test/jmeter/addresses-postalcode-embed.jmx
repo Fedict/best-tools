@@ -40,12 +40,12 @@
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments">
-              <elementProp name="postalcode" elementType="HTTPArgument">
+              <elementProp name="postCode" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">true</boolProp>
                 <stringProp name="Argument.value">${code}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
                 <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                <stringProp name="Argument.name">postalCode</stringProp>
+                <stringProp name="Argument.name">postCode</stringProp>
               </elementProp>
 			  <elementProp name="embed" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">true</boolProp>
