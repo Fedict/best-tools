@@ -66,6 +66,6 @@ public class LookupResourceMunicipalitypartTest extends LookupResourceTest {
 	public void testMunicipalitypartsNameMultiple() {
 		testFindByParams(LookupResource.MUNICIPALITY_PARTS, Map.of("partOfMunicipalityName", "Momalle"), "municipalitypart-collection-schema.json")
 			.body("items.size()", equalTo(2),
-					"items[0].name.fr", equalTo("Momalle"));
+					"items[0].partOfMunicipalityName.fr", equalTo("Momalle"));
 	}
 }
