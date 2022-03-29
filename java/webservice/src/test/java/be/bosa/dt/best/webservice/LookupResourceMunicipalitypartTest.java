@@ -50,21 +50,21 @@ public class LookupResourceMunicipalitypartTest extends LookupResourceTest {
 
 	@Test
 	public void testMunicipalitypartsNameAccent() {
-		testFindByParams(LookupResource.MUNICIPALITY_PARTS, Map.of("name", "Moderscheid"), "municipalitypart-collection-schema.json")
+		testFindByParams(LookupResource.MUNICIPALITY_PARTS, Map.of("partOfMunicipalityName", "Moderscheid"), "municipalitypart-collection-schema.json")
 			.body("items.size()", equalTo(1),
-					"items[0].name.de", equalTo("Möderscheid"));
+					"items[0].partOfMunicipalityName.de", equalTo("Möderscheid"));
 	}
 
 	@Test
 	public void testMunicipalitypartsNameLower() {
-		testFindByParams(LookupResource.MUNICIPALITY_PARTS, Map.of("name", "ath"), "municipalitypart-collection-schema.json")
+		testFindByParams(LookupResource.MUNICIPALITY_PARTS, Map.of("partOfMunicipalityName", "ath"), "municipalitypart-collection-schema.json")
 			.body("items.size()", equalTo(1),
-					"items[0].name.fr", equalTo("Ath"));
+					"items[0].partOfMunicipalityName.fr", equalTo("Ath"));
 	}
 	
 	@Test
 	public void testMunicipalitypartsNameMultiple() {
-		testFindByParams(LookupResource.MUNICIPALITY_PARTS, Map.of("name", "Momalle"), "municipalitypart-collection-schema.json")
+		testFindByParams(LookupResource.MUNICIPALITY_PARTS, Map.of("partOfMunicipalityName", "Momalle"), "municipalitypart-collection-schema.json")
 			.body("items.size()", equalTo(2),
 					"items[0].name.fr", equalTo("Momalle"));
 	}

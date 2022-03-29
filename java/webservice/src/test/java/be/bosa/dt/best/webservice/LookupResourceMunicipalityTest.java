@@ -52,38 +52,38 @@ public class LookupResourceMunicipalityTest extends LookupResourceTest {
 	public void testMunicipalityIDBxl() {
 		String bxl = "BE.BRUSSELS.BRIC.ADM.MUNICIPALITY/21002/6";
 		testFindByID(LookupResource.MUNICIPALITIES, bxl, "municipality-schema.json")
-			.body("name.nl", equalTo("Oudergem"),
-					"name.fr", equalTo("Auderghem"));
+			.body("municipalityName.nl", equalTo("Oudergem"),
+					"municipalityName.fr", equalTo("Auderghem"));
 	}
 
 	@Test
 	public void testMunicipalityIDVl() {
 		String vl = "https://data.vlaanderen.be/id/gemeente/71034/2002-08-13T17:32:32";
 		testFindByID(LookupResource.MUNICIPALITIES, vl, "municipality-schema.json")
-			.body("name.nl", equalTo("Leopoldsburg"),
-					"name.fr", equalTo("Bourg-Léopold"),
-					"name.de", equalTo("Leopoldsburg"));
+			.body("municipalityName.nl", equalTo("Leopoldsburg"),
+					"municipalityName.fr", equalTo("Bourg-Léopold"),
+					"municipalityName.de", equalTo("Leopoldsburg"));
 	}
 
 	@Test
 	public void testMunicipalityIDWal() {
 		String wal = "geodata.wallonie.be/id/Municipality/63067/4";
 		testFindByID(LookupResource.MUNICIPALITIES, wal, "municipality-schema.json")
-			.body("name.fr", equalTo("Saint-Vith"),
-					"name.de", equalTo("Sankt Vith"));
+			.body("municipalityName.fr", equalTo("Saint-Vith"),
+					"municipalityName.de", equalTo("Sankt Vith"));
 	}
 	
 	@Test
 	public void testMunicipalityNameAccent() {
-		testFindByParams(LookupResource.MUNICIPALITIES, Map.of("name", "Chievres"), "municipality-collection-schema.json")
+		testFindByParams(LookupResource.MUNICIPALITIES, Map.of("municipalityName", "Chievres"), "municipality-collection-schema.json")
 			.body("items.size()", equalTo(1),
-					"items[0].name.fr", equalTo("Chièvres"));
+					"items[0].municipalityName.fr", equalTo("Chièvres"));
 	}
 
 	@Test
 	public void testMunicipalityNameLower() {
-		testFindByParams(LookupResource.MUNICIPALITIES, Map.of("name", "sankt vith"), "municipality-collection-schema.json")
+		testFindByParams(LookupResource.MUNICIPALITIES, Map.of("municipalityName", "sankt vith"), "municipality-collection-schema.json")
 			.body("items.size()", equalTo(1),
-					"items[0].name.de", equalTo("Sankt Vith"));
+					"items[0].municipalityName.de", equalTo("Sankt Vith"));
 	}
 }

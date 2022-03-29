@@ -63,42 +63,42 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 	public void testStreetIDVl() {
 		String vl = "https://data.vlaanderen.be/id/straatnaam/26089/2013-10-05T15:59:10.067";
 		testFindByID(LookupResource.STREETS, vl, "street-schema.json")
-			.body("name.nl", equalTo("Elbeekstraat"),
-					"status", equalTo("current"));
+			.body("streetName.nl", equalTo("Elbeekstraat"),
+					"streetNameStatus", equalTo("current"));
 	}
 
 	@Test
 	public void testStreetIDWal() {
 		String wal = "geodata.wallonie.be/id/Streetname/7737097/1";
 		testFindByID(LookupResource.STREETS, wal, "street-schema.json")
-			.body("name.fr", equalTo("Sur les Roches"),
-					"status", equalTo("current"));
+			.body("streetName.fr", equalTo("Sur les Roches"),
+					"streetNameStatus", equalTo("current"));
 	}
 	
 	@Test
 	public void testStreetNameAccent() {
-		testFindByParams(LookupResource.STREETS, Map.of("name", "Rue de l'aerodrome"), "street-collection-schema.json")
+		testFindByParams(LookupResource.STREETS, Map.of("streetName", "Rue de l'aerodrome"), "street-collection-schema.json")
 			.body("items.size()", equalTo(1),
-					"items[0].name.fr", equalTo("Rue de l'Aérodrome"));
+					"items[0].streetName.fr", equalTo("Rue de l'Aérodrome"));
 	}
 
 	@Test
 	public void testStreetNameLower() {
-		testFindByParams(LookupResource.STREETS, Map.of("name", "abdijstraat"), "street-collection-schema.json")
+		testFindByParams(LookupResource.STREETS, Map.of("streetName", "abdijstraat"), "street-collection-schema.json")
 			.body("items.size()", equalTo(1),
-					"items[0].name.nl", equalTo("Abdijstraat"));
+					"items[0].streetName.nl", equalTo("Abdijstraat"));
 	}
 
 	@Test
 	public void testStreetNameMultiple() {
-		testFindByParams(LookupResource.STREETS, Map.of("name", "Rue de la Chapelle"), "street-collection-schema.json")
+		testFindByParams(LookupResource.STREETS, Map.of("streetName", "Rue de la Chapelle"), "street-collection-schema.json")
 			.body("items.size()", equalTo(2),
-					"items[0].name.fr", equalTo("Rue de la Chapelle"));
+					"items[0].streetName.fr", equalTo("Rue de la Chapelle"));
 	}
 	
 	@Test
 	public void testStreetStatusRetired() {
-		testFindByParams(LookupResource.STREETS, Map.of("status", "retired"), "street-collection-schema.json")
+		testFindByParams(LookupResource.STREETS, Map.of("streetNameStatus", "retired"), "street-collection-schema.json")
 			.body("items.size()", equalTo(10));
 	}
 
@@ -108,21 +108,21 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 			Map.of("postalinfoID", "https://data.vlaanderen.be/id/postinfo/1502/2002-08-13T16:37:33"),
 			"street-collection-schema.json")
 			.body("items.size()", equalTo(72),
-				"items.name.nl", hasItem("Claesplein"));
+				"items.streetName.nl", hasItem("Claesplein"));
 	}
 
 	@Test
 	public void testStreetPostalCode() {
 		testFindByParams(LookupResource.STREETS, Map.of("postalCode", "1502"), "street-collection-schema.json")
 			.body("items.size()", equalTo(72),
-					"items.name.nl", hasItem("Claesplein"));
+					"items.streetName.nl", hasItem("Claesplein"));
 	}
 
 	@Test
 	public void testStreetPostalName() {
 		testFindByParams(LookupResource.STREETS, Map.of("postalName", "Lembeek"), "street-collection-schema.json")
 			.body("items.size()", equalTo(72),
-					"items.name.nl", hasItem("Claesplein"));
+					"items.streetName.nl", hasItem("Claesplein"));
 	}
 
 	@Test
@@ -130,7 +130,7 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 		testFindByParams(LookupResource.STREETS, Map.of("municipalityID", 
 			"https://data.vlaanderen.be/id/gemeente/23027/2002-08-13T17:32:32"), "street-collection-schema.json")
 			.body("items.size()", equalTo(250),
-					"items.name.nl", hasItem("Claesplein"));
+					"items.streetName.nl", hasItem("Claesplein"));
 	}
 
 	@Test
@@ -140,21 +140,21 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 
 	@Test
 	public void testStreetNiscode() {
-		testFindByParams(LookupResource.STREETS, Map.of("nisCode", "21004"), "street-collection-schema.json")
+		testFindByParams(LookupResource.STREETS, Map.of("municipalityCode", "21004"), "street-collection-schema.json")
 			.body("items.size()", equalTo(250),
-					"items.name.fr", hasItem("Rue du Camp"));
+					"items.municipalityName.fr", hasItem("Rue du Camp"));
 	}
 	
 	@Test
 	public void testStreetNiscodeNotFound() {
-		testNotFoundByParams(LookupResource.STREETS, Map.of("nisCode", "9999"));
+		testNotFoundByParams(LookupResource.STREETS, Map.of("municipalityCode", "9999"));
 	}
 
 	@Test
 	public void testStreetMunicipalityName() {
 		testFindByParams(LookupResource.STREETS, Map.of("municipalityName", "Brussel"), "street-collection-schema.json")
 			.body("items.size()", equalTo(250),
-					"items.name.fr", hasItem("Rue du Camp"));
+					"items.municipalityName.fr", hasItem("Rue du Camp"));
 	}
 	
 	@Test
@@ -167,7 +167,7 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 		testFindByParams(LookupResource.STREETS, Map.of("municipalityName", "Brussel", "name", "Rue du Camp"), 
 			"street-collection-schema.json")
 			.body("items.size()", equalTo(1),
-					"items.name.fr", hasItem("Rue du Camp"));
+					"items.streetName.fr", hasItem("Rue du Camp"));
 	}
 
 	@Test

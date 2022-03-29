@@ -107,21 +107,21 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 	@Test
 	public void testAddressNisCodeBxl() {
 		String bxl = "BE.BRUSSELS.BRIC.ADM.MUNICIPALITY/21004/7";
-		testFindByParams(LookupResource.ADDRESSES, Map.of("nisCode", "21004"), "address-collection-schema.json")
+		testFindByParams(LookupResource.ADDRESSES, Map.of("municipalityCode", "21004"), "address-collection-schema.json")
 			.body("items.municipality.id", everyItem(equalTo(bxl)));
 	}
 
 	@Test
 	public void testAddressNisCodeVl() {
 		String vl = "https://data.vlaanderen.be/id/gemeente/23027/2002-08-13T17:32:32";
-		testFindByParams(LookupResource.ADDRESSES, Map.of("nisCode", "23027"), "address-collection-schema.json")
+		testFindByParams(LookupResource.ADDRESSES, Map.of("municipalityCode", "23027"), "address-collection-schema.json")
 			.body("items.municipality.id", everyItem(equalTo(vl)));
 	}
 
 	@Test
 	public void testAddressNisCodeWal() {
 		String wal = "geodata.wallonie.be/id/Municipality/63049/4";
-		testFindByParams(LookupResource.ADDRESSES, Map.of("nisCode", "63049"), "address-collection-schema.json")
+		testFindByParams(LookupResource.ADDRESSES, Map.of("municipalityCode", "63049"), "address-collection-schema.json")
 			.body("items.municipality.id", everyItem(equalTo(wal)));
 	}
 
@@ -149,21 +149,21 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 	@Test
 	public void testAddressPostalcodeBxl() {
 		String bxl = "BE.BRUSSELS.BRIC.ADM.PZ/1130/2";
-		testFindByParams(LookupResource.ADDRESSES, Map.of("postalCode", "1130"), "address-collection-schema.json")
+		testFindByParams(LookupResource.ADDRESSES, Map.of("postCode", "1130"), "address-collection-schema.json")
 			.body("items.postalinfo.id", everyItem(equalTo(bxl)));
 	}
 
 	@Test
 	public void testAddressPostalcodeVl() {
 		String vl = "https://data.vlaanderen.be/id/postinfo/1502/2002-08-13T16:37:33";
-		testFindByParams(LookupResource.ADDRESSES, Map.of("postalCode", "1502"), "address-collection-schema.json")
+		testFindByParams(LookupResource.ADDRESSES, Map.of("postCode", "1502"), "address-collection-schema.json")
 			.body("items.postalinfo.id", everyItem(equalTo(vl)));
 	}
 
 	@Test
 	public void testAddresPostalcodeWal() {
 		String wal = "geodata.wallonie.be/id/PostalInfo/4960/1";
-		testFindByParams(LookupResource.ADDRESSES, Map.of("postalCode", "4960"), "address-collection-schema.json")
+		testFindByParams(LookupResource.ADDRESSES, Map.of("postCode", "4960"), "address-collection-schema.json")
 			.body("items.postalinfo.id", everyItem(equalTo(wal)));
 	}
 	
@@ -171,7 +171,7 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 	public void testAddressPostalcodeStreetnameHousenumber() {
 		String vl = "https://data.vlaanderen.be/id/straatnaam/26057/2013-10-05T15:59:10.067";
 		testFindByParams(LookupResource.ADDRESSES, 
-				Map.of("postalCode", "1502", "streetName", "Claesplein", "houseNumber", "2"), "address-collection-schema.json")
+				Map.of("postCode", "1502", "streetName", "Claesplein", "houseNumber", "2"), "address-collection-schema.json")
 			.body("items.size()", equalTo(1),
 					"items.street.id", everyItem(equalTo(vl)),
 					"items.street.href", everyItem(notNullValue()),
