@@ -71,7 +71,9 @@ public class AddressSerializer extends BestSerializer<Address> {
 		jg.writeStringField("self", getHref(LookupResource.ADDRESSES, address.id));
 		writeObject(jg, "street", address.sIdentifier, LookupResource.STREETS);
 		writeObject(jg, "municipality",address.mIdentifier, LookupResource.MUNICIPALITIES);
-		writeObject(jg, "partOfMunicipality",address.mpIdentifier, LookupResource.MUNICIPALITY_PARTS);
+		if (address.mpIdentifier != null) {
+			writeObject(jg, "partOfMunicipality",address.mpIdentifier, LookupResource.MUNICIPALITY_PARTS);
+		}
 		writeObject(jg, "postalInfo",address.pIdentifier, LookupResource.POSTAL);
 		jg.writeStringField("houseNumber", address.housenumber);
 		if (address.boxnumber != null) {
