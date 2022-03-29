@@ -142,7 +142,7 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 	public void testStreetNiscode() {
 		testFindByParams(LookupResource.STREETS, Map.of("municipalityCode", "21004"), "street-collection-schema.json")
 			.body("items.size()", equalTo(250),
-					"items.municipalityName.fr", hasItem("Rue du Camp"));
+					"items.streetName.fr", hasItem("Rue du Camp"));
 	}
 	
 	@Test
@@ -154,7 +154,7 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 	public void testStreetMunicipalityName() {
 		testFindByParams(LookupResource.STREETS, Map.of("municipalityName", "Brussel"), "street-collection-schema.json")
 			.body("items.size()", equalTo(250),
-					"items.municipalityName.fr", hasItem("Rue du Camp"));
+					"items.streetName.fr", hasItem("Rue du Camp"));
 	}
 	
 	@Test
