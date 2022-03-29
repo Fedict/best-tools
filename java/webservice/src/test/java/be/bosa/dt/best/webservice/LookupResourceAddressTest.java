@@ -64,7 +64,7 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 
 	@Test
 	public void testAddressMunicipalityBxl() {
-		String bxl = "BE.BRUSSELS.BRIC.ADM.MUNICIPALITY/21004/7";
+		String bxl = "•	https://databrussels.be/id/municipality/21004/7";
 		testFindByParams(LookupResource.ADDRESSES, Map.of("municipalityID", bxl), "address-collection-schema.json")
 			.body("items.municipality.id", everyItem(equalTo(bxl)));
 	}
@@ -85,7 +85,7 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 	
 	@Test
 	public void testAddressMunicipalityNameBxl() {
-		String bxl = "BE.BRUSSELS.BRIC.ADM.MUNICIPALITY/21004/7";
+		String bxl = "•	https://databrussels.be/id/municipality/21004/7";
 		testFindByParams(LookupResource.ADDRESSES, Map.of("municipalityName", "Bruxelles"), "address-collection-schema.json")
 			.body("items.municipality.id", everyItem(equalTo(bxl)));
 	}
@@ -106,7 +106,7 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 
 	@Test
 	public void testAddressNisCodeBxl() {
-		String bxl = "BE.BRUSSELS.BRIC.ADM.MUNICIPALITY/21004/7";
+		String bxl = "•	https://databrussels.be/id/municipality/21004/7";
 		testFindByParams(LookupResource.ADDRESSES, Map.of("municipalityCode", "21004"), "address-collection-schema.json")
 			.body("items.municipality.id", everyItem(equalTo(bxl)));
 	}
@@ -127,7 +127,7 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 
 	@Test
 	public void testAddressPostalinfoBxl() {
-		String bxl = "BE.BRUSSELS.BRIC.ADM.PZ/1130/2";
+		String bxl = "•	https://databrussels.be/id/postalinfo/1130/2";
 		testFindByParams(LookupResource.ADDRESSES, Map.of("postalinfoID", bxl), "address-collection-schema.json")
 			.body("items.postalinfo.id", everyItem(equalTo(bxl)));
 	}
@@ -148,7 +148,7 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 
 	@Test
 	public void testAddressPostalcodeBxl() {
-		String bxl = "BE.BRUSSELS.BRIC.ADM.PZ/1130/2";
+		String bxl = "•	https://databrussels.be/id/postalinfo/1130/2";
 		testFindByParams(LookupResource.ADDRESSES, Map.of("postCode", "1130"), "address-collection-schema.json")
 			.body("items.postalinfo.id", everyItem(equalTo(bxl)));
 	}
@@ -180,7 +180,7 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 	
 	@Test
 	public void testAddressStreetIDBxl() {
-		String bxl = "BE.BRUSSELS.BRIC.ADM.STR/4003/2";
+		String bxl = "•	https://databrussels.be/id/streetname/4003/2";
 		testFindByParams(LookupResource.ADDRESSES, Map.of("streetID", bxl), "address-collection-schema.json")
 			.body("items.size()", equalTo(119),
 					"items.street.id", everyItem(equalTo(bxl)),
@@ -189,7 +189,7 @@ public class LookupResourceAddressTest extends LookupResourceTest {
 	
 	@Test
 	public void testAddressStreetIDBxlEmbed() {
-		String bxl = "BE.BRUSSELS.BRIC.ADM.STR/4003/2";
+		String bxl = "•	https://databrussels.be/id/streetname/4003/2";
 		testFindByParams(LookupResource.ADDRESSES, Map.of("streetID", bxl, "embed", "true"), "address-collection-schema.json")
 			.body("items.size()", equalTo(119),
 					"items.street.href", everyItem(notNullValue()),

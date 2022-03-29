@@ -51,7 +51,7 @@ public class LookupResourcePostalnfoTest extends LookupResourceTest {
 
 	@Test
 	public void testPostalinfoIDBxl() {
-		String bxl = "BE.BRUSSELS.BRIC.ADM.PZ/1000/2";
+		String bxl = "•	https://databrussels.be/id/postalinfo/1000/2";
 		testFindByID(LookupResource.POSTAL, bxl, "postal-schema.json")
 			.body("postalName.nl", equalTo("Brussel (Centrum)"),
 					"postalName.fr", equalTo("Bruxelles (Centre)"));
@@ -79,7 +79,7 @@ public class LookupResourcePostalnfoTest extends LookupResourceTest {
 
 	@Test
 	public void testPostalinfoNameAccent() {
-		testFindByParams(LookupResource.POSTAL, Map.of("name", "Parlement Europeen"), "postal-collection-schema.json")
+		testFindByParams(LookupResource.POSTAL, Map.of("postalName", "Parlement Europeen"), "postal-collection-schema.json")
 			.body("items.size()", equalTo(1),
 					"items[0].postalName.fr", equalTo("Parlement Européen"));
 	}

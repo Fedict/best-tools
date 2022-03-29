@@ -50,7 +50,7 @@ public class LookupResourceMunicipalityTest extends LookupResourceTest {
 
 	@Test
 	public void testMunicipalityIDBxl() {
-		String bxl = "BE.BRUSSELS.BRIC.ADM.MUNICIPALITY/21002/6";
+		String bxl = "•	https://databrussels.be/id/municipality/21002/6";
 		testFindByID(LookupResource.MUNICIPALITIES, bxl, "municipality-schema.json")
 			.body("municipalityName.nl", equalTo("Oudergem"),
 					"municipalityName.fr", equalTo("Auderghem"));

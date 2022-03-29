@@ -52,7 +52,7 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 
 	@Test
 	public void testStreetIDBxl() {
-		String bxl = "BE.BRUSSELS.BRIC.ADM.STR/3974/2";
+		String bxl = "•	https://databrussels.be/id/streetname/3974/2";
 		testFindByID(LookupResource.STREETS, bxl, "street-schema.json")
 			.body("name.nl", equalTo("Masuistraat"),
 					"name.fr", equalTo("Rue Masui"),
