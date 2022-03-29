@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
 public class LookupResourceAddressGeoTest extends LookupResourceTest {
 	@Test
 	public void testAddressGeoPoint() {
-		String bxl = "•	https://databrussels.be/id/municipality/21004/7";
+		String bxl = "https://databrussels.be/id/municipality/21004/7";
 		testFindByParams(LookupResource.ADDRESSES, Map.of("coordX", "4.4175", "coordY", "50.8956", "radius", "1000"), 
 			"address-collection-schema.json")
 			.body("items.size()", equalTo(250),
@@ -50,7 +50,7 @@ public class LookupResourceAddressGeoTest extends LookupResourceTest {
 
 	@Test
 	public void testAddressGeoPointL72() {
-		String bxl = "•	https://databrussels.be/id/municipality/21004/7";
+		String bxl = "https://databrussels.be/id/municipality/21004/7";
 		testFindByParams(LookupResource.ADDRESSES, Map.of("crs", "lambert72", "coordX", "153428", "coordY", "176141", "radius", "1000"), 
 			"address-collection-schema.json")
 			.body("items.size()", equalTo(250),
