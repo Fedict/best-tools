@@ -113,14 +113,14 @@ public class LookupResourceStreetTest extends LookupResourceTest {
 
 	@Test
 	public void testStreetPostalCode() {
-		testFindByParams(LookupResource.STREETS, Map.of("postalCode", "1502"), "street-collection-schema.json")
+		testFindByParams(LookupResource.STREETS, Map.of("postCode", "1502"), "street-collection-schema.json")
 			.body("items.size()", equalTo(72),
 					"items.streetName.nl", hasItem("Claesplein"));
 	}
 
 	@Test
 	public void testStreetPostalName() {
-		testFindByParams(LookupResource.STREETS, Map.of("postalName", "Lembeek"), "street-collection-schema.json")
+		testFindByParams(LookupResource.STREETS, Map.of("postName", "Lembeek"), "street-collection-schema.json")
 			.body("items.size()", equalTo(72),
 					"items.streetName.nl", hasItem("Claesplein"));
 	}
