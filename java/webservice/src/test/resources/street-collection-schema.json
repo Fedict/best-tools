@@ -18,7 +18,7 @@
 					"self": {
 						"type": "string"
 					},
-					"name": {
+					"streetName": {
 						"type": "object",
 						"properties": {
 							"nl": {
@@ -32,17 +32,17 @@
 							}
 						}
 					},
-					"validFrom": {
+					"beginDate": {
 						"type": "string"
 					},
-					"validTill": {
+					"endDate": {
 						"type": "string"
 					},
-					"status": {
+					"streetNameStatus": {
 						"type": "string"
 					}
 				},
-				"required": ["id", "self", "name", "status"]
+				"required": ["id", "self", "streetName", "streetNameStatus"]
 			}
 		},
 		"pageSize": {

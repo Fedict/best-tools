@@ -52,8 +52,8 @@ public class PostalInfoSerializer extends BestSerializer<PostalInfo> {
 		jg.writeStartObject();
         jg.writeStringField("id", postalinfo.id);
 		jg.writeStringField("self", getHref(LookupResource.POSTAL, postalinfo.id));
-		jg.writeStringField("postalCode", postalinfo.zipcode);
-		writeLangObject(jg, postalinfo.name_nl, postalinfo.name_fr, postalinfo.name_de);
+		jg.writeStringField("postCode", postalinfo.zipcode);
+		writeLangObject(jg, "postName", postalinfo.name_nl, postalinfo.name_fr, postalinfo.name_de);
         jg.writeEndObject();
 	}
 }

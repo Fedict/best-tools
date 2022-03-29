@@ -54,7 +54,7 @@
 						},
 						"required": ["id", "href"]
 					},
-					"housenumber": {
+					"houseNumber": {
 						"type": "string"
 					},
 					"status": {

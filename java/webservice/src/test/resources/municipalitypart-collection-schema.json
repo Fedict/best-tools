@@ -18,7 +18,7 @@
 					"self": {
 						"type": "string"
 					},
-					"name": {
+					"pattOfMunicipalityName": {
 						"type": "object",
 						"properties": {
 							"nl": {
@@ -33,7 +33,7 @@
 						}
 					}
 				},
-				"required": ["id", "self", "name"]
+				"required": ["id", "self", "partOfMunicipalityName"]
 			}
 		},
 		"pageSize": {

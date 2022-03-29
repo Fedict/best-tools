@@ -96,15 +96,15 @@ public class LookupResource {
 	 * 
 	 * @param municipalityID
 	 * @param municipalityName
-	 * @param nisCode
+	 * @param municipalityCode
 	 * @param streetID
 	 * @param streetName
 	 * @param postalID
-	 * @param postalName
-	 * @param postalCode
+	 * @param postName
+	 * @param postCode
 	 * @param houseNumber
 	 * @param boxNumber
-	 * @param status
+	 * @param addressStatus
 	 * @param coordX x-coordinate
 	 * @param coordY y-coordinate
 	 * @param radius max radius in meters
@@ -119,24 +119,24 @@ public class LookupResource {
 	@Path(LookupResource.ADDRESSES)
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonObject getAddresses(
-			@RestQuery String municipalityID, @RestQuery String municipalityName, @RestQuery String nisCode,
+			@RestQuery String municipalityID, @RestQuery String municipalityName, @RestQuery String municipalityCode,
 			@RestQuery String streetID, @RestQuery String streetName,
-			@RestQuery String postalID, @RestQuery String postalName, @RestQuery String postalCode,
+			@RestQuery String postalID, @RestQuery String postName, @RestQuery String postCode,
 			@RestQuery String houseNumber, @RestQuery String boxNumber,
-			@RestQuery String status,
+			@RestQuery String addressStatus,
 			@RestQuery double coordX, @RestQuery double coordY, @RestQuery int radius,
 			@RestQuery String polygon, @RestQuery String crs,
 			@RestQuery boolean embed, @RestQuery String after, UriInfo info) {
 		Multi<Address> addresses;
 		if (coordX > 0 && coordY > 0) {
-			addresses = repo.findByCoordinates(after, coordX, coordY, crs, radius, status);
+			addresses = repo.findByCoordinates(after, coordX, coordY, crs, radius, addressStatus);
 		} else if (polygon != null && !polygon.isEmpty()) {
-			addresses = repo.findByPolygon(after, polygon, crs, status);
+			addresses = repo.findByPolygon(after, polygon, crs, addressStatus);
 		} else {
 			addresses = repo.findAddresses(after, 
-								municipalityID, nisCode, municipalityName, streetID, streetName, 
-								postalID, postalCode, postalName, houseNumber, boxNumber, 
-								status);
+								municipalityID, municipalityCode, municipalityName, streetID, streetName, 
+								postalID, postCode, postName, houseNumber, boxNumber, 
+								addressStatus);
 		}
 		return Util.toJson(info, addresses, embed, cache);
 	}
@@ -160,9 +160,9 @@ public class LookupResource {
 	/**
 	 * Search for municipalities
 	 * 
-	 * @param niscode
-	 * @param postalcode
-	 * @param name
+	 * @param municipalityCode
+	 * @param postCode
+	 * @param municipalityName
 	 * @param nameMatch
 	 * @param info
 	 * @return (possibly empty) list of municipalities
@@ -171,11 +171,11 @@ public class LookupResource {
 	@Path(LookupResource.MUNICIPALITIES)
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonObject getMunicipalities(
-			@RestQuery String niscode,
-			@RestQuery String postalcode,
-			@RestQuery String name,
+			@RestQuery String municipalityCode,
+			@RestQuery String postCode,
+			@RestQuery String municipalityName,
 			@RestQuery String nameMatch, UriInfo info) {
-		Multi<Municipality> municipalities = repo.findMunicipalities(niscode, postalcode, name, nameMatch);
+		Multi<Municipality> municipalities = repo.findMunicipalities(municipalityCode, postCode, municipalityName, nameMatch);
 		return Util.toJson(info, municipalities);
 	}
 
@@ -198,7 +198,7 @@ public class LookupResource {
 	/**
 	 * Search for municipality parts
 	 * 
-	 * @param name
+	 * @param partOfMunicipalityName
 	 * @param after
 	 * @param info
 	 * @return (possibly empty) list of municipality parts
@@ -207,9 +207,9 @@ public class LookupResource {
 	@Path(LookupResource.MUNICIPALITY_PARTS)
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonObject getMunicipalityParts(	
-			@RestQuery String name,
+			@RestQuery String partOfMunicipalityName,
 			@RestQuery String after, UriInfo info) {
-		Multi<MunicipalityPart> parts = repo.findMunicipalityParts(after, name);
+		Multi<MunicipalityPart> parts = repo.findMunicipalityParts(after, partOfMunicipalityName);
 		return Util.toJson(info, parts);
 	}
 
@@ -232,8 +232,8 @@ public class LookupResource {
 	/**
 	 * Search for postal info
 	 * 
-	 * @param postalCode
-	 * @param name
+	 * @param postCode
+	 * @param postName
 	 * @param after
 	 * @param nameMatch
 	 * @param info
@@ -243,11 +243,11 @@ public class LookupResource {
 	@Path(LookupResource.POSTAL)
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonObject getPostalInfos(
-			@RestQuery String postalCode,
-			@RestQuery String name,
+			@RestQuery String postCode,
+			@RestQuery String postName,
 			@RestQuery String after, 
 			@RestQuery String nameMatch, UriInfo info) {
-		Multi<PostalInfo> postals = repo.findPostalInfos(after, postalCode, name, nameMatch);
+		Multi<PostalInfo> postals = repo.findPostalInfos(after, postCode, postName, nameMatch);
 		return Util.toJson(info, postals);
 	}
 
@@ -271,13 +271,13 @@ public class LookupResource {
 	 * Search for streets
 	 * 
 	 * @param municipalityID
-	 * @param nisCode
+	 * @param municipalityCode
 	 * @param municipalityName
 	 * @param postalinfoID
-	 * @param postalCode
-	 * @param postalName
-	 * @param name
-	 * @param status
+	 * @param postCode
+	 * @param postName
+	 * @param streetName
+	 * @param streetNameStatus
 	 * @param after
 	 * @param info
 	 * @return 
@@ -287,16 +287,16 @@ public class LookupResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonObject getStreets(
 			@RestQuery String municipalityID,
-			@RestQuery String nisCode,
+			@RestQuery String municipalityCode,
 			@RestQuery String municipalityName,
 			@RestQuery String postalinfoID,
-			@RestQuery String postalCode,
-			@RestQuery String postalName,
-			@RestQuery String name,
-			@RestQuery String status,
+			@RestQuery String postCode,
+			@RestQuery String postName,
+			@RestQuery String streetName,
+			@RestQuery String streetNameStatus,
 			@RestQuery String after, UriInfo info) {
-		Multi<Street> streets = repo.findStreets(after, municipalityID, nisCode, municipalityName, 
-			postalinfoID, postalCode, postalName, name, status);
+		Multi<Street> streets = repo.findStreets(after, municipalityID, municipalityCode, municipalityName, 
+			postalinfoID, postCode, postName, streetName, streetNameStatus);
 		return Util.toJson(info, streets);
 	}
 

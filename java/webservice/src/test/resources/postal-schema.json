@@ -9,10 +9,10 @@
 		"self": {
 			"type": "string"
 		},
-		"postalCode": {
+		"postCode": {
 			"type": "string"
 		},
-		"name": {
+		"postName": {
 			"type": "object",
 			"properties": {
 				"nl": {
@@ -27,5 +27,5 @@
 			}
 		}
 	},
-	"required": ["id", "self", "postalCode"]
+	"required": ["id", "self", "postCode"]
 }

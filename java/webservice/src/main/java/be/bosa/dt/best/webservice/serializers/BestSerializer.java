@@ -52,13 +52,14 @@ public abstract class BestSerializer<T extends BestEntity> extends StdSerializer
 	 * Write language object
 	 * 
 	 * @param jg JSON writer
+	 * @param field field name
 	 * @param nl Dutch name
 	 * @param fr French name
 	 * @param de German name
 	 * @throws IOException 
 	 */
-	protected void writeLangObject(JsonGenerator jg, String nl, String fr, String de) throws IOException {
-		jg.writeObjectFieldStart("name");
+	protected void writeLangObject(JsonGenerator jg, String field, String nl, String fr, String de) throws IOException {
+		jg.writeObjectFieldStart(field);
 		if (nl != null && !nl.isEmpty()) {
 			jg.writeStringField("nl", nl);
 		}

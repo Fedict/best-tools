@@ -71,10 +71,11 @@ public class AddressSerializer extends BestSerializer<Address> {
 		jg.writeStringField("self", getHref(LookupResource.ADDRESSES, address.id));
 		writeObject(jg, "street", address.sIdentifier, LookupResource.STREETS);
 		writeObject(jg, "municipality",address.mIdentifier, LookupResource.MUNICIPALITIES);
-		writeObject(jg, "postal",address.pIdentifier, LookupResource.POSTAL);
-		jg.writeStringField("housenumber", address.housenumber);
+		writeObject(jg, "partOfMunicipality",address.mpIdentifier, LookupResource.MUNICIPALITY_PARTS);
+		writeObject(jg, "postalInfo",address.pIdentifier, LookupResource.POSTAL);
+		jg.writeStringField("houseNumber", address.housenumber);
 		if (address.boxnumber != null) {
-			jg.writeStringField("boxnumber", address.boxnumber);
+			jg.writeStringField("boxNumber", address.boxnumber);
 		}
 		if (address.point.x > 0) {
 			jg.writeObjectFieldStart("lambert72");
@@ -87,12 +88,12 @@ public class AddressSerializer extends BestSerializer<Address> {
 			jg.writeNumberField("y", coord.y);
 			jg.writeEndObject();
 		}
-		jg.writeStringField("status", address.status);
+		jg.writeStringField("addressStatus", address.status);
 		if (address.validFrom != null) {
-			jg.writeStringField("validFrom", address.validFrom.toString());
+			jg.writeStringField("startDate", address.validFrom.toString());
 		}
 		if (address.validTo != null) {
-			jg.writeStringField("validTo", address.validTo.toString());			
+			jg.writeStringField("endDate", address.validTo.toString());			
 		}
         jg.writeEndObject();
 	}

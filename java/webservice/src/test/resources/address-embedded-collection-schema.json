@@ -55,13 +55,13 @@
 						"required": ["id", "href"]
 					}
 				},
-				"housenumber": {
+				"houseNumber": {
 					"type": "string"
 				},
-				"status": {
+				"addressStatus": {
 					"type": "string"
 				},
-				"validFrom" : {
+				"beginDate" : {
 					"type": "date"
 				},
 				"lambert72": {
@@ -80,7 +80,7 @@
 					},
 					"required": ["x", "y"]
 				},
-				"required": ["id", "self", "street", "municipality", "postal", "housenumber", "status"]
+				"required": ["id", "self", "street", "municipality", "postal", "houseNumber", "addressStatus"]
 			}
 		}
 	},

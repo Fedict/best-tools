@@ -53,8 +53,8 @@ public class MunicipalitySerializer extends BestSerializer<Municipality> {
 		jg.writeStartObject();
         jg.writeStringField("id", municipality.id);
 		jg.writeStringField("self", getHref(LookupResource.MUNICIPALITIES, municipality.id));
-		jg.writeStringField("nisCode", municipality.niscode);
-		writeLangObject(jg, municipality.name_nl, municipality.name_fr, municipality.name_de);
+		jg.writeStringField("municipalityCode", municipality.niscode);
+		writeLangObject(jg, "municipalityName", municipality.name_nl, municipality.name_fr, municipality.name_de);
         jg.writeEndObject();
 	}
 }
