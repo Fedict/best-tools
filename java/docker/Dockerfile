@@ -52,8 +52,10 @@ RUN useradd -m best && \
 
 COPY --from=0 /home/best/best-tools/java/webservice/target/webservice-${version}-runner.jar /home/best/runner.jar
 COPY --from=0 --chown=postgres:postgres /tmp/best/data/csv/*.csv /tmp/
-COPY postgis/postgresql.conf /etc/postgresql/14/main/postgresql.conf
-COPY --chown=postgres:postgres postgis/postgis.sql /tmp/
+COPY --from=0 /home/best/best-tools/java/docker/postgis/postgresql.conf /etc/postgresql/14/main/postgresql.conf
+COPY --from=0 /home/best/best-tools/java/docker/postgis/pg_hba.conf /etc/postgresql/14/main/pg_hba.conf
+
+COPY --from=0 --chown=postgres:postgres /home/best/best-tools/java/docker/postgis/postgis.sql /tmp/
 
 ENV PGDATA=/var/lib/postgresql/14/main
 
@@ -70,8 +72,6 @@ RUN service postgresql start && \
 STOPSIGNAL SIGINT
 
 # Copy the more restrictive access configuration
-
-COPY postgis/pg_hba.conf /etc/postgresql/14/main/pg_hba.conf
 
 WORKDIR /home/best
 
