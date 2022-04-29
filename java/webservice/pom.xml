@@ -22,6 +22,13 @@
 	<name>BeSt webservice</name>
     <version>1.2.9</version>
 	<description>Demo webservice</description>
+	<licenses>
+		<license>
+			<name>BSD-2-Clause</name>
+			<url>https://opensource.org/licenses/BSD-2-Clause</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -99,11 +106,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<version>2.0.0</version>
-			</plugin>
-			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.22.2</version>
 			</plugin>
@@ -124,41 +126,73 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>com.lazerycode.jmeter</groupId>
-				<artifactId>jmeter-maven-plugin</artifactId>
-				<version>3.5.0</version>
-				<executions>
-					<execution>
-						<id>configuration</id>
-						<goals>
-							<goal>configure</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>jmeter-tests</id>
-						<goals>
-							<goal>jmeter</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>jmeter-check-results</id>
-						<goals>
-							<goal>results</goal>
-						</goals>
-					</execution>
-				</executions>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>2.0.0</version>
 				<configuration>
-					<generateReports>true</generateReports>
-					<propertiesUser> 
-						<proto>${jmeter.proto}</proto>
-						<host>${jmeter.host}</host>
-						<port>${jmeter.port}</port>
-						<loops>${jmeter.loops}</loops>
-						<threads>${jmeter.threads}</threads>
-						<duration>${jmeter.duration}</duration>
-					</propertiesUser>
+					<organizeLicensesByDependencies>false</organizeLicensesByDependencies>
+					<cleanLicensesOutputDirectory>true</cleanLicensesOutputDirectory>
+					<forceDownload>true</forceDownload>
+					<generateBundle>true</generateBundle>
+					<excludedScopes>system,test</excludedScopes>
+					<licenseMerges>
+						<licenseMerge>Apache License, Version 2.0|Apache-2.0|Apache 2.0|Apache Software License, version 2.0|Apache License 2.0|The Apache License, Version 2.0|The Apache Software License, Version 2.0|Apache Software License, Version 2.0</licenseMerge>
+						<licenseMerge>Eclipse Distribution License - v 1.0|Eclipse Distribution License v. 1.0|EDL 1.0</licenseMerge>
+						<licenseMerge>Eclipse Public License v2.0|Eclipse Public License 2.0|Eclipse Public License - v 2.0|EPL 2.0</licenseMerge>
+						<licenseMerge>BSD-2-Clause|The 2-Clause BSD License</licenseMerge>
+						<licenseMerge>BSD-3-Clause|BSD 3-clause New License|BSD License 3|BSD Licence 3</licenseMerge>
+						<licenseMerge>MIT License|The MIT License</licenseMerge>
+					</licenseMerges>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>performance-testt</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.lazerycode.jmeter</groupId>
+						<artifactId>jmeter-maven-plugin</artifactId>
+						<version>3.5.0</version>
+						<executions>
+							<execution>
+								<id>configuration</id>
+								<goals>
+									<goal>configure</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>jmeter-tests</id>
+								<goals>
+									<goal>jmeter</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>jmeter-check-results</id>
+								<goals>
+									<goal>results</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<generateReports>true</generateReports>
+							<propertiesUser> 
+								<proto>${jmeter.proto}</proto>
+								<host>${jmeter.host}</host>
+								<port>${jmeter.port}</port>
+								<loops>${jmeter.loops}</loops>
+								<threads>${jmeter.threads}</threads>
+								<duration>${jmeter.duration}</duration>
+							</propertiesUser>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
