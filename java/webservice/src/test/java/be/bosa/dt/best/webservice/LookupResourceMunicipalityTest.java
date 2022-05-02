@@ -86,4 +86,11 @@ public class LookupResourceMunicipalityTest extends LookupResourceTest {
 			.body("items.size()", equalTo(1),
 					"items[0].municipalityName.de", equalTo("Sankt Vith"));
 	}
+
+	@Test
+	public void testMunicipalityPostalCode() {
+		testFindByParams(LookupResource.MUNICIPALITIES, Map.of("postCode", "1502"), "municipality-collection-schema.json")
+			.body("items.size()", equalTo(1),
+					"items[0].municipalityName.nl", equalTo("Halle"));
+	}
 }

@@ -35,7 +35,8 @@ public class SqlMunicipality extends Sql {
 	 * Join with postal municipalities auxiliary table
 	 */
 	public void joinPostal() {
-		this.join = " INNER JOIN postalmunicipalities p ON m.identifier = p.mIdentifier";	
+		this.join = " INNER JOIN postalmunicipalities pm ON m.identifier = pm.mIdentifier"  +
+					" INNER JOIN postalInfo p ON p.identifier = pm.pIdentifier";
 	}
 	
 	/**
