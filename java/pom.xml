@@ -6,7 +6,6 @@
     <version>1.2.9</version>
     <packaging>pom</packaging>
     <modules>
-        <module>converter</module>
         <module>dao</module>
         <module>dbloader</module>
         <module>unzip</module>

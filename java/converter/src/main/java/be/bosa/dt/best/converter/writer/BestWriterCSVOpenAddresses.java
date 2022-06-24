@@ -33,7 +33,6 @@ import be.bosa.dt.best.dao.Street;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -55,11 +54,6 @@ public class BestWriterCSVOpenAddresses extends BestWriterCSV {
 			s -> s.getId(), 
 			s -> new String[]{s.getName("nl"), s.getName("fr"), s.getName("de"), s.getIDVersion()},
 			(s1,s2) -> { return s2; }));
-	}
-
-	@Override
-	public Map<String, String[]> writeMunicipalityParts(BestRegion region, Path outdir, Stream<Municipality> cityParts) {
-		return Collections.EMPTY_MAP;
 	}
 
 	@Override
@@ -99,6 +93,7 @@ public class BestWriterCSVOpenAddresses extends BestWriterCSV {
 	
 		Function<Address, String[]> func = (Address s) -> {
 			String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[3]);
+			String[] cParts = cityParts.getOrDefault(s.getCityPart().getId(), new String[3]);
 			String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[3]);
 			String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[3]);
 
@@ -108,13 +103,15 @@ public class BestWriterCSVOpenAddresses extends BestWriterCSV {
 			TRANS.transform(src, dest);
 
 			return new String[]{
-				String.valueOf(s.getPoint().getX()),
-				String.valueOf(s.getPoint().getY()),
+				String.format(Locale.US, "%.5f", s.getPoint().getX()),
+				String.format(Locale.US, "%.5f", s.getPoint().getY()),
 				String.format(Locale.US, "%.5f", dest.y),
 				String.format(Locale.US, "%.5f", dest.x),
 				s.getId(), s.getBox(), s.getNumber(),
 				s.getCity().getId(), cCities[2], cCities[1], cCities[0],
-				s.getPostal().getId(), cPostal[1], cPostal[0],
+				s.getPostal().getId(), 
+					!(cPostal[1] == null || cPostal[1].isBlank()) ? cPostal[1] : cParts[1],
+					!(cPostal[0] == null || cPostal[0].isBlank()) ? cPostal[0] : cParts[0], 
 				s.getStreet().getId(), cStreet[2], cStreet[1], cStreet[0],
 				String.format("BE-%s", region.getAbbr().toUpperCase()), s.getStatus()
 			};
