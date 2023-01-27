@@ -3,7 +3,7 @@
 
 ## Java 
 
-Various BeST (Belgian Streets and Addresses) conversion tools
+Various BeST (Belgian Streets and Addresses) conversion tools, including a tool to load data into a PostGIS database.
 
 
 ## OSOC 19
