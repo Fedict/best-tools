@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>be.bosa.dt</groupId>
 		<artifactId>best</artifactId>
-		<version>1.3.0</version>
+		<version>1.3.1</version>
 	</parent>
 	<groupId>be.bosa.dt.best</groupId>
 	<artifactId>webservice</artifactId>
@@ -20,7 +20,7 @@
 		<jmeter.duration>60</jmeter.duration>
 	</properties>
 	<name>BeSt webservice</name>
-    <version>1.3.0</version>
+    <version>1.3.1</version>
 	<description>Demo webservice</description>
 	<licenses>
 		<license>
@@ -34,7 +34,7 @@
 			<dependency>
 				<groupId>io.quarkus</groupId>
 				<artifactId>quarkus-bom</artifactId>
-				<version>2.10.0.Final</version>
+				<version>2.16.5.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -44,7 +44,7 @@
 		<dependency>
 			<groupId>org.locationtech.proj4j</groupId>
 			<artifactId>proj4j</artifactId>
-			<version>1.1.5</version>
+			<version>1.2.3</version>
         </dependency>
        <dependency>
             <groupId>io.quarkus</groupId>
@@ -116,7 +116,7 @@
 			<plugin>
 				<groupId>io.quarkus</groupId>
 				<artifactId>quarkus-maven-plugin</artifactId>
-				<version>2.10.0.Final</version>
+				<version>2.16.5.Final</version>
 				<executions>
 					<execution>
 						<goals>
