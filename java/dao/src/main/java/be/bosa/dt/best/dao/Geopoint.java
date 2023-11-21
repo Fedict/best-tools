@@ -103,8 +103,8 @@ public class Geopoint {
 			throw new NumberFormatException("Not Lambert 72 projection");
 		}
 		String[] coords = xy.split(" ");
-		this.x = Double.valueOf(coords[0]);
-		this.y = Double.valueOf(coords[1]);
+		this.x = Double.parseDouble(coords[0]);
+		this.y = Double.parseDouble(coords[1]);
 		this.srs = "31370";
 	}		
 	

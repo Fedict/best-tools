@@ -44,17 +44,17 @@ import javax.xml.stream.events.XMLEvent;
  * @author Bart Hanssens
  */
 public class StreetnameReader extends AbstractXMLReader<Street> {
-	private final static QName STREETNAME = new QName(AbstractXMLReader.TNS, "Streetname");
+	private final static QName STREETNAME = new QName(AbstractXMLReader.TNS, "streetName");
 	//private final static QName STREETNAME_CODE = new QName(AbstractXMLReader.ADD, "streetnameCode");
-	private final static QName STREETNAME_NAME = new QName(AbstractXMLReader.ADD, "streetname");
-	private final static QName MUNICIPALITY = new QName(AbstractXMLReader.ADD, "Municipality");
+	private final static QName STREETNAME_NAME = new QName(AbstractXMLReader.ADD, "name");
+	private final static QName MUNICIPALITY = new QName(AbstractXMLReader.ADD, "isAssignedByMunicipality");
 	private final static QName NAMESPACE = new QName(AbstractXMLReader.ADD, "namespace");
 	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");
 	private final static QName VERSIONID = new QName(AbstractXMLReader.ADD, "versionIdentifier");
 	private final static QName LANGUAGE = new QName(AbstractXMLReader.ADD, "language");
 	private final static QName SPELLING = new QName(AbstractXMLReader.ADD, "spelling");
 	private final static QName STATUS = new QName(AbstractXMLReader.ADD, "status");
-	private final static QName STREET_TYPE = new QName(AbstractXMLReader.ADD, "streetnameType");
+	private final static QName STREET_TYPE = new QName(AbstractXMLReader.ADD, "type");
 	private final static QName BEGIN_LIFESPAN = new QName("", "beginLifeSpanVersion");
 	private final static QName END_LIFESPAN = new QName("", "endLifeSpanVersion");
 	private final static QName VALID_FROM = new QName(AbstractXMLReader.ADD, "validFrom");
