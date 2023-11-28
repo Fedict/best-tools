@@ -46,17 +46,17 @@ import javax.xml.stream.events.XMLEvent;
  * @author Bart Hanssens
  */
 public class AddressReader extends AbstractXMLReader<Address> {
-	private final static QName ADDRESS = new QName(AbstractXMLReader.TNS, "Address");
-	private final static QName MUNICIPALITY = new QName(AbstractXMLReader.ADD, "Municipality");
-	private final static QName MUNICIPALITY_PART = new QName(AbstractXMLReader.ADD, "PartOfMunicipality");
-	private final static QName POSTAL = new QName(AbstractXMLReader.ADD, "PostalInfo");
-	private final static QName STREETNAME = new QName(AbstractXMLReader.ADD, "Streetname");
+	private final static QName ADDRESS = new QName(AbstractXMLReader.TNS, "address");
+	private final static QName MUNICIPALITY = new QName(AbstractXMLReader.ADD, "hasMunicipality");
+	private final static QName MUNICIPALITY_PART = new QName(AbstractXMLReader.ADD, "hasPartOfMunicipality");
+	private final static QName POSTAL = new QName(AbstractXMLReader.ADD, "hasPostalInfo");
+	private final static QName STREETNAME = new QName(AbstractXMLReader.ADD, "hasStreetName");
 	private final static QName HOUSENUMBER = new QName(AbstractXMLReader.ADD, "houseNumber");
 	private final static QName BOXNUMBER = new QName(AbstractXMLReader.ADD, "boxNumber");
 	private final static QName NAMESPACE = new QName(AbstractXMLReader.ADD, "namespace");
 	private final static QName OBJECTID = new QName(AbstractXMLReader.ADD, "objectIdentifier");
 	private final static QName VERSIONID = new QName(AbstractXMLReader.ADD, "versionIdentifier");
-	private final static QName POS = new QName(AbstractXMLReader.GML, "pos");
+	private final static QName POS = new QName(AbstractXMLReader.ADD, "pos");
 	private final static QName STATUS = new QName(AbstractXMLReader.ADD, "status");
 	private final static QName SRSNAME = new QName("", "srsName");
 	private final static QName BEGIN_LIFESPAN = new QName("", "beginLifeSpanVersion");

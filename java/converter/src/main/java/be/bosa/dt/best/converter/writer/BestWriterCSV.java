@@ -64,7 +64,12 @@ public class BestWriterCSV implements BestWriter {
 	public BestWriterCSV() {
 		CRSFactory factory = new CRSFactory();
 		TRANS = new BasicCoordinateTransform(
-			factory.createFromName("EPSG:31370"), factory.createFromName("EPSG:4326"));
+			factory.createFromParameters("L72",
+			"+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 "
+			+ "+x_0=150000.013 +y_0=5400088.438 +ellps=intl "
+			+ "+nadgrids=bd72lb72_etrs89lb08.gsb "
+			+ "+units=m +no_defs"),
+			factory.createFromName("EPSG:4326"));
 	}
 
 	/**

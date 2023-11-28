@@ -237,9 +237,17 @@ public class BestWriterShape implements BestWriter {
 				while (iterator.hasNext()) {
 					Address s = (Address) iterator.next();
 
-					String[] cCities = cities.getOrDefault(s.getCity().getId(), new String[2]);
-					String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[2]);
-					String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[2]);
+					String[] cCities = cities.get(s.getCity().getId()); 
+					if (cCities == null) {
+						LOG.log(Level.WARNING, "No city for {0}",s.getCity().getId());
+						cCities = new String[3];
+					}
+					String[] cStreet = streets.get(s.getStreet().getId());
+					if (cStreet == null) {
+						LOG.log(Level.WARNING, "No street for {0}",s.getStreet().getId());
+						cStreet = new String[3];
+					}
+					String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[3]);
 					features.add(buildFeature(builder, s, cCities, cStreet, cPostal));
 
 					if (++i % 100_000 == 0) {

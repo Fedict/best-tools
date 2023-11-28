@@ -58,7 +58,7 @@ public abstract class AbstractXMLReader<T> implements BestReader {
 	// XML namespaces
 	public final static String TNS = "http://fsb.belgium.be/mappingservices/FullDownload/v1_00";
 	public final static String GML = "http://www.opengis.net/gml/3.2";
-	public final static String ADD = "http://vocab.belgif.be/ns/inspire/";
+	public final static String ADD = "http://fsb.belgium.be/data/common";
 	
 	private final static XMLInputFactory2 FAC = (XMLInputFactory2) XMLInputFactory.newInstance();
 	private final static Logger LOG = Logger.getLogger(AbstractXMLReader.class.getName());

@@ -3,13 +3,13 @@
   <parent>
     <artifactId>best</artifactId>
     <groupId>be.bosa.dt</groupId>
-    <version>1.3.1</version>
+    <version>1.4.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>be.bosa.dt.best</groupId>
   <artifactId>unzip</artifactId>
   <name>BeSt unzip utility</name>
-  <version>1.3.1</version>
+  <version>1.4.0</version>
   <description>Belgian Streets and Addresses unzip utility</description>
   <build>
     <plugins>
@@ -20,7 +20,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.0</version>
         <configuration>
           <archive>
             <manifest>
@@ -32,7 +32,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.4</version>
+        <version>3.5.1</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -69,7 +69,7 @@
     </plugins>
   </build>
   <properties>
-    <maven.compiler.target>11</maven.compiler.target>
-    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>17</maven.compiler.source>
   </properties>
 </project>
