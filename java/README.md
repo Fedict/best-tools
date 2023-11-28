@@ -15,14 +15,9 @@ Webservice testing requires a docker instance and 20 GB of disk space
 
 - [Unzip tool](unzip): recursively unzip the BeST-zip file.
 - [Converter tool](converter): convert XML files to CSV
-- [DBLoader](dbloader): loads (unzipped) prepare XML files for database
 - [Automation tool](automation) (internal use only)
 
 ## Helper modules
 
 - [DAO](dao)
 - [XmlReader](xmlreader)
-
-## Dockerized service
-
-- [Webservice](webservice): REST front-end
