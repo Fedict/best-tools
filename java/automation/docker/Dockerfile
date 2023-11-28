@@ -5,7 +5,7 @@
 FROM maven:3-openjdk-17-slim as builder
 MAINTAINER bart.hanssens@bosa.fgov.be
 
-ARG version=1.3.1
+ARG version=1.4.0
 
 RUN apt-get update && \
   apt-get install -y git-core && \
