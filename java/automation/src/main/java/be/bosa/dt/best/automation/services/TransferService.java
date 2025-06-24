@@ -29,7 +29,7 @@ package be.bosa.dt.best.automation.services;
 import io.quarkus.logging.Log;
 import java.io.IOException;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;

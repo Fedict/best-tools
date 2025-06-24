@@ -43,7 +43,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -186,11 +186,12 @@ public class Main implements QuarkusApplication {
 			Log.infof("Creating directory %s", tempData);
 			Files.createDirectory(tempData);
 
-			tempFile = Files.createTempFile(tempData, "bestfull", "local");
-			String localFile = tempFile.toAbsolutePath().toString();
+		//	tempFile = Files.createTempFile(tempData, "bestfull", "local");
+	//		String localFile = tempFile.toAbsolutePath().toString();
+			String localFile = "c:/data/best/best-full-latest-after-mergers.zip";
 			String fileName = Utils.getFileName(downloadFile);
 
-			sftp.download(fileName, localFile);
+//			sftp.download(fileName, localFile);
 			
 			verifier.verify(localFile);
 
@@ -199,15 +200,15 @@ public class Main implements QuarkusApplication {
 			zipFileOAWAL = Files.createTempFile(tempData, "oa", "wal");
 			Log.info("Converting to OpenAddresses format");
 			convertOA(localFile, zipFileOAVLG.toString(), zipFileOABRU.toString(), zipFileOAWAL.toString());
-			
+/*		
 			zipFilePs = Files.createTempFile(tempData, "street", "postal");			
 			Log.info("Converting postal streets");
 			convertStreets(localFile, zipFilePs.toString());
-					
+				
 			zipFileEs = Files.createTempFile(tempData, "street", "empty");			
 			Log.info("Converting empty streets");
 			convertEmptyStreets(localFile, zipFileEs.toString());
-			
+	
 			Log.info("Uploading BeST Full XML");
 			sftp.upload(localFile, uploadPath + fullFile);
 
@@ -223,7 +224,7 @@ public class Main implements QuarkusApplication {
 	
 			Log.info("Uploading empty streets");
 			sftp.upload(zipFileEs.toString(), uploadPath + emptystreetFile);
-			
+		*/	
 			Log.infof("Done (OK) %s", fileName);
 		} catch (IOException ioe) {
 			exitCode = -1;

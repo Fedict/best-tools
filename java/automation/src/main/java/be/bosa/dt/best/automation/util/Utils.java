@@ -64,14 +64,14 @@ public class Utils {
 		if (p == null) {
 			return true;
 		}
-
+/*
 		Log.infof("Delete directory %s", p);
 
 		try(Stream<Path> files = Files.walk(p)) {
 			files.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
 		} catch(IOException ioe) {
 			return false;
-		}
+		}*/
 		return true;
 	}
 

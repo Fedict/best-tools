@@ -4,7 +4,7 @@
     <parent>
         <groupId>be.bosa.dt</groupId>
         <artifactId>best</artifactId>
-        <version>1.4.0</version>
+        <version>1.5.0</version>
     </parent>
     <groupId>be.bosa.dt.best</groupId>
     <artifactId>automation</artifactId>
@@ -14,68 +14,73 @@
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
     <name>BeSt automation</name>
-	<version>1.4.0</version>
+    <version>1.5.0</version>
     <description>Webservice / tool to automate copying and transforming BeSt data</description>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>io.quarkus</groupId>
-				<artifactId>quarkus-bom</artifactId>
-				<version>2.16.12.Final</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-	<dependencies>
-		<dependency>
-			<groupId>io.quarkus</groupId>
-			<artifactId>quarkus-smallrye-fault-tolerance</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>converter</artifactId>
-			<version>${project.version}</version>
-		</dependency>	
-		<dependency>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-bom</artifactId>
+                <version>3.20.1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-fault-tolerance</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>converter</artifactId>
+            <version>${project.version}</version>
+        </dependency>	
+        <dependency>
             <groupId>com.hierynomus</groupId>
             <artifactId>sshj</artifactId>
             <version>0.32.0</version>
         </dependency>
-	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<version>2.0.0</version>
-				<executions>
-					<execution>
-						<id>aggregate-download-licenses</id>
-						<goals>
-							<goal>aggregate-download-licenses</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<sortArtifactByName>true</sortArtifactByName>
-					<licenseMerges>
-						<licenseMerge>Apache License, Version 2.0|The Apache License, Version 2.0|The Apache Software License, Version 2.0|Apache License 2.0|Apache-2.0</licenseMerge>
-					</licenseMerges>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>io.quarkus</groupId>
-				<artifactId>quarkus-maven-plugin</artifactId>
-				<version>2.16.12.Final</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>build</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.0.0</version>
+                <executions>
+                    <execution>
+                        <id>aggregate-download-licenses</id>
+                        <goals>
+                            <goal>aggregate-download-licenses</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <sortArtifactByName>true</sortArtifactByName>
+                    <licenseMerges>
+                        <licenseMerge>Apache License, Version 2.0|The Apache License, Version 2.0|The Apache Software License, Version 2.0|Apache License 2.0|Apache-2.0</licenseMerge>
+                    </licenseMerges>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-maven-plugin</artifactId>
+                <version>3.20.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>3.1.4</version>
+            </plugin>
+        </plugins>
+    </build>
 </project>

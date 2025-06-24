@@ -85,6 +85,9 @@ public class BestWriterCSVEmptyStreets extends BestWriterCSV {
 	private void fillPostals(Address a, Map<String, String[]> cacheCities,
 							Map<String, String[]> postalNL, Map<String, String[]> postalFR, 
 							Map<String, String[]> postalDE) {
+		LOG.info("Getting addr " + a.getId());
+		LOG.info("Getting city " + a.getCity().getId());
+		
 		String[] city = cacheCities.get(a.getCity().getId());
 		String[] values = new String[] { a.getPostal().getId(), city[0], city[1], city[2] };
 		
