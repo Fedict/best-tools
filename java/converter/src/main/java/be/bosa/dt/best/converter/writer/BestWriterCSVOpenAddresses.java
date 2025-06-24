@@ -100,7 +100,7 @@ public class BestWriterCSVOpenAddresses extends BestWriterCSV {
 			ProjCoordinate src = new ProjCoordinate(s.getPoint().getX(), s.getPoint().getY());
 			ProjCoordinate dest = new ProjCoordinate();
 
-			TRANS.transform(src, dest);
+			TRANSFORM.transform(src, dest);
 
 			return new String[]{
 				String.format(Locale.US, "%.5f", s.getPoint().getX()),

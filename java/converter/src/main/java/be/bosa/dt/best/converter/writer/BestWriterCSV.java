@@ -55,22 +55,19 @@ import org.locationtech.proj4j.ProjCoordinate;
  * @author Bart Hanssens
  */
 public class BestWriterCSV implements BestWriter {
-	protected static BasicCoordinateTransform TRANS;
-	private final static Logger LOG = Logger.getLogger(BestWriterCSV.class.getName());
+	protected static final CRSFactory F = new CRSFactory();
+	protected static final BasicCoordinateTransform TRANSFORM = 
+		new BasicCoordinateTransform(
+			F.createFromParameters("L72",
+				"+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 "
+				+ "+x_0=150000.013 +y_0=5400088.438 +ellps=intl "
+				+ "+nadgrids=bd72lb72_etrs89lb08.gsb "
+				+ "+units=m +no_defs"),
+			F.createFromParameters("WGS84t", 
+				"+proj=longlat +a=6378137.0 +b=6356752.31425 "
+				+ "+towgs84=0.0546,0.05018,-0.1035,0.00292,0.01764,-0.02851,0.00334"));
 
-	/**
-	 * Constructor
-	 */
-	public BestWriterCSV() {
-		CRSFactory factory = new CRSFactory();
-		TRANS = new BasicCoordinateTransform(
-			factory.createFromParameters("L72",
-			"+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 "
-			+ "+x_0=150000.013 +y_0=5400088.438 +ellps=intl "
-			+ "+nadgrids=bd72lb72_etrs89lb08.gsb "
-			+ "+units=m +no_defs"),
-			factory.createFromName("EPSG:4326"));
-	}
+	private final static Logger LOG = Logger.getLogger(BestWriterCSV.class.getName());
 
 	/**
 	 * Write a series of Best object to a file
@@ -194,7 +191,7 @@ public class BestWriterCSV implements BestWriter {
 			ProjCoordinate src = new ProjCoordinate(a.getPoint().getX(), a.getPoint().getY());
 			ProjCoordinate dest = new ProjCoordinate();
 
-			TRANS.transform(src, dest);
+			TRANSFORM.transform(src, dest);
 
 			// A street can have different postal codes, so create a cache of info per street per postal code
 			if ((a.getStatus().equals("current") && a.getTillDate() == null) || a.getStatus().equals("reserved")) {

@@ -67,7 +67,7 @@ public class BestRegionWriter {
 			// key: ID, value: fields as strings
 			Map<String, String[]> cacheCities = writer.writeMunicipalities(region, outPath, cities);
 
-			Map<String, String[]> cacheCityParts = Collections.EMPTY_MAP;
+			Map<String, String[]> cacheCityParts = Collections.emptyMap();
 			if (region.equals(BestRegion.WALLONIA)) { // only Walloon Region provides "municipality parts"
 				try ( Stream<Municipality> cityParts = new MunicipalityPartReader().read(region, inPath)) {
 					cacheCityParts = writer.writeMunicipalityParts(region, outPath, cityParts);
