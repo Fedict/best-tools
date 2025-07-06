@@ -60,10 +60,9 @@ public class VerifyService {
 	public void verify(String file) throws IOException {
 		long fileSize = new File(file).length();
 		if (fileSize < minSize) {
-			throw new IOException("File too small: " + fileSize);
+			throw new IOException("File " + file + " too small: " + fileSize);
 		}
 		Log.infof("File size %s OK", fileSize);
-
 		List<String> files = zip.listFiles(Paths.get(file));
 		if (files.size() != expected.size()) {
 			throw new IOException("Number of files is different: " + files.size());

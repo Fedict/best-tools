@@ -34,6 +34,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.FingerprintVerifier;
+import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import org.eclipse.microprofile.faulttolerance.Retry;
@@ -91,6 +92,8 @@ public class TransferService {
 		SSHClient client = new SSHClient();
 		if (downloadFingerprint != null && !downloadFingerprint.isBlank()) {
 			client.addHostKeyVerifier(FingerprintVerifier.getInstance(downloadFingerprint));
+		} else {
+			client.addHostKeyVerifier(new PromiscuousVerifier());
 		}
 		client.connect(downloadServer, downloadPort);
 		client.authPassword(downloadUser, downloadPass);
@@ -116,6 +119,8 @@ public class TransferService {
 		SSHClient client = new SSHClient();
 		if (uploadFingerprint != null && !uploadFingerprint.isBlank()) {
 			client.addHostKeyVerifier(FingerprintVerifier.getInstance(uploadFingerprint));
+		} else {
+			client.addHostKeyVerifier(new PromiscuousVerifier());
 		}
 		client.connect(uploadServer, uploadPort);
 		client.authPassword(uploadUser, uploadPass);
