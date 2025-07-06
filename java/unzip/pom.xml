@@ -4,7 +4,7 @@
     <parent>
         <groupId>be.bosa.dt</groupId>
         <artifactId>best</artifactId>
-        <version>1.5.0</version>
+        <version>1.5.1</version>
     </parent>
     <groupId>be.bosa.dt.best</groupId>
     <artifactId>unzip</artifactId>
@@ -14,7 +14,7 @@
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
     <name>BeSt unzip utility</name>
-    <version>1.5.0</version>
+    <version>1.5.1</version>
     <dependencies>
         <dependency>
             <groupId>commons-cli</groupId>
