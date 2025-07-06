@@ -14,14 +14,14 @@
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
     <name>BeSt automation</name>
-    <version>1.5.0</version>
+    <version>1.5.1</version>
     <description>Webservice / tool to automate copying and transforming BeSt data</description>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-bom</artifactId>
-                <version>3.20.1</version>
+                <version>3.24.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>com.hierynomus</groupId>
             <artifactId>sshj</artifactId>
-            <version>0.32.0</version>
+            <version>0.40.0</version>
         </dependency>
     </dependencies>
     <build>
@@ -67,7 +67,7 @@
             <plugin>
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
-                <version>3.20.1</version>
+                <version>3.24.0</version>
                 <executions>
                     <execution>
                         <goals>

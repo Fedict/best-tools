@@ -89,7 +89,9 @@ public class TransferService {
 		Log.infof("Downloading %s from %s (port %d) to %s", remote, downloadServer, downloadPort, local);
 
 		SSHClient client = new SSHClient();
-		client.addHostKeyVerifier(FingerprintVerifier.getInstance(downloadFingerprint));
+		if (downloadFingerprint != null && !downloadFingerprint.isBlank()) {
+			client.addHostKeyVerifier(FingerprintVerifier.getInstance(downloadFingerprint));
+		}
 		client.connect(downloadServer, downloadPort);
 		client.authPassword(downloadUser, downloadPass);
 
@@ -112,7 +114,9 @@ public class TransferService {
 		Log.infof("Uploading %s to %s (port %d) to %s", local, uploadServer, uploadPort, remote);
 
 		SSHClient client = new SSHClient();
-		client.addHostKeyVerifier(FingerprintVerifier.getInstance(uploadFingerprint));
+		if (uploadFingerprint != null && !uploadFingerprint.isBlank()) {
+			client.addHostKeyVerifier(FingerprintVerifier.getInstance(uploadFingerprint));
+		}
 		client.connect(uploadServer, uploadPort);
 		client.authPassword(uploadUser, uploadPass);
 
