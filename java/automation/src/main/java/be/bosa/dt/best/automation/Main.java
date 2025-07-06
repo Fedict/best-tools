@@ -186,12 +186,11 @@ public class Main implements QuarkusApplication {
 			Log.infof("Creating directory %s", tempData);
 			Files.createDirectory(tempData);
 
-		//	tempFile = Files.createTempFile(tempData, "bestfull", "local");
-	//		String localFile = tempFile.toAbsolutePath().toString();
-			String localFile = "c:/data/best/best-full-latest-after-mergers.zip";
+			tempFile = Files.createTempFile(tempData, "bestfull", "local");
+			String localFile = tempFile.toAbsolutePath().toString();
 			String fileName = Utils.getFileName(downloadFile);
 
-//			sftp.download(fileName, localFile);
+			sftp.download(fileName, localFile);
 			
 			verifier.verify(localFile);
 
@@ -200,7 +199,7 @@ public class Main implements QuarkusApplication {
 			zipFileOAWAL = Files.createTempFile(tempData, "oa", "wal");
 			Log.info("Converting to OpenAddresses format");
 			convertOA(localFile, zipFileOAVLG.toString(), zipFileOABRU.toString(), zipFileOAWAL.toString());
-/*		
+		
 			zipFilePs = Files.createTempFile(tempData, "street", "postal");			
 			Log.info("Converting postal streets");
 			convertStreets(localFile, zipFilePs.toString());
@@ -224,7 +223,7 @@ public class Main implements QuarkusApplication {
 	
 			Log.info("Uploading empty streets");
 			sftp.upload(zipFileEs.toString(), uploadPath + emptystreetFile);
-		*/	
+	
 			Log.infof("Done (OK) %s", fileName);
 		} catch (IOException ioe) {
 			exitCode = -1;
