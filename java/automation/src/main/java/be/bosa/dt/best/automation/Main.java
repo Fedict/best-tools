@@ -62,6 +62,9 @@ public class Main implements QuarkusApplication {
 
 	@Inject
 	VerifyService verifier;
+
+	@ConfigProperty(name = "automation.mode.local")
+	boolean localMode;
 	
 	@ConfigProperty(name = "automation.download.file")
 	String downloadFile;
@@ -186,11 +189,18 @@ public class Main implements QuarkusApplication {
 			Log.infof("Creating directory %s", tempData);
 			Files.createDirectory(tempData);
 
-			tempFile = Files.createTempFile(tempData, "bestfull", "local");
-			String localFile = tempFile.toAbsolutePath().toString();
-			String fileName = Utils.getFileName(downloadFile);
-
-			sftp.download(fileName, localFile);
+			String localFile; 
+			String fileName;
+			
+			if (!localMode) {
+				tempFile = Files.createTempFile(tempData, "bestfull", "local");
+				localFile = tempFile.toAbsolutePath().toString();
+				fileName = Utils.getFileName(downloadFile);
+				sftp.download(fileName, localFile);
+			} else {
+				localFile = downloadFile;
+				fileName = downloadFile;
+			}
 			
 			verifier.verify(localFile);
 	
@@ -208,22 +218,23 @@ public class Main implements QuarkusApplication {
 			Log.info("Converting empty streets");
 			convertEmptyStreets(localFile, zipFileEs.toString());
 	
-			Log.info("Uploading BeST Full XML");
-			sftp.upload(localFile, uploadPath + fullFile);
+			if (!localMode) {
+				Log.info("Uploading BeST Full XML");
+				sftp.upload(localFile, uploadPath + fullFile);
 
-			Log.info("Uploading OpenAddresses VLG");
-			sftp.upload(zipFileOAVLG.toString(), uploadPath + oaVlgFile);
-			Log.info("Uploading OpenAddresses BRU");
-			sftp.upload(zipFileOABRU.toString(), uploadPath + oaBruFile);
-			Log.info("Uploading OpenAddresses WAL");
-			sftp.upload( zipFileOAWAL.toString(), uploadPath + oaWalFile);
+				Log.info("Uploading OpenAddresses VLG");
+				sftp.upload(zipFileOAVLG.toString(), uploadPath + oaVlgFile);
+				Log.info("Uploading OpenAddresses BRU");
+				sftp.upload(zipFileOABRU.toString(), uploadPath + oaBruFile);
+				Log.info("Uploading OpenAddresses WAL");
+				sftp.upload( zipFileOAWAL.toString(), uploadPath + oaWalFile);
 
-			Log.info("Uploading postal streets");
-			sftp.upload(zipFilePs.toString(), uploadPath + postalstreetFile);
+				Log.info("Uploading postal streets");
+				sftp.upload(zipFilePs.toString(), uploadPath + postalstreetFile);
 	
-			Log.info("Uploading empty streets");
-			sftp.upload(zipFileEs.toString(), uploadPath + emptystreetFile);
-	
+				Log.info("Uploading empty streets");
+				sftp.upload(zipFileEs.toString(), uploadPath + emptystreetFile);
+			}
 			Log.infof("Done (OK) %s", fileName);
 		} catch (Exception ioe) {
 			exitCode = -1;
