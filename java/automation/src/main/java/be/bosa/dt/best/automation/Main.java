@@ -240,7 +240,9 @@ public class Main implements QuarkusApplication {
 			exitCode = -1;
 			Log.error("Failed", ioe);	
 		} finally {
-			Utils.recursiveDelete(tempData);
+			if (!localMode) {
+				Utils.recursiveDelete(tempData);
+			}
 		}
 		return exitCode;
 	}
