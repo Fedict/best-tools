@@ -210,7 +210,7 @@ public abstract class AbstractXMLReader<T> implements BestReader {
 		}	
 		LOG.log(Level.INFO, "Reading {0}", file);
 	
-		FAC.configureForSpeed();
+		FAC.configureForLowMemUsage();
 		
 		try {
 			// not in try-resourcese, input/reader must be closed in stream iterator
