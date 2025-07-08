@@ -34,7 +34,7 @@ import java.util.Map;
  * @author Bart Hanssens
  */
 public abstract class BestNamedObject extends BestObject {
-	private Map<String,String> names = new HashMap<>();
+	private Map<String,String> names = new HashMap<>(4);
 
 
 	public Map<String,String> getNames() {
