@@ -221,7 +221,7 @@ public abstract class AbstractXMLReader<T> implements BestReader {
 			// to Java 8 stream
 			Iterator<T> iter = getIterator(reader);
 			Spliterator<T> split = Spliterators.spliteratorUnknownSize(iter, Spliterator.IMMUTABLE);
-			return StreamSupport.stream(split, true);
+			return StreamSupport.stream(split, false);
 		} catch (XMLStreamException|IOException ex) {
 			closeReader();
 			LOG.log(Level.SEVERE, "Error parsing XML", ex);
