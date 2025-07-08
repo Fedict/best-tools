@@ -105,7 +105,7 @@ public class BestWriterCSVEmptyStreets extends BestWriterCSV {
 
 	@Override
 	public Map<String, String[]> writeMunicipalityParts(BestRegion region, Path outdir, Stream<Municipality> cityParts) {
-		return Collections.EMPTY_MAP;
+		return Collections.emptyMap();
 	}
 
 	@Override
