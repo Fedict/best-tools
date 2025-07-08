@@ -193,7 +193,7 @@ public class Main implements QuarkusApplication {
 			sftp.download(fileName, localFile);
 			
 			verifier.verify(localFile);
-
+	
 			zipFileOAVLG = Files.createTempFile(tempData, "oa", "vlg");			
 			zipFileOABRU = Files.createTempFile(tempData, "oa", "bru");
 			zipFileOAWAL = Files.createTempFile(tempData, "oa", "wal");
@@ -225,7 +225,7 @@ public class Main implements QuarkusApplication {
 			sftp.upload(zipFileEs.toString(), uploadPath + emptystreetFile);
 	
 			Log.infof("Done (OK) %s", fileName);
-		} catch (IOException ioe) {
+		} catch (Exception ioe) {
 			exitCode = -1;
 			Log.error("Failed", ioe);	
 		} finally {
