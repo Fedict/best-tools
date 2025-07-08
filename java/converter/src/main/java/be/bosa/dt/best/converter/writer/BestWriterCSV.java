@@ -81,7 +81,7 @@ public class BestWriterCSV implements BestWriter {
 	 */
 	protected <T> void write(Path file, String[] header, Stream<T> lines, Function<T, String[]> func, boolean quotes) {
 		LOG.log(Level.INFO, "Writing {0}", file);
-		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(file))) {
+		try (CSVWriter w = new CSVWriter(Files.newBufferedWriter(file)); lines) {
 			w.writeNext(header, quotes);
 			lines.forEach(s -> w.writeNext(func.apply(s), quotes));
 		} catch (IOException ioe) {
