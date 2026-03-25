@@ -31,6 +31,9 @@ package be.bosa.dt.best.dao;
  * @author Bart Hanssens
  */
 public class Geopoint {
+	public final static String CRS_L72 = "31370";
+	public final static String CRS_L08 = "3812";
+
 	private double x;
 	private double y;
 	private String srs;
@@ -99,14 +102,19 @@ public class Geopoint {
 		if (xy == null || !xy.contains(" ")) {
 			throw new NumberFormatException("Not a valid X Y coordinate string");
 		}
-		if (!srs.endsWith("31370")) {
-			throw new NumberFormatException("Not Lambert 72 projection");
+		if (!srs.endsWith(CRS_L72) || !srs.endsWith(CRS_L08)) {
+			throw new NumberFormatException("Not a Lambert 72 or 2008 projection");
 		}
 		String[] coords = xy.split(" ");
 		this.x = Double.parseDouble(coords[0]);
 		this.y = Double.parseDouble(coords[1]);
-		this.srs = "31370";
-	}		
+		
+		if (srs.endsWith(CRS_L72)) {
+			this.srs = CRS_L72;
+		} else if(srs.endsWith(CRS_L08)) {
+			this.srs = CRS_L08;
+		}
+	}
 	
 	/**
 	 * Constructor
