@@ -4,7 +4,7 @@
     <parent>
         <groupId>be.bosa.dt</groupId>
         <artifactId>best</artifactId>
-        <version>1.5.1</version>
+        <version>1.6.0</version>
     </parent>
     <groupId>be.bosa.dt.best</groupId>
     <artifactId>unzip</artifactId>
@@ -14,7 +14,7 @@
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
     <name>BeSt unzip utility</name>
-    <version>1.5.1</version>
+    <version>1.6.0</version>
     <dependencies>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -24,7 +24,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.19.0</version>
+            <version>2.21.0</version>
         </dependency>
     </dependencies>
     <description>Belgian Streets and Addresses unzip utility</description>
@@ -33,12 +33,12 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>2.0.0</version>
+                <version>2.7.1</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.2</version>
+                <version>3.5.0</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -51,7 +51,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.6.2</version>
                 <configuration>
                     <createDependencyReducedPom>true</createDependencyReducedPom>
                     <filters>
