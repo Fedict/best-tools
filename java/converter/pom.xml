@@ -11,8 +11,7 @@
     <version>1.6.1</version>
     <packaging>jar</packaging>
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
     </properties>
     <name>BeSt converters</name>
     <description>Belgian Streets and Addresses converter (XML to other formats)</description>
