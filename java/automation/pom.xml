@@ -4,24 +4,24 @@
     <parent>
         <groupId>be.bosa.dt</groupId>
         <artifactId>best</artifactId>
-        <version>1.6.0</version>
+        <version>1.6.1</version>
     </parent>
     <groupId>be.bosa.dt.best</groupId>
     <artifactId>automation</artifactId>
     <packaging>jar</packaging>
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
     <name>BeSt automation</name>
-    <version>1.6.0</version>
+    <version>1.6.1</version>
     <description>Webservice / tool to automate copying and transforming BeSt data</description>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-bom</artifactId>
-                <version>3.32.3</version>
+                <version>3.37.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -67,7 +67,7 @@
             <plugin>
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
-                <version>3.32.3</version>
+                <version>3.37.0</version>
                 <executions>
                     <execution>
                         <goals>
