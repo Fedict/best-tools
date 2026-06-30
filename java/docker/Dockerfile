@@ -2,7 +2,7 @@
 
 # start with downloading / converting data and compiling latest sources
 
-FROM maven:3-openjdk-17-slim as builder
+FROM maven:3-openjdk-25-slim as builder
 MAINTAINER bart.hanssens@bosa.fgov.be
 
 ARG version=1.2.9

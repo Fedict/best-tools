@@ -102,8 +102,11 @@ public class Geopoint {
 		if (xy == null || !xy.contains(" ")) {
 			throw new NumberFormatException("Not a valid X Y coordinate string");
 		}
-		if (!srs.endsWith(CRS_L72) || !srs.endsWith(CRS_L08)) {
-			throw new NumberFormatException("Not a Lambert 72 or 2008 projection");
+		if (srs == null ||srs.isBlank()) {
+			throw new NumberFormatException("SRS is null or empty");
+		}
+		if (!(srs.endsWith(CRS_L72) || srs.endsWith(CRS_L08))) {
+			throw new NumberFormatException("Not a Lambert 72 or 2008 projection: " + srs);
 		}
 		String[] coords = xy.split(" ");
 		this.x = Double.parseDouble(coords[0]);

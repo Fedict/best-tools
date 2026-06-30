@@ -122,7 +122,7 @@ public class AddressReader extends AbstractXMLReader<Address> {
 						try {
 							obj.getPoint().setXY(txt, srs);
 						} catch (NumberFormatException nfe) {
-							LOG.log(Level.WARNING, "Error geoposition {0} for {1} ", new Object[]{ nfe, obj.getId()});
+							LOG.log(Level.WARNING, "Error geoposition {0} for {1} ", new Object[]{ nfe.getMessage(), obj.getId()});
 						}
 					} else if (el.equals(VALID_FROM)) {
 						String txt = reader.getElementText();
