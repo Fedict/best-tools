@@ -30,6 +30,7 @@ import be.bosa.dt.best.dao.BestRegion;
 import be.bosa.dt.best.dao.Municipality;
 import be.bosa.dt.best.dao.Postal;
 import be.bosa.dt.best.dao.Street;
+import java.io.IOException;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.proj4j.ProjCoordinate;
@@ -98,15 +100,27 @@ public class BestWriterCSVOpenAddresses extends BestWriterCSV {
 			String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[3]);
 
 			ProjCoordinate src = new ProjCoordinate(s.getPoint().getX(), s.getPoint().getY());
-			ProjCoordinate dest = new ProjCoordinate();
-
-			L72_TO_WGS84.transform(src, dest);
+			ProjCoordinate l72 = new ProjCoordinate();
+			ProjCoordinate wgs84 = new ProjCoordinate();
+			
+			String srs = s.getPoint().getSrs();
+			
+			if (srs == null || srs.isEmpty()) {
+				throw new IllegalArgumentException("Missing SRS");
+			}
+			// check if coordinate is non-zero Lambert 2008
+			if (srs.endsWith("3812") && (src.x > 0.01 && src.y > 0.01)) {
+				L08_TO_L72.transform(src, l72);
+			} else {
+				l72.setValue(src.x, src.y);
+			}
+			L72_TO_WGS84.transform(l72, wgs84);
 
 			return new String[]{
-				String.format(Locale.US, "%.5f", s.getPoint().getX()),
-				String.format(Locale.US, "%.5f", s.getPoint().getY()),
-				String.format(Locale.US, "%.5f", dest.y),
-				String.format(Locale.US, "%.5f", dest.x),
+				String.format(Locale.US, "%.5f", l72.x),
+				String.format(Locale.US, "%.5f", l72.y),
+				String.format(Locale.US, "%.5f", wgs84.y),
+				String.format(Locale.US, "%.5f", wgs84.x),
 				s.getId(), s.getBox(), s.getNumber(),
 				s.getCity().getId(), cCities[2], cCities[1], cCities[0],
 				s.getPostal().getId(), 
