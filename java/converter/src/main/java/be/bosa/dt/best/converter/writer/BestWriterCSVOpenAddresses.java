@@ -27,6 +27,7 @@ package be.bosa.dt.best.converter.writer;
 
 import be.bosa.dt.best.dao.Address;
 import be.bosa.dt.best.dao.BestRegion;
+import be.bosa.dt.best.dao.Geopoint;
 import be.bosa.dt.best.dao.Municipality;
 import be.bosa.dt.best.dao.Postal;
 import be.bosa.dt.best.dao.Street;
@@ -109,7 +110,7 @@ public class BestWriterCSVOpenAddresses extends BestWriterCSV {
 				throw new IllegalArgumentException("Missing SRS");
 			}
 			// check if coordinate is non-zero Lambert 2008
-			if (srs.endsWith("3812") && (src.x > 0.01 && src.y > 0.01)) {
+			if (srs.endsWith(Geopoint.CRS_L08) && (src.x > 0.01 && src.y > 0.01)) {
 				L08_TO_L72.transform(src, l72);
 			} else {
 				l72.setValue(src.x, src.y);
