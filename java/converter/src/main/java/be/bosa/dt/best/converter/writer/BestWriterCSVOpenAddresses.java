@@ -85,7 +85,7 @@ public class BestWriterCSVOpenAddresses extends BestWriterCSV {
 
 		Map<String, Map<String, String[]>> cache = new HashMap<>();
 		String[] header = { 
-			"EPSG:31370_x","EPSG:31370_y",
+			"EPSG:3812_x","EPSG:3812_y",
 			"EPSG:4326_lat","EPSG:4326_lon",
 			"address_id","box_number","house_number",
 			"municipality_id","municipality_name_de","municipality_name_fr","municipality_name_nl",
@@ -100,8 +100,7 @@ public class BestWriterCSVOpenAddresses extends BestWriterCSV {
 			String[] cStreet = streets.getOrDefault(s.getStreet().getId(), new String[3]);
 			String[] cPostal = postals.getOrDefault(s.getPostal().getId(), new String[3]);
 
-			ProjCoordinate src = new ProjCoordinate(s.getPoint().getX(), s.getPoint().getY());
-			ProjCoordinate l72 = new ProjCoordinate();
+			ProjCoordinate src = new ProjCoordinate(s.getPoint().getX(), s.getPoint().getY());;
 			ProjCoordinate wgs84 = new ProjCoordinate();
 			
 			String srs = s.getPoint().getSrs();
@@ -109,17 +108,11 @@ public class BestWriterCSVOpenAddresses extends BestWriterCSV {
 			if (srs == null || srs.isEmpty()) {
 				throw new IllegalArgumentException("Missing SRS");
 			}
-			// check if coordinate is non-zero Lambert 2008
-			if (srs.endsWith(Geopoint.CRS_L08) && (src.x > 0.01 && src.y > 0.01)) {
-				L08_TO_L72.transform(src, l72);
-			} else {
-				l72.setValue(src.x, src.y);
-			}
-			L72_TO_WGS84.transform(l72, wgs84);
+			L08_TO_WGS84.transform(src, wgs84);
 
 			return new String[]{
-				String.format(Locale.US, "%.5f", l72.x),
-				String.format(Locale.US, "%.5f", l72.y),
+				String.format(Locale.US, "%.5f", src.x),
+				String.format(Locale.US, "%.5f", src.y),
 				String.format(Locale.US, "%.5f", wgs84.y),
 				String.format(Locale.US, "%.5f", wgs84.x),
 				s.getId(), s.getBox(), s.getNumber(),

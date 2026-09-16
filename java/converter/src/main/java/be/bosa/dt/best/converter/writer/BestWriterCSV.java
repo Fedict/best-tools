@@ -65,25 +65,12 @@ public class BestWriterCSV implements BestWriter {
 		F.createFromParameters("WGS84t", "+proj=longlat +a=6378137.0 +b=6356752.31425 "
 				+ "+towgs84=0.0546,0.05018,-0.1035,0.00292,0.01764,-0.02851,0.00334");
 
-	protected static final CoordinateReferenceSystem L72 =
-		F.createFromParameters("L72",
-				"+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 "
-				+ "+x_0=150000.013 +y_0=5400088.438 +ellps=intl "
-				+ "+nadgrids=bd72lb72_etrs89lb08.gsb "
-				+ "+units=m +no_defs");
-
 	protected static final CoordinateReferenceSystem L08 = F.createFromName("epsg:3812");
-
-	protected static final BasicCoordinateTransform L08_TO_L72 = 
-		new BasicCoordinateTransform(L08, L72);
-
-	protected static final BasicCoordinateTransform L72_TO_WGS84 =
-		new BasicCoordinateTransform(L72, WGS84t);
 		
 	protected static final BasicCoordinateTransform L08_TO_WGS84 =
 		new BasicCoordinateTransform(L08, WGS84t);
 		
-		
+
 	/**
 	 * Write a series of Best object to a file
 	 *
@@ -206,9 +193,7 @@ public class BestWriterCSV implements BestWriter {
 			ProjCoordinate src = new ProjCoordinate(a.getPoint().getX(), a.getPoint().getY());
 			ProjCoordinate dest = new ProjCoordinate();
 
-			if (a.getPoint().getSrs().equals(Geopoint.CRS_L72)) { 
-				L72_TO_WGS84.transform(src, dest);
-			} else {
+			if (a.getPoint().getSrs().equals(Geopoint.CRS_L08)) { 
 				L08_TO_WGS84.transform(src, dest);
 			}
 
