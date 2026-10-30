@@ -37,7 +37,6 @@ These files are also used by OpenAddresses.io
 |streetname_nl|name of the street in Dutch, if available|
 |region_code|region code|
 |status|status of the address|
-|-----|----|
 
 ## Streets with at least one address, per postal code
 
